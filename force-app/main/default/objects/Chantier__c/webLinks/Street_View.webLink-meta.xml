@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Street_View</fullName>
+    <availability>online</availability>
+    <description>Affiche la position Street View du Chantier</description>
+    <displayType>button</displayType>
+    <linkType>javascript</linkType>
+    <masterLabel>Street View</masterLabel>
+    <openType>onClickJavaScript</openType>
+    <protected>false</protected>
+    <url>var streetViewURL = &apos;/apex/VF002_StreetView?address={!JSENCODE(Chantier__c.rue__c)} {!JSENCODE(Chantier__c.codePostal__c)} {!JSENCODE(Chantier__c.ville__c)}&amp;x={!VALUE(TEXT(Chantier__c.x__c))}&amp;y={!VALUE(TEXT(Chantier__c.y__c))}&apos;;
+
+if (typeof(srcUp) == &apos;function&apos;) {
+    srcUp(streetViewURL);
+} else if( (typeof sforce != &apos;undefined&apos;) &amp;&amp; (sforce != null) ) {
+	// Salesforce1 navigation
+	sforce.one.navigateToURL(streetViewURL);
+} else {
+	// Set the window&apos;s URL using a Visualforce expression
+	window.open(streetViewURL, &apos;Street_View&apos;, &apos;menubar=no, status=no, scrollbars=no, menubar=no, width=1024, height=768&apos;);
+}</url>
+</WebLink>

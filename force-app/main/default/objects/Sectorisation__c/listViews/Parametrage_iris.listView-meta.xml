@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Parametrage_iris</fullName>
+    <columns>NAME</columns>
+    <columns>codeRegion__c</columns>
+    <columns>libelleRegion__c</columns>
+    <columns>codeDV__c</columns>
+    <columns>libelleDV__c</columns>
+    <columns>codeMagasin__c</columns>
+    <columns>libelleMagasin__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>IRIS__c</field>
+        <operation>equals</operation>
+        <value>580790101</value>
+    </filters>
+    <label>Parametrage iris</label>
+    <language>fr</language>
+</ListView>

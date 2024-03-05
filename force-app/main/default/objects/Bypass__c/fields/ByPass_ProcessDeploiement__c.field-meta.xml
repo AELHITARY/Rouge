@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ByPass_ProcessDeploiement__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>CGI - FSL : Paramètre personnalisé permettant de bypasser les PB : WO,Gestion cycle de vie,RessourcesAssignees de manière individualisée.</description>
+    <externalId>false</externalId>
+    <label>ByPass_ProcessDeploiement</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

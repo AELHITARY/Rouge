@@ -1,0 +1,30 @@
+<apex:component >
+<style>
+ .progressBar{
+     background-color: #f8f8f8;
+     border:1px solid #DDDDDD;
+     height: 19px;
+     width: 300px;
+     -moz-border-radius: 5px; 
+     -webkit-border-radius: 5px;
+ }
+.progress{
+    background-color: #F7B64B;
+    border:1px solid #E78F08; 
+    height: 100%;
+    margin: -1px;
+    text-align: center;
+    -moz-border-radius: 5px; 
+    -webkit-border-radius: 5px;
+    line-height: 18px;
+}
+</style>
+ <apex:attribute name="percentComplete" description="Batch percent to Complete" type="String" required="true"/>
+ <apex:attribute name="status" description="Treatment Status" type="String" required="true"/>
+
+<apex:outputPanel id="loadingBar"  styleClass="progressBar">
+				<span class="progress" style="width: {!percentComplete}%;">
+				{!percentComplete}% &nbsp;{!status}
+				</span>
+</apex:outputPanel> 
+</apex:component>

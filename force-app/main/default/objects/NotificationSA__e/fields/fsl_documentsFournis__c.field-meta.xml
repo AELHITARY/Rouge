@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>fsl_documentsFournis__c</fullName>
+    <description>CGI - FSL : Avis d&apos;imposition sur le revenu
+Chèque annulé
+Num Pièce d&apos;identité (Perm.Cond, CI, Passeport)	
+Relevé d&apos;identité bancaire	
+Bulletin de salaire	
+Attestation TVA</description>
+    <externalId>false</externalId>
+    <isFilteringDisabled>false</isFilteringDisabled>
+    <isNameField>false</isNameField>
+    <isSortingDisabled>false</isSortingDisabled>
+    <label>Documents fournis</label>
+    <length>131000</length>
+    <type>LongTextArea</type>
+    <visibleLines>10</visibleLines>
+</CustomField>

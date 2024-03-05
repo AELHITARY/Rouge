@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>publicSharing__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>CRM-279 : Flag permetttant de savoir si l&apos;enregistrement est déjà public</description>
+    <externalId>false</externalId>
+    <label>Enregistrement public</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

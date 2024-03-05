@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>employmentContractType__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Type de contrat de travail</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>NRV10GridRevision__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>workingContract</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>NRV10GridRevision__c</referenceTo>
+    <relationshipLabel>Contrats de rémunération</relationshipLabel>
+    <relationshipName>Contrats_de_r_mun_ration</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FinancialCharge</fullName>
+    <fields>Name</fields>
+    <fields>date__c</fields>
+    <fields>amount__c</fields>
+    <fields>reason__c</fields>
+    <fields>type__c</fields>
+    <label>Charge financière</label>
+</CompactLayout>

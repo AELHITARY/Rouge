@@ -1,0 +1,246 @@
+<apex:page standardcontroller="Case" extensions="Ctrl_CaseActions" showquickactionvfheader="true">
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <apex:includescript value="/support/console/40.0/integration.js" />
+
+    <script type="text/javascript">
+        var j$ = jQuery.noConflict();
+        var tabId = '';
+        var tabPrimaryId = '';
+        var tabLink;
+
+        // CONSOLE : Here evaluating a tab ID
+        var readTabId = function(result){
+            tabId = result.id;
+            sforce.console.getTabLink(sforce.console.TabLink.SALESFORCE_URL, tabId, showTabLink);
+        };// CONSOLE : Here evaluating a parent tab ID
+        var readPrimaryTabId = function(result){
+            tabPrimaryId = result.id;
+        };
+        var showTabLink = function showTabLink(result) {
+            tabLink = result.tabLink;
+        };
+
+        // CONSOLE : Report whether refreshing the tab was successful
+        var refreshSuccess = function refreshSuccess(result) {
+            if (result.success == true) {
+                rerenderEscalationAction();
+            } else {
+                rerenderEscalationAction();
+            }
+        };
+
+        // Page Init
+        j$(document).ready(function() {
+            if(sforce.console.isInConsole()) {
+                sforce.console.getEnclosingTabId(readTabId);
+                sforce.console.getEnclosingPrimaryTabId(readPrimaryTabId);
+            }
+        });
+
+        // Refresh the page
+        function refreshFeed() {
+            if(j$('[id$=error-messages]').length == "0") {
+                // Refresh the record after update
+                if(sforce.console.isInConsole()) {
+                    //sforce.console.refreshSubtabById(tabId, false, refreshSuccess, false);
+                    //sforce.console.refreshPrimaryTabById(tabPrimaryId, true, refreshSuccess);
+                    sforce.console.closeTab(tabPrimaryId);
+                    //sforce.console.reopenLastClosedTab(refreshSuccess);
+                    sforce.console.openPrimaryTab(null , tabLink, true, '', null);
+                } else
+                    window.top.location = '/{!case.id}';
+            }
+            return false;
+        }
+
+    </script>
+    
+    <style type="text/css">
+        /* ALERT */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+
+        .alert-info {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+        }
+
+        .alert-warning {
+            color: #8a6d3b;
+            background-color: #fcf8e3;
+            border-color: #faebcc;
+        }
+
+        .alert-danger {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+
+        .alert-text {
+            margin-bottom: 20px;
+        }
+
+        .alert-text-success {
+            color: #3c763d;
+        }
+
+        .alert-text-info {
+            color: #31708f;
+        }
+
+        .alert-text-warning {
+            color: #8a6d3b;
+        }
+
+        .alert-text-danger {
+            color: #a94442;
+        }
+
+        /* BODY */
+        .panel-custom.alignTop {
+            border-bottom: 0;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            -moz-border-radius: 3px 3px 0 0;
+        }
+
+        .panel-custom {
+            border: 1px solid #c7ccce;
+            background-color: #fff;
+            background-repeat: repeat-x;
+            width: auto;
+            height: auto;
+        }
+
+        .panel-custom .panel-body {
+            margin-top: 10px;
+            padding-top: 0;
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-bottom: 10px;
+            white-space: normal;
+        }
+
+        .bottom-bar {
+            padding: 9px;
+            height: 30px;
+            background: #f5f6f6;
+            border: 1px solid #c7ccce;
+            border-top: none;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .bottom-bar-right {
+            float: right;
+        }
+
+        .bottom-bar-left {
+            float: left;
+            width: 80%;
+        }
+
+        /* BUTTON */
+        .zen-btn {
+            color: #222;
+            border: 1px solid #c3c3c3;
+            border-color: #c3c3c3 #aaa #909090;
+            font-size: .917em;
+            font-weight: bold;
+            text-decoration: none;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            background: #f0f0f0;
+            background: -moz-linear-gradient(#fff,#f0f0f0);
+            background: -webkit-linear-gradient(#fff,#f0f0f0);
+            background: -ms-linear-gradient(#fff,#f0f0f0);
+            padding: 3px 6px;
+            overflow: visible;
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            padding: 2px 3px;
+            margin: 1px;
+        }
+
+        .zen-highlightBtn {
+            font-family: Arial;
+            font-size: 1.08em;
+            background-color: #8ab529;
+            border: 1px solid #6c8049;
+            background-image: -ms-linear-gradient(top,#8AB529 0,#87AC31 100%);
+            background-image: -moz-linear-gradient(top,#8AB529 0,#87AC31 100%);
+            background-image: -webkit-linear-gradient(top,#8AB529 0,#87AC31 100%);
+            background-image: linear-gradient(top,#8AB529 0,#87AC31 100%);
+            display: inline-block;
+            padding-top: 0;
+            padding-bottom: 1px;
+            padding-left: 10px;
+            padding-right: 10px;
+            height: 30px;
+            color: #fff;
+            -moz-border-radius: 3px;
+            border-radius: 2px;
+            -moz-box-shadow: 0 1px 2px 0 #adadad;
+            -webkit-box-shadow: 0 1px 2px 0 #adadad;
+            box-shadow: 0 1px 2px 0 #adadad;
+            margin: 0;
+        }
+
+        .zen-btn.zen-highlightBtn:hover, .zen-btn.zen-highlightBtn.onHover {
+            background-color: #a0cb3d;
+            background-image: -ms-linear-gradient(top,#a5cd48 0,#97bf3a 100%);
+            background-image: -moz-linear-gradient(top,#a5cd48 0,#97bf3a 100%);
+            background-image: -webkit-linear-gradient(top,#a5cd48 0,#97bf3a 100%);
+            background-image: linear-gradient(top,#a5cd48 0,#97bf3a 100%);
+        }
+
+        .zen-highlightBtn:active {
+            background-color: #769b24;
+            background-image: -ms-linear-gradient(top,#7ba229 0,#8ab237 100%);
+            background-image: -moz-linear-gradient(top,#7ba229 0,#8ab237 100%);
+            background-image: -webkit-linear-gradient(top,#7ba229 0,#8ab237 100%);
+            background-image: linear-gradient(top,#7ba229 0,#8ab237 100%);
+        }
+
+        .zen-highlightBtn:focus {
+            background-color: #8ab529;
+            background-image: -ms-linear-gradient(top,#8AB529 0,#87AC31 100%);
+            background-image: -moz-linear-gradient(top,#8AB529 0,#87AC31 100%);
+            background-image: -webkit-linear-gradient(top,#8AB529 0,#87AC31 100%);
+            background-image: linear-gradient(top,#8AB529 0,#87AC31 100%);
+        }
+
+        .zen-btn.zen-highlightBtn[disabled] {
+            -webkit-appearance: none;
+            background: #dcdfe0;
+            color: #fff;
+            border: 1px solid #c7ccce;
+            -moz-box-shadow: none;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
+    </style>
+        
+    <apex:form >
+        <apex:actionfunction action="{!renvoyerNotificationReseau}" name="actionExecute" rerender="out" oncomplete="refreshFeed();" />
+            <span class="publisherShareButtonPlaceholder">
+                <input id="publisherExecuteButton" value="Renvoyer une notification au réseau" class="zen-btn zen-highlightBtn" name="publisherExecuteButton"
+                       onclick="j$('[id$=error-messages]').addClass('hidden'); j$('[id$=publisherExecuteButton]').prop('disabled', true); actionExecute();" title="Renvoyer une notification au réseau" type="button" />
+            </span>
+    </apex:form>
+</apex:page>

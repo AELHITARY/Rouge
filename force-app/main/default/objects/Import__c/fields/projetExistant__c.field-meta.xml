@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>projetExistant__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+OR(
+  !ISPICKVAL(materiauxCoulissant__c, &apos;&apos;),
+  !ISPICKVAL(materiauxFenetre__c, &apos;&apos;),
+  !ISPICKVAL(materiauxMoustiquaire__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPersienne__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPortail__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPorteBlindee__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPorteEntree__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPorteInterieur__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPorteGarage__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPorteService__c, &apos;&apos;),
+  !ISPICKVAL(materiauxPorteFenetre__c, &apos;&apos;),
+  !ISPICKVAL(materiauxIsolationCombles__c, &apos;&apos;),
+  AND(!ISPICKVAL(materiauxStoreBanne__c, &apos;&apos;), !ISPICKVAL(materiauxStoreBanne__c, &apos;Aucun&apos;)),
+  !ISPICKVAL(materiauxVoletBattant__c, &apos;&apos;),
+  !ISPICKVAL(materiauxVoletRoulant__c, &apos;&apos;),
+  !ISNULL(quantiteCoulissant__c),
+  !ISNULL(quantiteFenetre__c),
+  !ISNULL(quantiteMoustiquaire__c),
+  !ISNULL(quantitePersienne__c),
+  !ISNULL(quantitePortail__c),
+  !ISNULL(quantitePorteBlindee__c),
+  !ISNULL(quantitePorteEntree__c),
+  !ISNULL(quantitePorteInterieur__c),
+  !ISNULL(quantitePorteGarage__c),
+  !ISNULL(quantitePorteService__c),
+  !ISNULL(quantitePorteFenetre__c),
+  !ISNULL(quantiteStoreBanne__c),
+  !ISNULL(quantiteVoletBattant__c),
+  !ISNULL(quantiteVoletRoulant__c),
+  !ISNULL(quantiteIsolationCombles__c)
+),
+True, False)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Projet existant</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

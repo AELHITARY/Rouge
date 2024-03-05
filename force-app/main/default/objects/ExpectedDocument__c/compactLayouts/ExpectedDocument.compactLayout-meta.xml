@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ExpectedDocument</fullName>
+    <fields>Name</fields>
+    <fields>expectedBy__c</fields>
+    <fields>type__c</fields>
+    <fields>document__c</fields>
+    <label>Document attendu</label>
+</CompactLayout>

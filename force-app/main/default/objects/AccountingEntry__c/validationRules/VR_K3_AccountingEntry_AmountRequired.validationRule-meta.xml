@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingEntry_AmountRequired</fullName>
+    <active>true</active>
+    <description>Montant obligatoire. Si RT = ‘BankRemittance’ Alors &gt; 0
+Sinon Si RT = ‘BankRemittanceCancellation’ ou ‘Unpaid’ ou ‘BankFees’ Alors &lt; 0
+Sinon différent 0 (sauf pour Balance qui avoir n’importe quelle valeur)</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+isLegacy__c == false &amp;&amp;
+(
+				ISNULL( amount__c ) ||
+				amount__c == 0 ||
+    (
+				    ( RecordType.DeveloperName == &apos;BankRemittance&apos; &amp;&amp; amount__c &lt;= 0 ) ||
+				    ( (RecordType.DeveloperName == &apos;BankRemittanceCancellation&apos; || RecordType.DeveloperName == &apos;Unpaid&apos; || RecordType.DeveloperName == &apos;BankFees&apos;) &amp;&amp; amount__c &gt;= 0 ) 
+    )
+)</errorConditionFormula>
+    <errorDisplayField>amount__c</errorDisplayField>
+    <errorMessage>Montant obligatoire ou invalide!</errorMessage>
+</ValidationRule>

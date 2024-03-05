@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_CodeDV</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(LEN(Code_DV__c ) &lt; 3, 
+    !CONTAINS($Profile.Name, &apos;K/K - DV&apos;), 
+    $User.ByPassValidationRule__c = FALSE)</errorConditionFormula>
+    <errorDisplayField>Code_DV__c</errorDisplayField>
+    <errorMessage>Le Code DV doit contenir 3 trois caractères</errorMessage>
+</ValidationRule>

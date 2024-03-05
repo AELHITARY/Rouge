@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DateFinValidite__c</fullName>
+    <description>Ce champ est utilisé pour connaître la période de validité dun tarif. Il a un impact sur le champ &quot;Actif__c&quot;. Seuls les records de tarif actifs sont utilisés par les quotes CPQ.</description>
+    <externalId>false</externalId>
+    <label>Date de fin de validité</label>
+    <required>true</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

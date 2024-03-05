@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Objectif_CA_S2</fullName>
+    <active>true</active>
+    <description>Chiffre d&apos;affaire semaine 2 toujours positif</description>
+    <errorConditionFormula>chiffreAffaireVenduS2__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>chiffreAffaireVenduS2__c</errorDisplayField>
+    <errorMessage>Vous devez saisir une valeur positive !</errorMessage>
+</ValidationRule>

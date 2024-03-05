@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>salesrate__c</fullName>
+    <externalId>false</externalId>
+    <label>Taux de vente</label>
+    <referenceTo>NRV10RemunerationRate__c</referenceTo>
+    <relationshipLabel>Taux de produits</relationshipLabel>
+    <relationshipName>Taux_de_produits</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

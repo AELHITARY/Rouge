@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <description>Configuration des panneaux dans les pages de détail ou édition pour les objets</description>
+    <enableFeeds>false</enableFeeds>
+    <label>Configuration panneaux objets</label>
+    <visibility>Protected</visibility>
+</CustomObject>

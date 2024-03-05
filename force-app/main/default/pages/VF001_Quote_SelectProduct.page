@@ -1,0 +1,210 @@
+<apex:page standardController="Quote" extensions="Ctrl001_Quote_SelectProduct" action="{!initPSS}">
+    <style>
+        .selectButtons{text-align: center;margin-bottom: 1em;}
+        .searchContent{padding:0 5px 15px; background:url("/img/alohaSkin/bPageBlock_gradient.png") repeat-x scroll 0 0 #F2F2F2;border-bottom: 1px solid #999;}
+        .searchTitle{color: black;font-size: 1.2em;white-space: nowrap;font-family: Arial, Helvetica, sans-serif;}
+        .relatedListsearchHeader{border-bottom: 1px solid #999;margin-bottom: 10px;padding-bottom: 6px;}
+        .pSearchShowMore{font-size: .95em;text-align: center;white-space: nowrap;margin-top: .3em;}
+        .searchFilterFields { background: 0 none;border: 1px solid #D6D6D6;padding: 10px 0;margin: 20px 0 0;
+                                border-top-left-radius: 4px;border-top-right-radius: 4px;}
+        .relatedListsearchHeader {border-top: 1px solid #999999;}
+        /*table#filterTable {width: 50% !important;}*/
+        span.inputTitle { font-weight: bold}
+        .MoreFilter{color: #015BA7;line-height: 1.6em;text-decoration: none;white-space: nowrap;}
+        .searchFilterFields td input[type="text"] {margin-top: 1px;}
+    </style>
+
+    <apex:sectionHeader title="Devis {!Quote.Name}" subtitle="Sélection du produit"/>
+    <div class="bOverviewSearch"><div class="view">Entrez votre mot-clé et vos critères de filtre, puis cliquez sur Rechercher pour commencer la recherche. Cliquez sur Plus de filtres pour utiliser plusieurs filtres. Les résultats de recherche tiennent compte de tous les enregistrements qui correspondent à la fois au mot-clé et aux filtres.</div><div class="messages"></div></div>
+    <apex:pageMessages />
+    <apex:form id="myForm">
+        <span id="selectedIds"><apex:inputHidden value="{!selectedIds}" /></span>
+        <span id="showMoreFilters"><apex:inputHidden value="{!showMoreFilters}" /></span>
+        <apex:actionFunction action="{!addToQuote}" name="addToQuote"/>
+        <apex:actionFunction action="{!cancel}" name="returnQuote"/>
+
+        <div class="selectButtons">
+            <input type="button" class="btn addToQuoteBTN" id="addToQuoteBTN" value="Sélectionner" title="Sélectionner" />
+            &nbsp;
+            <input type="button" class="btn" id="cancel" onclick="returnQuote();" value="Annuler" title="Annuler" />
+        </div>
+
+        <apex:pageBlock mode="edit">
+            <apex:facet name="header">
+                <apex:outputPanel layout="block" styleClass="searchContent">
+                    <div class="searchTitle"><h3>Rechercher des produits [{!productListSetCtrl.ResultSize}]</h3></div>
+                    <table class="searchFilterFields">
+                        <tbody>
+                            <tr>
+                                <td class="keywordElement" style="width:5%">
+                                    <span class="inputTitle">Par mot-clé</span>
+                                    <br/>
+                                    <apex:inputText value="{!keyword}" size="20" title="Rechercher"/>
+                                    <br/>&nbsp;
+                                </td>
+                                <td>
+                                    <c:Filter filter="{!filter}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <div class="searchFilterButtons productButtons">
+                                        <apex:commandButton value="Rechercher" action="{!search}" onclick="setSql()"  title="Rechercher" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </apex:outputPanel>
+            </apex:facet>
+
+            <apex:outputPanel styleclass="relatedListsearchHeader" id="showmore">
+                <div class="pSearchShowMore">
+                    <apex:image styleClass="prevArrow" value="/img/search_prevarrow.gif" width="5" height="8" rendered="{!productListSetCtrl.HasPrevious}"/>
+                    <apex:commandLink styleClass="pShowMore" value="Page précédente" action="{!productListSetCtrl.Previous}" rendered="{!productListSetCtrl.HasPrevious}"  />
+                    <apex:image styleClass="prevArrow" value="/img/search_prevarrow_disabled.gif" width="5" height="8" rendered="{!NOT(productListSetCtrl.HasPrevious)}"/>
+                    <apex:outputText styleClass="pShowLess noLink" value="Page précédente" rendered="{!NOT(productListSetCtrl.HasPrevious)}"/>
+                    <apex:outputpanel rendered="{!productList.size > 0}" styleClass="itemsRange">({!productListIndex}-{!productListIndex + productList.size - 1})</apex:outputpanel>
+                    <apex:commandLink styleClass="pShowMore" value="Page suivante" action="{!productListSetCtrl.next}" rendered="{!productListSetCtrl.HasNext}"/>
+                    <apex:image styleClass="nextArrow" value="/img/search_nextarrow.gif" width="5" height="8" rendered="{!productListSetCtrl.HasNext}"/>
+                    <apex:outputText styleClass="pShowLess noLink" value="Page suivante" rendered="{!NOT(productListSetCtrl.HasNext)}"/>
+                    <apex:image styleClass="nextArrow" value="/img/search_nextarrow_disabled.gif" width="5" height="8" rendered="{!NOT(productListSetCtrl.HasNext)}"/>
+                </div>
+            </apex:outputPanel>
+
+            <apex:pageBlockTable value="{!productList}" var="product" id="productList">
+                <apex:column width="10px;">
+                    <apex:facet name="header">
+                        <input type="checkbox" id="allBox"/>
+                    </apex:facet>
+                    <apex:repeat value="{!product.PricebookEntries}" var="pbe">
+                        <input type="checkbox" id="{!pbe.id}" name="productChbx" onchange="removeAllCkbx();"/>
+                    </apex:repeat>
+                </apex:column>
+                <apex:repeat value="{!$ObjectType.Product2.FieldSets.VF001_Quote_SelectProduct}" var="f">
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputPanel >
+                                <apex:commandLink action="{!search}" >
+                                    <apex:param value="{!f}" assignTo="{!orderBy}" name="orderBy"/>
+                                    <apex:param value="true" assignTo="{!orderByChange}" name="orderByChange"/>
+                                    <apex:outputText value="{!f.Label}"/>
+                                    <apex:outputPanel rendered="{!AND(orderBy==f,orderByOrder='asc')}">
+                                        <img src="/s.gif" alt="Tri croissant" class="sortAsc" title="Tri croissant"/>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!AND(orderBy==f,orderByOrder='desc')}">
+                                        <img src="/s.gif" alt="Tri décroissant" class="sortDesc" title="Tri décroissant"/>
+                                    </apex:outputPanel>
+                                </apex:commandLink>
+                            </apex:outputPanel>
+                        </apex:facet>
+                        <apex:outputField value="{!product[f]}"/>
+                    </apex:column>
+                </apex:repeat>
+            </apex:pageBlockTable>
+
+            <!-- champs cachés sur la page pour pouvoir les utiliser dans le contrôleur -->
+            <apex:pageBlockSection >
+                <apex:outputText value="{!Quote.Pricebook2Id}" rendered="false"/>
+                <apex:outputText value="{!Quote.OpportunityId}" rendered="false"/>
+                <apex:outputText value="{!Quote.codeCoupon__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.dateDevis__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.referenceDate__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.source__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.QuoteNumber}" rendered="false"/>
+                <apex:outputText value="{!Quote.Opportunity.Owner.CodeMagasin__c}" rendered="false"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+
+        <apex:outputPanel styleclass="relatedListsearchHeader" id="showmore2">
+            <div class="pSearchShowMore">
+                <apex:image styleClass="prevArrow" value="/img/search_prevarrow.gif" width="5" height="8" rendered="{!productListSetCtrl.HasPrevious}"/>
+                <apex:commandLink styleClass="pShowMore" value="Page précédente" action="{!productListSetCtrl.Previous}" rendered="{!productListSetCtrl.HasPrevious}"  />
+                <apex:image styleClass="prevArrow" value="/img/search_prevarrow_disabled.gif" width="5" height="8" rendered="{!NOT(productListSetCtrl.HasPrevious)}"/>
+                <apex:outputText styleClass="pShowLess noLink" value="Page précédente" rendered="{!NOT(productListSetCtrl.HasPrevious)}"/>
+                <apex:outputpanel rendered="{!productList.size > 0}" styleClass="itemsRange">({!productListIndex}-{!productListIndex + productList.size - 1})</apex:outputpanel>
+                <apex:commandLink styleClass="pShowMore" value="Page suivante" action="{!productListSetCtrl.next}" rendered="{!productListSetCtrl.HasNext}"/>
+                <apex:image styleClass="nextArrow" value="/img/search_nextarrow.gif" width="5" height="8" rendered="{!productListSetCtrl.HasNext}"/>
+                <apex:outputText styleClass="pShowLess noLink" value="Page suivante" rendered="{!NOT(productListSetCtrl.HasNext)}"/>
+                <apex:image styleClass="nextArrow" value="/img/search_nextarrow_disabled.gif" width="5" height="8" rendered="{!NOT(productListSetCtrl.HasNext)}"/>
+            </div>
+        </apex:outputPanel>
+
+        <div class="selectButtons">
+            <input type="button" class="btn addToQuoteBTN" id="addToQuoteBTN" value="Sélectionner" title="Sélectionner" />
+            &nbsp;
+            <input type="button" class="btn" id="cancel" onclick="returnQuote();" value="Annuler" title="Annuler" />
+        </div>
+
+        <script type="text/javascript">
+            function removeAllCkbx(){
+                    $("#allBox").removeAttr("checked");
+            }
+            function addRemoveSelectId(a){
+                    if(a.checked && $("#selectedIds input").val().search(a.id) == '-1')
+                            $("#selectedIds input").val($("#selectedIds input").val()+a.id+',');
+                    if(!a.checked && $("#selectedIds input").val().search(a.id) != '-1')
+                            $("#selectedIds input").val($("#selectedIds input").val().replace(a.id+',',''));
+            }
+            function showHideMoreFilters(){
+                    if($("#showMoreFilters input").val()=='true')
+                            $("#showMoreFilters input").val('false');
+                    else
+                            $("#showMoreFilters input").val('true');
+                    showHideMoreFilters2();
+            }
+            function showHideMoreFilters2(){
+                    $("#filterTable tr").each(function(){
+                            if($("#showMoreFilters input").val()=='true' ){
+                                    this.style.display = "block";
+                                    $("#and1").show();
+                                    $("#MoreFilters1").hide();
+                                    $("#MoreFilters4").show();
+                            }
+                            else if(this.rowIndex>1){
+                                    this.style.display = "none";
+                                    $("#and1").hide();
+                                    $("#MoreFilters1").show();
+                                    $("#MoreFilters4").hide();
+                            }
+
+                    });
+            }
+
+            $(document).ready(function()
+            {
+                    $("input[name=productChbx]").each(function()
+                    {
+                            if($("#selectedIds input").val().search(this.id) != '-1')
+                                    this.checked = true;
+                    });
+
+                    //$("#showMoreFilters input").val(!$("#showMoreFilters ").val());
+                    showHideMoreFilters2();
+
+                    $("#allBox").click(function()               {
+                            var checked_status = this.checked;
+                            $("input[name=productChbx]").each(function()
+                            {
+                                    this.checked = checked_status;
+                                    addRemoveSelectId(this);
+                            });
+                    });
+
+                    $("input[name=productChbx]").change(function()
+                    {
+                            addRemoveSelectId(this);
+                    });
+
+                    $(".addToQuoteBTN").click(function()
+                    {
+                            if($("#selectedIds input").val()=='')
+                                    alert('Veuillez sélectionner au moins une ligne');
+                            else
+                                    addToQuote();
+                    });
+            });
+
+        </script>
+    </apex:form>
+</apex:page>

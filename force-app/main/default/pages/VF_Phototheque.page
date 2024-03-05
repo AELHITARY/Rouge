@@ -1,0 +1,530 @@
+<apex:page title="Photothèque" id="Phototheque" showHeader="true" controller="Ctrl_Phototheque" docType="html-5.0" action="{!insertUserStats}" >
+    <meta name="viewport" content="maximum-scale=1.0, user-scalable=no" />
+    <apex:includeScript value="{!URLFOR($Resource.TouchNSwipe, 'template/js/jquery-1.10.0.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.TouchNSwipe, 'template/js/jquery.hammer.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.TouchNSwipe, 'template/js/jquery.mousewheel.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.TouchNSwipe, 'template/js/modernizr.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.TouchNSwipe, 'template/js/TweenMax.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.TouchNSwipe, 'template/js/TouchNSwipe.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.VisualStrap_Resources, 'js/bootstrap.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.colorwheel, 'Raphael-min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.colorwheel, 'colorwheel.js')}" />
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+        
+        /* Initialisation à la page                                                        */
+        /*---------------------------------------------------------------------------------*/
+        $(document).ready(function() {
+            $("#affichage").css("display", "none");
+            if('{!$CurrentPage.parameters.codeproduit}' !='' || '{!$CurrentPage.parameters.quotelineitem}' !=''){
+                getRemoteResult();
+            }
+        });
+
+        /* Fonction effectuant la recherche                                                */
+        /*---------------------------------------------------------------------------------*/
+        function getRemoteResult(){
+            $('[id$=Recherche]')[0].disabled = true;
+            $("#affichage").html(" ");
+            $("#affichage").css("display", "none");
+            // récupération des valeurs entrées
+            if($('[id$=codeproduit]')[0] != null)
+                var codeproduit = addslashes($('[id$=codeproduit]')[0].value);
+            if($('[id$=famille]')[0] != null)
+                var famille = $('[id$=famille]')[0].value;
+            if($('[id$=sousfamille]')[0] != null)
+                var sousfamille = $('[id$=sousfamille]')[0].value;
+            if($('[id$=matiere]')[0] != null)
+                var matiere = $('[id$=matiere]')[0].value;
+            if($('[id$=sousmatiere]')[0] != null)
+                var sousmatiere=$('[id$=sousmatiere]')[0].value;
+
+            var imagesSwipeString='';
+            var imagesThumbString='';
+            var k = 1;
+            var galleryDiv = '';
+
+            if(famille == ''){
+                var errorMessage = 'Vous n\'avez pas renseigné de Famille.<br/>';
+                $("#affichage").append(errorMessage);
+                $("#affichage").css("display", "block");
+                $('[id$=Recherche]')[0].disabled = false;
+            } else {
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_Phototheque.recuperephotos}', codeproduit, famille, sousfamille, matiere, sousmatiere,
+                function(result, event) {
+                    if (event.status) {
+                        if(result != null && result.length > 0 ) {
+                            for (var i in result){
+                                // Ajout de l'image
+                                if ((result[i] != undefined) && (result[i].RROwner != undefined)){
+                                    var urlThumbFile = '/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB120BY90&versionId=' + result[i].RRId;
+                                    var urlFile = '/sfc/servlet.shepherd/version/download/' + result[i].RRId;
+                                    // Génération du contenu pour l'image
+                                    imagesSwipeString += '<li><a href="' + urlFile  + '">';
+                                    imagesSwipeString += '<img src="' + urlThumbFile  + '"/></a>';
+                                    imagesSwipeString += '<div data-elem="imgCaption"> Code : <span class="nColor"><em><strong>';
+                                    imagesSwipeString += replaceSimpleQuotes(result[i].RRCodeProduit);
+                                    imagesSwipeString += '</strong></em></span> - Nom : <span class="nColor"><em><strong>';
+                                    imagesSwipeString += replaceSimpleQuotes(result[i].RRName);
+                                    imagesSwipeString += '</strong></em></span> - Famille : <span class="nColor"><em><strong>';
+                                    imagesSwipeString += replaceSimpleQuotes(result[i].RRFamille);
+                                    imagesSwipeString += '</strong></em></span> - Sous-Famille : <span class="nColor"><em><strong>';
+                                    imagesSwipeString += replaceSimpleQuotes(result[i].RRSousFamille);
+                                    imagesSwipeString += '</strong></em></span> - Matière : <span class="nColor"><em><strong>';
+                                    imagesSwipeString += replaceSimpleQuotes(result[i].RRMatiere);
+                                    imagesSwipeString += '</strong></em></span> - Sous-Matière : <span class="nColor"><em><strong>';
+                                    imagesSwipeString += replaceSimpleQuotes(result[i].RRSousMatiere);
+                                    imagesSwipeString += '</strong></em></span><br/> Photo <span class="nColor"><em><strong>' + k + ' / ' + result.length + '</strong></em></span></div></li>';
+                                    imagesThumbString += '<img src="' + urlThumbFile  + '" class="image-thumb" alt="Image 0' + k +'" data-link="slider:0; index:' + (k-1) + '"/>';
+                                    k++;
+                                }
+                            }
+
+                            // Ajout des vignettes
+                            galleryDiv += '<div class="col-md-12 container-images">';
+                            galleryDiv += '<div>';
+                            galleryDiv += '<section>';
+                            galleryDiv += imagesThumbString;
+                            galleryDiv += '</section>';
+                            galleryDiv += '</div>';
+                            galleryDiv += '</div>';
+
+                            // Ajout du contenu pour Touch&Swipe
+                            galleryDiv += '<div class="sliderHolder" data-elem="sliderHolder" style="position:fixed; top: 0px; left: 0px; font-size: 100%; width:100%; overflow:hidden; z-index: 8;">';
+                            galleryDiv += ' <div class="slider" data-elem="slider" data-options="initShow:false; resetScrollDuration:1;" data-show="autoAlpha:1; display:block" data-hide="autoAlpha:0; display:none">';
+                            galleryDiv += ' <div data-elem="thumbsHolder">';
+                            galleryDiv += '     <div data-elem="thumbs" data-options="animDuration:0;" data-show="" data-hide="" ></div>';
+                            galleryDiv += ' </div>';
+                            galleryDiv += ' <div class="sliderBg blackBgAlpha90"></div>';
+                            galleryDiv += ' <div class="slides" data-elem="slides" data-options="preloaderUrl:url({!URLFOR($Resource.TouchNSwipe,'template/assets/preloader.gif')}); resizeDuration:1; adjustHeight:0" ></div>';
+                            galleryDiv += ' <div class="gsCaptionHolder" data-elem="captionHolder">';
+                            galleryDiv += ' <div class="gsCaption blackBgAlpha60" data-elem="caption" data-options="initShow:true; setHolderHeight:true; resizeDuration:1;" data-show="bottom:0%; display:block; autoAlpha:1;" data-hide="bottom:-60px; display:none; autoAlpha:0; ease:Power4.easeIn"> </div>';
+                            galleryDiv += '</div>';
+                            galleryDiv += '<div class="gsControlHolder" style="top:0px;">';
+                            galleryDiv += ' <div class="gsAutoPlay controlPos1" data-elem="autoPlay" data-on="background-position:-30px 0px;" data-off="background-position:0px 0px;" style="background-image:url({!URLFOR($Resource.TouchNSwipe,'template/assets/gs_autoplay.png')});"> </div>';
+                            galleryDiv += ' <div class="gsPrev controlPos2" data-elem="prev" data-on="autoAlpha:1; cursor: pointer;" data-off="autoAlpha:0.5; cursor:default" style="background-image:url({!URLFOR($Resource.TouchNSwipe,'template/assets/gs_prev.png')});"> </div>';
+                            galleryDiv += ' <div class="gsNext controlPos3" data-elem="next" data-on="autoAlpha:1; cursor: pointer;" data-off="autoAlpha:0.5; cursor:default" style="background-image:url({!URLFOR($Resource.TouchNSwipe,'template/assets/gs_next.png')});"> </div>';
+                            galleryDiv += ' <div class="gsZoomOut controlPos4" data-elem="zoomOut" data-on="autoAlpha:1; cursor: pointer;" data-off="autoAlpha:0.5; cursor:default" style="background-image:url({!URLFOR($Resource.TouchNSwipe,'template/assets/gs_zoom_out.png')});"> </div>';
+                            galleryDiv += ' <div class="gsZoomIn controlPos5" data-elem="zoomIn" data-on="autoAlpha:1; cursor: pointer;" data-off="autoAlpha:0.5; cursor:default" style="background-image:url({!URLFOR($Resource.TouchNSwipe,'template/assets/gs_zoom_in.png')});"> </div>';
+                            galleryDiv += ' <div class="gsCaptionToggle controlPos6" data-elem="captionToggle" data-on="autoAlpha:1;" data-off="autoAlpha:0.5;" style="background-image:url({!URLFOR($Resource.TouchNSwipe,'template/assets/gs_caption_toggle.png')});"></div>';
+                            galleryDiv += ' <div class="gscloseIcon controlPos7" data-elem="close" style="background-position:-250px 0; background-image:url({!URLFOR($Resource.TouchNSwipe,'template/assets/control_sheet.png')});"></div>';
+                            galleryDiv += '</div>';
+                            galleryDiv += '<ul id="ul0" data-elem="items">' + imagesSwipeString + '</ul></div></div>';
+                            
+                            // Affichage des photos, init de Touch&Swipe et suppression du formulaire
+                            $("#rendu").append(galleryDiv);
+                            $( '#rendu' ).css( "display", "inline" );
+                            $( '#colorwheel' ).css( "display", "inline" );
+                            $( '#criteres' ).css( "display", "none" );
+                            TouchNSwipe.init();
+
+                            // Initialisation de ColorWheel
+                            var cw = Raphael.colorwheel($(".colorwheel")[0],80);
+                            cw.input($("#rendu .input-colorwheel")[0]);
+                            cw.color("#000000");
+                            cw.onchange(function(color) {
+                              var colors = [parseInt(color.r), parseInt(color.g), parseInt(color.b)];
+                              $('.blackBgAlpha90').css("background", color.hex).text("RGB:"+colors.join(", "));
+                              $('.container-images').css("background", color.hex);
+                            })
+                        } else {
+                            var retour = 'Votre recherche n\'a aboutie à aucun résultat. Veuillez modifier vos critères de recherche.';
+                            $("#affichage").append(retour);
+                            $("#affichage").css("display", "block");
+                        }
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                    $('[id$=Recherche]')[0].disabled = false;
+                },
+                {escape: true}
+            );
+            }
+        }
+
+        /* Fonction qui récupère les caractéristiques d'un produit et alimente les champs  */
+        /*---------------------------------------------------------------------------------*/
+        function getRemoteResultGlobal(){
+            var codeproduit;
+            // récupération des valeurs entrées
+            if($('[id$=codeproduit]')[0] != null)
+                var codeproduit= $('[id$=codeproduit]')[0].value;
+            else {
+                alert ("Produit non valide.");
+                return;
+            }
+            if(codeproduit != "") {
+                $('[id$=famille]')[0].value = '';
+                $('[id$=matiere]')[0].value = '';
+                $('[id$=sousfamille]')[0].value = '';
+                $('[id$=sousmatiere]')[0].value = '';
+                rerendersousfamilles('');
+                rerendersousmatieres('');
+                if ((typeof sforce != 'undefined') && (sforce != null)) {
+                    sleep(1500);
+                } else {
+                    sleep(200);
+                }
+                getRemoteResult2();
+            }
+        }
+
+        /* Fonction qui récupère les caractéristiques d'un produit et alimente les champs  */
+        /*---------------------------------------------------------------------------------*/
+        function getRemoteResult2(){
+            var codeproduit;
+            // récupération des valeurs entrées
+            if($('[id$=codeproduit]')[0] != null)
+                var codeproduit= $('[id$=codeproduit]')[0].value;
+            else {
+                alert ("Produit non valide.");
+                return;
+            }
+            if(codeproduit != "") {
+                Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Phototheque.recupereproduit}', codeproduit,
+                function(result, event) {
+                    if (event.status) {
+                        if(result!=null) {
+                            // Récupération des caractéristiques du produit
+                            $('[id$=famille]')[0].value = result.Family;
+                            //rerendersousfamilles(returnObject.Family);
+                            $('[id$=sousfamille]')[0].value = result.SousFamille__c;
+                            $('[id$=matiere]')[0].value = result.Matiere__c;
+                            //rerendersousmatieres(returnObject.Matiere__c);
+                            $('[id$=sousmatiere]')[0].value = result.SousMatiere__c;
+                        }
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+                );
+            }
+        }
+        
+        /* Fonction d'échappement des caractères spéciaux                                  */
+        /*---------------------------------------------------------------------------------*/
+        function addslashes(ch) {
+            var result = ch;
+            if(ch) {
+                ch = ch.replace(/\\/g,"\\\\")
+                ch = ch.replace(/\'/g,"\\'")
+                ch = ch.replace(/\"/g,"\\\"")
+                ch = ch.replace(/[\[\]]+/g,'')
+                ch = ch.replace(/[\(\)]+/g,'')
+                ch = ch.replace(/[-_*,:.^]+/g,'')
+            } else {
+                result = "";
+            }
+            return result
+        }
+        
+        /* Fonction pour effectuer une attente                                             */
+        /*---------------------------------------------------------------------------------*/
+        function sleep(milliseconds) {
+            var start = new Date().getTime();
+            for (var i = 0; i < 1e7; i++) {
+                if ((new Date().getTime() - start) > milliseconds){
+                    break;
+                }
+            }
+        }
+        function replaceSimpleQuotes(text){
+            var textReplaced = text.replace(/&#39;/g, "`");
+            var textReplaced2 = textReplaced.replace(/'/g, "`");
+            return textReplaced2;
+        }
+    </script>
+    <apex:stylesheet value="{!URLFOR($Resource.TouchNSwipe, 'template/css/touchnswipe.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.css')}" />
+    <style>
+        /* Style TouchSwipe et ColorWheel */
+        .image-thumb{
+            border:3px solid #999;
+            margin:15px 15px auto auto;
+            cursor:pointer;
+            height:90px; 
+            width:60px;
+        }
+        .image-thumb:hover{
+            border:3px solid #099;
+        }
+        .container-images {
+            position:relative;
+            top: 0px;
+            left: 0px;
+            font-size: 100%;
+            text-align: center;
+            width:100%;
+            height:100%;
+            min-height:100%;
+            overflow:auto;
+            clear: both;
+        }
+
+        #contentWrapper{
+            width-min:0px;
+        }
+
+        .gsThumbs, .gsThumbs2 {
+            width:100%;
+            min-height:100%;
+            overflow:hidden;
+            position:absolute;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor:pointer;
+            min-height:0%;
+        }
+        .gsThumbsHolder, .gsThumbsHolder2 {
+            width:100%;
+            height:104px;
+            position:absolute;
+            overflow:hidden;
+        }
+        .gsThumbs {
+            bottom:0px;
+            top:auto;
+        }
+        .gsThumbs2 {
+            bottom:0px;
+            top:auto;
+        }
+        .gsThumbsHolder {
+            bottom:0px;
+            top:auto;
+        }
+        .gsThumbsHolder2 {
+            bottom:30px;
+            top:auto;
+        }
+        .gsThumbToggle, .gsCaptionToggle, .gsAutoPlay, .gsPrev, .gsNext, .gsZoomIn, .gsZoomOut{
+            width:30px;
+            height:30px;
+            cursor:pointer;
+        }
+
+        .gscloseIcon{
+            width:20px;
+            height:30px;
+            cursor:pointer;
+        }
+
+        .gsCaptionHolder {
+            width:100%;
+            min-height:20px;
+            position:absolute;
+            overflow:hidden;
+            padding-top:5px;
+            padding-bottom:5px;
+            bottom:0px;
+            top:auto;
+            min-height:40px;
+        }
+        .gsCaption, .gsCaption2 {
+            width:100%;
+            min-height:20px;
+            color:#EEE;
+            top:0px;
+            text-align:center;
+            padding-top:5px;
+            padding-bottom:5px;
+            position:absolute;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+        .gsCaption {
+            bottom:0px;
+            top:auto;
+        }
+        .gsControlHolder {
+            width:100%;
+            height:30px;
+            background: #363334;
+            background:rgba(54, 51, 52, 0.9);
+            position:absolute;
+            bottom:0px;
+            overflow:hidden;
+        }
+
+        .lookupInput input{
+            width:90%;
+            padding:5px 10px;
+            font-size:12px;
+            line-height:1.5;
+            border-radius:3px;
+            color: #555555;
+            background-color: #ffffff;
+            border:1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing:border-box;
+            transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+
+        #colorwheel {
+            height:45px;
+            width:45px;
+            left: 0;
+            bottom:50px;
+            border:1px solid black;
+            z-index:100000;
+            font-color:red;
+            text-color:red;
+            color:red;
+            background-color:white;
+            position: fixed
+        }
+        
+        /* Style Bootstrap */
+        h2 {
+            font-size: 30px;
+        }
+        
+        h2 small {
+            font-size: 65%;
+            color: #999999;
+        }
+        
+        .btn {
+            display: inline-block !important;
+            margin-bottom: 0 !important;
+            font-weight: normal !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            cursor: pointer !important;
+            background-image: none !important;
+            border: 1px solid transparent !important;
+            white-space: nowrap !important;
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+            line-height: 1.428571429 !important;
+            border-radius: 4px !important;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            -o-user-select: none !important;
+            user-select: none !important;
+        }
+        
+        .btn-primary {
+            color: #ffffff !important;
+            background: #337ab7 !important; 
+            border-color: #2e6da4 !important;
+        }
+
+        /* Correction affichage boutons de Salesforce */
+        .menuButton {
+            z-index: 1;
+        }
+    </style>
+
+    <div id="colorwheel" class="colorwheel" style="display:none;"></div>
+    
+    <center> 
+        <div class="page-header">
+            <h2>  
+                <span class="glyphicon glyphicon-camera"></span> Photothèque <small>{!$User.FirstName} {!$User.LastName}</small>
+            </h2>
+        </div>
+    </center>
+    
+    <apex:form id="PhotothequeForm">
+        <apex:actionFunction name="rerendersousfamilles" rerender="sousfamille" >
+            <apex:param name="firstParam" assignTo="{!famille}" value="" />
+        </apex:actionFunction>
+        <apex:actionFunction name="rerendersousmatieres" rerender="sousmatiere" >
+            <apex:param name="firstParam" assignTo="{!matiere}" value="" />
+        </apex:actionFunction>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Critères de recherche</h3>
+            </div>
+            <div id="cal-legend" class="panel-body">
+                <!-- Critères -->
+                <div id="criteres" class=" col-md-12 form-horizontal">
+                    <div class="well well-sm">
+                        Vous pouvez filtrer l'affichage des photos en entrant les critères suivants (<span style="color:red;">* </span>champs obligatoires)
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-1">
+                            <label class="control-label" for="codeproduit">Produit</label>
+                        </div>
+                        <div class="col-md-5">
+                            <apex:inputField label="Produit" value="{!codeproduit.Product2Id}" required="false" id="codeproduit" onchange="getRemoteResultGlobal();"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-1">
+                            <span style="color:red;">* </span><label class="control-label" for="famille"> Famille</label>
+                        </div>
+                        <div class="col-md-5">
+                            <apex:selectList label="Famille" id="famille" styleclass="form-control" size="1" value="{!famille}" onChange="rerendersousfamilles(this.value)" >
+                                <apex:selectOptions value="{!famillesSelectList}"/>
+                            </apex:selectList>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="control-label" for="sousfamille" style="text-align: left">Sous-Famille</label>
+                        </div>
+                        <div class="col-md-5">
+                            <apex:selectList label="Sous-Famille" id="sousfamille" styleclass="form-control" size="1" value="{!sousfamille}">
+                                <apex:selectOptions value="{!sousfamillesSelectList}"/>
+                            </apex:selectList>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-1">
+                            <label class="control-label" for="matiere">Matière</label>
+                        </div>
+                        <div class="col-md-5">
+                            <apex:selectList label="Matière" id="matiere" styleclass="form-control" size="1" value="{!matiere}" onChange="rerendersousmatieres(this.value)">
+                                <apex:selectOptions value="{!matieresSelectList}"/>
+                            </apex:selectList>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="control-label" for="sousmatiere">Sous-Matière</label>
+                        </div>
+                        <div class="col-md-5">
+                            <apex:selectList label="Sous-Matière" id="sousmatiere" styleclass="form-control" size="1" value="{!sousmatiere}">
+                                <apex:selectOptions value="{!sousmatieresSelectList}"/>
+                            </apex:selectList>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <input type="button" id="Recherche" class="btn btn-primary" onclick="getRemoteResult(); return false;"  value="Rechercher"/>
+                    </div>
+                </div>
+                <div id="affichage" style="text-align:center; margin-bottom: 0px; margin-top: 10px" class="col-md-12 alert alert-danger" role="alert"></div>
+
+                <!-- Photos -->
+                <div class="col-md-12 form-horizontal" id="rendu" style="display:none; margin-left:auto; margin-right:auto;">
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <div class="col-md-6">
+                                <apex:actionFunction action="{!newSearch}" name="newSearchJavascript" />
+                                <apex:commandButton styleclass="btn btn-primary" id="newSearch" value="Nouvelle recherche" style="margin-left: 50%;"/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-md-2">
+                                <label class="control-label" for="backgroudcolor">Couleur de fond</label>
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control input-sm input-colorwheel" id="backgroudcolor" name="Couleur de fond" value="#FF9900" size="7" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </apex:form>
+</apex:page>

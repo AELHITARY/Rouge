@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CTRL_Comm_able_avec_date_de_clich</fullName>
+    <columns>quote__c</columns>
+    <columns>NAME</columns>
+    <columns>calculationDate__c</columns>
+    <columns>instantDate__c</columns>
+    <columns>comType__c</columns>
+    <columns>user__c</columns>
+    <columns>status__c</columns>
+    <columns>productCode__c</columns>
+    <columns>sellingPrice__c</columns>
+    <columns>productRate__c</columns>
+    <columns>ecPercent__c</columns>
+    <columns>discountCoefficient__c</columns>
+    <columns>remuneration__c</columns>
+    <columns>teamRate__c</columns>
+    <columns>salesRem__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>status__c</field>
+        <operation>equals</operation>
+        <value>Non commissionnable,Commissionnable,Décommissionnable,Régularisable</value>
+    </filters>
+    <filters>
+        <field>instantDate__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <label>CTRL Comm. able avec date de cliché</label>
+    <sharedTo>
+        <role>Supportutilisateur</role>
+    </sharedTo>
+</ListView>

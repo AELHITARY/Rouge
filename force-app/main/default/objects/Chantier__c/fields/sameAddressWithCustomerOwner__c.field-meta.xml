@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>sameAddressWithCustomerOwner__c</fullName>
+    <description>True si le chantier à la même adresse que le propriétaire fiscal.
+Utilisé par Rollup Helper pour mettre à jour le champ chantierOwnerSameAddressCount__c sur Account nécessaire au filtre sur l&apos;action &quot;Chantier rapide&quot;</description>
+    <externalId>false</externalId>
+    <formula>rue__c = proprietaire__r.rue__c &amp;&amp; 
+codePostal__c = proprietaire__r.codePostal__c &amp;&amp; 
+ville__c = proprietaire__r.ville__c &amp;&amp; 
+departement__c = proprietaire__r.departement__c &amp;&amp; 
+pays__c = proprietaire__r.pays__c</formula>
+    <label>[#] Adresse identique propriétaire</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

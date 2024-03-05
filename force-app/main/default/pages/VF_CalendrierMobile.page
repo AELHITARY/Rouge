@@ -1,0 +1,870 @@
+<apex:page sidebar="false" docType="html-5.0" controller="Ctrl_CalendrierMobile" action="{!insertUserStats}">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery.mobile.1.4.5.touch.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/bootstrap-datepicker.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/locales/bootstrap-datepicker.fr.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.FullCalendar, 'lib/moment.min.js')}" />
+    <script type="text/javascript">
+        j$ = jQuery.noConflict();
+        var actualDay = new Date();
+        var vendeursIDs = [];
+        var vendeursPopoverList = new Object();
+        var htmlLoadingEvent;
+        var htmlBodyEvent;
+        var htmlLoadingTask;
+        var htmlBodyTask;
+        var checkGetVendeur = [];
+
+        /////////////////
+        //   ON LOAD   //
+        /////////////////
+        j$(document).ready(function(){
+            htmlLoadingTask = j$("#loading-task");
+            htmlBodyTask = j$("#panelTask-body");
+            htmlLoadingEvent = j$("#loading-event");
+            htmlBodyEvent = j$("#panelEvent-body");
+            sortType = "heure";
+
+            // Initialisation des fonction jQuery mobile pour l'action "Swipe" pour mobile
+            if(isMobile()) {
+                $(document).on( "swipeleft", switchDay );
+                $(document).on( "swiperight", switchDay );
+            }
+
+            // Initialisation du bouton "Menu" Popover
+            j$('#menu-button-id').click(function() {
+                // Récupération des vendeurs sélectionner lors de la fermeture de la popover
+                if(j$('.popover').hasClass('in')) {
+                    vendeursPopoverList = new Object();
+                    j$.each(j$('.popover.in').find('input:checked'),function( index, element ){
+                      vendeursPopoverList[element.value] = true;
+                    });
+                }
+                var content = j$('#menu-content-id').html();
+                var codeMagasin = j$("[id$=codeMagasinActuel]")[0].value;
+                initPopover(content, codeMagasin, "toggle");
+                // Sélection des vendeurs précédemment sélectionnés (pas de sauvegarde de l'état entre fermeture et ouverture)
+                if(j$('.popover').hasClass('in')) {
+                    j$.each(j$('.popover.in').find('input'), function( index, element ){
+                        if(vendeursPopoverList[element.id])
+                            element.checked = true;
+                        else
+                            element.checked = false;
+                    });
+                }
+            });
+
+            var momentDay = moment('{!selectedDate}', 'DD-MM-YYYY');
+            if(momentDay.isValid()){
+                actualDay = new Date(momentDay.year(), momentDay.month(), momentDay.date());
+            }
+            // Init du datepicker
+            $('#input-datetimepicker').datepicker({
+                format: "dd/mm/yyyy",
+                language: "fr",
+                autoclose: true,
+                todayHighlight: true,
+                showOnFocus: false
+            });
+            $('#input-datetimepicker').datepicker().on('changeDate', function(e){
+                switchDay(e.currentTarget.firstElementChild.value);
+            });
+
+            // Initialisation du magasin et des vendeurs
+            var codeMagasinActuel = j$("[id$=codeMagasinActuel]")[0].value;
+            getVendeursByMagasin(codeMagasinActuel, true);
+        });
+
+        /*--------------------------------------------------*/
+        /* FONCTION D'INITILISATION DU MENU POPOVER         */
+        /*--------------------------------------------------*/
+        function initPopover(content, codeMagasin, event){
+            j$('#menu-button-id').popover({
+                trigger: 'manual',
+                container: '#visualstrap-body',
+                placement: 'bottom',
+                viewport: {selector: 'body', padding: 2},
+                html: true,
+                content: function() {
+                    return content;
+                }
+            });
+            j$('#menu-button-id').popover(event);
+            j$('.menu-content .magasin-picklist option[value="'+codeMagasin+'"]').prop('selected', true);
+            j$('.popover-content .magasin-picklist option[value="'+codeMagasin+'"]').prop('selected', true);
+        }
+
+        /*--------------------------------------------------*/
+        /* FONCTION DE RECHERCHE DES VENDEURS PAR MAGASIN   */
+        /*--------------------------------------------------*/
+        function getVendeursByMagasin(codeMagasin, init){
+            var codeMagasinActuel;
+            var userProf = '{!$Profile.Name}';
+            var userId = '{!$User.Id}';
+            vendeursIDs = [];
+            vendeursPopoverList = new Object();
+
+            // Construction du tableau de vendeurs
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_CalendrierMobile.getVendeursByMagasin}', codeMagasin,
+                function(result, event) {
+                    if (event.status) {
+                        var content = '';
+                        if(result != null){
+                            content += '<thead><tr><th>Vendeurs du magasin (' + result.length + ')</th></tr></thead><tbody>';
+                            j$.each(result,function( index, element){
+                                if(userProf.indexOf('Vendeur') < 0 || (userProf.indexOf('Vendeur') >= 0 && userId == element.UserId)) {
+                                    vendeursPopoverList[element.UserId] = true;
+                                    content += '<tr>';
+                                    // On met les référents en gras
+                                    if(element.isResponsable){
+                                        content += '<td style="font-weight: bold;">';
+                                    } else {
+                                        content += '<td>';
+                                    }
+                                    content += '        <input type="checkbox" name="vendeursChecked" id="' + element.UserId + '" value="' + element.UserId + '" onClick="switchDay(\'today\');" checked/>  ' + element.Vendeur.FirstName + ' ' + element.Vendeur.LastName;
+                                    content += '        <a style="float:right;" href="/'+ element.UserId +'">';
+                                    content += '            <img src="'+ element.Vendeur.SmallPhotoUrl +'" class="vendeur-photo"/>';
+                                    content += '        </a>';
+                                    content += '    </td>';
+                                    content += '</tr>';
+                                    vendeursIDs.push(element.UserId);
+                                }
+                            });
+                            content += '</tbody>';
+                        }
+                        // Mise à jour de la liste des vendeurs
+                        if(!init) j$(".page-header-title").html('Calendrier <small> '+ j$(".popover-content [id$=codeMagasinActuel]").children(':selected').text() +' </small>');
+                        // Mise à jour de la liste des vendeurs
+                        j$('.menu-content #vendeurs-table-id').html(content);
+
+                        // Construction de la popover lors du changement du magasin (non lors initialisation)
+                        if(!init) {
+                            var contentPopover = j$('#menu-content-sector-id').append(j$('.menu-content #vendeurs-table-id').html(content)).html();
+                            j$('#menu-button-id').popover('destroy');
+                            initPopover(contentPopover, codeMagasin, "show");
+                        }
+
+                        // Chargement des taches et events
+                        switchDay("today");
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+            {escape: false}
+            );
+        }
+
+        /*--------------------------------------------------*/
+        /*  FONCTION DE CHANGEMENT DE JOUR                  */
+        /*--------------------------------------------------*/
+        function switchDay( event ){
+            checkGetVendeur = [];
+            // Chargement
+            toggleLoading(true, 'task');
+            toggleLoading(true, 'event');
+
+            // Cas du swipe ou clic
+            if(event.type == 'swipeleft' || event == 'clickright') actualDay.setDate(actualDay.getDate()+1);
+            else if(event.type == 'swiperight' || event == 'clickleft') actualDay.setDate(actualDay.getDate()-1);
+            else if(event == 'today') {}
+            else {
+                if((typeof sforce != 'undefined') && (sforce != null)){
+                    var listeMois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+                    for(var i=0; i<listeMois.length;i++){
+                        event = event.replace(' ' + listeMois[i] + ' ', '/' + [i+1] + '/');
+                    }
+                }
+                var tempDate = moment(event, 'DD-MM-YYYY');
+                actualDay.setDate(tempDate.date());
+                actualDay.setMonth(tempDate.month());
+                actualDay.setFullYear(tempDate.year());
+            }
+
+            // Mise à jour du datepicker
+            $('#input-datetimepicker').datepicker('update', new Date(actualDay.getFullYear(), actualDay.getMonth(), actualDay.getDate()));
+
+            var jour = actualDay.getDate();
+            var mois = actualDay.getMonth();
+            var annee = actualDay.getFullYear();
+
+            // Filtre sur les vendeurs (condition si popover ouvert ou non)
+            var vendeurList = [];
+            if(j$('.popover').hasClass('in')) {
+                j$.each(j$('.popover.in').find('input:checked'),function( index, element ){
+                    vendeurList.push(element.value);
+                });
+            } else {
+                for(var i=0;i<vendeursIDs.length;i++){
+                    if(j$('#' + vendeursIDs[i]).is(':checked')){
+                        vendeurList.push(vendeursIDs[i]);
+                    }
+                }
+            }
+
+            // Récupère les évènements d'un jour donné
+            Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.Ctrl_CalendrierMobile.getSelectedEvents}', jour, mois, annee, sortType, vendeurList,
+            function(result, event) {
+                if (event.status) {
+                    // Mise à jour des indicateurs d'évènements
+                    var content = '';
+                    var ev = result;
+                    var mutedDate = 'Evènements pour le ' + moment(actualDay).format("DD/MM/YYYY");
+                    j$('[id=nbEvents]').html(ev.length);
+                    j$('[id=mutedEventDay]').html(mutedDate);
+
+                    // Cas avec au moins 1 event
+                    if(ev.length){
+                        j$('#noEvents').removeClass("show").addClass("hidden");
+                        for (i=0;i < ev.length ; i++){
+                            // Formatage date
+                            var date = formatDate(ev[i].StartDateTime);
+                            // Vérification si les variables ne sont pas nulles
+                            ev[i].ResultatduRDV__c = isDefined(ev[i].ResultatduRDV__c, 'Non renseigné');
+                            var motifAnnulation = '';
+
+                            // Récupération du champ de motif adéquat au résultat du RDV
+                            if(ev[i].ResultatduRDV__c == 'Annulé/client avec report de RDV' || ev[i].ResultatduRDV__c == 'Annulé/client sans report de RDV' || ev[i].ResultatduRDV__c == 'Refus de visite'
+                                || ev[i].ResultatduRDV__c == 'imprévu dernière minute' || ev[i].ResultatduRDV__c == 'Absent/A rappeler')
+                                motifAnnulation = isDefined(ev[i].Motifsannulationclient__c, '');
+                            if(ev[i].ResultatduRDV__c == 'Non devisable') motifAnnulation = isDefined(ev[i].MotifsAnnulationnondevisable__c, '');
+                            if(ev[i].ResultatduRDV__c == 'Annulé/vendeur') motifAnnulation = isDefined(ev[i].Motifsannulationvendeur__c, '');
+
+                            // INJECTION-HEADER
+                            content += '<div class="panel panel-default">';
+                            content += '    <div class="panel-heading ' + isDefined(ev[i].Type, '?') + ' ' + ev[i].RecordTypeId +'" role="tab">';
+                            content += '        <h4 class="panel-title">';
+
+                            if(ev[i].RecordTypeId == '{!rtEventProspection}'){
+                            	if(ev[i].debriefe__c) 	content += '<span class="lisere DebriefeOui"></span>';
+                            	else					content += '<span class="lisere DebriefeNon"></span>';
+                            } else						content += '<span class="lisere ' + removeSpaces(ev[i].StatutRDV__c) + '"></span>';
+
+                            if(isMobile()) {
+                                content +='         <a href="javascript:sforce.one.navigateToSObject(\'' + ev[i].Id + '\')'+'" class="'+ ev[i].Id + '">';
+                            } else {
+                                content += '        <a href="/' + ev[i].Id + '?retURL={!$CurrentPage.URL}" target="_blank" class="'+ ev[i].Id + '">';
+                            }
+                            content += '                ' + isDefined(ev[i].Type, '?') + ' - ' + date + ' - ' + ev[i].Owner.Name;
+                            if(ev[i].Who != null)
+                                content += '                - Contact : ' + ev[i].Who.Name + '';
+                            content += '            </a>';
+                            content += '            <a role="button" data-toggle="collapse" data-parent="#eventTab" href="#' + ev[i].Id + '" aria-expanded="f" aria-controls="' + ev[i].Id + '" class="pull-right"';
+                                content += '                    onClick="getVendeurByDistance(\'' + ev[i].Id + '\', \'' + ev[i].OwnerId + '\', \'' + ev[i].WhatId + '\', ' + ev[i].Latitude + ', ' + ev[i].Longitude + ');">';
+                            content += '                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>';
+                            content += '            </a>';
+                            content += '        </h4>';
+                            content += '    </div>';
+                            content += '    <div id="' + ev[i].Id + '" data-toggle="false" class="panel-collapse collapse" role="tabpanel" name="' + ev[i].Id + '"">';
+                            content += '        <div class="panel-body">';
+                            // INJECTION-CONTENU : Cas d'un évènement de prospection
+                            if(ev[i].RecordTypeId == '{!rtEventProspection}') {
+                                content += '        <div class="row" >';
+                                if(ev[i].Type == 'Prospection physique' || ev[i].Type == 'Visite de pose') {
+                                    content += '        <div class="col-md-4 panel-field">';
+                                    content += '            <label for="BAL' + ev[i].Id + '" style="padding:5px;">BAL : </label>';
+                                    content +=              isDefined(ev[i].NbBAL50__c, '');
+                                    content += '        </div>';
+                                    content += '        <div class="col-md-4 panel-field">';
+                                    content += '            <label for="TAP' + ev[i].Id + '" style="padding:5px;">TAP : </label>';
+                                    content +=              isDefined(ev[i].NbTAP51__c, '');
+                                    content += '        </div>';
+                                } else {
+                                    var labelId = '';
+                                    var labelName = '';
+                                    var fieldValue = '';
+                                    if(ev[i].Type == 'Phone') {
+                                        labelId = 'phone';
+                                        labelName = 'Phone';
+                                        fieldValue = isDefined(ev[i].NbPhone55__c, '');
+                                    }
+                                    if(ev[i].Type == 'Stand/Marché') {
+                                        labelId = 'marché';
+                                        labelName = 'Stand/marché';
+                                        fieldValue = isDefined(ev[i].NbStandMarch54__c, '');
+                                    }
+                                    if(ev[i].Type == 'Stand/Galerie Marchande') {
+                                        labelId = 'GM';
+                                        labelName = 'Stand/GM';
+                                        fieldValue = isDefined(ev[i].NbStandGM42__c, '');
+                                    }
+                                    if(ev[i].Type == 'Foire') {
+                                        labelId = 'foire';
+                                        labelName = 'Foire';
+                                        fieldValue = isDefined(ev[i].NbFoire43__c, '');
+                                    }
+
+                                    content += '        <div class="col-md-4 panel-field">';
+                                    content += '            <label for="' + labelId + '' + ev[i].Id + '" style="padding:5px;">' + labelName + ' : </label>';
+                                    content +=              fieldValue;
+                                    content += '        </div>';
+                                }
+                                content += '        </div>';
+                            // INJECTION-CONTENU : Cas d'un évènement Commercial
+                            } else if(ev[i].RecordTypeId == '{!rtEventCommercial}'){
+                                content += '        <div class="row" >';
+                                // Champ "Statut du RDV"
+                                content += '            <div class="col-md-3 col-xs-6 panel-field"><label for="statut' + ev[i].Id + '" style="padding:5px;">Statut du RDV : </label>';
+                                content +=                  ev[i].StatutRDV__c;
+                                content += '            </div>';
+                                // Champ "Décisionnaire"
+                                var decisionnaireValue = (ev[i].Decisionnaire__c) ? "Oui" : "Non";
+                                content += '            <div class="col-md-3 col-xs-6 panel-field"><label for="decisionnaire' + ev[i].Id + '" style="padding:5px;">Décisionnaire présent : </label>';
+                                    content +=                  decisionnaireValue;
+                                content += '            </div>';
+
+                                // Champ "Résultat du RDV"
+                                if(ev[i].ResultatduRDV__c != 'Non renseigné') {
+                                    content += '        <div class="col-md-3 col-xs-6 panel-field" id="showResultat' + ev[i].Id + '"><label for="resultat' + ev[i].Id + '" style="padding:5px;">Résultat du RDV : </label>';
+                                        content +=              ev[i].ResultatduRDV__c;
+                                    content += '        </div>';
+                                }
+                                // Champ "Motif"
+                                if(motifAnnulation != '') {
+                                    content += '        <div class="col-md-3 col-xs-6 panel-field" id="showMotif' + ev[i].Id + '"><label for="motif' + ev[i].Id + '" style="padding:5px;">Motif annulation : </label>';
+                                        content +=              motifAnnulation;
+                                    content += '        </div>';
+                                }
+                                content += '        </div>';
+                            }
+                            content += '        <div class="row" >';
+                            // Champ "Nom du projet"
+                            if(ev[i].What) {
+                                content += '        <div class="col-md-4 col-xs-6 panel-field"><label for="projectName' + ev[i].Id + '" style="padding:5px;">Nom du projet : </label>';
+                                if(isMobile()) {
+                                    content +='         <a href="javascript:sforce.one.navigateToSObject(\'' + ev[i].WhatId + '\')'+'">'+ ev[i].What.Name +'</a>';
+                                } else {
+                                    content +='         <a target="_blank" href="/'+ ev[i].WhatId +'">'+ ev[i].What.Name +'</a>'
+                                }
+                                content += '        </div>';
+                            }
+                            // Champ "Nom du contact"
+                            if(ev[i].Who) {
+                                content += '        <div class="col-md-4 col-xs-6 panel-field"><label for="contactName' + ev[i].Id + '" style="padding:5px;">Nom du contact : </label>';
+                                if(isMobile()) {
+                                    content +='         <a href="javascript:sforce.one.navigateToSObject(\'' + ev[i].WhoId + '\')'+'">'+ ev[i].Who.Name +'</a>';
+                                } else {
+                                    content +='         <a target="_blank" href="/'+ ev[i].WhoId +'">'+ ev[i].Who.Name +'</a>'
+                                }
+                                content += '        </div>';
+                            }
+                            content += '        </div>';
+                            // Champ "Propriétaire"
+                            content += '        <div class="row" >';
+                            content += '            <div class="col-md-12 panel-field" style="display: inline-flex;"><label for="owner' + ev[i].Id + '" style="padding:5px; min-width: 110px;">Propriétaire : </label>';
+                            content += '                <select id="owner' + ev[i].Id + '" class="form-control" onchange="changeEvent(\'' + ev[i].Id + '\', \'owner\')">';
+                            content += '                </select>';
+                            content += '            </div>';
+                            content += '        </div>';
+                            // INJECTION-FIN : Alerte de sauvegarde / Bouton sauvegarde / Erreurs / Fermeture des balises
+                            content += '    <div class="row hidden" id="alerte' + ev[i].Id + '">';
+                            content += '        <div class="col-md-12 panel-field">';
+                            content += '            <div class="alert alert-warning" role="alert">';
+                            content += '                <p><strong>Attention ! </strong> Certains champs ont été modifiés. Cliquez sur le bouton pour sauvegarder les modifications.</p>';
+                            content += '                <p><a href="#" id="event-button-save' + ev[i].Id + '" class="btn btn-success btn-lg" role="button" onclick="saveEvent(\'' + ev[i].Id + '\', \'' + ev[i].Owner.Name + '\')" data-loading-text="Veuillez patientier...">Sauvegarder</a></p>';
+                            content += '            </div>';
+                            content += '        </div>';
+                            content += '    </div>';
+                            content += '    </div>';
+                            content += '    </div>';
+                            content += '</div>';
+                        }
+
+                        // Cas sans évènements
+                        } else
+                            j$('#noEvents').removeClass("hidden").addClass("show");
+
+                        // Injection, mise à jour des couleurs, fermeture des panels
+                        j$('[id=eventTab]').html(content);
+                        setupEventColors();
+                        j$('.panel-collapse').collapse("hide");
+                        // RAZ chargement
+                        toggleLoading(false, 'event');
+                    } else if (event.type === 'exception') {
+                        // RAZ chargement
+                        toggleLoading(false, 'event');
+                        alert(event.message);
+                    } else {
+                        // RAZ chargement
+                        toggleLoading(false, 'event');
+                        alert(event.message);
+                    }
+                },
+            {buffer: false, escape: true}
+            );
+
+            // Récupère les taches d'un jour donné
+            Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.Ctrl_CalendrierMobile.getSelectedTasks}', jour, mois, annee, vendeurList,
+            function(result, event) {
+                if (event.status) {
+                    // Mise à jour des indicateurs de taches
+                    var content = '';
+                    var mutedDate = 'Tâches pour le ' + moment(actualDay).format("DD/MM/YYYY");
+                        j$('[id=nbTasks]').html(result.length);
+                        j$('[id=mutedTaskDay]').html(mutedDate);
+
+                        // Cas avec au moins 1 tache
+                        if(result.length){
+                            j$('#noTasks').removeClass("show").addClass("hidden");
+                            for (i=0; i<result.length; i++) {
+                                // Injection : Header
+                                content += '<div class="panel panel-default">';
+                                content += '    <div class="panel-heading" role="tab">';
+                                content += '        <h4 class="panel-title">';
+                                content += '            <span class="lisere ' + removeSpaces(result[i].Status) + '"></span>';
+                                if(isMobile()) {
+                                    content +='         <a href="javascript:sforce.one.navigateToSObject(\'' + result[i].Id + '\')'+'">';
+                                } else {
+                                    content += '        <a href="/' + result[i].Id + '?retURL={!$CurrentPage.URL}" target="_blank">';
+                                }
+                                content += '                ' + result[i].Subject + ' - ' + result[i].Owner.Name;
+                                content += '            </a>';
+                                content += '            <a role="button" data-toggle="collapse" data-parent="#taskTab" href="#' + result[i].Id + '" aria-expanded="f" aria-controls="' + result[i].Id + '" class="pull-right">';
+                                content += '                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>';
+                                content += '            </a>';
+                                content += '        </h4>';
+                                content += '    </div>';
+                                content += '    <div id="' + result[i].Id + '" data-toggle="false" class="panel-collapse collapse" role="tabpanel" name="' + result[i].Id + '">';
+                                content += '        <div class="panel-body">';
+                                content += '            <div class="row" >';
+                                // Injection : Champ "Priorité"
+                                content += '                <div class="col-md-3 col-xs-6 panel-field"><label for="taskpriority' + result[i].Id + '" style="padding:5px;">Priorité : </label>';
+                                content +=                      result[i].Priority;
+                                content += '                </div>';
+                                // Injection : Champ "Description (Commentaires)"
+                                content += '                <div class="col-md-3 col-xs-6 panel-field"><label for="taskDescription' + result[i].Id + '" style="padding:5px;">Commentaires : </label>';
+                                if(result[i].Description)
+                                    content +=                  result[i].Description;
+                                content += '                </div>';
+                                content += '            </div>';
+                                content += '        </div>';
+                                content += '    </div>';
+                                content += '</div>';
+                            }
+                        // Cas sans taches
+                        } else
+                            j$('#noTasks').removeClass("hidden").addClass("show");
+
+                        // Injection
+                        j$('[id=taskTab]').html(content);
+                        j$('.panel-collapse').collapse("hide");
+                        // RAZ chargement
+                        toggleLoading(false, 'task');
+                    } else if (event.type === 'exception') {
+                        // RAZ chargement
+                        toggleLoading(false, 'task');
+                        alert(event.message);
+                    } else {
+                        // RAZ chargement
+                        toggleLoading(false, 'task');
+                        alert(event.message);
+                    }
+                },
+            {buffer: false, escape: true}
+            );
+        }
+
+        /*--------------------------------------------------*/
+        /* RECUPERATION DES VENDEURS PAR DISTANCE           */
+        /*--------------------------------------------------*/
+        function getVendeurByDistance(eventId, eventOwnerId, eventProjetId, eventLatitude, eventLongitude) {
+            // Vérifie si la liste des vendeurs a déjà été initialisé pour l'event
+            if(!checkGetVendeur[eventId]) {
+                // Init
+                checkGetVendeur[eventId] = true;
+                var selectList = j$('#owner' + eventId);
+                eventLatitude = (eventLatitude) ? eventLatitude : null;
+                eventLongitude = (eventLongitude) ? eventLongitude : null;
+                // Filtre sur les vendeurs (condition si popover ouvert ou non)
+                var vendeurList = [];
+                if(j$('.popover').hasClass('in')) {
+                    j$.each(j$('.popover.in').find('input:checked'),function( index, element ){
+                        vendeurList.push(element.value);
+                    });
+                } else {
+                    for(var i=0;i<vendeursIDs.length;i++){
+                        if(j$('#' + vendeursIDs[i]).is(':checked')){
+                            vendeurList.push(vendeursIDs[i]);
+                        }
+                    }
+                }
+                // Récupère la liste des vendeurs par ordre de distance
+                Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_CalendrierMobile.getVendeursByDistance}', vendeurList, eventProjetId, eventLatitude, eventLongitude,
+                function(result, event) {
+                    if (event.status) {
+                        // Valeur NON NULL
+                        j$.each(result,function( index, element ){
+                            if(element.Distance) {
+                                var selected = (eventOwnerId == element.UserId) ? 'selected' : '';
+                                selectList.append('<option value="'+element.UserId+'" '+selected+'>'+element.UserName+'</option>');
+                            }
+                        });
+                        // Valeur NULL
+                        j$.each(result,function( index, element ){
+                            if(!element.Distance) {
+                                var selected = (eventOwnerId == element.UserId) ? 'selected' : '';
+                                selectList.append('<option value="'+element.UserId+'" '+selected+'>'+element.UserName+'</option>');
+                            }
+                        });
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                {buffer: false, escape: true}
+                );
+            }
+        }
+
+        /*--------------------------------------------------*/
+        /* Afficher/cacher le chargement selon type         */
+        /*--------------------------------------------------*/
+        function toggleLoading(loading, type){
+            var loadingDiv = (type == 'task') ? htmlLoadingTask : htmlLoadingEvent;
+            var bodyDiv = (type == 'task') ? htmlBodyTask : htmlBodyEvent;
+
+            if(loading) {
+                // affiche chargement
+                loadingDiv.removeClass("hidden").addClass("show");
+                bodyDiv.removeClass("show").addClass("hidden");
+            } else {
+                // cache chargement
+                loadingDiv.removeClass("show").addClass("hidden");
+                bodyDiv.removeClass("hidden").addClass("show");
+            }
+        }
+
+        /*--------------------------------------------------*/
+        /* Formatage de date (Affichage en jj/mm/YYYY)      */
+        /*--------------------------------------------------*/
+        function formatDate(date){
+            var dateFormatee;
+            if(date != null){
+                dateFormatee = moment(date).format("HH[h]mm");
+            }
+            return dateFormatee;
+        }
+
+        /*--------------------------------------------------*/
+        /*  Fonction qui check si un champ est défini       */
+        /*--------------------------------------------------*/
+        function isDefined(variable, remplacement){
+            if(variable == null) variable = remplacement;
+            return variable;
+        }
+
+        /*--------------------------------------------------*/
+        /*  Initialisation des couleurs des évènements      */
+        /*--------------------------------------------------*/
+        function setupEventColors() {
+            // Panels
+            j$( ".{!rtEventCommercial}" ).css( "background-color", "#0B00AD" );
+            j$( ".{!rtEventCommercial}" ).css( "color", "white" );
+            j$( ".R1" ).css( "background-color", "#00B2BD" );
+            j$( ".R2" ).css( "background-color", "#6B72FF" );
+            j$( ".{!rtEventProspection}" ).css( "background-color", "#f5c130" );
+            j$( ".{!rtEventAnnexe}" ).css( "background-color", "#CECECE" );
+        }
+
+        /*--------------------------------------------------*/
+        /* Modifie le trie des taches/événements            */
+        /*--------------------------------------------------*/
+        function changeSortBy(type){
+            if(type == "vendeur") {
+                j$('#sort-glyphicon-vendeur').addClass("glyphicon glyphicon-ok");
+                j$('#sort-glyphicon-type').removeClass("glyphicon glyphicon-ok");
+                j$('#sort-glyphicon-heure').removeClass("glyphicon glyphicon-ok");
+            } else if(type == "heure"){
+                j$('#sort-glyphicon-type').removeClass("glyphicon glyphicon-ok");
+                j$('#sort-glyphicon-vendeur').removeClass("glyphicon glyphicon-ok");
+                j$('#sort-glyphicon-heure').addClass("glyphicon glyphicon-ok");
+            } else {
+                j$('#sort-glyphicon-type').addClass("glyphicon glyphicon-ok");
+                j$('#sort-glyphicon-vendeur').removeClass("glyphicon glyphicon-ok");
+                j$('#sort-glyphicon-heure').removeClass("glyphicon glyphicon-ok");
+            }
+
+            sortType = type;
+            // Chargement des taches et event avec trie différent
+            switchDay("today");
+        }
+
+        /*--------------------------------------------------*/
+        /*  Fonction d'alerte après modification d'un champ */
+        /*--------------------------------------------------*/
+        function changeEvent(eventId, fieldUpdated){
+            // Modification de la couleur du champ modifié et affichage de l'alert + bouton
+            var fieldId = fieldUpdated + '' + eventId;
+            document.getElementById(fieldId).style.backgroundColor = '#fcf8e3';
+            j$('#alerte' + eventId).removeClass("hidden").addClass("show");
+        }
+
+        /*--------------------------------------------------*/
+        /*  Fonction de sauvegarde d'un évènement           */
+        /*--------------------------------------------------*/
+        function saveEvent(eventId, oldOwnerName){
+            var eventOwnerId = '';
+            var eventOwnerName = '';
+            // Récupération de la valeur des champs de l'évènement a sauvegardé
+            if(j$("#owner"+eventId).length) {
+                eventOwnerId = j$("[id$=owner"+eventId+"]").children(':selected').val();
+                eventOwnerName = j$("[id$=owner"+eventId+"]").children(':selected').text();
+            }
+
+            // Désactivation boutton sauvegarde et annuler
+            j$("#event-button-save"+eventId).button('loading');
+
+            // Mise à jour de l'évènement
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_CalendrierMobile.updateEvent}', eventId, eventOwnerId,
+                function(result, event) {
+                    if (event.status) {
+                        j$("#event-button-save"+eventId).button('reset');
+                        // Suppression de l'alerte de sauvegarde et de la couleur jaune sur les champs modifiés (et désormais sauvegardés)
+                        if(j$( "#owner"+eventId).length)
+                            document.getElementById('owner' + eventId).style.backgroundColor = '#ffffff';
+                        j$('#alerte' + eventId).removeClass("show").addClass("hidden");
+                        // Replace le nom de l'ancien propriétaire
+                        var title = j$("a."+eventId).html().replace(oldOwnerName, eventOwnerName);
+                        j$("a."+eventId).html(title);
+                    } else if (event.type === 'exception') {
+                        j$("#event-button-save"+eventId).button('reset');
+                        alert(event.message);
+                    } else {
+                        j$("#event-button-save"+eventId).button('reset');
+                        alert(event.message);
+                    }
+                },
+                {buffer: false, escape: true}
+            );
+        }
+
+        /*--------------------------------------------------*/
+        /*  Gestion des liens Navigateur/SF1                */
+        /*--------------------------------------------------*/
+        function createObject(name, recordType) {
+            if( (typeof sforce != 'undefined') && (sforce != null) ) {
+                // Salesforce1 navigation
+                if(recordType == 'null') sforce.one.createRecord(name, "{!rtTaskVendeur}");
+                else sforce.one.createRecord(name, recordType);
+            } else {
+                // Set the window's URL using a Visualforce expression
+                var link = '';
+                var dateToday = moment(actualDay).format("DD/MM/YYYY");
+                if(name == 'Event') link = '{!URLFOR($Action.Activity.NewEvent, null, [retURL=$CurrentPage.URL])}' + '&RecordType=' + recordType + '&StartDateTime=' + dateToday + '&EndDateTime=' + dateToday;
+                else if(name == 'Task') link = '{!URLFOR($Action.Task.NewTask, null, [retURL=$CurrentPage.URL])}' + '&tsk4=' + dateToday;
+                window.open(link);
+            }
+        }
+
+        /*--------------------------------------------------*/
+        /* Formatage des espaces                            */
+        /*--------------------------------------------------*/
+        function removeSpaces(text){
+            if(text != null){
+                var newText = text.replace(/ /g,'');
+                return newText;
+            } else return null;
+         }
+
+        /*--------------------------------------------------*/
+        /*  Check pour le cas d'un mobile                   */
+        /*--------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                // || navigator.userAgent.match(/iPhone/i)
+                // || navigator.userAgent.match(/iPad/i)
+                // || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                || ((typeof sforce != 'undefined') && (sforce != null) )
+            ) return true;
+            else return false;
+        }
+    </script>
+    <style type="text/css">
+        .lisere {
+            height:18px;
+            margin-right:11px;
+            width:7px;
+            display:block;
+            float:left;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border-top-left-radius: 3px;
+        }
+        .Pris, .Afaire, .DebriefeNon { background-color: red }
+        .Nonconfirmé { background-color: orange }
+        .Effectué, .Terminé, .DebriefeOui { background-color: green }
+        .Noneffectué { background-color: black }
+        .Déplacé, .Aréaffecter { background-color: violet }
+        .AnnuléCall { background-color: grey }
+
+         .ui-loader-default {
+            display: none;
+         }
+
+        .panel-field {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .vendeur-photo {
+            margin-right: 3px;
+            margin-left: 3px;
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Page_CSS)}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrapDatepicker_js, 'css/datepicker.css')}"/>
+    <c:importvisualstrap theme="default" />
+    <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+    <div id="visualstrap-body" class="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero">
+        <div class="text-center">
+            <div class="page-header" style="margin-bottom: 10px;">
+                <h2>
+                    <span class="glyphicon glyphicon-calendar "></span>
+                    <span class="page-header-title">Calendrier <small> {!libelleMagasinActuel} </small></span>
+                </h2>
+             </div>
+        </div>
+
+        <apex:form styleClass="form-inline">
+            <apex:actionFunction action="{!refreshDate}" name="updateStartDate" rerender="hiddenFields">
+                <apex:param name="firstParam" assignTo="{!selectedDate}" value="this.value" />
+            </apex:actionFunction>
+            <input style="height:0px; top:-1000px; position:absolute" type="text" value=""/><br/>
+            <div class="row" style="margin-bottom: 10px;" >
+                <div class="col-md-12">
+                    <div style="max-width:140px; display: inline-flex; float:left; margin-right:5px;">
+                        <div class='input-group date' id='input-datetimepicker'>
+                            <input type='text' class="form-control" id="selectedDate" autocomplete="off" value="{!selectedDate}"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display: inline-flex;">
+                        <div class="btn-group" role="group" aria-label="Filtres" >
+                            <button type="button" class="btn btn-default" id="filter-button-dayBefore" onClick="switchDay('clickleft');"><span class="glyphicon glyphicon-minus"></span></button>
+                            <button type="button" class="btn btn-default" id="filter-button-dayAfter" onClick="switchDay('clickright');"><span class="glyphicon glyphicon-plus"></span></button>
+                            <button type="button" class="btn btn-default" id="filter-button-refresh" onClick="switchDay('today');"><span class="glyphicon glyphicon-refresh"></span></button>
+                            <!-- MENU -->
+                            <button type="button" class="btn btn-primary" id="menu-button-id">Menu <span class="caret"></span></button>
+                            <div id ="menu-content-id" class="menu-content hidden" style="z-index: 10; position: absolute; padding: 1px; border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 6px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                <div id="menu-content-sector-id">
+                                    <div class="menu-content-sector">
+                                        <div><apex:selectlist tabIndex="1" styleClass="form-control input-sm magasin-picklist" id="codeMagasinActuel" size="1" value="{!codeMagasinActuel}" onChange="getVendeursByMagasin(this.value, false);"
+                                            disabled="{!(CONTAINS($Profile.Name, 'RVJ') || CONTAINS($Profile.Name, 'RV') || CONTAINS($Profile.Name, 'Vendeur')) && !unlockMagasin}"
+                                            readonly="{!(CONTAINS($Profile.Name, 'RVJ') || CONTAINS($Profile.Name, 'RV') || CONTAINS($Profile.Name, 'Vendeur')) && !unlockMagasin}">
+                                             <apex:selectOptions value="{!magasinOptionList}" />
+                                         </apex:selectlist></div>
+                                    </div>
+                                </div>
+                                <div style="max-height:240px; overflow: auto"><table class="table table-condensed table-striped table-hover" id="vendeurs-table-id"></table></div>
+                            </div>
+                            <!-- TRIER PAR -->
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Trier par <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" onClick="changeSortBy('heure');"><span id="sort-glyphicon-heure" class="glyphicon glyphicon-ok"></span> Trier par heure</a></li>
+                                <li><a href="#" onClick="changeSortBy('vendeur');"><span id="sort-glyphicon-vendeur" class=""></span> Trier par vendeur</a></li>
+                                <li><a href="#" onClick="changeSortBy('type');"><span id="sort-glyphicon-type" class=""></span> Trier par type</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- MENU
+                    <div class="pull-right" id="menu-id" style="display: inline-flex;">
+                        <button type="button" class="btn btn-primary" id="menu-button-id">Menu <span class="caret"></span></button>
+                    </div>
+                    <div id ="menu-content-id" class="menu-content hidden" style="z-index: 10; position: absolute; padding: 1px; border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 6px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                        <div id="menu-content-sector-id">
+                            <div class="menu-content-sector">
+                                <div><apex:selectlist tabIndex="1" styleClass="form-control input-sm magasin-picklist" id="codeMagasinActuel" size="1" value="{!codeMagasinActuel}" onChange="getVendeursByMagasin(this.value, false);"
+                                    disabled="{!CONTAINS($Profile.Name, 'RVJ') || CONTAINS($Profile.Name, 'RV') || CONTAINS($Profile.Name, 'Vendeur')}"
+                                    readonly="{!CONTAINS($Profile.Name, 'RVJ') || CONTAINS($Profile.Name, 'RV') || CONTAINS($Profile.Name, 'Vendeur')}">
+                                     <apex:selectOptions value="{!magasinOptionList}" />
+                                 </apex:selectlist></div>
+                            </div>
+                        </div>
+                        <div style="max-height:240px; overflow: auto"><table class="table table-condensed table-striped table-hover" id="vendeurs-table-id"></table></div>
+                    </div> -->
+
+                </div>
+            </div>
+
+            <!-- PANEL DES EVENEMENTS -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h5 style="cursor: pointer;">
+                        <a id="panelEventTitle" data-toggle="collapse" data-target="#panelEvent" class="panel-title">Evénements</a>
+                    </h5>
+                </div>
+                <div class="panel-body" id="panelEvent">
+                    <div id="loading-event" class="section section-loading show">
+                        <span class="loader loader-quart"></span>
+                        Chargement en cours... Veuillez patienter
+                    </div>
+                    <div id="panelEvent-body" class="hidden">
+                        <c:well style="text-align:center;">
+                            <c:glyph icon="time" style="font-size:40px"/> &nbsp;<span style="font-size:54px" id="nbEvents"></span>
+                            <p id="mutedEventDay" class="text-muted">Evénements pour aujourd'hui</p>
+                            <a class="btn btn-primary" href="" onClick="createObject('Event', '{!rtEventCommercial}')">RDV Commercial</a>
+                            <a class="btn btn-primary" href="" onClick="createObject('Event', '{!rtEventProspection}')">Prospection</a>
+                            <a class="btn btn-primary" href="" onClick="createObject('Event', '{!rtEventAnnexe}')">Autre</a>
+                        </c:well>
+                        <div class="panel-group" id="eventTab" role="tablist" aria-multiselectable="true">
+
+                        </div>
+                        <div id="noEvents" class="hidden">
+                            <c:alert type="success" style="text-align:center">
+                                <c:glyph icon="ok-sign"/> {!$Label.AucunEnregTrouve}
+                            </c:alert>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+            <!-- PANEL DES TACHES -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h5 style="cursor: pointer;">
+                        <a id="panelTaskTitle" data-toggle="collapse" data-target="#panelTask" class="panel-title">Tâches</a>
+                    </h5>
+                </div>
+                <div class="panel-body" id="panelTask">
+                    <div id="loading-task" class="section section-loading show">
+                        <span class="loader loader-quart"></span>
+                        Chargement en cours... Veuillez patienter
+                    </div>
+                    <div id="panelTask-body" class="hidden">
+                        <c:well style="text-align:center;">
+                            <c:glyph icon="tasks" style="font-size:40px"/> &nbsp;<span id="nbTasks" style="font-size:54px"></span>
+                            <p id="mutedTaskDay" class="text-muted">Tâches à faire pour aujourd'hui</p>
+                            <a class="btn btn-primary" href="" onClick="createObject('Task', 'null')">Nouvelle Tâche</a>
+                        </c:well>
+                        <div class="panel-group" id="taskTab" role="tablist" aria-multiselectable="true">
+
+                        </div>
+                        <div id="noTasks" class="hidden">
+                            <c:alert type="success" style="text-align:center">
+                                <c:glyph icon="ok-sign"/> {!$Label.AucunEnregTrouve}
+                            </c:alert>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </apex:form>
+    </div>
+</apex:page>

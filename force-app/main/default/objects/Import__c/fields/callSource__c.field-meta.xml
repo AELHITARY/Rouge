@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>callSource__c</fullName>
+    <externalId>false</externalId>
+    <label>Source (Call)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>13 - ancien client</fullName>
+                <default>false</default>
+                <label>13 - ancien client</label>
+            </value>
+            <value>
+                <fullName>13 - Bouche à oreille</fullName>
+                <default>false</default>
+                <label>13 - Bouche à oreille</label>
+            </value>
+            <value>
+                <fullName>13 - enseigne magasin</fullName>
+                <default>false</default>
+                <label>13 - enseigne magasin</label>
+            </value>
+            <value>
+                <fullName>13 - NSPP</fullName>
+                <default>false</default>
+                <label>13 - NSPP</label>
+            </value>
+            <value>
+                <fullName>13 - Panneaux de chantier</fullName>
+                <default>false</default>
+                <label>13 - Panneaux de chantier</label>
+            </value>
+            <value>
+                <fullName>13 - PJaune papier</fullName>
+                <default>false</default>
+                <label>13 - PJaune papier</label>
+            </value>
+            <value>
+                <fullName>15 - Affichage</fullName>
+                <default>false</default>
+                <label>15 - Affichage</label>
+            </value>
+            <value>
+                <fullName>15 - Batiweb</fullName>
+                <default>false</default>
+                <label>15 - Batiweb</label>
+            </value>
+            <value>
+                <fullName>15 - Calculéo A</fullName>
+                <default>false</default>
+                <label>15 - Calculéo A</label>
+            </value>
+            <value>
+                <fullName>15 - Calculéo B</fullName>
+                <default>false</default>
+                <label>15 - Calculéo B</label>
+            </value>
+            <value>
+                <fullName>15 - Calculéo C</fullName>
+                <default>false</default>
+                <label>15 - Calculéo C</label>
+            </value>
+            <value>
+                <fullName>15 - Calculéo D</fullName>
+                <default>false</default>
+                <label>15 - Calculéo D</label>
+            </value>
+            <value>
+                <fullName>15 - Campagne Marketing</fullName>
+                <default>false</default>
+                <label>15 - Campagne Marketing</label>
+            </value>
+            <value>
+                <fullName>15 - comprendre choisir</fullName>
+                <default>false</default>
+                <label>15 - comprendre choisir</label>
+            </value>
+            <value>
+                <fullName>15 - Keltravo</fullName>
+                <default>false</default>
+                <label>15 - Keltravo</label>
+            </value>
+            <value>
+                <fullName>15 - presse</fullName>
+                <default>false</default>
+                <label>15 - presse</label>
+            </value>
+            <value>
+                <fullName>15 - Quotatis</fullName>
+                <default>false</default>
+                <label>15 - Quotatis</label>
+            </value>
+            <value>
+                <fullName>15 - Radio</fullName>
+                <default>false</default>
+                <label>15 - Radio</label>
+            </value>
+            <value>
+                <fullName>15 - TV</fullName>
+                <default>false</default>
+                <label>15 - TV</label>
+            </value>
+            <value>
+                <fullName>17 - JPO</fullName>
+                <default>false</default>
+                <label>17 - JPO</label>
+            </value>
+            <value>
+                <fullName>20 - passage magasin</fullName>
+                <default>false</default>
+                <label>20 - passage magasin</label>
+            </value>
+            <value>
+                <fullName>26 - Telepro magasin</fullName>
+                <default>false</default>
+                <label>26 - Telepro magasin</label>
+            </value>
+            <value>
+                <fullName>34 - vente personnel</fullName>
+                <default>false</default>
+                <label>34 - vente personnel</label>
+            </value>
+            <value>
+                <fullName>35 - vente personnel StGobain</fullName>
+                <default>false</default>
+                <label>35 - vente personnel StGobain</label>
+            </value>
+            <value>
+                <fullName>36 - Prescription</fullName>
+                <default>false</default>
+                <label>36 - Prescription</label>
+            </value>
+            <value>
+                <fullName>43 - Foire</fullName>
+                <default>false</default>
+                <label>43 - Foire</label>
+            </value>
+            <value>
+                <fullName>44 - Affiliation</fullName>
+                <default>false</default>
+                <label>44 - Affiliation</label>
+            </value>
+            <value>
+                <fullName>44 - Batiweb</fullName>
+                <default>false</default>
+                <label>44 - Batiweb</label>
+            </value>
+            <value>
+                <fullName>44 - Formulaire site KparK</fullName>
+                <default>false</default>
+                <label>44 - Formulaire site KparK</label>
+            </value>
+            <value>
+                <fullName>44 - Formulaire site QTS</fullName>
+                <default>false</default>
+                <label>44 - Formulaire site QTS</label>
+            </value>
+            <value>
+                <fullName>44 - Internet bannières</fullName>
+                <default>false</default>
+                <label>44 - Internet bannières</label>
+            </value>
+            <value>
+                <fullName>44 - Internet Emailing</fullName>
+                <default>false</default>
+                <label>44 - Internet Emailing</label>
+            </value>
+            <value>
+                <fullName>44 - moteur de recherche</fullName>
+                <default>false</default>
+                <label>44 - moteur de recherche</label>
+            </value>
+            <value>
+                <fullName>44 - PJaune web</fullName>
+                <default>false</default>
+                <label>44 - PJaune web</label>
+            </value>
+            <value>
+                <fullName>44 - Web call back</fullName>
+                <default>false</default>
+                <label>44 - Web call back</label>
+            </value>
+            <value>
+                <fullName>44 - Web configurateur</fullName>
+                <default>false</default>
+                <label>44 - Web configurateur</label>
+            </value>
+            <value>
+                <fullName>50 - Bal (Tap)</fullName>
+                <default>false</default>
+                <label>50 - Bal (Tap)</label>
+            </value>
+            <value>
+                <fullName>53 - Parrainage</fullName>
+                <default>false</default>
+                <label>53 - Parrainage</label>
+            </value>
+            <value>
+                <fullName>54 - Stand</fullName>
+                <default>false</default>
+                <label>54 - Stand</label>
+            </value>
+            <value>
+                <fullName>Maison_Travaux</fullName>
+                <default>false</default>
+                <label>Maison_Travaux</label>
+            </value>
+            <value>
+                <fullName>P</fullName>
+                <default>false</default>
+                <label>P</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

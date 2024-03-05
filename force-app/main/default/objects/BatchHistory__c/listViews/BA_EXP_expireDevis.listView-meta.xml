@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BA_EXP_expireDevis</fullName>
+    <columns>NAME</columns>
+    <columns>dateLancementStart__c</columns>
+    <columns>dateFinStart__c</columns>
+    <columns>dateLancementExecute__c</columns>
+    <columns>dateFinExecute__c</columns>
+    <columns>statut__c</columns>
+    <columns>nombreATraiter__c</columns>
+    <columns>nombreTraite__c</columns>
+    <columns>traceErreurs__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>nomDuBatch__c</field>
+        <operation>equals</operation>
+        <value>BA_EXP_expireDevis</value>
+    </filters>
+    <label>BA_EXP_expireDevis</label>
+    <language>fr</language>
+</ListView>

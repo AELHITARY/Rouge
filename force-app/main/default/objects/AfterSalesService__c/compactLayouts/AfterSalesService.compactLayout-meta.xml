@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AfterSalesService</fullName>
+    <fields>Name</fields>
+    <fields>account__c</fields>
+    <fields>workSite__c</fields>
+    <fields>status__c</fields>
+    <label>SAV</label>
+</CompactLayout>

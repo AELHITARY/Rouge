@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_FinancialCharge_OrderItermEqOrder</fullName>
+    <active>true</active>
+    <description>La ligne de commande doit appartenir à la commande</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+NOT(ISBLANK(order__c)) &amp;&amp; 
+NOT(ISBLANK(orderItem__c)) &amp;&amp; 
+orderItem__r.OrderId != order__c</errorConditionFormula>
+    <errorDisplayField>orderItem__c</errorDisplayField>
+    <errorMessage>La ligne de commande doit appartenir à la commande!</errorMessage>
+</ValidationRule>

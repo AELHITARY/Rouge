@@ -1,0 +1,93 @@
+<template>
+    <lightning-card variant="Narrow" icon-name="standard:skill" title="Sélecteur de compétences">
+        
+        <!-- BODY -->
+        <div class="c-container">
+        
+            <!-- Spinner -->
+            <div if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </div>
+        
+            <lightning-messages></lightning-messages>
+            
+            <template if:true={product.data}>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">                        
+                        <template if:true={hasSkillsData}>
+                            <div class="slds-m-bottom_medium">
+                                <p>Veuillez sélectionner les compétences requise pour le produit en définissant le niveau.</p>
+                                <ul>
+                                    <li>Pas de valeur ou 0 : Compétence non requise</li>
+                                    <li>1 : Débutant</li>
+                                    <li>2 : Confirmé</li>
+                                    <li>3 : Expert</li>
+                                </ul>
+                            </div>
+                            <div style="overflow: auto;">
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th class="" scope="col">
+                                                <div class="slds-truncate" title="Compétence">Compétence</div>
+                                            </th>
+                                            <th class="" scope="col">
+                                                <div class="slds-truncate" title="Niveau requis">Niveau requis</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={skillsData} for:item="skill">
+                                            <tr class="slds-hint-parent" key={skill.id}>
+                                                <th data-label="Compétence" scope="row">
+                                                    <div class="slds-truncate" title={skill.name}>{skill.name}</div>
+                                                </th>
+                                                <td data-label="Niveau requis">
+                                                    <div class="slds-truncate">
+                                                        <lightning-input name="skill-level"
+                                                                        data-skill-id={skill.id}    
+                                                                        data-skill-name={skill.name}
+                                                                        variant="label-hidden"
+                                                                        label="Niveau requis"
+                                                                        type="number" 
+                                                                        value={skill.value}
+                                                                        placeholder="Niveau requis pour la compétence"
+                                                                        min="0" 
+                                                                        max="3">
+                                                        </lightning-input>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+        </div>
+
+        <div slot="footer">
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            <!-- BUTTONS -->   
+            <lightning-button variant="brand" label="Enregistrer" class="slds-m-around_medium" onclick={handleCreateProductSkills}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

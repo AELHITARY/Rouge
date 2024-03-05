@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>miscellaneousOperationType__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE(RecordType.DeveloperName,
+     &quot;ReceiptCancellation&quot;,    &quot;1 - AN&quot;,
+     &quot;Refund&quot;,                 &quot;2 - RS&quot;,
+     &quot;MiscellaneousOperation&quot;, &quot;3 - OD&quot;,
+     &quot;Agios&quot;,                  &quot;4 - AC&quot;,
+     &quot;PaymentDifference&quot;,      &quot;5 - DR&quot;,
+     &quot;VATDifference&quot;,          &quot;6 - EC&quot;,
+     &quot;DoubtfulDebt&quot;,           &quot;7 - CD&quot;,
+     &quot;ProfitsAndLosses&quot;,       &quot;8 - PP&quot;,
+     RecordType.Name)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Type Opération Diverse</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

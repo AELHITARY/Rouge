@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_EncaissementPlafon</fullName>
+    <active>false</active>
+    <description>Lors de la création d&apos;une annulation d&apos;encaissement (remis ou non remis), vérifier que le montant de la nouvelle annulation ajouté au montant déjà annulé de l&apos;encaissement ne dépasse pas le montant total de l&apos;encaissement</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp; 
+NOT(ISNULL(invoice__c)) &amp;&amp;
+RecordType.DeveloperName = &apos;Receipt&apos; &amp;&amp;
+ISNULL(PRIORVALUE(accountingDate__c)) &amp;&amp;
+((amount__c + invoice__r.perceivedAmount__c) &gt; invoice__r.amount__c)</errorConditionFormula>
+    <errorMessage>Montant cumulé des encaissements supérieur au montant à percevoir de la facture!</errorMessage>
+</ValidationRule>

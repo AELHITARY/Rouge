@@ -1,0 +1,758 @@
+<apex:page title="Objectifs vendeurs" docType="html-5.0" showHeader="true" controller="Ctrl_ObjectifsVendeurs" action="{!insertUserStats}">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui-1.10.3.custom.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/numeral.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/languages.min.js')}" />
+    <style type="text/css">
+        input:invalid {
+            border-color: red;
+            outline: 0;
+            -webkit-box-shadow: inset 0 0px 0px red, 0 0 6px red !important;
+            box-shadow: inset 0 0px 0px red, 0 0 6px red !important;
+        }
+        input:focus:invalid {
+            color: red;
+        }
+
+        #loading {
+            display: inline-block;
+            margin-top: -10px;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        .section {
+            line-height: 500px; }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative; }
+
+        /* Loaders */
+        .loader-quart {
+            border-radius: 20px;
+            border: 4px solid rgba(0, 0, 0, 0.4); }
+
+        .loader-quart:after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            bottom: -4px;
+            right: -4px;
+            border-radius: 20px;
+            border: 4px solid transparent;
+            border-top-color: #000;
+            -webkit-animation: spin 1s linear infinite;
+            -moz-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite; }
+
+        /* Animations */
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg); }
+            to {
+                -webkit-transform: rotate(360deg); } }
+        @-moz-keyframes spin {
+            from {
+                -moz-transform: rotate(0deg); }
+            to {
+                -moz-transform: rotate(360deg); } }
+        @keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg); }
+            to {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg); } }
+
+        .tableSaisie tfoot {
+            background-color: #f9f9f9;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+        Visualforce.remoting.maxretries = 2; // Set maximum number of retries at page level
+        j$ = jQuery.noConflict();
+
+        // Variables vendeurs
+        var vendeursIDs = new Array();
+        var newVendeursIDs = new Array();
+        var vendeursInTable = new Object();
+        var vendeursActive = new Object();
+        var vendeursName = new Object();
+        var nbVendeursActive =  0;
+
+        // Variables
+        var htmlTableauSaisie;
+        var htmlVendeursMagasin;
+        var htmlTitreSaisie;
+        var htmlButtonSave;
+        var htmlButtonAddVendeur;
+        var htmlButtonAddAllVendeurs;
+        var htmlMsgSaisie;
+        var htmlLoading;
+        var magasinCode =  '';
+        var viewAllVendeurValue = false;
+        var accepteVendeurInactif = false;
+        var tableSaisieHeader = '<thead><tr> <th>Vendeurs</th> <th>Nombre de contacts actifs</th> <th>Nombre de ventes</th> <th>CA (K€) vendu</th> </tr></thead>';
+        var errorMsg = "{!JSENCODE($Label.objectif_erreur_valeurs)}";
+        var errorInternalMsg = "{!JSENCODE($Label.objectif_erreur_global)}";
+        var errorCAMini = "{!JSENCODE($Label.objectif_ca_mois_minimum)}";
+        var saveMsg = "{!JSENCODE($Label.objectif_save_success)}";
+        var addInactifMsg = "{!JSENCODE($Label.objectif_ajout_vendeur_inactif)}";
+        var decimalFormat = "0.00";
+        var NotDecimalFormat = "0,0";
+
+        //Initialisation à la page
+        j$(document).ready(function() {
+            numeral.language('fr', {
+                delimiters: {
+                    thousands: ' ',
+                    decimal: ','
+                },
+                abbreviations: {
+                    thousand: 'k',
+                    million: 'm',
+                    billion: 'b',
+                    trillion: 't'
+                },
+                ordinal : function (number) {
+                    return number === 1 ? 'er' : 'ème';
+                },
+                currency: {
+                    symbol: '€'
+                }
+            });
+            numeral.language('fr');
+
+            // Récupère le premier secteur de la liste
+            magasinCode = '{!JsEncode(codeMagasinActuel)}';
+
+            htmlTableauSaisie = j$("[id$=tableSaisie]");
+            htmlVendeursMagasin = j$("[id$=vendeurMagasinList]");
+            htmlButtonSave = j$("[id$=buttonSave]");
+            htmlButtonAddVendeur = j$("[id$=buttonAddVendeur]");
+            htmlButtonAddAllVendeurs = j$("[id$=buttonAddAllVendeurs]");
+            htmlMsgSaisie = j$("[id$=msgSaisie]");
+            htmlLoading = j$("#loading");
+            htmlTitreSaisie = j$("[id$=titreSaisie]").find('h3:first')[0];
+            htmlTitreSaisie.innerText = 'Saisie des objectifs pour la semaine '+j$("[id$=semaine]")[0].value+' du mois de ' + j$("[id$=mois] option:selected").text() + ' ' + j$("[id$=annee]")[0].value;
+
+            // Désactivation de la liste de valeurs Magasin si pas de magasins
+            if(j$("[id$=magasin] option").length == "1")
+                    j$("[id$=magasin]").attr('disabled', true);
+
+            // Désactivation button sauvegarde
+            htmlButtonSave.attr('disabled', true);
+
+            // Chargement des vendeurs et objectifs
+            loadVendeur();
+        });
+
+        /* Récupère les objectifs du vendeur courant pour la semaine                    */
+        /*------------------------------------------------------------------------------*/
+        function loadVendeur() {
+            // Chargement
+            htmlLoading.css('visibility', 'visible');
+
+            // Désactivation button ajouter vendeur et sauvegarde
+            htmlButtonAddVendeur.attr('disabled', true);
+            htmlButtonSave.attr('disabled', true);
+            htmlButtonAddAllVendeurs.attr('disabled', true);
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ObjectifsVendeurs.getActiveVendeurs}', magasinCode,
+                function(result, event) {
+                    if (event.status) {
+                        if (result.length > 0) {
+                            // Init des tableaux et objets des vendeurs
+                            nbVendeursActive = 0;
+                            for(var i = 0; i < result.length; ++i) {
+                                vendeursIDs.push(result[i].Id);
+                                vendeursName[result[i].Id] = result[i].Name;
+                                vendeursActive[result[i].Id] = result[i].IsActive;
+                                if(result[i].IsActive) nbVendeursActive = nbVendeursActive + 1;
+                            }
+
+                            // RAZ du tableau
+                            htmlTableauSaisie.html(tableSaisieHeader);
+
+                            // Création des objectifs
+                            newVendeursIDs = vendeursIDs;
+                            getObjectifsVendeurs(false);
+
+                            htmlLoading.css('visibility', 'hidden');
+
+                            // Activation button ajouter vendeur
+                            htmlButtonAddVendeur.attr('disabled', false);
+                            htmlButtonAddAllVendeurs.attr('disabled', false);
+                        }
+                    } else if (event.type === 'exception') {
+                        htmlLoading.css('visibility', 'hidden');
+                        displayMessage(true, errorInternalMsg, false);
+                        alert(event.message);
+                    } else {
+                        htmlLoading.css('visibility', 'hidden');
+                        displayMessage(true, errorInternalMsg, false);
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Créer les objectifs des vendeurs actifs du magasin pour la date choisies     */
+        /*------------------------------------------------------------------------------*/
+        function createObjectifsVendeurs(refresh) {
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+
+            // Chargement
+            htmlLoading.css('visibility', 'visible');
+
+            // Désactivation button sauvegarde
+            htmlButtonSave.attr('disabled', true);
+
+            // Mise à jour de la liste des vendeurs dans la popup
+            changeViewAllVendeurs();
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ObjectifsVendeurs.createObjectifsVendeurs}', anneeAct, moisAct, newVendeursIDs,
+                function(result, event) {
+                    if (event.status) {
+                        // Si refresh, on récupère les objectifs des vendeurs dans la liste
+                        if(refresh)
+                                getObjectifsVendeurs(true);
+                        htmlLoading.css('visibility', 'hidden');
+                    } else if (event.type === 'exception') {
+                        htmlLoading.css('visibility', 'hidden');
+                        displayMessage(true, errorInternalMsg, false);
+                        alert(event.message);
+                    } else {
+                        htmlLoading.css('visibility', 'hidden');
+                        displayMessage(true, errorInternalMsg, false);
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+            );
+
+            // Lors de changement de date, on construit le tableau selon les vendeurs déjà présent
+            if(refresh) {
+                newVendeursIDs = new Array();
+                for (var vendeur in vendeursInTable) {
+                    newVendeursIDs.push(vendeur);
+                }
+            }
+        }
+
+        /* Récupère les objectifs du vendeur courant pour la semaine                    */
+        /*------------------------------------------------------------------------------*/
+        function getObjectifsVendeurs(refresh) {
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+            var Somme_objectifContactActif = 0;
+            var Somme_objectifNbVentes = 0;
+            var Somme_objectifCAVendu = 0;
+
+            // Chargement
+            htmlLoading.css('visibility', 'visible');
+
+            // Désactivation button sauvegarde
+            htmlButtonSave.attr('disabled', true);
+
+            // Lors de changement de date, on construit le tableau selon les vendeurs déjà présent
+            if(refresh) {
+                newVendeursIDs = new Array();
+                for (var vendeur in vendeursInTable) {
+                    newVendeursIDs.push(vendeur);
+                }
+            }
+
+            // Si il y a des vendeurs
+            if(newVendeursIDs.length > 0) {
+                // Call APEX function
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_ObjectifsVendeurs.getObjectifsVendeurs}', anneeAct, moisAct, newVendeursIDs,
+                    function(result, event) {
+                        if (event.status) {
+                            var contenu = '';
+                            var nbVendeurs = 0;
+                            var contactsActifs = 0;
+                            var nbVentes = 0;
+                            var chiffreAffaireVendu = 0;
+
+                            htmlTableauSaisie.html(contenu);
+                            contenu+= tableSaisieHeader;
+
+                            for(var i = 0; i < vendeursIDs.length; ++i) {
+                                if(result.hasOwnProperty(vendeursIDs[i])) {
+                                    var obj = result[vendeursIDs[i]];
+                                    // Sélection des objectifs selon la semaine
+                                    if(semaineAct == "1") {
+                                        contactsActifs = obj.nbContactsActifsS1__c;
+                                        nbVentes = obj.nbVentesS1__c;
+                                        chiffreAffaireVendu = obj.chiffreAffaireVenduS1__c;
+                                    } else if(semaineAct == "2") {
+                                        contactsActifs = obj.nbContactsActifsS2__c;
+                                        nbVentes = obj.nbVentesS2__c;
+                                        chiffreAffaireVendu = obj.chiffreAffaireVenduS2__c;
+                                    } else if(semaineAct == "3") {
+                                        contactsActifs = obj.nbContactsActifsS3__c;
+                                        nbVentes = obj.nbVentesS3__c;
+                                        chiffreAffaireVendu = obj.chiffreAffaireVenduS3__c;
+                                    } else if(semaineAct == "4") {
+                                        contactsActifs = obj.nbContactsActifsS4__c;
+                                        nbVentes = obj.nbVentesS4__c;
+                                        chiffreAffaireVendu = obj.chiffreAffaireVenduS4__c;
+                                    } else if(semaineAct == "5") {
+                                        contactsActifs = obj.nbContactsActifsS5__c;
+                                        nbVentes = obj.nbVentesS5__c;
+                                        chiffreAffaireVendu = obj.chiffreAffaireVenduS5__c;
+                                    }
+                                    // Ajout dans le tableau si vendeur à des objectifs
+                                    vendeursInTable[obj.vendeur__c] = true;
+
+                                    // Construction des lignes du tableau
+                                    if(vendeursInTable[obj.vendeur__c]) {
+                                        nbVendeurs = nbVendeurs + 1;
+                                        contenu+= '<tr id="tr'+ obj.vendeur__c +'">';
+                                        if(vendeursActive[obj.vendeur__c])
+                                                contenu+= '<td>' + vendeursName[obj.vendeur__c] + '</td>';
+                                        else
+                                                contenu+= '<td>' + vendeursName[obj.vendeur__c] + ' (Inactif)</td>';
+                                        contenu+= '<td><input type="number" required min="0" step="1" pattern="\d+" class="form-control" placeholder="Nombre de contacts actifs" value="' + contactsActifs + '"/></td>';
+                                        contenu+= '<td><input type="number" required min="0" step="1" pattern="\d+" class="form-control" placeholder="Nombre de ventes" value="' + nbVentes + '"/></td>';
+                                        contenu+= '<td><input type="number" required min="0" step="1" pattern="\d+" class="form-control" placeholder="CA (K€) vendu" value="' + chiffreAffaireVendu + '"/></td>';
+                                        contenu+= '</tr>';
+
+                                        Somme_objectifContactActif += contactsActifs;
+                                        Somme_objectifNbVentes += nbVentes;
+                                        Somme_objectifCAVendu += chiffreAffaireVendu;
+                                    }
+                                }
+                            }
+                            // Ajout du pied de page
+                            contenu+= '<tfoot>';
+                            contenu+= addTableFooter(nbVendeurs, Somme_objectifContactActif, Somme_objectifNbVentes, Somme_objectifCAVendu);
+                            contenu+= '</tfoot>';
+                            // Ajout dans le tableau
+                            if(contenu != '') {
+                                    htmlTableauSaisie.html(contenu);
+                            }
+
+                            // Activation bouton sauvegarde
+                            htmlButtonSave.attr('disabled', false);
+
+                            // Désactivation du bouton ajouter tous si tous les vendeurs
+                            if(nbVendeurs >= nbVendeursActive)
+                                    htmlButtonAddAllVendeurs.attr('disabled', true);
+
+                            // Mise à jour de la liste des vendeurs dans la popup
+                            changeViewAllVendeurs();
+
+                            htmlLoading.css('visibility', 'hidden');
+                        } else if (event.type === 'exception') {
+                            htmlLoading.css('visibility', 'hidden');
+                            displayMessage(true, errorInternalMsg, false);
+                            alert(event.message);
+                        } else {
+                            htmlLoading.css('visibility', 'hidden');
+                            displayMessage(true, errorInternalMsg, false);
+                            alert(event.message);
+                        }
+                    },
+                    {escape: true}
+                );
+            }
+        }
+
+        /* Ajout du pied de page (Totaux) au tableau                                    */
+        /*------------------------------------------------------------------------------*/
+        function addTableFooter(nbVendeurs, objectifContactActif, objectifNbVentes, objectifCAVendu) {
+            var contenu = '';
+
+            contenu+= '<tr>';
+            if(nbVendeurs > 1)
+                contenu+= '<td>Total des ' + nbVendeurs + ' vendeurs</td>';
+            else
+                contenu+= '<td>Total</td>';
+            contenu+= '<td>' + numeral(objectifContactActif).format(NotDecimalFormat) + '</td>';
+            contenu+= '<td>' + numeral(objectifNbVentes).format(NotDecimalFormat) + '</td>';
+            contenu+= '<td>' + numeral(objectifCAVendu).format(decimalFormat) + ' K€</td></tr>';
+
+            return contenu;
+        }
+
+        /* Mise à jour des objectifs des vendeurs du tableau pour la semaine            */
+        /*------------------------------------------------------------------------------*/
+        function saveObjectifs() {
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+            var argumentsArray = new Array();
+            var errorFlag = false;
+            var Somme_objectifContactActif = 0;
+            var Somme_objectifNbVentes = 0;
+            var Somme_objectifCAVendu = 0;
+            var nbVendeurs = 0;
+
+            // Chargement
+            htmlLoading.css('visibility', 'visible');
+
+            // RAZ message
+            htmlMsgSaisie.html('');
+
+            // Construction du tableau pour arguments sur la Remote Action
+            for (var vendeur in vendeursInTable) {
+                j$("[id$=tr"+vendeur+"]").each(function (i) {
+                    var $this = $(this);
+                    var listOfTD = $this.children("td");
+                    var name = listOfTD.eq(0)[0].innerText;
+                    var contactActif = listOfTD.eq(1).children("input")[0].value;
+                    var ventes = listOfTD.eq(2).children("input")[0].value;
+                    var caVendu = listOfTD.eq(3).children("input")[0].value;
+
+                    // Gestion des erreurs
+                    if((contactActif == "" || ventes == "" || caVendu == "") && !errorFlag) {
+                        htmlLoading.css('visibility', 'hidden');
+                        displayMessage(true, errorMsg, false);
+                        errorFlag = true;
+                    }
+                    if ((!isFinite(contactActif) || !isFinite(ventes) || !isFinite(caVendu)) && !errorFlag) {
+                        htmlLoading.css('visibility', 'hidden');
+                        displayMessage(true, errorMsg, false);
+                        errorFlag = true;
+                    } else if ((checkDecimal(contactActif) || checkDecimal(ventes) || checkDecimal(caVendu))
+                                || (contactActif < 0  || ventes < 0  || caVendu < 0)
+                                && !errorFlag) {
+                        htmlLoading.css('visibility', 'hidden');
+                        displayMessage(true, errorMsg, false);
+                        errorFlag = true;
+                    }
+
+                    if(!errorFlag) {
+                        // Totaux
+                        Somme_objectifContactActif += parseInt(contactActif);
+                        Somme_objectifNbVentes += parseInt(ventes);
+                        Somme_objectifCAVendu += parseInt(caVendu);
+                        nbVendeurs = nbVendeurs+1;
+
+                        var argument = new Object();
+                        argument['id'] = vendeur;
+                        argument['name'] = name;
+                        argument['contactActif'] = contactActif;
+                        argument['ventes'] = ventes;
+                        argument['caVendu'] = caVendu;
+
+                        argumentsArray.push(argument);
+                    }
+                });
+            }
+            var periodId = j$("[id$=periodId]")[0].value;
+            var fiscalSettingsId = j$("[id$=fiscalSettingsId]")[0].value;
+
+            if(!errorFlag) {
+                // Mise à jour des objectifs
+                // Call APEX function
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_ObjectifsVendeurs.updateObjectifs}', anneeAct, moisAct, semaineAct, fiscalSettingsId, argumentsArray,
+                    function(result, event) {
+                        if (result){
+                            if (event.status) {
+                                var contenu='';
+                                // Mise à jour du pied de page
+                                contenu+= addTableFooter(nbVendeurs, Somme_objectifContactActif, Somme_objectifNbVentes, Somme_objectifCAVendu);
+                                j$("[id$=tableSaisie] tfoot").html(contenu);
+
+                                displayMessage(false, saveMsg, false);
+                                htmlLoading.css('visibility', 'hidden');
+                            } else if (event.type === 'exception') {
+                                htmlLoading.css('visibility', 'hidden');
+                                displayMessage(true, errorInternalMsg, false);
+                                alert(event.message);
+                            } else {
+                                htmlLoading.css('visibility', 'hidden');
+                                displayMessage(true, errorInternalMsg, false);
+                                alert(event.message);
+                            }
+                        } else {
+                            htmlLoading.css('visibility', 'hidden');
+                            displayMessage(true, errorCAMini, true);
+                        }
+                    },
+                {escape: true}
+                );
+            }
+        }
+
+        /* Vérifie si la valeur numérique est décimal (retoune true si décimal)         */
+        /*------------------------------------------------------------------------------*/
+        function checkDecimal(value) {
+            var decimal=  /^[-+]?[0-9]+\.[0-9]+$/;
+            if(value.match(decimal))
+                return true;
+            else
+                return false;
+        }
+
+        /* Affiche message d'information ou d'erreur                                     */
+        /*------------------------------------------------------------------------------*/
+        function displayMessage(isError, message, errorCA) {
+            if(isError) {
+                if(errorCA) {
+                    var CA_MIN_VF = j$("[id$=CA_MIN_VF]")[0].value;
+                    message = message + ' ' + CA_MIN_VF + ' K';
+                }
+                htmlMsgSaisie.html(message);
+                htmlMsgSaisie.css('color', 'red');
+            } else {
+                htmlMsgSaisie.html(message);
+                htmlMsgSaisie.css('color', 'green');
+            }
+        }
+
+        function refreshValues(modeChanged){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois] option:selected").text();
+            var semaineAct = j$("[id$=semaine]")[0].value;
+
+            // Titre
+            htmlTitreSaisie.innerText = 'Saisie des objectifs pour la semaine '+semaineAct+' du mois de '+moisAct+' ' + anneeAct;
+            // RAZ message
+            htmlMsgSaisie.html('');
+
+            if(modeChanged == 'annee' || modeChanged == 'mois' || modeChanged == 'semaine') {
+                for(var i = 0; i < vendeursIDs.length; ++i) {
+                    vendeursInTable[vendeursIDs[i]] = false;
+                }
+                htmlButtonAddAllVendeurs.attr('disabled', false);
+                // Récupère les objectifs
+                getObjectifsVendeurs(true);
+            }
+
+            if(modeChanged == 'magasin') {
+                vendeursIDs = new Array();
+                newVendeursIDs = new Array();
+                vendeursInTable = new Object();
+                vendeursActive = new Object();
+                vendeursName = new Object();
+
+                // Charge les vendeurs du magasin
+                magasinCode = j$("[id$=magasin]")[0].value;
+                loadVendeur();
+            }
+        }
+
+        /* POPUP - Mise à jour de la liste de valeurs des vendeurs dans la popup        */
+        /*------------------------------------------------------------------------------*/
+        function changeViewAllVendeurs() {
+            var contenu = '';
+            var viewAllVendeur = j$("[id$=allowVendeurInactif]")[0];
+
+            if(typeof(viewAllVendeur.checked) == "undefined")
+                viewAllVendeurValue = false;
+            else if (viewAllVendeur.checked == false)
+                viewAllVendeurValue = false;
+            else if (viewAllVendeur.checked)
+                viewAllVendeurValue = true;
+
+            for(var i = 0; i < vendeursIDs.length; ++i) {
+                if(!vendeursInTable[vendeursIDs[i]]) {
+                    if(viewAllVendeurValue) {
+                        viewAllVendeurValue = true;
+                        if(vendeursActive[vendeursIDs[i]] == false)
+                            contenu+= '<option value="' + vendeursIDs[i] + '">' + vendeursName[vendeursIDs[i]] + ' (Inactif)</option>';
+                        else
+                            contenu+= '<option value="' + vendeursIDs[i] + '">' + vendeursName[vendeursIDs[i]] + '</option>';
+                    } else {
+                        if(vendeursActive[vendeursIDs[i]]) {
+                            contenu+= '<option value="' + vendeursIDs[i] + '">' + vendeursName[vendeursIDs[i]] + '</option>';
+                            viewAllVendeurValue = false;
+                        }
+                    }
+                }
+            }
+
+            htmlVendeursMagasin.html(contenu);
+        }
+
+        /* POPUP - Mise à jour des vendeurs dans le tableau lors de l'ajout d'un vendeur*/
+        /*------------------------------------------------------------------------------*/
+        function addVendeurInTable() {
+            var optionSelected = new Array();
+            var inactif = false;
+            newVendeursIDs = new Array();
+
+            // Récupération des vendeurs sélectionnés
+            j$("[id$=vendeurMagasinList] option:selected").each(function(){
+                optionSelected.push(j$(this).val());
+                if(vendeursActive[j$(this).val()] == false)
+                    inactif = true;
+            });
+
+            // Vérification des inactifs et confirmation
+            if(inactif && !accepteVendeurInactif) {
+                j$("[id$=errorModal]").html(addInactifMsg);
+                accepteVendeurInactif = true;
+            }
+            else {
+                // Ajout dans la liste des vendeurs dans le tableau
+                for(var i = 0; i < optionSelected.length; ++i) {
+                    vendeursInTable[optionSelected[i]] = true;
+                    newVendeursIDs.push(optionSelected[i]);
+                }
+
+                // Cache la popup
+                j$("[id$=modalAddVendeur]").modal('hide');
+                j$("[id$=errorModal]").html('');
+
+                // Mise à jour de la liste des vendeurs dans la popup
+                changeViewAllVendeurs();
+
+                // Récupération des objectifs et construction du tableau
+                createObjectifsVendeurs(true);
+            }
+        }
+
+        /* Ajout de tous les vendeurs actif du magasin dans le tableau                  */
+        /*------------------------------------------------------------------------------*/
+        function addAllVendeursInTable() {
+            newVendeursIDs = new Array();
+
+            // Récupération de tous les vendeurs non présent dans le tableu
+            for(var i = 0; i < vendeursIDs.length; ++i) {
+                if(!vendeursInTable[vendeursIDs[i]] && vendeursActive[vendeursIDs[i]]) {
+                    vendeursInTable[vendeursIDs[i]] = true;
+                    newVendeursIDs.push(vendeursIDs[i]);
+                }
+            }
+
+            // Mise à jour de la liste des vendeurs dans la popup
+            changeViewAllVendeurs();
+
+            // Récupération des objectifs et construction du tableau
+            createObjectifsVendeurs(true);
+        }
+    </script>
+
+    <c:importvisualstrap theme="default" />
+    <c:visualstrapblock >
+        <center>
+                <c:pageheader title="Saisie des objectifs des vendeurs" icon="flag"/>
+        </center>
+
+        <c:panel title="Critères" type="primary">
+            <div id="error" style="color:#FF0000;"></div>
+            <c:formblock alignment="horizontal">
+                <apex:form >
+                    <apex:actionFunction name="rerendermois" rerender="semaine" oncomplete="refreshValues('mois');">
+                        <apex:param name="firstParam" assignTo="{!moisActuel}" value=""/>
+                    </apex:actionFunction>
+                    <apex:actionFunction name="rerenderannee" rerender="semaine" oncomplete="refreshValues('annee');">
+                        <apex:param name="firstParam" assignTo="{!anneeActuelle}" value=""/>
+                    </apex:actionFunction>
+                    <apex:actionFunction name="rerendermoisdelannee" rerender="mois" oncomplete="rerenderannee(this.value);">
+                        <apex:param name="firstParam" assignTo="{!anneeActuelle}" value="" />
+                    </apex:actionFunction>
+
+                    <c:formgroup >
+                        <c:column type="col-md-1">
+                            <apex:outputLabel >Date</apex:outputLabel>
+                        </c:column>
+                        <c:column type="col-md-2">
+                            <apex:selectlist styleClass="form-control input-sm" id="annee" size="1" value="{!anneeActuelle}" onChange="htmlLoading.css('visibility', 'visible'); htmlButtonSave.attr('disabled', true); rerendermoisdelannee(this.value);">
+                                <apex:selectOptions value="{!annee}" />
+                            </apex:selectlist>
+                        </c:column>
+                        <c:column type="col-md-2">
+                            <apex:selectlist styleClass="form-control input-sm" id="mois" size="1" value="{!moisActuel}" onChange="htmlLoading.css('visibility', 'visible'); htmlButtonSave.attr('disabled', true); rerendermois(this.value);">
+                                <apex:selectOptions value="{!mois}" />
+                            </apex:selectlist>
+                        </c:column>
+                        <c:column type="col-md-3">
+                            <apex:selectlist styleClass="form-control input-sm" id="semaine" size="1" value="{!semaineActuelle}" onChange="htmlLoading.css('visibility', 'visible'); htmlButtonSave.attr('disabled', true); refreshValues('semaine');">
+                                <apex:selectOptions value="{!semaine}" />
+                            </apex:selectlist>
+                        </c:column>
+                        <c:column type="col-md-1">
+                            <apex:outputLabel >Magasin</apex:outputLabel>
+                        </c:column>
+                        <c:column type="col-md-3">
+                            <apex:selectlist styleClass="form-control input-sm" id="magasin" size="1" value="{!codeMagasinActuel}" onChange="refreshValues('magasin');">
+                                <apex:selectOptions value="{!magasinOptionList}" />
+                            </apex:selectlist>
+                        </c:column>
+                    </c:formgroup>
+                </apex:form>
+            </c:formblock>
+        </c:panel>
+
+        <c:panel id="titreSaisie" title="Saisie des objectifs" type="primary">
+            <table class="table tableSaisie" id="tableSaisie">
+                <thead>
+                    <tr>
+                        <th>Vendeurs</th>
+                        <th>Nombre de contacts actifs</th>
+                        <th>Nombre de ventes</th>
+                        <th>CA (K€) vendu</th>
+                    </tr>
+                </thead>
+                <tfoot></tfoot>
+            </table>
+
+            <apex:form >
+                <!-- BOUTONS et ERREUR -->
+                <apex:actionRegion >
+                    <div class="btn-group" role="group" aria-label="group">
+                        <apex:commandButton value="Ajouter un vendeur" id="buttonAddVendeur" onclick="return false;" html-data-toggle="modal" html-data-target="#modalAddVendeur" styleClass="btn btn-primary"/>
+                        <apex:commandButton value="Ajouter tous les vendeurs" id="buttonAddAllVendeurs" onclick="addAllVendeursInTable(); return false;" styleClass="btn btn-primary"/>
+                        <apex:commandButton value="Sauvegarder" id="buttonSave" oncomplete="saveObjectifs();" rerender="CA_MIN_VF" styleClass="btn btn-primary"/>
+                    </div>
+                </apex:actionRegion>
+                <div id="msgSaisie" style="display: inline-block;"></div>
+                <div id="loading" class="section" style="visibility: visible;">
+                    <span class="loader loader-quart"></span>
+                    Traitement en cours... Veuillez patienter
+                </div>
+                <apex:outputPanel id="hiddenFields">
+                    <apex:inputHidden id="periodId" value="{!periodId}"/>
+                    <apex:inputHidden id="fiscalSettingsId" value="{!fiscalSettingsId}"/>
+                    <apex:inputHidden id="CA_MIN_VF" value="{!CA_MIN_VF}"/>
+                </apex:outputPanel>
+
+                <!-- POPUP MODAL-->
+                <c:modal title="Ajouter un vendeur" id="modalAddVendeur">
+                    <p><label>Afficher les vendeurs inactifs</label>
+                    <input type="checkbox" id="allowVendeurInactif" onchange="changeViewAllVendeurs()"/></p>
+
+                    <p><label>Vendeurs disponible</label>
+                    <select multiple="multiple" id="vendeurMagasinList" class="form-control input-sm"> </select></p>
+                    <div id="errorModal" style="color:#FF0000;"></div>
+                    <apex:outputPanel layout="block" styleClass="modal-footer">
+                        <apex:commandButton value="Fermer" styleClass="btn btn-warning" html-data-dismiss="modal"/>
+                        <apex:commandButton value="Ajouter" styleClass="btn btn-success" onclick="addVendeurInTable(); return false;"/>
+                    </apex:outputPanel>
+                </c:modal>
+            </apex:form>
+        </c:panel>
+    </c:visualstrapblock>
+</apex:page>

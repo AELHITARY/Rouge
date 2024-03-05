@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MF_AdvancePayment2</fullName>
+    <active>true</active>
+    <description>L&apos;acompte doit être supérieur à 0 si renseigné</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+advancePayment2__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>advancePayment2__c</errorDisplayField>
+    <errorMessage>Acompte doit être supérieur ou égal à 0!</errorMessage>
+</ValidationRule>

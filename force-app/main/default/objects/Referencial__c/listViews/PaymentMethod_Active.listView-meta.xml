@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PaymentMethod_Active</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.PaymentMethod</value>
+    </filters>
+    <filters>
+        <field>active__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Mode de règlement (Actif)</label>
+</ListView>

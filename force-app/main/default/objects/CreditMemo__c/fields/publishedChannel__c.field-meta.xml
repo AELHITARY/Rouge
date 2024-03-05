@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>publishedChannel__c</fullName>
+    <externalId>false</externalId>
+    <label>Canal de publication</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>En main propre chez le client</fullName>
+                <default>false</default>
+                <label>En main propre chez le client</label>
+            </value>
+            <value>
+                <fullName>En main propre sur l&apos;entité commerciale</fullName>
+                <default>false</default>
+                <label>En main propre sur l&apos;entité commerciale</label>
+            </value>
+            <value>
+                <fullName>En main propre sur l&apos;entité service</fullName>
+                <default>false</default>
+                <label>En main propre sur l&apos;entité service</label>
+            </value>
+            <value>
+                <fullName>Par courrier</fullName>
+                <default>false</default>
+                <label>Par courrier</label>
+            </value>
+            <value>
+                <fullName>Par email</fullName>
+                <default>false</default>
+                <label>Par email</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

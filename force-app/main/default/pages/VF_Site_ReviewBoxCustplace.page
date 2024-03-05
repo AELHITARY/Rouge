@@ -1,0 +1,46 @@
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="Ctrl_Site_ReviewBoxCustplace" applyHtmlTag="false" standardStylesheets="false" cache="false">
+    <html>
+        <head>
+            <title>Custplace</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="robots" content="noindex, follow" />
+            <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+            <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+            <apex:includescript value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/js/bootstrap.min.js')}" />
+            <script type="text/javascript">
+                j$ = jQuery.noConflict();
+                var objectId = "{!objectId}";
+
+                j$(document).ready(function(){
+                    j$("[id$=Custplace_ReviewBox]").prop('data-email', "{!email}");
+                    j$("[id$=Custplace_ReviewBox]").prop('data-username', "{!nom}");
+                });
+
+            </script>
+            <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+            <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}"/>
+        </head>
+        <body>
+            <div class="container" id="container">
+                <div class="row">
+                    <form class="form-horizontal">
+                        <img alt="Logo K par K" class="img-responsive center-block logo" src="{!URLFOR($Resource.Logo_kpark)}" style="max-width: 190px;"/>
+
+                        <div id="content-errors" class="col-md-12" style="margin-top: 20px;">
+                            <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                                <div class="alert {!IF(message.SeverityStr=='confirm','alert-success',
+                                                    IF(message.SeverityStr=='info','alert-info',
+                                                    IF(message.SeverityStr=='warning','alert-warning','alert-danger')))}">
+                                    <apex:outputtext escape="false" value="{!message.Message}"/>
+                                </div>
+                            </apex:repeat>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script type="text/javascript" async="true" src="https://widgets.custplace.com/reviewbox/v1/static/js/bundle.js"></script>
+            <div id="Custplace_ReviewBox" data-client="6233" data-token="6233-WLZ0Wybf9kY5rF7WukYnqdQIfYOkUtBEBb5t1JXO" data-theme="white" data-source="reviewbox" 
+                data-shop="{!magasin}" data-title="{!titre}" data-note="5" data-message="{!avis}" data-email="{!email}" data-username="{!nom}" data-date="{!dateAvis}"></div>
+        </body>
+    </html>
+</apex:page>

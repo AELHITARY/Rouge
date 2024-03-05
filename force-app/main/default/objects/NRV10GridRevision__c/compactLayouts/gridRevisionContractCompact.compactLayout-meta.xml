@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>gridRevisionContractCompact</fullName>
+    <fields>Name</fields>
+    <fields>startDate__c</fields>
+    <fields>endDate__c</fields>
+    <label>Révision de grille contrat compact</label>
+</CompactLayout>

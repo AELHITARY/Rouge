@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CA_en_cours_de_test</fullName>
+    <columns>NAME</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>assignedClosing__c</columns>
+    <columns>customerOrder__c</columns>
+    <columns>codeContrat__c</columns>
+    <columns>numeroMDC__c</columns>
+    <columns>dateStats__c</columns>
+    <columns>montantHT__c</columns>
+    <columns>montantTTC__c</columns>
+    <columns>type__c</columns>
+    <columns>SGID__c</columns>
+    <columns>magasinVendeur__c</columns>
+    <columns>nomMagasinVendeur__c</columns>
+    <columns>DRServiceChantier__c</columns>
+    <columns>nomDRServiceChantier__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>nomDepotChantier__c</field>
+        <operation>equals</operation>
+        <value>TREMBLAY</value>
+    </filters>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>greaterOrEqual</operation>
+        <value>2/17/2023 7:00 PM</value>
+    </filters>
+    <label>CA en cours de test</label>
+</ListView>

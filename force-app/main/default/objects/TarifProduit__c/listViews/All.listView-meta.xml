@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>CodeProduit__c</columns>
+    <columns>Produit__c</columns>
+    <columns>codeProduitParent__c</columns>
+    <columns>productOption__c</columns>
+    <columns>Actif__c</columns>
+    <columns>DateDebutValidite__c</columns>
+    <columns>DateFinValidite__c</columns>
+    <columns>DimensionHL__c</columns>
+    <columns>DimensionHLMAX__c</columns>
+    <columns>NombreVantaux__c</columns>
+    <columns>methodePrixParent__c</columns>
+    <columns>PrixUnitaireHT__c</columns>
+    <columns>coeffVente__c</columns>
+    <columns>valeurPercent__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Tout</label>
+    <language>fr</language>
+</ListView>

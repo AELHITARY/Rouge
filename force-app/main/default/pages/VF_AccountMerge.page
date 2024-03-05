@@ -1,0 +1,1228 @@
+<apex:page standardcontroller="Account" extensions="Ctrl_AccountMerge" title="Kube - Fusion de comptes" doctype="html-5.0">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'classes/dqe.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'jquery.dqemail.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'jquery.dqephone.js')}" />
+    <script type="text/javascript">
+        j$ = jQuery.noConflict();
+        // Liste des regex et des champs à fusionner sur la page
+        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        var phoneRegex = /^[0-9]{10}$/;
+        var nombreRegex = /^[0-9]{1,2}$/;
+        var lettreRegex = /^[a-zA-ZÜ-ü-' ]+$/;
+        var lettreAndNumRegex = /^[0-9a-zA-ZÜ-ü-' ]+$/;
+        var dateRegex = /^(0[1-9]|[12][0-9]|3[01])[- \/.](0[1-9]|1[012])[- \/.](19|20)\d\d$/;
+        var isPersonAccount = '{!personAccount}';
+        var isSale = '{!isSale}';
+        var isCall = '{!isCall}';
+        var mergeCustomValueEnabled = '{!mergeCustomValueEnabled}';
+        var compteMaitre = 'doublon';
+        var masterId = '';
+        var oppositionList = [];
+        var variablesList = Object(); // Utilisée pour stocker les listes des champs spéciaux
+        var fieldNames = [];
+        var reglesFusion = new Object();
+        var fieldNamesOld = ['complementAdresse__c','canalPrefere__c','Phone','Fax','fichiersOpposition__c','Description','typesTravaux__c','NPAI__c','AccountSource','accountCallSource__c','Salutation','FirstName','LastName','PersonHomePhone','PersonMobilePhone','PersonOtherPhone','PersonBirthdate','PersonEmail','PersonMailingStreet', 'PersonMailingPostalCode','PersonMailingCity','PersonMailingState','PersonMailingCountry','etage__c','codeAcces__c','interphone__c','conjoint__c','CSP__c','Salutation','FirstName','LastName','PersonHomePhone','PersonMobilePhone','PersonOtherPhone','PersonBirthdate','PersonEmail','PersonMailingStreet', 'PersonMailingPostalCode','PersonMailingCity','PersonMailingState','PersonMailingCountry','etage__c','codeAcces__c','interphone__c','conjoint__c','CSP__c','Name','Ownership','ParentId','BillingStreet','BillingPostalCode','BillingCity','BillingState','BillingCountry'];
+
+        /* Initialisation à la page                                                        */
+        /*---------------------------------------------------------------------------------*/
+        $(document).ready(function() {
+
+            // Récupération de la liste des champs à fusionner
+            reglesFusion = JSON.parse('{!reglesFusionJSONMap}');
+            for (var key in reglesFusion) {
+                if (reglesFusion.hasOwnProperty(key))
+                    fieldNames.push(key);
+            }
+            // Cas de test / A supprimer
+            /*for (var key in fieldNames) {
+                var ligneChampHTML = '';
+                var champTest = fieldNames[key];
+
+                ligneChampHTML += '<tr class="tr-'+champTest+'">';
+                ligneChampHTML += '    <td class="field">{!$ObjectType.Account.fields.FirstName.Label}</td>';
+                ligneChampHTML += '    <td class="td-custom-'+champTest+'">';
+                ligneChampHTML += '        <input type="radio" name="'+champTest+'" id="FirstName0" value="custom" />';
+                ligneChampHTML += '        <input type="text" id="'+champTest+'-custom" class="form-control" />';
+                ligneChampHTML += '    </td>';
+                ligneChampHTML += '    <td class="td-select-'+champTest+'">';
+                ligneChampHTML += '        <input type="radio" name="'+champTest+'" id="FirstName1" value="'+accountValues[champTest]+'" />';
+                ligneChampHTML += '        <label class="checkbox-inline">';
+                ligneChampHTML += '            '+accountValues[champTest];
+                ligneChampHTML += '        </label>';
+                ligneChampHTML += '    </td>';
+                ligneChampHTML += '    <td class="td-select-'+champTest+'">';
+                ligneChampHTML += '        <input type="radio" name="'+champTest+'" id="FirstName2" value="'+accountValues[champTest]+'" />';
+                ligneChampHTML += '        <label class="checkbox-inline">';
+                ligneChampHTML += '            '+accountValues[champTest];
+                ligneChampHTML += '        </label>';
+                ligneChampHTML += '    </td>';
+                ligneChampHTML += '</tr>';
+
+                $("#tableau").append(ligneChampHTML);
+
+            }*/
+
+            for(var i=0; i<fieldNamesOld.length; i++) {
+                var champ = fieldNamesOld[i];
+
+                // Suppression de l'affichage des cases du tableau réglées comme non-modifiables par les règles de fusion
+                if(reglesFusion != undefined && reglesFusion != null){
+                    // Cas ou aucune règle n'est définie
+                    if(reglesFusion[champ] == undefined || (!((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("libre")
+                                                        &&  !((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("sélection"))){
+                        j$('#mergeTable > tbody > tr.tr-'+champ).remove();
+                    } else {
+                        // Cas ou l'écriture libre est interdite
+                        if(reglesFusion[champ] == undefined || !((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("libre")){
+                            j$('#mergeTable > tbody > tr > td.td-custom-'+champ+' > *').remove(); // Cache le selecteur libre
+                            j$('#'+champ+'1').prop('checked', true);
+                        }
+                        // Cas ou la sélection des valeurs de compte est interdite
+                        if(reglesFusion[champ] == undefined || !((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("sélection")){
+                            j$('#mergeTable > tbody > tr > td.td-select-'+champ+' > input').remove(); // Cache tous les selecteurs mais garde le label
+                            j$('#'+champ+'0').prop('checked', true);
+                        }
+                    }
+                }
+
+                // Selectionne un champ custom si modifié (initialisation selectRadio)
+                j$("[id$="+champ+"-custom]").change(function() {
+                    var fieldId=j$(this).attr('id').substring(j$(this).attr('id').lastIndexOf(':')+1).split('-')[0];
+                    selectRadio(fieldId+'0');
+                });
+            }
+
+            // Cache la colonne "Valeur personnalisé" selon paramètre global
+            if(mergeCustomValueEnabled!='true') {
+                j$('#mergeTable > thead > tr > th:nth-child(2)').remove();
+                j$('#mergeTable > tbody > tr > td:nth-child(2)').remove();
+                j$('#column1').css('width','37.5%');
+                j$('#column2').css('width','37.5%');
+            }
+
+            // Définit le compte existant comme principal si insertion
+            if('{!account.Id}' == '') {
+                j$("[id$=values2]").prop('checked', true);
+                selectAllAccount('1');
+                selectAllAccount('2');
+                defineMasterRecord(j$("[id$=principal2"));
+                // Désactivation du bouton (compte existant obligatoirement maitre)
+                j$("[id$=principal2]").prop('disabled', true);
+            } else {
+                determineMasterAccount();
+                if(compteMaitre == 'account'){
+                    j$("[id$=values1]").prop('checked', true);
+                    selectAllAccount('2');
+                    selectAllAccount('1');
+                    defineMasterRecord(j$("[id$=principal1"));
+                } else if(compteMaitre == 'doublon'){
+                    j$("[id$=values2]").prop('checked', true);
+                    selectAllAccount('1');
+                    selectAllAccount('2');
+                    defineMasterRecord(j$("[id$=principal2"));
+                }
+            }
+            
+            // DQE Software - Address
+            dqe.license_name = "{!licenceDQE}";
+            // DQE Software - Email (Person Account seulement)
+            if(isPersonAccount == "true" && "{!emailDQEEnabled}" == "true") {
+                var email_field = j$('[id$=PersonEmail-custom]');
+                email_field.addClass('input-merge');
+                email_field.wrap( "<div id='email-custom-check_state' class='inline-block has-feedback'></div>" );
+                email_field.after( "<span id='email-custom-check_glyphicon' class='glyphicon form-control-feedback' aria-hidden='true'></span>" );
+                var email = $('[id$=PersonEmail-custom]').dqemail({ myDQEIcon : true });
+                email.on('checked', function(ui, data) {
+                    j$('#email-custom-check_glyphicon').attr('title',data.msg);
+                });
+                email.trigger('blur');
+            }
+            // DQE Software - Phone
+            if("{!phoneDQEEnabled}" == "true") {
+                initializeDQEPhone('PersonHomePhone-custom');
+                initializeDQEPhone('PersonMobilePhone-custom');
+                initializeDQEPhone('Phone-custom');
+                initializeDQEPhone('PersonOtherPhone-custom');
+                initializeDQEPhone('Fax-custom');
+            }
+        });
+
+        /* Fonction pour initialiser la vérification DQE Phone - EDITION   */
+        /*-----------------------------------------------------------------*/
+        function initializeDQEPhone(fieldId) {
+            var phone_field = j$('[id$='+fieldId+']');
+            phone_field.wrap( "<div id='"+fieldId+"-check_state' class='has-feedback inline-block'></div>" );
+            phone_field.after( "<span id='"+fieldId+"-check_glyphicon' class='glyphicon form-control-feedback' aria-hidden='true'></span>" );
+            var phone = $('[id$='+fieldId+']').dqephone({ myDQEIcon : true });
+            phone.on('checked', function(ui, data) {
+                j$('#'+fieldId+'-check_glyphicon').attr('title',data.status ? '{!$Label.PhoneValid}' : '{!$Label.PhoneInvalid}');
+            });
+            phone.trigger('blur');
+        }
+
+        /* Fonction pour déterminer l'enregistrement maitre                                */
+        /*---------------------------------------------------------------------------------*/
+        function defineMasterRecord(field) {
+            // Ne fait rien si déjà actif
+            if(!j$(field).hasClass('active')){
+                j$(field).toggleClass('active');
+                masterId = j$(field).attr('name');
+                // Récupération du numero de l'index
+                var index= j$(field).attr('id').substr(j$(field).attr('id').length - 1);
+                var columnIndex1=(mergeCustomValueEnabled=='true') ? parseInt(index)+2 : parseInt(index)+1;
+                // Fond gris
+                j$('#mergeTable > thead > tr > th:nth-child('+columnIndex1+')').addClass('master-column');
+                j$('#mergeTable > tbody > tr > td:nth-child('+columnIndex1+')').addClass('master-column');
+                index = (index=='2') ? '1' : '2';
+                var columnIndex2=(mergeCustomValueEnabled=='true') ? parseInt(index)+2 : parseInt(index)+1;
+                j$("[id$=principal"+index+"]").removeClass('active');
+                j$('#mergeTable > thead > tr > th:nth-child('+columnIndex2+')').removeClass('master-column');
+                j$('#mergeTable > tbody > tr > td:nth-child('+columnIndex2+')').removeClass('master-column');
+            }
+        }
+
+        /* Fonction qui selectionne les valeurs non nulles du compte associé (1) ou du doublon (2) */
+        /*-----------------------------------------------------------------------------------------*/
+        function selectAllAccount(nb){
+            for(var i=0; i<fieldNames.length; i++) {
+                var fieldId = fieldNames[i]+nb;
+                if(j$('#'+fieldId)[0] && j$('#'+fieldId).val()!='') {
+                    j$('#'+fieldId).prop('checked', true);
+                } else if(j$('#'+fieldNames[i]+'0')[0] && j$('#'+fieldNames[i]+'0').val()!='') {
+                    j$('#'+fieldNames[i]+'0').prop('checked', true);
+                }
+            }
+        }
+
+        function determineMasterAccount(){
+            var accountType = '{!account.Type}';
+            var doublonType = '{!doublonToMerge.Type}';
+
+            if(accountType != doublonType){
+                if(accountType == 'Client')                                             compteMaitre = 'account';
+                else if(doublonType == 'Client'      || doublonType == 'Ex-Client')     compteMaitre = 'doublon';
+                else if(accountType == 'Ex-Client'   || accountType == 'Prospect')      compteMaitre = 'account';
+                else if(doublonType == 'Prospect'    || doublonType == 'Contact')       compteMaitre = 'doublon';
+                else if(accountType == 'Contact'     || accountType == 'Pré-contact')   compteMaitre = 'account';
+                else if(doublonType == 'Pré-contact' || doublonType == 'Piste')         compteMaitre = 'doublon';
+                else if(accountType == 'Piste')                                         compteMaitre = 'account';
+                else compteMaitre = '{!comptePlusAncien}';
+            } else compteMaitre = '{!comptePlusAncien}';
+
+            console.log(accountType);
+            console.log(doublonType);
+            console.log(compteMaitre);
+            console.log('{!doublonToMerge.Type}');
+        }
+
+        /* Fonction qui remet à jour les champs en erreur                                  */
+        /*---------------------------------------------------------------------------------*/
+        function resetError(){
+            j$(".has-field-error").removeClass('has-field-error');
+            j$("[id$=save]").html('Sauvegarder');
+            j$(".btn").attr ('disabled', false);
+        }
+
+        /* Fonction pour afficher une erreur                                               */
+        /*---------------------------------------------------------------------------------*/
+        function displayError(message, errorList){
+            resetError();
+            var content = '<div class="alert alert-danger"><apex:outputtext escape="false" value="'+message+'"/></div>';
+            j$("[id$=error]").html(content);
+            if(errorList) {
+                for (var i = 0; i < errorList.length; i++) {
+                    j$("[id$="+errorList[i]+"-custom]").addClass('has-field-error');
+                }
+            }
+            if('{!account.Id}' == '') {
+                j$("[id$=principal2").attr ('disabled', true);
+            }
+            scroll(0,0);
+        }
+
+        /* Fonction appellée via onChange qui selectionne un champ custom si modifié       */
+        /*---------------------------------------------------------------------------------*/
+        function selectRadio(fieldId){
+            j$("[id$="+fieldId+"]").prop('checked', true);
+        }
+
+        /* Fonction pour cocher la case selon la valeur pour un champ picklist             */
+        /*---------------------------------------------------------------------------------*/
+        function refreshCheckBoxObject(fieldName, value){
+            var triggerValue = false;
+            var tempList = [];
+            if(variablesList[fieldName] != undefined && variablesList[fieldName] != null && variablesList[fieldName] != '') tempList = variablesList[fieldName];
+            for(var i=0; i<tempList.length;i++){
+                if(tempList[i] == value) triggerValue = true;
+            }
+            if(triggerValue == false) tempList.push(value);
+            else {
+                for(var i=0; i<tempList.length;i++){
+                    if(tempList[0] != value) tempList.push(tempList.shift());
+                }
+                tempList.shift();
+            }
+            selectRadio(fieldName+'0');
+            variablesList[fieldName] = tempList;
+        }
+
+        /* Fonction permettant de récupérer la valeur personnalisée ou sélectionnée        */
+        /*---------------------------------------------------------------------------------*/
+        function getCustomOrCheckedValue(fieldName){
+            var value = j$("input[name="+fieldName+"]:checked").val();
+            if(value == 'custom') value = j$("[id$="+fieldName+"-custom]").val();
+            return value;
+        }
+
+        /* Fonction pour afficher le message de confirmation                               */
+        /*---------------------------------------------------------------------------------*/
+        function showConfirmationMessage() {
+            var masterText = ''; var slaveText = '';
+            if(masterId=="{!doublonToMerge.Id}") {
+                masterText="{!doublonToMerge.AccountNumber} {!doublonToMerge.FirstName} {!doublonToMerge.LastName}";
+                slaveText="{!account.AccountNumber} {!account.FirstName} {!account.LastName}";
+            } else {
+                slaveText="{!doublonToMerge.AccountNumber} {!doublonToMerge.FirstName} {!doublonToMerge.LastName}";
+                masterText="{!account.AccountNumber} {!account.FirstName} {!account.LastName}";
+            }
+            return confirm('Confirmez-vous la fusion des données du compte '+slaveText.trim()+' dans le compte '+masterText.trim()+' ?')
+        }
+
+        /* Lancement de la fusion                                                          */
+        /*---------------------------------------------------------------------------------*/
+        function saveFusion(){
+
+            // Récupération des types de champs à fusionner
+            var fieldsType = JSON.parse('{!fieldsTypeJSONMap}');
+            var newCompte = new Object();
+            resetError();
+            var errorList = [];
+
+            // Récupération des valeurs selectionnées et gestion des erreurs par type
+            for(var i=0; i<fieldNames.length; i++) {
+                var champ = fieldNames[i];
+                console.log(champ+' : '+fieldsType[champ]);
+
+                if(fieldsType[champ] == 'STRING' || fieldsType[champ] == 'TEXTAREA' || fieldsType[champ] == 'PICKLIST' || fieldsType[champ] == 'BOOLEAN'){
+                    newCompte[champ] = getCustomOrCheckedValue(champ);
+
+                } else if(fieldsType[champ] == 'DOUBLE'){
+                    newCompte[champ] = getCustomOrCheckedValue(champ);
+                    if(newCompte[champ] != '' && newCompte[champ] != undefined) newCompte[champ]=parseInt(newCompte[champ]);
+                    if(newCompte[champ] != null && newCompte[champ] != '' && !(nombreRegex).test(newCompte[champ])) errorList.push(champ);
+
+                } else if(fieldsType[champ] == 'EMAIL'){
+                    newCompte[champ] = getCustomOrCheckedValue(champ);
+                    if(newCompte[champ] != null && newCompte[champ] != '' && !(emailRegex).test(newCompte[champ])) errorList.push(champ);
+
+                } else if(fieldsType[champ] == 'PHONE'){
+                    newCompte[champ] = getCustomOrCheckedValue(champ);
+                    if(newCompte[champ] != null && newCompte[champ] != '' && !(phoneRegex).test(newCompte[champ])) errorList.push(champ);
+
+                } else if(fieldsType[champ] == 'DATE'){
+                    newCompte[champ] = getCustomOrCheckedValue(champ);
+                    if(newCompte[champ] != null && newCompte[champ] != '' && !(dateRegex).test(newCompte[champ])) errorList.push(champ);
+
+                } else if(fieldsType[champ] == 'MULTIPICKLIST'){
+                    var tempVar = j$("input[name='"+champ+"']:checked").val();
+                    if(tempVar == 'custom'){
+                        tempVar = '';
+                        tempList = variablesList[champ];
+                        if(tempList != undefined){
+                            for(var j=0;j<tempList.length;j++){
+                                if(j != 0) tempVar+= ';';
+                                tempVar += tempList[j];
+                            }
+                        } else
+                            tempVar = null;
+                    }
+                    newChantier[champ] = tempVar;
+
+                } else if(fieldsType[champ] == 'REFERENCE'){
+                    var tempVar = j$("input[name='"+champ+"']:checked").val();
+                    if(tempVar == 'custom'){
+                        tempVar = j$("[id$="+champ+"-custom]").val();
+                        var champId = j$("[id$="+champ+"-custom_lkid]").val();
+                    } else {
+                        var champId = tempVar;
+                    }
+                    newCompte[champ] = champId;
+                    if(newCompte[champ] != null && newCompte[champ] != '' && (champId == null || champId == '')) errorList.push(champ);
+                }  
+
+                // Gestions des champs avec vérifications particulières
+                if(champ == 'LastName' || champ == 'FirstName'){
+                    if(newCompte[champ] == null || newCompte[champ] == '' || !(lettreRegex).test(newCompte[champ])) errorList.push(champ);
+                } else if(champ == 'Name'){
+                    if(newCompte[champ] != null && newCompte[champ] != '' && !(lettreAndNumRegex).test(newCompte[champ])) errorList.push(champ);
+                }
+            }
+
+            // Affiche l'erreur
+            if(errorList.length != 0){
+                displayError("{!$Label.merge_msg_errorsFieldRequired}", errorList);
+            } else {
+                // Sinon fusion
+                j$("[id$=save]").html('{!$Label.merge_text_processMerge}');
+                j$(".btn").attr ('disabled', true);
+                var myJSONString = JSON.stringify('{!newAccountJSON}');
+                var myEscapedJSONString = myJSONString.replace(/\\\n/g, " ").replace(/\\\r/g, " ");
+                var myEscapedJSONString2 = JSON.parse(myEscapedJSONString);
+
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_AccountMerge.manualMerge}', newCompte, myEscapedJSONString2,'{!doublonKeyId}',masterId,isPersonAccount, fieldNames,
+                    function(result, event) {
+                        if (event.status) {
+                            var link = '/apex/VF_AccountVueDetails?id=' + result;
+                            window.open(link, '_self');
+                        } else if (event.type === 'exception') {
+                            displayError("{!$Label.merge_msg_errorsInMerge} "+event.message, null);
+                        } else {
+                            displayError("{!$Label.merge_msg_errorsInMerge} "+event.message, null);
+                        }
+                    },
+                    {escape: true}
+                );
+            }
+        }
+    </script>
+    <style type="text/css">
+        .lookupInput input {
+            width: 198px;
+            padding: 5px 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            border-radius: 3px;
+            color: #555555;
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing: border-box;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+
+        .select-all {
+            margin-top: 5px;
+        }
+
+            .select-all label {
+                margin-bottom: 0px;
+            }
+
+        .input-merge {
+            width: 198px !important;
+            margin-left: 2px !important;
+        }
+
+        .input-merge-dqe {
+            margin-left: 0px !important;
+        }
+
+        .master-column {
+            background-color: #f5f5f5;
+        }
+    </style>
+    <c:importvisualstrap theme="default" />
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/smoothness/jquery-ui-1.11.2.autocomplete.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Page_CSS)}" />
+    <div id="visualstrap-body" class="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero">
+        <div class="text-center">
+            <div class="page-header" style="margin-bottom: 10px;">
+                <h2>
+                    <span class="glyphicon glyphicon-import"></span>
+                    <span class="page-header-title">{!$Label.merge_text_mergeAccountSubTitle} <small>{!$User.FirstName} {!$User.LastName}</small></span>
+                </h2>
+            </div>
+        </div>
+        <div id="error"></div>
+        <apex:form styleclass="form-inline">
+            <div class="panel panel-account">
+                <div class="panel-heading">
+                    <div class="panel-title">{!$Label.merge_text_mergeSubTitle}</div>
+                </div>
+                <div class="panel-body">
+                    <span id="helpBlock" class="help-block">
+                        <apex:outputtext escape="false" value="{!$Label.merge_text_helpText}" />
+                    </span>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="mergeTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:25%;">Nom du champ</th>
+                                    <th style="width:25%;">Valeur personnalisée</th>
+                                    <th style="width:25%;" id="column1">
+                                        <div class="text-center">{!account.FirstName} {!account.LastName} (Compte)</div>
+                                        <apex:outputpanel layout="none" rendered="{!NOT(ISBLANK(account.Id))}">
+                                            <div class="btn-group btn-group-justified" role="group">
+                                                <a role="button" class="btn btn-primary btn-xs" id="principal1" name="{!account.Id}" onclick="defineMasterRecord(this);">{!$label.merge_text_accountToKeep}</a>
+                                                <apex:outputpanel layout="none" rendered="{!NOT(ISBLANK(account.Id))}">
+                                                    <a class="btn btn-primary btn-xs" href="/{!account.Id}" target="_blank">Voir</a>
+                                                </apex:outputpanel>
+                                            </div>
+                                        </apex:outputpanel>
+                                        <div class="select-all">
+                                            <label>
+                                                <input type="radio" name="values" id="values1" onclick="selectAllAccount('1');" /> {!$label.merge_text_selectAllValues}
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th style="width:25%;" id="column2">
+                                        <div class="text-center">{!doublonToMerge.FirstName} {!doublonToMerge.LastName} (Doublon détecté)</div>
+                                        <div class="btn-group btn-group-justified" role="group">
+                                            <a role="button" class="btn btn-primary btn-xs" id="principal2" name="{!doublonToMerge.Id}" onclick="defineMasterRecord(this);">{!$label.merge_text_accountToKeep}</a>
+                                            <apex:outputpanel layout="none" rendered="{!NOT(ISBLANK(doublonToMerge.Id))}">
+                                                <a class="btn btn-primary btn-xs" href="/{!doublonToMerge.Id}" target="_blank">Voir</a>
+                                            </apex:outputpanel>
+                                        </div>
+                                        <div class="select-all">
+                                            <label>
+                                                <input type="radio" name="values" id="values2" onclick="selectAllAccount('2');" /> {!$label.merge_text_selectAllValues}
+                                            </label>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableau">
+                                <!-- Compte personnel -->
+                                <!-- --><apex:outputpanel layout="none" rendered="{!personAccount}">
+                                    <tr class="tr-Salutation">
+                                        <td class="field">{!$ObjectType.Account.fields.Salutation.Label}</td>
+                                        <td class="td-custom-Salutation">
+                                            <input type="radio" name="Salutation" id="Salutation0" value="custom" />
+                                            <apex:selectlist styleclass="form-control input-merge" size="1" id="Salutation-custom" value="{!salutation}">
+                                                <apex:selectoptions value="{!salutationList}" />
+                                            </apex:selectlist>
+                                        </td>
+                                        <td class="td-select-Salutation">
+                                            <input type="radio" name="Salutation" id="Salutation1" value="{!account.Salutation}" />
+                                            <label class="checkbox-inline">
+                                                {!account.Salutation}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-Salutation">
+                                            <input type="radio" name="Salutation" id="Salutation2" value="{!doublonToMerge.Salutation}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.Salutation}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-FirstName">
+                                        <td class="field">{!$ObjectType.Account.fields.FirstName.Label}</td>
+                                        <td class="td-custom-FirstName">
+                                            <input type="radio" name="FirstName" id="FirstName0" value="custom" />
+                                            <input type="text" id="FirstName-custom" class="form-control" maxlength="40" />
+                                        </td>
+                                        <td class="td-select-FirstName">
+                                            <input type="radio" name="FirstName" id="FirstName1" value="{!account.FirstName}" />
+                                            <label class="checkbox-inline">
+                                                {!account.FirstName}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-FirstName">
+                                            <input type="radio" name="FirstName" id="FirstName2" value="{!doublonToMerge.FirstName}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.FirstName}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-LastName">
+                                        <td class="field">{!$ObjectType.Account.fields.LastName.Label}</td>
+                                        <td class="td-custom-LastName">
+                                            <input type="radio" name="LastName" id="LastName0" value="custom" />
+                                            <input type="text" id="LastName-custom" class="form-control" maxlength="80" />
+                                        </td>
+                                        <td class="td-select-LastName">
+                                            <input type="radio" name="LastName" id="LastName1" value="{!account.LastName}" />
+                                            <label class="checkbox-inline">
+                                                {!account.LastName}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-LastName">
+                                            <input type="radio" name="LastName" id="LastName2" value="{!doublonToMerge.LastName}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.LastName}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel>
+                                <apex:outputpanel layout="none" rendered="{!NOT(personAccount)}">
+                                    <tr class="tr-Name">
+                                        <td class="field">{!$ObjectType.Account.fields.Name.Label}</td>
+                                        <td class="td-custom-Name">
+                                            <input type="radio" name="Name" id="Name0" value="custom" />
+                                            <input type="text" id="Name-custom" class="form-control" maxlength="80" />
+                                        </td>
+                                        <td class="td-select-Name">
+                                            <input type="radio" name="Name" id="Name1" value="{!account.Name}" />
+                                            <label class="checkbox-inline">
+                                                {!account.Name}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-Name">
+                                            <input type="radio" name="Name" id="Name2" value="{!doublonToMerge.Name}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.Name}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-Ownership">
+                                        <td class="field">{!$ObjectType.Account.fields.Ownership.Label}</td>
+                                        <td class="td-custom-Ownership">
+                                            <input type="radio" name="Ownership" id="Ownership0" value="custom" />
+                                            <apex:selectlist styleclass="form-control input-merge" label="Source du compte (Call)" size="1" id="Ownership-custom" value="{!formeJuridique}">
+                                                <apex:selectoptions value="{!formeJuridiqueList}" />
+                                            </apex:selectlist>
+                                        </td>
+                                        <td class="td-select-Ownership">
+                                            <input type="radio" name="Ownership" id="Ownership1" value="{!account.Ownership}" />
+                                            <label class="checkbox-inline">
+                                                {!account.Ownership}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-Ownership">
+                                            <input type="radio" name="Ownership" id="Ownership2" value="{!doublonToMerge.Ownership}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.Ownership}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-ParentId">
+                                        <td class="field">Compte principal</td>
+                                        <td class="td-custom-ParentId">
+                                            <input type="radio" name="ParentId" id="ParentId0" value="custom" />
+                                            <apex:outputpanel id="ParentId-custom-panel" layout="inline">
+                                                <apex:inputfield value="{!accountCustom.ParentId}" id="ParentId-custom" />
+                                            </apex:outputpanel>
+                                        </td>
+                                        <td class="td-select-ParentId">
+                                            <input type="radio" name="ParentId" id="ParentId1" value="{!account.ParentId}" />
+                                            <label class="checkbox-inline">
+                                                {!accParentIdReformate}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-ParentId">
+                                            <input type="radio" name="ParentId" id="ParentId2" value="{!doublonToMerge.ParentId}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonParentIdReformate}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel>
+                                <apex:outputpanel layout="none" rendered="{!!isSale}">
+                                    <tr class="tr-accountCallSource__c">
+                                        <td class="field">{!$ObjectType.Account.fields.accountCallSource__c.Label}</td>
+                                        <td class="td-custom-accountCallSource__c">
+                                            <input type="radio" name="accountCallSource__c" id="accountCallSource__c0" value="custom" />
+                                            <apex:selectlist styleclass="form-control input-merge" label="Source du compte (Call)" size="1" id="accountCallSource__c-custom" value="{!accountCallSource}">
+                                                <apex:selectoptions value="{!accountCallSourceList}" />
+                                            </apex:selectlist>
+                                        </td>
+                                        <td class="td-select-accountCallSource__c">
+                                            <input type="radio" name="accountCallSource__c" id="accountCallSource__c1" value="{!account.accountCallSource__c}" />
+                                            <label class="checkbox-inline">
+                                                {!account.accountCallSource__c}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-accountCallSource__c">
+                                            <input type="radio" name="accountCallSource__c" id="accountCallSource__c2" value="{!doublonToMerge.accountCallSource__c}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.accountCallSource__c}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel>
+                                <apex:outputpanel layout="none" rendered="{!!isCall}">
+                                    <tr class="tr-AccountSource">
+                                        <td class="field">{!$ObjectType.Account.fields.AccountSource.Label}</td>
+                                        <td class="td-custom-AccountSource">
+                                            <input type="radio" name="AccountSource" id="AccountSource0" value="custom" />
+                                            <apex:selectlist styleclass="form-control input-merge" label="Source du compte" size="1" id="AccountSource-custom" value="{!AccountSource}">
+                                                <apex:selectoptions value="{!AccountSourceList}" />
+                                            </apex:selectlist>
+                                        </td>
+                                        <td class="td-select-AccountSource">
+                                            <input type="radio" name="AccountSource" id="AccountSource1" value="{!account.AccountSource}" />
+                                            <label class="checkbox-inline">
+                                                {!account.AccountSource}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-AccountSource">
+                                            <input type="radio" name="AccountSource" id="AccountSource2" value="{!doublonToMerge.AccountSource}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.AccountSource}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel> 
+                                <apex:outputpanel layout="none" rendered="{!personAccount}">
+                                    <tr class="tr-PersonMailingStreet">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonMailingStreet.Label}</td>
+                                        <td class="td-custom-PersonMailingStreet">
+                                            <input type="radio" name="PersonMailingStreet" id="PersonMailingStreet0" value="custom" />
+                                            <input type="text" id="PersonMailingStreet-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-PersonMailingStreet">
+                                            <input type="radio" name="PersonMailingStreet" id="PersonMailingStreet1" value="{!account.PersonMailingStreet}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonMailingStreet}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonMailingStreet">
+                                            <input type="radio" name="PersonMailingStreet" id="PersonMailingStreet2" value="{!doublonToMerge.PersonMailingStreet}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonMailingStreet}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-PersonMailingPostalCode">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonMailingPostalCode.Label}</td>
+                                        <td class="td-custom-PersonMailingPostalCode">
+                                            <input type="radio" name="PersonMailingPostalCode" id="PersonMailingPostalCode0" value="custom" />
+                                            <input type="text" id="PersonMailingPostalCode-custom" class="form-control" maxlength="5" />
+                                        </td>
+                                        <td class="td-select-PersonMailingPostalCode">
+                                            <input type="radio" name="PersonMailingPostalCode" id="PersonMailingPostalCode1" value="{!account.PersonMailingPostalCode}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonMailingPostalCode}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonMailingPostalCode">
+                                            <input type="radio" name="PersonMailingPostalCode" id="PersonMailingPostalCode2" value="{!doublonToMerge.PersonMailingPostalCode}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonMailingPostalCode}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-PersonMailingCity">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonMailingCity.Label}</td>
+                                        <td class="td-custom-PersonMailingCity">
+                                            <input type="radio" name="PersonMailingCity" id="PersonMailingCity0" value="custom" />
+                                            <input type="text" id="PersonMailingCity-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-PersonMailingCity">
+                                            <input type="radio" name="PersonMailingCity" id="PersonMailingCity1" value="{!account.PersonMailingCity}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonMailingCity}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonMailingCity">
+                                            <input type="radio" name="PersonMailingCity" id="PersonMailingCity2" value="{!doublonToMerge.PersonMailingCity}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonMailingCity}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-PersonMailingState">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonMailingState.Label}</td>
+                                        <td class="td-custom-PersonMailingState">
+                                            <input type="radio" name="PersonMailingState" id="PersonMailingState0" value="custom" />
+                                            <input type="text" id="PersonMailingState-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-PersonMailingState">
+                                            <input type="radio" name="PersonMailingState" id="PersonMailingState1" value="{!account.PersonMailingState}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonMailingState}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonMailingState">
+                                            <input type="radio" name="PersonMailingState" id="PersonMailingState2" value="{!doublonToMerge.PersonMailingState}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonMailingState}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-PersonMailingCountry">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonMailingCountry.Label}</td>
+                                        <td class="td-custom-PersonMailingCountry">
+                                            <input type="radio" name="PersonMailingCountry" id="PersonMailingCountry0" value="custom" />
+                                            <input type="text" id="PersonMailingCountry-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-PersonMailingCountry">
+                                            <input type="radio" name="PersonMailingCountry" id="PersonMailingCountry1" value="{!account.PersonMailingCountry}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonMailingCountry}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonMailingCountry">
+                                            <input type="radio" name="PersonMailingCountry" id="PersonMailingCountry2" value="{!doublonToMerge.PersonMailingCountry}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonMailingCountry}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-etage__c">
+                                        <td class="field">{!$ObjectType.Account.fields.etage__c.Label}</td>
+                                        <td class="td-custom-etage__c">
+                                            <input type="radio" name="etage__c" id="etage__c0" value="custom" />
+                                            <input type="number" id="etage__c-custom" class="form-control" maxlength="2" />
+                                        </td>
+                                        <td class="td-select-etage__c">
+                                            <input type="radio" name="etage__c" id="etage__c1" value="{!account.etage__c}" />
+                                            <label class="checkbox-inline">
+                                                <apex:outputfield value="{!account.etage__c}" />
+                                            </label>
+                                        </td>
+                                        <td class="td-select-etage__c">
+                                            <input type="radio" name="etage__c" id="etage__c2" value="{!doublonToMerge.etage__c}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.etage__c}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-codeAcces__c">
+                                        <td class="field">{!$ObjectType.Account.fields.codeAcces__c.Label}</td>
+                                        <td class="td-custom-codeAcces__c">
+                                            <input type="radio" name="codeAcces__c" id="codeAcces__c0" value="custom" />
+                                            <input type="text" id="codeAcces__c-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-codeAcces__c">
+                                            <input type="radio" name="codeAcces__c" id="codeAcces__c1" value="{!account.codeAcces__c}" />
+                                            <label class="checkbox-inline">
+                                                {!account.codeAcces__c}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-codeAcces__c">
+                                            <input type="radio" name="codeAcces__c" id="codeAcces__c2" value="{!doublonToMerge.codeAcces__c}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.codeAcces__c}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-interphone__c">
+                                        <td class="field">{!$ObjectType.Account.fields.interphone__c.Label}</td>
+                                        <td class="td-custom-interphone__c">
+                                            <input type="radio" name="interphone__c" id="interphone__c0" value="custom" />
+                                            <input type="text" id="interphone__c-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-interphone__c">
+                                            <input type="radio" name="interphone__c" id="interphone__c1" value="{!account.interphone__c}" />
+                                            <label class="checkbox-inline">
+                                                {!account.interphone__c}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-interphone__c">
+                                            <input type="radio" name="interphone__c" id="interphone__c2" value="{!doublonToMerge.interphone__c}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.interphone__c}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel>
+                                <apex:outputpanel layout="none" rendered="{!NOT(personAccount)}">
+                                    <tr class="tr-BillingStreet">
+                                        <td class="field">{!$ObjectType.Account.fields.BillingStreet.Label}</td>
+                                        <td class="td-custom-BillingStreet">
+                                            <input type="radio" name="BillingStreet" id="BillingStreet0" value="custom" />
+                                            <input type="text" id="BillingStreet-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-BillingStreet">
+                                            <input type="radio" name="BillingStreet" id="BillingStreet1" value="{!account.BillingStreet}" />
+                                            <label class="checkbox-inline">
+                                                {!account.BillingStreet}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-BillingStreet">
+                                            <input type="radio" name="BillingStreet" id="BillingStreet2" value="{!doublonToMerge.BillingStreet}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.BillingStreet}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-BillingPostalCode">
+                                        <td class="field">{!$ObjectType.Account.fields.BillingPostalCode.Label}</td>
+                                        <td class="td-custom-BillingPostalCode">
+                                            <input type="radio" name="BillingPostalCode" id="BillingPostalCode0" value="custom" />
+                                            <input type="text" id="BillingPostalCode-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-BillingPostalCode">
+                                            <input type="radio" name="BillingPostalCode" id="BillingPostalCode1" value="{!account.BillingPostalCode}" />
+                                            <label class="checkbox-inline">
+                                                {!account.BillingPostalCode}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-BillingPostalCode">
+                                            <input type="radio" name="BillingPostalCode" id="BillingPostalCode2" value="{!doublonToMerge.BillingPostalCode}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.BillingPostalCode}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-BillingCity">
+                                        <td class="field">{!$ObjectType.Account.fields.BillingCity.Label}</td>
+                                        <td class="td-custom-BillingCity">
+                                            <input type="radio" name="BillingCity" id="BillingCity0" value="custom" />
+                                            <input type="text" id="BillingCity-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-BillingCity">
+                                            <input type="radio" name="BillingCity" id="BillingCity1" value="{!account.BillingCity}" />
+                                            <label class="checkbox-inline">
+                                                {!account.BillingCity}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-BillingCity">
+                                            <input type="radio" name="BillingCity" id="BillingCity2" value="{!doublonToMerge.BillingCity}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.BillingCity}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-BillingState">
+                                        <td class="field">{!$ObjectType.Account.fields.BillingState.Label}</td>
+                                        <td class="td-custom-BillingState">
+                                            <input type="radio" name="BillingState" id="BillingState0" value="custom" />
+                                            <input type="text" id="BillingState-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-BillingState">
+                                            <input type="radio" name="BillingState" id="BillingState1" value="{!account.BillingState}" />
+                                            <label class="checkbox-inline">
+                                                {!account.BillingState}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-BillingState">
+                                            <input type="radio" name="BillingState" id="BillingState2" value="{!doublonToMerge.BillingState}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.BillingState}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-BillingCountry">
+                                        <td class="field">{!$ObjectType.Account.fields.BillingCountry.Label}</td>
+                                        <td class="td-custom-BillingCountry">
+                                            <input type="radio" name="BillingCountry" id="BillingCountry0" value="custom" />
+                                            <input type="text" id="BillingCountry-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-BillingCountry">
+                                            <input type="radio" name="BillingCountry" id="BillingCountry1" value="{!account.BillingCountry}" />
+                                            <label class="checkbox-inline">
+                                                {!account.BillingCountry}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-BillingCountry">
+                                            <input type="radio" name="BillingCountry" id="BillingCountry2" value="{!doublonToMerge.BillingCountry}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.BillingCountry}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel>
+                                <tr class="tr-complementAdresse__c">
+                                    <td class="field">{!$ObjectType.Account.fields.complementAdresse__c.Label}</td>
+                                    <td class="td-custom-complementAdresse__c">
+                                        <input type="radio" name="complementAdresse__c" id="complementAdresse__c0" value="custom" />
+                                        <input type="text" id="complementAdresse__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-complementAdresse__c">
+                                        <input type="radio" name="complementAdresse__c" id="complementAdresse__c1" value="{!account.complementAdresse__c}" />
+                                        <label class="checkbox-inline">
+                                            {!account.complementAdresse__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-complementAdresse__c">
+                                        <input type="radio" name="complementAdresse__c" id="complementAdresse__c2" value="{!doublonToMerge.complementAdresse__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.complementAdresse__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-NPAI__c">
+                                    <td class="field">{!$ObjectType.Account.fields.NPAI__c.Label}</td>
+                                    <td class="td-custom-NPAI__c">
+                                        <input type="radio" name="NPAI__c" id="NPAI__c0" value="custom" />
+                                        <apex:selectlist styleclass="form-control input-merge" label="NPAI" size="1" id="NPAI__c-custom" value="{!NPAI}">
+                                            <apex:selectoptions value="{!NPAIList}" />
+                                        </apex:selectlist>
+                                    </td>
+                                    <td class="td-select-NPAI__c">
+                                        <input type="radio" name="NPAI__c" id="NPAI__c1" value="{!account.NPAI__c}" />
+                                        <label class="checkbox-inline">
+                                            {!account.NPAI__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-NPAI__c">
+                                        <input type="radio" name="NPAI__c" id="NPAI__c2" value="{!doublonToMerge.NPAI__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.NPAI__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-canalPrefere__c">
+                                    <td class="field">{!$ObjectType.Account.fields.canalPrefere__c.Label}</td>
+                                    <td class="td-custom-canalPrefere__c">
+                                        <input type="radio" name="canalPrefere__c" id="canalPrefere__c0" value="custom" />
+                                        <apex:selectlist styleclass="form-control input-merge" label="Canal préféré" size="1" id="canalPrefere__c-custom" value="{!canalPrefere}">
+                                            <apex:selectoptions value="{!canalPrefereList}" />
+                                        </apex:selectlist>
+                                    </td>
+                                    <td class="td-select-canalPrefere__c">
+                                        <input type="radio" name="canalPrefere__c" id="canalPrefere__c1" value="{!account.canalPrefere__c}" />
+                                        <label class="checkbox-inline">
+                                            {!account.canalPrefere__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-canalPrefere__c">
+                                        <input type="radio" name="canalPrefere__c" id="canalPrefere__c2" value="{!doublonToMerge.canalPrefere__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.canalPrefere__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <apex:outputpanel layout="none" rendered="{!personAccount}">
+                                    <tr class="tr-PersonEmail">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonEmail.Label}</td>
+                                        <td class="td-custom-PersonEmail">
+                                            <input type="radio" name="PersonEmail" id="PersonEmail0" value="custom" />
+                                            <input type="text" id="PersonEmail-custom" class="form-control" />
+                                        </td>
+                                        <td class="td-select-PersonEmail">
+                                            <input type="radio" name="PersonEmail" id="PersonEmail1" value="{!account.PersonEmail}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonEmail}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonEmail">
+                                            <input type="radio" name="PersonEmail" id="PersonEmail2" value="{!doublonToMerge.PersonEmail}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonEmail}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-PersonHomePhone">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonHomePhone.Label}</td>
+                                        <td class="td-custom-PersonHomePhone">
+                                            <input type="radio" name="PersonHomePhone" id="PersonHomePhone0" value="custom" />
+                                            <input type="text" id="PersonHomePhone-custom" class="form-control input-merge input-merge-dqe" />
+                                        </td>
+                                        <td class="td-select-PersonHomePhone">
+                                            <input type="radio" name="PersonHomePhone" id="PersonHomePhone1" value="{!account.PersonHomePhone}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonHomePhone}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonHomePhone">
+                                            <input type="radio" name="PersonHomePhone" id="PersonHomePhone2" value="{!doublonToMerge.PersonHomePhone}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonHomePhone}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-PersonMobilePhone">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonMobilePhone.Label}</td>
+                                        <td class="td-custom-PersonMobilePhone">
+                                            <input type="radio" name="PersonMobilePhone" id="PersonMobilePhone0" value="custom" />
+                                            <input type="text" id="PersonMobilePhone-custom" class="form-control input-merge input-merge-dqe" />
+                                        </td>
+                                        <td class="td-select-PersonMobilePhone">
+                                            <input type="radio" name="PersonMobilePhone" id="PersonMobilePhone1" value="{!account.PersonMobilePhone}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonMobilePhone}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonMobilePhone">
+                                            <input type="radio" name="PersonMobilePhone" id="PersonMobilePhone2" value="{!doublonToMerge.PersonMobilePhone}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonMobilePhone}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-PersonOtherPhone">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonOtherPhone.Label}</td>
+                                        <td class="td-custom-PersonOtherPhone">
+                                            <input type="radio" name="PersonOtherPhone" id="PersonOtherPhone0" value="custom" />
+                                            <input type="text" id="PersonOtherPhone-custom" class="form-control input-merge input-merge-dqe" />
+                                        </td>
+                                        <td class="td-select-PersonOtherPhone">
+                                            <input type="radio" name="PersonOtherPhone" id="PersonOtherPhone1" value="{!account.PersonOtherPhone}" />
+                                            <label class="checkbox-inline">
+                                                {!account.PersonOtherPhone}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonOtherPhone">
+                                            <input type="radio" name="PersonOtherPhone" id="PersonOtherPhone2" value="{!doublonToMerge.PersonOtherPhone}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.PersonOtherPhone}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel>
+
+                                <tr class="tr-Phone">
+                                    <td class="field">Téléphone</td>
+                                    <td class="td-custom-Phone">
+                                        <input type="radio" name="Phone" id="Phone0" value="custom" />
+                                        <input type="text" id="Phone-custom" class="form-control input-merge input-merge-dqe" />
+                                    </td>
+                                    <td class="td-select-Phone">
+                                        <input type="radio" name="Phone" id="Phone1" value="{!account.Phone}" />
+                                        <label class="checkbox-inline">
+                                            {!account.Phone}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-Phone">
+                                        <input type="radio" name="Phone" id="Phone2" value="{!doublonToMerge.Phone}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.Phone}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-Fax">
+                                    <td class="field">Fax</td>
+                                    <td class="td-custom-Fax">
+                                        <input type="radio" name="Fax" id="Fax0" value="custom" />
+                                        <input type="text" id="Fax-custom" class="form-control input-merge input-merge-dqe" />
+                                    </td>
+                                    <td class="td-select-Fax">
+                                        <input type="radio" name="Fax" id="Fax1" value="{!account.Fax}" />
+                                        <label class="checkbox-inline">
+                                            {!account.Fax}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-Fax">
+                                        <input type="radio" name="Fax" id="Fax2" value="{!doublonToMerge.Fax}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.Fax}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-fichiersOpposition__c">
+                                    <td class="field">{!$ObjectType.Account.fields.fichiersOpposition__c.Label}</td>
+                                    <td class="td-custom-fichiersOpposition__c">
+                                        <input type="radio" name="fichiersOpposition__c" id="fichiersOpposition__c0" value="custom" />
+                                        <table id="special-fichiersOpposition__c" style="display:inline; margin-left:8px;">
+                                            <apex:repeat value="{!fichierOpposition}" var="fieldName" id="checkBoxes">
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" value="{!fieldName.value}" id="fichiersOpposition__c-{!fieldName.value}" onclick="refreshCheckBoxObject('fichiersOpposition__c', this.value);" />
+                                                        {!fieldName.label}
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                        </table>
+                                    </td>
+                                    <td class="td-select-fichiersOpposition__c">
+                                        <input type="radio" name="fichiersOpposition__c" id="fichiersOpposition__c1" value="{!account.fichiersOpposition__c}" />
+                                        <label class="checkbox-inline">
+                                            {!account.fichiersOpposition__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-fichiersOpposition__c">
+                                        <input type="radio" name="fichiersOpposition__c" id="fichiersOpposition__c2" value="{!doublonToMerge.fichiersOpposition__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.fichiersOpposition__c}
+                                        </label>
+                                    </td>
+                                </tr>
+
+                                <apex:outputpanel layout="none" rendered="{!personAccount}">
+                                    <tr class="tr-PersonBirthdate">
+                                        <td class="field">{!$ObjectType.Account.fields.PersonBirthdate.Label}</td>
+                                        <td class="td-custom-PersonBirthdate">
+                                            <input type="radio" name="PersonBirthdate" id="PersonBirthdate0" value="custom" />
+                                            <apex:inputfield id="PersonBirthdate-custom" styleclass="form-control input-merge" value="{!mergeCustom.personBirthdate}" html-maxlength="10" html-placeholder="JJ/MM/AAAA" html-pattern="^(0[1-9]|1[012])[- /.](0[1-9]|1[012])[- /.]?(?:19|20)[0-9]{2}$" />
+                                        </td>
+                                        <td class="td-select-PersonBirthdate">
+                                            <input type="radio" name="PersonBirthdate" id="PersonBirthdate1" value="{!accPersonBirthdateReformate}" />
+                                            <label class="checkbox-inline">
+                                                {!accPersonBirthdateReformate}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-PersonBirthdate">
+                                            <input type="radio" name="PersonBirthdate" id="PersonBirthdate2" value="{!doublonPersonBirthdateReformate}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonPersonBirthdateReformate}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-conjoint__c">
+                                        <td class="field">{!$ObjectType.Account.fields.conjoint__c.Label}</td>
+                                        <td class="td-custom-conjoint__c">
+                                            <input type="radio" name="conjoint__c" id="conjoint__c0" value="custom" />
+                                            <apex:outputpanel id="conjoint__c-custom-panel" layout="inline">
+                                                <apex:inputfield value="{!accountCustom.conjoint__c}" id="conjoint__c-custom" />
+                                            </apex:outputpanel>
+                                        </td>
+                                        <td class="td-select-conjoint__c">
+                                            <input type="radio" name="conjoint__c" id="conjoint__c1" value="{!account.conjoint__c}" />
+                                            <label class="checkbox-inline">
+                                                {!accConjointReformate}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-conjoint__c">
+                                            <input type="radio" name="conjoint__c" id="conjoint__c2" value="{!doublonToMerge.conjoint__c}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonConjointReformate}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <tr class="tr-CSP__c">
+                                        <td class="field">{!$ObjectType.Account.fields.CSP__c.Label}</td>
+                                        <td class="td-custom-CSP__c">
+                                            <input type="radio" name="CSP__c" id="CSP__c0" value="custom" />
+                                            <apex:selectlist styleclass="form-control input-merge" size="1" id="CSP__c-custom" value="{!CSP}">
+                                                <apex:selectoptions value="{!CSPList}" />
+                                            </apex:selectlist>
+                                        </td>
+                                        <td class="td-select-CSP__c">
+                                            <input type="radio" name="CSP__c" id="CSP__c1" value="{!account.CSP__c}" />
+                                            <label class="checkbox-inline">
+                                                {!account.CSP__c}
+                                            </label>
+                                        </td>
+                                        <td class="td-select-CSP__c">
+                                            <input type="radio" name="CSP__c" id="CSP__c2" value="{!doublonToMerge.CSP__c}" />
+                                            <label class="checkbox-inline">
+                                                {!doublonToMerge.CSP__c}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </apex:outputpanel>
+
+                                <tr class="tr-Description">
+                                    <td class="field">{!$ObjectType.Account.fields.Description.Label}</td>
+                                    <td class="td-custom-Description">
+                                        <input type="radio" name="Description" id="Description0" value="custom" />
+                                        <input type="text" id="Description-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-Description">
+                                        <input type="radio" name="Description" id="Description1" value="{!account.Description}" />
+                                        <label class="checkbox-inline">
+                                            {!account.Description}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-Description">
+                                        <input type="radio" name="Description" id="Description2" value="{!doublonToMerge.Description}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.Description}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-typesTravaux__c">
+                                    <td class="field">{!$ObjectType.Account.fields.typesTravaux__c.Label}</td>
+                                    <td class="td-custom-typesTravaux__c">
+                                        <input type="radio" name="typesTravaux__c" id="typesTravaux__c0" value="custom" />
+                                        <input type="text" id="typesTravaux__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-typesTravaux__c">
+                                        <input type="radio" name="typesTravaux__c" id="typesTravaux__c1" value="{!account.typesTravaux__c}" />
+                                        <label class="checkbox-inline">
+                                            {!account.typesTravaux__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-typesTravaux__c">
+                                        <input type="radio" name="typesTravaux__c" id="typesTravaux__c2" value="{!doublonToMerge.typesTravaux__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.typesTravaux__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="btn btn-xs btn-success btn-sm" id="save" style="float:right; padding: 5px 10px; min-width:80px;" onclick="if(showConfirmationMessage()) saveFusion();">Sauvegarder</div>
+                    <apex:commandlink style=" float:right;" styleclass="btn btn-primary btn-sm" id="Annuler2" value="Annuler" action="{!cancelMerge}" />
+                </div>
+            </div>
+        </apex:form>
+    </div>
+</apex:page>

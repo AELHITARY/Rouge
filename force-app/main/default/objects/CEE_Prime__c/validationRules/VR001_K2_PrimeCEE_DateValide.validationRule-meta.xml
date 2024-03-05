@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_PrimeCEE_DateValide</fullName>
+    <active>true</active>
+    <description>Vérifier que les dates de début et de fin sont bien chronologiquement dans le bon ordre</description>
+    <errorConditionFormula>dateDebutValidite__c &gt; dateFinValidite__c</errorConditionFormula>
+    <errorDisplayField>dateFinValidite__c</errorDisplayField>
+    <errorMessage>La date de fin de validité ne peut pas être inférieure à la date de début de validité.</errorMessage>
+</ValidationRule>

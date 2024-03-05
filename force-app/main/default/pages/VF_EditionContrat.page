@@ -1,0 +1,1603 @@
+<apex:page title="Aide pour le contrat" controller="Ctrl_EditionContrat" sidebar="false" showHeader="false" renderAs="PDF" standardStylesheets="false" applyhtmltag="false" docType="html-5.0">
+    <head>
+        <style type="text/css" media="all" >
+        /********************** reset ***********************/
+
+        /* `XHTML, HTML4, HTML5 Reset
+        ----------------------------------------------------------------------------------------------------*/
+
+        a,
+        b,
+        body,
+        div,
+        em,
+        fieldset,
+        font,
+        form,
+        h4,
+        html,
+        i,
+        iframe,
+        img,
+        label,
+        li,
+        p,
+        small,
+        span,
+        strong,
+        table,
+        tbody,
+        td,
+        tfoot,
+        th,
+        thead,
+        tr,
+        u,
+        ul {
+                border:0;
+                margin: 0;
+                padding: 0;
+                font-size: 100%;
+        }
+
+        html,
+        body {
+                height: 100%;
+        }
+
+        @page :first {
+                margin-top: 0cm;
+                margin-bottom: 0cm;
+                font-family: 'Arial', 'Helvetica', sans-serif;
+        }
+
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        hgroup,
+        menu,
+        nav,
+        section {
+        /*
+                Override the default (display: inline) for
+                browsers that do not recognize HTML5 tags.
+
+                IE8 (and lower) requires a shiv:
+                http://ejohn.org/blog/html5-shiv
+        */
+                display: block;
+        }
+
+        b,
+        strong {
+        /*
+                Makes browsers agree.
+                IE + Opera = font-weight: bold.
+                Gecko + WebKit = font-weight: bolder.
+        */
+                font-weight: bold;
+        }
+
+        img {
+                color: transparent;
+                font-size: 0;
+                vertical-align: middle;
+        /*
+                For IE.
+                http://css-tricks.com/ie-fix-bicubic-scaling-for-images
+        */
+                -ms-interpolation-mode: bicubic;
+        }
+
+        li {
+        /*
+                For IE6 + IE7.
+        */
+                display: list-item;
+        }
+
+        table {
+                border-collapse: collapse;
+                border-spacing: 0;
+        }
+
+        th,
+        td,
+        caption {
+                font-weight: normal;
+                vertical-align: top;
+                text-align: left;
+        }
+
+        q {
+                quotes: none;
+        }
+
+        q:before,
+        q:after {
+                content: '';
+                content: none;
+        }
+
+        sub,
+        sup,
+        small {
+                font-size: 75%;
+        }
+
+        sub,
+        sup {
+                line-height: 0;
+                position: relative;
+                vertical-align: baseline;
+        }
+
+        sub {
+                bottom: -0.25em;
+        }
+
+        sup {
+                top: -0.5em;
+        }
+
+        svg {
+        /*
+                For IE9.
+        */
+                overflow: hidden;
+        }
+
+
+        /***************************************************/
+
+        /*
+                960 Grid System ~ Text CSS.
+                Learn more ~ http://960.gs/
+
+                Licensed under GPL and MIT.
+        */
+
+        /* `Basic HTML
+        ----------------------------------------------------------------------------------------------------*/
+
+        body {
+                font: 8pt/1.5 Arial, 'Liberation Sans', FreeSans, sans-serif;
+        }
+
+        pre,
+        code {
+                font-family: 'DejaVu Sans Mono', Monaco, Consolas, monospace;
+        }
+
+        hr {
+                border: 0 #ccc solid;
+                border-top-width: 1pt;
+                clear: both;
+                height: 0;
+        }
+
+        /* `Headings
+        ----------------------------------------------------------------------------------------------------*/
+
+        h1 {
+                font-size: 25pt;
+        }
+
+        h2 {
+                font-size: 23pt;
+        }
+
+        h3 {
+                font-size: 21pt;
+        }
+
+        h4 {
+                font-size: 19pt;
+        }
+
+        h5 {
+                font-size: 17pt;
+        }
+
+        h6 {
+                font-size: 15pt;
+        }
+
+        /* `Spacing
+        ----------------------------------------------------------------------------------------------------*/
+
+        ol {
+                list-style: decimal;
+        }
+
+        ul {
+                list-style: disc;
+        }
+
+        li {
+                margin-left: 30pt;
+        }
+
+        p,
+        dl,
+        hr,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        ol,
+        ul,
+        pre,
+        table,
+        address,
+        fieldset,
+        figure {
+                margin-bottom: 20pt;
+        }
+
+        /***   Inside CSS   ***/                                                /* Main Div */
+        #Titre {
+                text-align:center;
+                border-left : solid 1px;
+                border-right : solid 1px;
+                width:100px;
+                margin:auto;
+                margin-bottom:10px;
+                padding-left:8px;
+                padding-right:8px;
+        }
+
+        #Signataire {
+                text-align:center;
+                border : solid 1px;
+                padding: 6px;
+                width:342px;
+                height:185px;
+                margin:auto;
+                margin-bottom:10px;
+                float:left;
+        }
+
+        #Chantier {
+                text-align:center;
+                border : solid 1px;
+                padding: 6px;
+                width:342px;
+                height:185px;
+                margin-left:364px;
+                margin-bottom:10px;
+                display:block;
+        }
+
+        #NbPorte {
+                text-align:center;
+                width:284px;
+                height:125px;
+                margin:auto;
+                float:left;
+        }
+
+        #Chauffage {
+                text-align:center;
+                border : solid 1px;
+                padding: 6px;
+                width:400px;
+                height:109px;
+                margin-left:306px;
+                display:block;
+                margin-bottom:2px;
+        }
+
+        #Proposition {
+                text-align:center;
+                border-right : solid 3px;
+                padding: 2px;
+                width:350px;
+                height:165px;
+                margin:auto;
+                float:left;
+        }
+
+        #Contrat {
+                text-align:center;
+                padding: 2px;
+                width:350px;
+                height:165px;
+                margin-left:362px;
+                display:block;
+        }
+
+        .Produits {
+                border: solid 1px;
+                width: 718px;
+                height:300px;
+                margin-bottom:20px;
+                display:block;
+        }
+
+        .ProduitsAutre {
+                border: solid 1px;
+                width: 718px;
+                height:100px;
+                margin-bottom:20px;
+                display:block;
+        }
+
+        /* Details Page 1 */
+        #numerodoc {
+                border: solid 1px;
+                text-align:center;
+                height:50px;
+        }
+
+        #grostitre {
+                color:red;
+                font-size:16px;
+                text-align:center;
+                font-weight:bold;
+        }
+
+        #CadreKpK {
+                padding: 6px;
+                width:272px;
+                border : solid 1px;
+                background-color:#dddddd;
+                text-align:left;
+        }
+
+        #separationProposition {
+                width:330px;
+                border-top : dotted 1px;
+                margin : 6px 6px;
+        }
+
+        #separationContrat {
+                width:345px;
+                border-top : dotted 1px;
+                margin : 6px 6px;
+        }
+
+        /* Details page produits  */
+        .prodProprietes {
+                width: 537px;
+                height:300px;
+                border-right: solid 1px;
+                float:left;
+        }
+
+        .prodVisuelPrix {
+                width: 180px;
+                height:300px;
+                float:right;
+                display:block;
+        }
+
+        .prodVisuelPrix2 {
+                width: 180px;
+                height:80px;
+                float:right;
+                display:block;
+                border-left: solid 1px;
+
+
+        }
+
+        .prodEmplacement {
+                width: 532px;
+                height:19px;
+                border-bottom: solid 1px;
+                border-right: solid 1px;
+                padding-left: 5px;
+                display:block;
+        }
+
+        .prodEmplacement2 {
+                width: 718px;
+                height:19px;
+                border-bottom: solid 1px;
+                padding-left: 5px;
+                display:block;
+        }
+
+        .prodTitres {
+                width: 537px;
+                height:19px;
+                border-bottom: solid 1px;
+                display:block;
+                background-color:#FFC6C6;
+        }
+
+        .prodTitle2 {
+                width: 537px;
+                height:40px;
+                border-bottom: solid 1px;
+                border-right: solid 1px;
+                display:block;
+                background-color:#FFC6C6;
+        }
+
+        .prodDesignation {
+                width: 200px;
+                height:19px;
+                border-right: solid 1px;
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+        .prodDesignB {
+                width: 130px;
+                height:40px;
+                border-right: solid 1px;
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+        .prodMateriau {
+                width: 215px;
+                height:19px;
+                border-right: solid 1px;
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+
+        .prodMaterB {
+                width: 240px;
+                border-right: solid 1px;
+                height:40px;
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+        .prodDimensions {
+                width: 120px;
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+        .prodDimensB {
+                width: 160px;
+                height:40px;
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+        .prodDetails {
+                width: 537px;
+                height:76px;
+                border-bottom: solid 1px;
+                display:block;
+        }
+
+        .prodDesignation2 {
+                width: 198px;
+                height:76px;
+                border-right: solid 1px;
+                display:block;
+                float:left;
+                text-align: center;
+                padding-left:2px;
+        }
+
+        .prodDesignB2 {
+                width: 130px;
+                height:147px;
+                border-right: solid 1px;
+                border-bottom:solid 1px;
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+        .prodMateriau2 {
+                width: 213px;
+                height:76px;
+                border-right: solid 1px;
+                display:block;
+                float:left;
+                text-align: center;
+                padding-left:2px;
+        }
+
+        .prodMaterB2 {
+                width: 240px;
+                height:147px;
+                border-right: solid 1px;
+                border-bottom: solid 1px;
+
+                display:block;
+                float:left;
+                text-align: center;
+        }
+
+        .prodDimensions2 {
+                width: 118px;
+                height:76px;
+                display:block;
+                float:left;
+                text-align: center;
+                padding-left:2px;
+        }
+
+        .prodDimensB2 {
+                width: 163px;
+                height:147px;
+                display:block;
+                float:left;
+                text-align: center;
+                padding-left:2px;
+                border-bottom: solid 1px;
+
+        }
+        .prodInstSub {
+                width: 537px;
+                height:38px;
+                border-bottom: solid 1px;
+                display:block;
+        }
+
+        .prodInstallation {
+                width: 440px;
+                height:38px;
+                border-right: solid 1px;
+                float:left;
+                padding-left:2px;
+        }
+
+        .prodSub {
+                width: 92px;
+                height:38px;
+                float:left;
+                padding-left:2px;
+        }
+
+        .prodOptions {
+                width: 537px;
+                height:19px;
+                border-bottom: solid 1px;
+                display:block;
+        }
+
+        .prodPoignee {
+                width: 183px;
+                height:19px;
+                border-right: solid 1px;
+                display:block;
+                float:left;
+                padding-left:2px;
+        }
+
+        .prodCaches {
+                width: 198px;
+                height:19px;
+                border-right: solid 1px;
+                display:block;
+                float:left;
+                padding-left:2px;
+        }
+
+        .prodOscillo {
+                width: 142px;
+                height:19px;
+                display:block;
+                float:left;
+                padding-left:2px;
+        }
+
+        .prodNotes {
+                width: 533px;
+                height:120px;
+                display:block;
+                padding:2px;
+        }
+
+        .prodCroquis {
+                width: 180px;
+                height:19px;
+                text-align: center;
+                border-bottom: solid 1px;
+        }
+
+        .prodVue {
+                width: 180px;
+                height:19px;
+                border-bottom: solid 1px;
+        }
+
+        .prodDessin {
+                width: 180px;
+                height:183px;
+                text-align: center;
+                border-bottom: solid 1px;
+        }
+
+        .prodPrix {
+                width: 180px;
+                height:76px;
+                text-align: center;
+        }
+
+        #Contenu {
+                width: 100%;
+                height:100%;
+        }
+
+
+
+        /* Classes */
+        .line_info {
+                text-align:left;
+                padding:1px;
+                font-size:10px;
+        }
+
+        .udlabel {
+                font-weight:bold;
+        }
+
+        .break {
+                page-break-after:always;
+        }
+
+        .spacer {
+                clear: both;
+        }
+
+        #titreContrat {
+                padding: 4px;
+                width:342px;
+                background-color:#000000;
+                color:#FFFFFF;
+                font-size:12px;
+                margin-bottom:5px;
+                font-weight:bold;
+                line-height: 1.2;
+        }
+
+        #titreConclusion {
+                padding: 4px;
+                width:100%;
+                background-color:#000000;
+                color:#FFFFFF;
+                font-size:12px;
+                margin-bottom:5px;
+                text-align:center;
+                line-height: 1.2;
+        }
+
+        .enteteConclusion{
+                width:100%;
+                color: #D03157;
+                font-size:9px;
+                font-weight:bold;
+                line-height: 1;
+        }
+
+        #modePaiement {
+                border : solid 1px;
+                padding: 6px;
+                padding-right:15px;
+                padding-left:15px;
+                width:95%;
+                /*height:185px;*/
+                margin:auto;
+                margin-top:2px;
+                float:left;
+        }
+
+        #signatureSociete {
+                border : solid 1px;
+                padding: 6px;
+                width:35%;
+                height: 90px;
+                margin:auto;
+                margin-right:30px;
+                float:left;
+                font-size:10px;
+        }
+
+        #signatureClient {
+                border : solid 1px;
+                padding: 6px;
+                width:55%;
+                height: 90px;
+                margin:auto;
+                float:right;
+                font-size:10px;
+        }
+
+        #titreLeftPaiement{
+            border : solid 1px;
+            width:95%;
+            font-size:10px;
+            text-align:center;
+            font-weight:bold;
+            line-height: 1.2;
+
+        }
+
+        #titreProposition {
+                padding: 4px;
+                width:330px;
+                background-color:#dddddd;
+                font-size: 12px;
+                margin-bottom:5px;
+                font-weight:bold;
+        }
+
+        .ligneSeparation {
+            margin-bottom: 5px;
+            margin-top: 5px;
+            border-top: 1px solid black;
+        }
+        </style>
+    </head>
+    <body>
+        <apex:outputPanel rendered="{!quote == null}">
+            <div style="color:red; font-size:16px; text-align:center; font-weight:bold; margin-top: 350px;">Erreur, le devis n'existe pas</div>
+        </apex:outputPanel>
+        <apex:outputPanel id="Contenu" rendered="{!quote != null}">
+            <!-- PAGE 1 : INFOS GENERALES -->
+            <div id="Titre">
+                <apex:image value="{!URLFOR($Resource.Logo_kpark)}" height="100%" width="100%"/>
+                <div id="numerodoc">N° Document</div>
+                <div id="grostitre">Proposition /<br/>Contrat</div>
+            </div> <!-- Fin Titre -->
+            <div id="Signataire" style="height:150px;">
+                <span style="font-size:10px; float:right;" class="udlabel">SIGNATAIRE</span>
+                <div class="line_info" style="padding-top:22px;">
+                    <span class="udlabel">Civilité :</span>
+                    <span>{!quote.civiliteDemandeurs__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">NOM :</span>
+                    <span style="width:150px; display:inline-block;">{!quote.nomDemandeurs__c}</span>
+                    <span class="udlabel">Prénom :</span>
+                    <span>{!quote.prenomDemandeurs__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Adresse :</span>
+                    <span>{!quote.rueDemandeurs__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Compl Ad :</span>
+                    <span>{!quote.compte__r.complementAdresse__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Code Postal :</span>
+                    <span style="width:60px; display:inline-block;">{!quote.codePostalDemandeurs__c}</span>
+                    <span class="udlabel">Ville :</span>
+                    <span>{!quote.villeDemandeurs__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel" style="width:60px; display:inline-block;">Tél DOM :</span>
+                    <span style="width:80px; display:inline-block;">{!quote.telephoneDomicileDemandeurs__c}</span>
+                    <span class="udlabel">Autre Tel :</span>
+                    <span>{!quote.autreTelephoneDemandeurs__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel" style="width:60px; display:inline-block;">Tél PORT :</span>
+                    <span>{!quote.telephoneMobileDemandeurs__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">e-mail :</span>
+                    <span>{!quote.emailDemandeurs__c}</span>
+                </div>
+            </div> <!-- Fin Signataire -->
+            <div id="Chantier" style="height:150px;">
+                <span style="font-size:10px; float:right; font-weight:bold;">CHANTIER</span>
+                <div style="text-align:left;">
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOn.jpg')}"  rendered="{!isSameAddress}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOff.jpg')}" rendered="{!isSameAddress == false}"/>
+                    <span class="udlabel">Adresse chantier identique au Signataire</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Civilité :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.civiliteChantier__c}</span>
+                    </apex:outputPanel>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">NOM :</span>
+                    <span style="width:150px; display:inline-block;">
+                        <apex:outputPanel rendered="{!isSameAddress == false}">{!quote.nomChantier__c}</apex:outputPanel>
+                    </span>
+                    <span class="udlabel">Prénom :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.prenomChantier__c}</span>
+                    </apex:outputPanel>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Adresse :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.rueChantier__c}</span>
+                    </apex:outputPanel>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Compl Ad :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.Opportunity.chantier__r.complementAdresse__c}</span>
+                    </apex:outputPanel>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Code Postal : </span>
+                    <span style="width:60px; display:inline-block;">
+                        <apex:outputPanel rendered="{!isSameAddress == false}">{!quote.codePostalChantier__c}</apex:outputPanel>
+                    </span>
+                    <span class="udlabel">Ville :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.villeChantier__c}</span>
+                    </apex:outputPanel>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Tél DOM :</span>
+                    <span style="width:80px; display:inline-block;">
+                        <apex:outputPanel rendered="{!isSameAddress == false}">{!quote.telephoneDomicileChantier__c}</apex:outputPanel>
+                    </span>
+                    <span class="udlabel">Autre Tel :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.autreTelephoneChantier__c}</span>
+                    </apex:outputPanel>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Tél PORT :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.telephoneMobileChantier__c}</span>
+                    </apex:outputPanel>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">e-mail :</span>
+                    <apex:outputPanel rendered="{!isSameAddress == false}">
+                        <span>{!quote.emailChantier__c}</span>
+                    </apex:outputPanel>
+                </div>
+            </div> <!-- Fin Chantier -->
+            <div id="NbPorte">
+                <div class="line_info">
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!quote.opportunity.chantier__r.typeResidence__c == "Principale"}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"  rendered="{!quote.opportunity.chantier__r.typeResidence__c != "Principale"}"/>
+                    <span class="udlabel">Chantier : résidence principale signataire</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">NB Fenêtres/Portes-fenêtres déjà présente(s) :</span>
+                    <span>{!quote.opportunity.chantier__r.nbPortesEtFenetres__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">NB Fenêtres/Portes-fenêtres à rénover :</span>
+                    <span>{!nbPortesEtFenetres}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Part des Fenêtres/Portes-fenêtres rénovée(s) :</span>
+                    <span>{!IF(partPortesEtFenetresRenoves == 0, "", TEXT(partPortesEtFenetresRenoves) & "%")}</span>
+                </div>
+                <div id="CadreKpK" style="text-align:center;">
+                <span>Cadre réservé à K par K</span><br/>
+                    <span class="udlabel">N° Contrat : |__|__|__|__|__|__|__|__|__|__|</span>
+                </div>
+            </div> <!-- Fin NbPorte -->
+            <div id="Chauffage">
+                <div class="line_info">
+                    <span class="udlabel">Energie de chauffage :</span>
+                    <span>{!quote.opportunity.chantier__r.chauffages__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Année de construction :</span>
+                    <span>{!quote.opportunity.chantier__r.AnneeConstruction__c}</span>
+                </div>
+                <div class="line_info">
+                    <span class="udlabel">Eco Subvention :</span>
+                    <span>{!quote.C2E__c}</span>
+                </div>
+            </div> <!-- Fin Chauffage -->
+            <div id="Proposition" style="height:190px;">
+                <div id="titreProposition">PROPOSITION</div>
+                <div class="line_info">
+                    <div class="line_info" style="text-align:right;padding-right:17px;">
+                        <span class="udlabel">Date : </span>
+                        <apex:outputText value="{0,date,dd/MM/yyyy}">
+                            <apex:param value="{!quote.dateDevis__c}" />
+                        </apex:outputText>
+                        <br/>
+                    </div>
+                    <span class="udlabel" style="color:red; padding-right:20px;">TVA :</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!quote.tvaReduite__c != 0}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.tvaReduite__c == 0}"/>
+                    <span class="udlabel" style="color:red; padding-right:20px;">5,5%</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!quote.tvaIntermediaire__c != 0}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.tvaIntermediaire__c == 0}"/>
+                    <span class="udlabel" style="color:red; padding-right:20px;">10%</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!quote.tvaNormal__c != 0}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.tvaNormal__c == 0}"/>
+                    <span class="udlabel" style="color:red; padding-right:20px;">20%</span>
+                    <span style="width:110px; display:inline-block; font-color:red;"></span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span class="udlabel" style="padding-right:10px;">Forfait chantier :</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!forfaitA}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!forfaitA == false}"/>
+                    <span style="padding-right:10px;">A</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!forfaitB}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!forfaitB == false}"/>
+                    <span style="padding-right:10px;">B</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!forfaitC}"/>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!forfaitC == false}"/>
+                    <span>C</span>
+                    <span style="padding-right:17px; width:70px; display:inline-block;">
+                        <apex:outputText value="{!IF(CONTAINS(TEXT( prixForfaitA + prixForfaitB + prixForfaitC ), '.' ), SUBSTITUTE( TEXT( prixForfaitA + prixForfaitB + prixForfaitC ),'.',','), TEXT( prixForfaitA + prixForfaitB + prixForfaitC ) + ',00')}" /> €
+                    </span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span>Total HT :</span>
+                    <span style="padding-right:17px; width:70px; display:inline-block;">
+                        <apex:outputText value="{!IF(CONTAINS(TEXT( quote.TotalHTlignes__c ), '.' ), SUBSTITUTE( TEXT( quote.TotalHTlignes__c),'.',','), TEXT( quote.TotalHTlignes__c ) + ',00')}" /> €
+                    </span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span>Total TTC :</span>
+                    <span style="padding-right:17px; width:70px; display:inline-block;">
+                        <apex:outputText value="{!IF(CONTAINS(TEXT( quote.Total_TTC_hors_remise_enseigne__c ), '.' ), SUBSTITUTE( TEXT( quote.Total_TTC_hors_remise_enseigne__c ),'.',','), TEXT( quote.Total_TTC_hors_remise_enseigne__c ) + ',00')}" /> €
+                    </span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span>Remise enseigne :</span>
+                    <span style="padding-right:17px; width:70px; display:inline-block;">
+                        <apex:outputPanel rendered="{!quote.Remise_Enseigne_Options__c != null && quote.Remise_Enseigne_Options__c < 0}" >
+                            <apex:outputText value="{!IF(CONTAINS(TEXT( quote.Remise_Enseigne_Options__c ), '.' ), SUBSTITUTE( TEXT( quote.Remise_Enseigne_Options__c ),'.',','), TEXT( quote.Remise_Enseigne_Options__c ) + ',00')}" /> €
+                        </apex:outputPanel>
+                    </span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span style="padding-right:17px; width:70px; display:inline-block;">
+                        <apex:outputPanel rendered="{!remiseDevis != null && remiseDevis > 0}" >
+                            - <apex:outputText value="{!IF(CONTAINS(TEXT( remiseDevis ), '.' ), SUBSTITUTE( TEXT( remiseDevis ),'.',','), TEXT( remiseDevis ) + ',00')}" /> €
+                        </apex:outputPanel>
+                    </span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span class="udlabel">Montant proposition TTC :</span>
+                    <span style="padding-right:17px; width:70px; display:inline-block;">
+                        <apex:outputText value="{!IF(CONTAINS(TEXT( quote.Total_TTC_devis__c ), '.' ), SUBSTITUTE( TEXT( quote.Total_TTC_devis__c ),'.',','), TEXT( quote.Total_TTC_devis__c ) + ',00')}" /> €
+                    </span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span>Nombre d'annexes de chiffrage produit :</span>
+                    <span style="width:70px; display:inline-block;padding-right:17px;"></span>
+                </div>
+            </div> <!-- Fin Proposition -->
+            <div id="Contrat" style="height:190px;">
+                <div id="titreContrat">
+                    CONTRAT<br/>
+                    <span style="font-size: 10px;">Partie à remplir au moment de la conclusion du contrat</span>
+                </div>
+                <div class="line_info" style="text-align:left;">
+                    <span class="udlabel" style="color:red; padding-right:20px;">TVA :</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" />
+                    <span class="udlabel" style="color:red; padding-right:20px;">5,5%</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span class="udlabel" style="color:red; padding-right:20px;">10%</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span class="udlabel" style="color:red; padding-right:20px;">20%</span>
+                    <span style="width:110px; display:inline-block; font-color:red;"></span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span class="udlabel" style="padding-right:10px;">Forfait chantier :</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span style="padding-right:10px;">A</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span style="padding-right:10px;">B</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span>C</span>
+                    <span style="width:80px; display:inline-block;">€</span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span>Total HT :</span>
+                    <span style="width:70px; display:inline-block;"></span>
+                    <span>€</span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span>Total TTC :</span>
+                    <span style="width:70px; display:inline-block;"></span>
+                    <span>€</span>
+                </div>
+                <div class="line_info" style="text-align:right;"><span style="width:70px; display:inline-block;">&nbsp;</span></div>
+                <div class="line_info" style="text-align:right;"><span style="width:70px; display:inline-block;">&nbsp;</span></div>
+                <div class="line_info" style="text-align:right;">
+                    <span class="udlabel">Montant proposition TTC :</span>
+                    <span style="width:70px; display:inline-block;"></span>
+                    <span>€</span>
+                </div>
+                <div class="line_info" style="text-align:right;">
+                    <span>Nombre <ins>définitif</ins> d'annexes de chiffrages produits :</span>
+                    <span style="width:79px; display:inline-block;"></span>
+                </div>
+            </div>
+            <div id="conclusion">
+                <div id="titreConclusion">Ci-dessous les informations légales à compléter et signer au moment <ins>de la conclusion du contrat</ins></div>
+                <div class="enteteConclusion">
+                    L'ACCEPTATION DU CONTRAT se fait au regard des conditions générales de vente au dos du présent document dont le client reconnaît avoir pris connaissance.<br/>
+                    Délai prévu : ...................... semaines à compter de la prise de cotes par le technicien métreur et encaissement de l'acompte.<br/>
+                </div>
+                <hr class="ligneSeparation"/>
+                <div class="enteteConclusion">
+                    MODE DE PAIEMENT
+                </div>
+                <div id="modePaiement">
+                    <div style="float:left; width:65%;font-size:8px;line-height: 1;">
+                        <span style="font-size:9px;"><strong>&bull;&nbsp;Accompte de
+                        {!IF(quote.pctAcompteAttendu__c == null, "............................. €", IF(CONTAINS(TEXT( quote.mntAcompteAttendu__c ), '.' ), SUBSTITUTE( TEXT( quote.mntAcompteAttendu__c),'.',','), TEXT( quote.mntAcompteAttendu__c ) + ',00') & " € (" & TEXT(quote.pctAcompteAttendu__c) & " %)")}</strong></span><br/>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOff.jpg')}" height="12px" width="12px" style="margin-top:6px"/>
+                        A remettre au métreur après expiration du délai de réflexion prévu à l'article L.121-25 du Code de la consommation.<br/>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOff.jpg')}" height="12px" width="12px" style="margin-top:6px"/>
+                        A prélever sur mon compte. Prélèvement bancaire ou postal effectué par PROJEO au nom et pour le compte de K par K,<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mandaté par ce dernier à cet effet.<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nota: Conformément à l'article L.121-26 du Code de la consommation, l'autorisation de prélèvement au profit de Projeo <br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ne pourra être signée par le client qu'après expiration du délai de 7 jours visé à l'article L.121-25 du code de la <br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;consommation (voir le texte au verso). Le client autorise ainsi Projeo à préléver d'une part pour le compte de K par K le <br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;montant de l'accompte visé ci-dessus et d'autre part pour son propre compte le montant des mensualités de crédit. <br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cette autorisation de prélèvement prendra effet le 7 ou le 20 du mois suivant la signature du client.<br/>
+                        <span style="font-size:9px;"><strong>&bull;&nbsp;Solde égal à
+                        {!IF(solde == null, "............................. €", IF(CONTAINS(TEXT( solde ), '.' ), SUBSTITUTE( TEXT( solde ),'.',','), TEXT( solde ) + ',00') & " € (" & TEXT(pourcentageSolde) & " %)")}</strong></span>
+                    </div>
+                    <div style="float:right; width:35%;line-height:1;">
+                        <div id="titreLeftPaiement">
+                            Autres moyens de paiement
+                        </div>
+                        <span style="font-weight:bold;color: #D03157;">
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOn.jpg')}" height="12px" width="12px" style="margin-top:6px" rendered="{!quote.modeFinancement__c == 'PAIEMENT COMPTANT'}"/>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOff.jpg')}" height="12px" width="12px" style="margin-top:6px" rendered="{!quote.modeFinancement__c != 'PAIEMENT COMPTANT'}"/>
+                            Au comptant (Chèque, espèces)
+                        </span><br/>
+                        <span style="font-size:6pt;color: #D03157;margin-left:5px;">
+                            "Conformément à l'article D.112-3 du Code monétaire et financier,<br/>
+                            &nbsp;&nbsp;&nbsp;ne peut être effectué en espèces le paiement d'une dette d'un<br/>
+                            &nbsp;&nbsp;&nbsp;montant supérieur à 3000€ lorsque le débiteur a son domicile<br/>
+                            &nbsp;&nbsp;&nbsp;fiscal en France ou agit pour les besoins d'une activité<br/>
+                            &nbsp;&nbsp;&nbsp;professionnelle (sauf exceptions mentionnées à l'article L.112-6<br/>
+                            &nbsp;&nbsp;&nbsp;dudit Code)."
+                        </span><br/>
+                        <span style="font-weight:bold;color: #D03157;line-height:1;">
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOn.jpg')}" height="12px" width="12px" style="margin-top:6px" rendered="{!quote.modeFinancement__c == '3 FOIS SANS FRAIS PROJEO (PROMO)'}"/>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOff.jpg')}" height="12px" width="12px" style="margin-top:6px" rendered="{!quote.modeFinancement__c != '3 FOIS SANS FRAIS PROJEO (PROMO)'}"/>
+                            3 fois sans frais<br/>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOn.jpg')}" height="12px" width="12px" style="margin-top:6px" rendered="{!quote.modeFinancement__c != 'PAIEMENT COMPTANT' && quote.modeFinancement__c != '3 FOIS SANS FRAIS PROJEO (PROMO)'}"/>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOff.jpg')}" height="12px" width="12px" style="margin-top:6px" rendered="{!quote.modeFinancement__c == 'PAIEMENT COMPTANT' || quote.modeFinancement__c == '3 FOIS SANS FRAIS PROJEO (PROMO)'}"/>
+                            Par crédit affecté Projeo<br/>
+                        </span>
+                    </div>
+                </div>
+                <div style="float:left;width:100%;font-size:6pt;line-height:1.1">
+                    Le prix indiqué sur la proposition est valable pendant une durée de 14 jours.<br/>
+                    <hr class="ligneSeparation"/>
+                    <strong>La formation du contrat résulte de la signature des deux parties.</strong><br/>
+                    <i>Notre garantie prend effet à la date de l'encaissement du solde des travaux.</i><br/>
+                </div>
+                <div id="signatureSociete">
+                    <strong>Nom, prénom et signature du représentant de la société K par K :</strong><br/>
+                    {!quote.Opportunity.Owner.FirstName} {!quote.Opportunity.Owner.Lastname}
+                </div>
+                <div id="signatureClient">
+                    <div><strong>Le client signataire :</strong></div>
+                    <span style="margin-right:200px;"><strong>Fait à : </strong></span><span><strong>Le</strong></span><br/>
+                    <div><strong>Signature du client</strong></div>
+                    <div style="float:left; width: 90px;font-size:8px;text-align:center;"><i>Précédée de la mention<br/> "lu et approuvé"</i></div>
+                </div>
+            </div>
+            <!-- Fin Contrat -->
+
+            <div class="break"></div>
+
+            <!-- PAGE 2...N-1 : LISTE DES PRODUITS -->
+            <!-- *************************** Porte fenetre *************************** -->
+            <apex:repeat value="{!prodListPorteF}" var="produit">
+                <div class="Produits" style="page-break-inside:avoid">
+                    <div class="prodProprietes">
+                        <div class="prodEmplacement">
+                            <span style="float:left;"><strong>EMPLACEMENT(S) :</strong> {!produit.qli.Emplacement__c}</span>
+                            <span style="float:right;padding-left: 5px; margin-right: 5px;border-left:solid 1px">
+                                <span class="udlabel" style="color:red; padding-right:20px;">TVA :</span>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c == 5.5}"/>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c != 5.5}"/>
+                                <span class="udlabel" style="color:red; padding-right:20px;">5,5%</span>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c == 10}"/>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c != 10}"/>
+                                <span class="udlabel" style="color:red; padding-right:20px;">10%</span>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c == 20}"/>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c != 20}"/>
+                                <span class="udlabel" style="color:red; padding-right:20px;">20%</span>
+                            </span>
+                        </div>
+                        <div class="prodTitres">
+                            <div class="prodDesignation" >
+                                <span class="udlabel">DÉSIGNATION</span>
+                            </div>
+                            <div class="prodMateriau">
+                                <span class="udlabel">MATÉRIAU/COULEUR/CONFIGURATION</span>
+                            </div>
+                            <div class="prodDimensions">
+                                <span class="udlabel">DIMENSIONS (CM)</span>
+                            </div>
+                        </div>
+                        <div class="prodDetails">
+                            <div class="prodDesignation2">
+                                <div class="line_info">
+                                    <span class="udlabel">Modèle </span>
+                                    <span>{!produit.qli.PriceBookEntry.product2.Modele__c}</span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel">Version </span>
+                                    <span>{!produit.qli.Version__c}</span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel">Vitrage </span>
+                                </div>
+                            </div>
+                            <div class="prodMateriau2">
+                                <div class="line_info">
+                                    <span class="udlabel">Materiau : </span>
+                                    <span>{!produit.qli.PriceBookEntry.product2.Matiere__c}</span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel">Couleur : </span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel">Essence : </span>
+                                </div>
+                            </div>
+                            <div class="prodDimensions2">
+                                <div class="line_info">
+                                    <span class="udlabel">Hauteur : </span>
+                                    <span>{!produit.qli.Hauteur__c}</span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel">Largeur : </span>
+                                    <span>{!produit.qli.Largeur__c}</span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel">Nb Vantaux : </span>
+                                    <span>{!produit.qli.Nombredevantaux__c}</span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel">Tombée :</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="prodInstSub">
+                            <div class="prodInstallation">
+                                <div class="line_info">
+                                    <span class="udlabel" style="width:70px; display:inline-block;">Installation   </span>
+                                    <span class="udlabel" style="padding-right:5px;">Fenêtre / Porte : </span>
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!produit.poseExistant}"/>
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.poseExistant)}"/>
+                                    <span style="padding-right:5px;">Pose sur bâti </span>
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!produit.poseSemi}"/>
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.poseSemi)}"/>
+                                    <span style="padding-right:5px;">Semi-rénovation </span>
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!produit.poseTotal}"/>
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.poseTotal)}"/>
+                                    <span>Dépose totale</span>
+                                </div>
+                                <div class="line_info">
+                                    <span class="udlabel" style="width:70px; display:inline-block;"></span>
+                                    <span class="udlabel">Autre Produit : </span>
+                                    <span>{!produit.installationAutre}</span>
+                                </div>
+                            </div>
+                            <div class="prodSub">
+                                <div class="line_info" style="text-align:center;">
+                                    <span class="udlabel">Eco Subvention</span><br/>
+                                    <span style="text-align:center;">{!IF(produit.ecoSubvention, TEXT(produit.ecoSubventionMontant) & " € HT", '')}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="prodOptions">
+                            <div class="prodPoignee">
+                                <div class="line_info">
+                                    <span>Poignée : </span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <div class="prodCaches">
+                                <div class="line_info">
+                                    <span>Caches-fiches : </span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <div class="prodOscillo">
+                                <div class="line_info" style="text-align:left;">
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.oscilloBattant}"/>
+                                    <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.oscilloBattant)}"/>
+                                    <span>Oscillo-battant</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="prodNotes">
+                            <div class="line_info">
+                                <div>{!produit.qli.Description__c}</div>
+                                <div>{!produit.otherOptions}</div>
+                            </div>
+                        </div>
+                    </div> <!-- Fin prodProprietes -->
+                    <div class="prodVisuelPrix">
+                        <div class="prodCroquis">
+                            <span class="udlabel">Croquis du produit</span>
+                        </div>
+                        <div style="height:187px;border-bottom: solid 1px;"> </div>
+                        <div class="line_info">
+                            <span class="udlabel">Prix unitaire HT </span><apex:outputText value="{!IF(CONTAINS(TEXT( produit.qli.PrixunitaireHTtarif__c ), '.' ), SUBSTITUTE( TEXT( produit.qli.PrixunitaireHTtarif__c ),'.',','), TEXT( produit.qli.PrixunitaireHTtarif__c ) + ',00')}" /> €<br/>
+                            <span class="udlabel">Quantité </span><apex:outputText value="{!FLOOR(produit.qli.quantity)}" /><br/>
+                            <span class="udlabel">Prix total HT </span><apex:outputText value="{!IF(CONTAINS(TEXT( produit.qli.PrixHTtarif__c ), '.' ), SUBSTITUTE( TEXT( produit.qli.PrixHTtarif__c ),'.',','), TEXT( produit.qli.PrixHTtarif__c ) + ',00')}" /> €
+                        </div>
+                    </div> <!-- Fin prodVisuelPrix -->
+                </div> <!-- Fin Produits -->
+            </apex:repeat>
+
+            <!-- *************************** Porte de garage et Portail *************************** -->
+            <apex:repeat value="{!prodListPorteGaragePortail}" var="produit">
+                <div class="Produits" style="page-break-inside:avoid">
+                    <div class="prodProprietes">
+                        <div class="prodEmplacement">
+                            <span><strong>EMPLACEMENT(S) :</strong> {!produit.qli.Emplacement__c}</span>
+                            <span style="float:right;padding-left: 5px; margin-right: 5px;border-left:solid 1px">
+                                <span class="udlabel" style="color:red; padding-right:20px;">TVA :</span>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c == 5.5}"/>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c != 5.5}"/>
+                                <span class="udlabel" style="color:red; padding-right:20px;">5,5%</span>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c == 10}"/>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c != 10}"/>
+                                <span class="udlabel" style="color:red; padding-right:20px;">10%</span>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c == 20}"/>
+                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" height="12px" width="12px" rendered="{!produit.qli.TVApourcentage__c != 20}"/>
+                                <span class="udlabel" style="color:red; padding-right:20px;">20%</span>
+                            </span>
+                        </div>
+                        <div class="prodTitle2">
+                            <div class="prodDesignB" >
+                                <span class="udlabel">DÉSIGNATION</span>
+                            </div>
+                            <div class="prodMaterB">
+                                <span class="udlabel">SPÉCIFICITÉS PORTE DE GARAGE</span>
+                            </div>
+                            <div class="prodDimensB">
+                                <span class="udlabel">SPÉCIFICITÉS PORTAIL/CLÔTURE</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="prodDesignB2">
+                                <div class="line_info" style="padding-left:2px;">
+                                    <span class="udlabel">Modèle : </span>
+                                    <span>{!produit.qli.PriceBookEntry.product2.Modele__c}</span>
+                                </div>
+                                <div class="line_info" style="padding-left:2px;border-bottom: solid 1px;">
+                                    <span class="udlabel">Version : </span>
+                                    <span>{!produit.qli.Version__c}</span>
+                                </div>
+                                <div style="background-color:#FFC6C6;border-bottom: solid 1px;">
+                                    <span class="udlabel">MATÉRIAU/COULEUR</span>
+                                </div>
+                                <div class="line_info" style="height:80px;">
+                                    <span class="udlabel">Materiau : </span>
+                                    <span>{!produit.qli.PriceBookEntry.product2.Matiere__c}</span><br/>
+                                    <span class="udlabel">Couleur : </span>
+                                </div>
+                            </div>
+
+                            <!-- Garage -->
+                            <apex:outputPanel rendered="{!NOT(produit.isPortail)}">
+                                <div class="prodMaterB2">
+                                    <div class="line_info" style="border-bottom: solid 1px;">
+                                        <div style="padding-left:2px;" class="line_info">
+                                            <span>Hauteur (sous linteau) : </span>
+                                            <span style="margin-right: 35px;">{!produit.qli.Hauteur__c}</span>
+                                            <span>Largeur : </span>
+                                            <span>{!produit.qli.Largeur__c}</span>
+                                        </div>
+                                        <br/>
+                                        <div  style="padding-left:2px;" class="line_info">
+                                            <span>Retombée linteau : </span>
+                                        </div>
+                                    </div>
+                                    <div style="border-bottom: solid 1px;" class="line_info">
+                                        <div class="line_info" style="float:left; padding-left:2px; border-right: solid 1px; width:90px;">
+                                            <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.enroulement}"/>
+                                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.enroulement)}"/>
+                                            <span>Enroulement</span><br/>
+                                            <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.sectionnelle}"/>
+                                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.sectionnelle)}"/>
+                                            <span>Sectionnelle</span>
+                                        </div>
+                                        <div class="line_info" style="text-align:left;" >
+                                            <div class="line_info">
+                                                <span style="padding-left:4px; padding-right:8px;"> Refoulement : </span>
+                                                <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.refoulementPlaf}"/>
+                                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.refoulementPlaf)}"/>
+                                                <span>plafond </span><br/>
+                                                <span style="color: white; padding-left:4px; padding-right:8px;"> Refoulement : </span>
+                                                <apex:image height="16px" value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.refoulementLat}"/>
+                                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.refoulementLat)}"/>
+                                                <span>latéral</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="line_info" style="padding-left:2px;">
+                                        <span>Motorisation : &nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.motorisation}"/>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.motorisation)}"/>
+                                        <span style="padding-right:20px;">oui </span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!NOT(produit.motorisation)}"/>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!produit.motorisation}"/>
+                                        <span>non</span>
+                                    </div>
+                                    <div class="line_info" style="padding-left:2px;">
+                                        <span style="padding-right:2px;">Portillon : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span style="padding-right:20px;">oui </span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span>non</span>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!produit.isPortail}">
+                                <div class="prodMaterB2">
+                                    <div  class="line_info" style="border-bottom: solid 1px;">
+                                        <div  style="padding-left:2px;" class="line_info">
+                                            <span>Hauteur (sous linteau) : </span>
+                                            <span style="margin-right: 35px;"></span>
+                                            <span>Largeur : </span>
+                                        </div>
+                                        <br/>
+                                        <div style="padding-left:2px;" class="line_info">
+                                            <span class="udlabel">Retombée linteau : </span>
+                                        </div>
+                                    </div>
+                                    <div style="border-bottom: solid 1px;" class="line_info">
+                                        <div class="line_info" style="float:left; padding-left:2px; border-right: solid 1px; width:90px;">
+                                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                            <span>Enroulement</span><br/>
+                                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                            <span>Sectionnelle</span>
+                                        </div>
+                                        <div class="line_info" style="text-align:left;" >
+                                            <div class="line_info">
+                                                <span> Refoulement : </span>
+                                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                                <span>plafond </span><br/>
+                                                <span style="color: white;"> Refoulement : </span>
+                                                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                                <span>latéral</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="line_info" style="padding-left:2px;">
+                                        <span>Motorisation : &nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span style="padding-right:20px;">oui </span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span>non</span>
+                                    </div>
+                                    <div class="line_info" style="padding-left:2px;">
+                                        <span>Portillon : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span style="padding-right:20px;">oui </span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span>non</span>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+
+                            <!-- Portail -->
+                            <apex:outputPanel rendered="{!produit.isPortail}">
+                                <div class="prodDimensB2">
+                                    <div class="line_info">
+                                        <span>Hauteur portail : </span>
+                                        <span>{!produit.qli.Hauteur__c}</span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span>Largeur : </span>
+                                        <span>{!produit.qli.Largeur__c}</span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span>Forme : </span>
+                                        <span></span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span class="udlabel">Motorisation :&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.motorisation}"/>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.motorisation)}"/>
+                                        <span class="udlabel">oui&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!NOT(produit.motorisation)}"/>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!produit.motorisation}"/>
+                                        <span class="udlabel">non</span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span class="udlabel" style="padding-right:4px;">Ouverture :&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.ouvertureExt}"/>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.ouvertureExt)}"/>
+                                        <span class="udlabel">extérieur</span><br/>
+                                        <span class="udlabel" style="color: white; padding-right:4px;">Ouverture :&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.ouvertureInt}"/>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.ouvertureInt)}"/>
+                                        <span class="udlabel">intérieur</span><br/>
+                                        <span class="udlabel" style="color: white; padding-right:4px;">Ouverture :&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!produit.ouvertureCoul}"/>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!NOT(produit.ouvertureCoul)}"/>
+                                        <span class="udlabel">coulissant</span>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!NOT(produit.isPortail)}">
+                                <div class="prodDimensB2">
+                                    <div class="line_info">
+                                        <span>Hauteur portail : </span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span>Largeur : </span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span>Forme : </span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span class="udlabel">Motorisation :</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span class="udlabel">oui </span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span class="udlabel">non</span>
+                                    </div>
+                                    <div class="line_info">
+                                        <span class="udlabel">Ouverture :&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span class="udlabel">extérieur</span><br/>
+                                        <span class="udlabel" style="color: white;">Ouverture :&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span class="udlabel">intérieur</span><br/>
+                                        <span class="udlabel" style="color: white;">Ouverture :&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                                        <span class="udlabel">coulissant</span>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                        </div>
+                        <div style="float:left;">
+                            <div class="line_info">
+                                <div>{!produit.qli.Description__c}</div>
+                                <div>{!produit.otherOptions}</div>
+                            </div>
+                        </div>
+                    </div> <!-- Fin prodProprietes -->
+                    <div class="prodVisuelPrix">
+                        <div class="prodCroquis">
+                            <span class="udlabel">Croquis du produit</span>
+                        </div>
+                        <div style="height:188px;border-bottom: solid 1px;">
+                        </div>
+                        <div class="line_info">
+                            <span class="udlabel">Prix unitaire HT </span><apex:outputText value="{!IF(CONTAINS(TEXT( produit.qli.PrixunitaireHTtarif__c ), '.' ), SUBSTITUTE( TEXT( produit.qli.PrixunitaireHTtarif__c ),'.',','), TEXT( produit.qli.PrixunitaireHTtarif__c ) + ',00')}" /> €<br/>
+                            <span class="udlabel">Quantité </span><apex:outputText value="{!FLOOR(produit.qli.quantity)}" /><br/>
+                            <span class="udlabel">Prix total HT </span><apex:outputText value="{!IF(CONTAINS(TEXT( produit.qli.PrixHTtarif__c ), '.' ), SUBSTITUTE( TEXT( produit.qli.PrixHTtarif__c ),'.',','), TEXT( produit.qli.PrixHTtarif__c ) + ',00')}" /> €
+                        </div>
+                    </div> <!-- Fin prodVisuelPrix -->
+                </div> <!-- Fin Produits -->
+            </apex:repeat>
+
+            <!-- *************************** Autre produit *************************** -->
+            <apex:repeat value="{!prodListAutre}" var="qli" >
+                <div class="ProduitsAutre" style="page-break-inside:avoid">
+                    <div class="prodEmplacement2">
+                        <span style="text-align:left;" class="udlabel">Autre Produit</span>
+                        <span style="padding-left:20%;" class="udlabel">Emplacement(s) : {!qli.Emplacement__c} </span>
+                        <span style="float:right;padding-left: 5px; margin-right: 5px;border-left:solid 1px">
+                            <span class="udlabel" style="color:red; padding-right:20px;">TVA :</span>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!qli.TVApourcentage__c == 5.5}"/>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!qli.TVApourcentage__c != 5.5}"/>
+                            <span class="udlabel" style="color:red; padding-right:20px;">5,5%</span>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!qli.TVApourcentage__c == 10}"/>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!qli.TVApourcentage__c != 10}"/>
+                            <span class="udlabel" style="color:red; padding-right:20px;">10%</span>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!qli.TVApourcentage__c == 20}"/>
+                            <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!qli.TVApourcentage__c != 20}"/>
+                            <span class="udlabel" style="color:red; padding-right:20px;">20%</span>
+                        </span>
+                    </div>
+                    <div class="prodVisuelPrix2">
+                        <div class="line_info">
+                            <span class="udlabel">Prix unitaire HT </span><apex:outputText value="{!IF(CONTAINS(TEXT( qli.PrixunitaireHTtarif__c ), '.' ), SUBSTITUTE( TEXT( qli.PrixunitaireHTtarif__c ),'.',','), TEXT( qli.PrixunitaireHTtarif__c ) + ',00')}" /> €<br/>
+                            <span class="udlabel">Quantité </span><apex:outputText value="{!FLOOR(qli.quantity)}" /><br/>
+                            <span class="udlabel">Prix total HT </span><apex:outputText value="{!IF(CONTAINS(TEXT( qli.PrixHTtarif__c ), '.' ), SUBSTITUTE( TEXT( qli.PrixHTtarif__c ),'.',','), TEXT( qli.PrixHTtarif__c ) + ',00')}" /> €
+                        </div>
+                    </div>
+                    <div class="prodNotes">
+                        <div class="line_info">
+                            <span class="udlabel">Nom du produit : {!qli.PriceBookEntry.Product2.Name}</span><br />
+                            <span>{!qli.Description__c}</span>
+                        </div>
+                    </div>
+                </div>
+            </apex:repeat>
+
+            <div style="page-break-inside: avoid;">
+                <div style="text-align: center;font-size:13px;" class="udlabel">ATTESTATION SIMPLIFIEE*</div>
+                <span class="udlabel" style="font-size:10px;">1 - Nature des locaux</span><br/>
+                <span style="font-size:9px;">J'atteste que les travaux à réaliser portent sur un immeuble achevé depuis plus de deux ans à la date de commencement des travaux et affecté à l'habitation à l'issue de ces travaux :</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!quote.Opportunity.chantier__r.typeHabitation__c == 'Pavillon'}"/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.Opportunity.chantier__r.typeHabitation__c != 'Pavillon'}"/>
+                <span style="width:200px;display:inline-block;font-size:9px;">maison ou immeuble individuel</span>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="width:200px;display:inline-block;font-size:9px;">immeuble collectif</span>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}"  rendered="{!quote.Opportunity.chantier__r.typeHabitation__c == 'Appartement'}"/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"  rendered="{!quote.Opportunity.chantier__r.typeHabitation__c != 'Appartement'}"/>
+                <span style="width:200px;display:inline-block;font-size:9px;">appartement individuel</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">autre (precisez la nature du local à usage d'habitation)</span><br/>
+                <span class="udlabel" style="font-size:10px;">Les travaux sont réalisés dans :</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">un local affecté exclusivement ou principalement à l’habitation</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">des pièces affectées exclusivement à l’habitation situées dans un local affecté pour moins de 50 % à cet usage.</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">des parties communes de locaux affectés exclusivement ou principalement à l’habitation dans une</span><br/><span style="font-size:9px;">proportion de</span><span style="width:200px; display:inline-block;"></span><span style="font-size:9px;">millièmes de l’immeuble.</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">un local antérieurement affecté à un usage autre que d’habitation et transformé à cet usage</span><br/>
+                <apex:outputPanel rendered="{!isSameAddress == false}">
+                    <span class="udlabel" style="font-size:11px;">Adresse** : </span>
+                    <span style="width:300px; display:inline-block;">{!quote.rueChantier__c}</span>
+                    <span class="udlabel" style="font-size:11px;">Commune : </span>
+                    <span style="width:100px; display:inline-block;">{!quote.villeChantier__c}</span>
+                    <span class="udlabel" style="font-size:11px;">Code postal : </span>
+                    <span style="width:50px; display:inline-block;">{!quote.codePostalChantier__c}</span><br/>
+
+                    <span class="udlabel" style="font-size:11px;">dont je suis : </span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span class="udlabel" style="width:100px;display:inline-block;">propriétaire</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span class="udlabel" style="width:100px;display:inline-block;">locataire</span>
+                    <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                    <span class="udlabel" style="width:150px;display:inline-block;">autre (précisez votre qualité)</span>
+                    <br/><br/>
+                </apex:outputPanel>
+                <span class="udlabel" style="font-size:10px;">2 - Nature des travaux</span><br/>
+                <span style="font-size:9px;">J’atteste que sur la période de deux ans précédant ou suivant la réalisation des travaux décrits dans la présente attestation,les travaux :</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">n’affectent ni les fondations, ni les éléments, hors fondations, déterminant la résistance et la rigidité de l’ouvrage, ni laconsistance des façades (hors ravalement).</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">n’affectent pas plus de cinq des six éléments de second œuvre suivants :</span><br/>
+                <span style="font-size:9px;font-style: italic;color:#303030;">Cochez la case correspondant aux éléments affectés : </span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px; padding-right:8px;">planchers qui ne déterminent pas la résistance ou la rigidité de l’ouvrage</span>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">huisseries extérieures</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px; padding-right:8px;">cloisons intérieures</span>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px; padding-right:8px;">installations sanitaires et de plomberie</span>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">installations éléctriques système de chauffage (pour les immeubles situés en métropole)</span><br/>
+                <span style="font-size:9px;font-style: italic;color:#303030;">NB : tous les autres travaux sont sans incidence sur le bénéfice du taux réduits.</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">n’entraînent pas une augmentation de la surface de plancher hors œuvre nette (majorée pour les bâtiments d’exploitations agricoles de la surface de plancher hors œuvre brute) des locaux existants supérieure à 10%.</span><br/>
+                <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}"/>
+                <span style="font-size:9px;">ne consistent pas en une surélévation ou une addition de construction</span><br/>
+                <br/>
+                <span class="udlabel" style="font-size:10px;margin-top:4px">3 - Conservation d'une copie de l'attestation et des pièces justificatives</span><br/>
+                <span style="font-size:9px;">Je conserve une copie de cette attestation ainsi que de toutes les factures ou notes émises par les entreprises prestataires jusqu’au 31 décembre de la cinquième année suivant la réalisation
+                des travaux et m’engage à en produire une copie à l’administration fiscale sur sa demande.</span><br/>
+                <span style="font-size:9px;">Si les mentions portées sur l’attestation s’avèrent inexactes de votre fait et ont eu pour conséquence l’application erronée dutaux réduit de la TVA, vous êtes solidairement tenu au paiement
+                du complément de taxe résultant de la différence entre le montant de la taxe due (TVA au taux de 20%) et le montant effectivement payé (TVA au taux de 5,5% ou10 %).</span><br/>
+                <span style="font-size:9px;">Fait à</span><span style="width:300px; display:inline-block;"></span><span>le</span><br/>
+                <span style="font-size:9px;">Signature du client ou de son représentant légal :</span><br/>
+                <span style="font-size:7px;">* Pour remplir cette attestation, cochez les cases correspondant à votre situation et complétez les rubriques en pointillés.</span><br/>
+                <span style="font-size:7px;">** Si différente de l’adresse signataire indiquée sur le premier volet du document.</span>
+            </div>
+        </apex:outputPanel> <!-- Fin Contenu -->
+    </body>
+</apex:page>

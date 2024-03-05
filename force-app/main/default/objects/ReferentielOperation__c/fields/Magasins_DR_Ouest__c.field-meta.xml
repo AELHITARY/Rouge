@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Magasins_DR_Ouest__c</fullName>
+    <externalId>false</externalId>
+    <label>Magasins (DR Ouest)</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>AGEN</fullName>
+                <default>false</default>
+                <label>AGEN</label>
+            </value>
+            <value>
+                <fullName>ALBI</fullName>
+                <default>false</default>
+                <label>ALBI</label>
+            </value>
+            <value>
+                <fullName>ANGERS</fullName>
+                <default>false</default>
+                <label>ANGERS</label>
+            </value>
+            <value>
+                <fullName>BLOIS</fullName>
+                <default>false</default>
+                <label>BLOIS</label>
+            </value>
+            <value>
+                <fullName>BORDEAUX CENON</fullName>
+                <default>false</default>
+                <label>BORDEAUX CENON</label>
+            </value>
+            <value>
+                <fullName>BORDEAUX VILLENAVE</fullName>
+                <default>false</default>
+                <label>BORDEAUX VILLENAVE</label>
+            </value>
+            <value>
+                <fullName>LANGON</fullName>
+                <default>false</default>
+                <label>LANGON</label>
+            </value>
+            <value>
+                <fullName>LE MANS</fullName>
+                <default>false</default>
+                <label>LE MANS</label>
+            </value>
+            <value>
+                <fullName>LIBOURNE</fullName>
+                <default>false</default>
+                <label>LIBOURNE</label>
+            </value>
+            <value>
+                <fullName>MONTARGIS</fullName>
+                <default>false</default>
+                <label>MONTARGIS</label>
+            </value>
+            <value>
+                <fullName>ORLEANS</fullName>
+                <default>false</default>
+                <label>ORLEANS</label>
+            </value>
+            <value>
+                <fullName>SAINT ANDRE DE CUBZAC</fullName>
+                <default>false</default>
+                <label>SAINT ANDRE DE CUBZAC</label>
+            </value>
+            <value>
+                <fullName>SAINTES</fullName>
+                <default>false</default>
+                <label>SAINTES</label>
+            </value>
+            <value>
+                <fullName>TOULOUSE ARCOLE</fullName>
+                <default>false</default>
+                <label>TOULOUSE ARCOLE</label>
+            </value>
+            <value>
+                <fullName>TOULOUSE MURET</fullName>
+                <default>false</default>
+                <label>TOULOUSE MURET</label>
+            </value>
+            <value>
+                <fullName>TOULOUSE SAINT CYPRIEN</fullName>
+                <default>false</default>
+                <label>TOULOUSE SAINT CYPRIEN</label>
+            </value>
+            <value>
+                <fullName>TOULOUSE URSS</fullName>
+                <default>false</default>
+                <label>TOULOUSE URSS</label>
+            </value>
+            <value>
+                <fullName>TOURS</fullName>
+                <default>false</default>
+                <label>TOURS</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>3</visibleLines>
+</CustomField>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>creditMemo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Avoir</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CreditMemo__c.creditMemoReference__c</field>
+            <operation>notEqual</operation>
+            <value></value>
+        </filterItems>
+        <filterItems>
+            <field>CreditMemo__c.customerOrder__c</field>
+            <operation>equals</operation>
+            <valueField>$Source.order__c</valueField>
+        </filterItems>
+        <isOptional>true</isOptional>
+    </lookupFilter>
+    <referenceTo>CreditMemo__c</referenceTo>
+    <relationshipLabel>Pièces comptables</relationshipLabel>
+    <relationshipName>AccountingPieces</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

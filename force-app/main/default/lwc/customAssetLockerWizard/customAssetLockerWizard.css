@@ -1,0 +1,18 @@
+.slds-modal__container {
+    max-width: 80rem !important;
+    width: 80% !important;
+}
+
+.hidden{
+    display:none;
+}
+
+.picklist-container{
+    width : 90%;
+    margin: 0 auto;
+}
+
+.picklist-container .slds-dropdown{
+    position: relative !important;
+    z-index: 99 !important;
+}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EngagementLetter</fullName>
+    <active>true</active>
+    <description>Contrat spécifique à une mission différente du contrat pour un collaborateur</description>
+    <label>Lettre de mission</label>
+    <picklistValues>
+        <picklist>stageName__c</picklist>
+        <values>
+            <fullName>Désactivé</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En cours</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Provisionné</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>type__c</picklist>
+        <values>
+            <fullName>CAE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CDD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CDI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CIE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CTT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CUI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrat d%27apprentissage</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrat de prestation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contrat de professionnalisation</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

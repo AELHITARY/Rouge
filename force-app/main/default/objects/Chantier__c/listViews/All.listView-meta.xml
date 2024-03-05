@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>numeroChantier__c</columns>
+    <columns>statutVisuel__c</columns>
+    <columns>proprietaire__c</columns>
+    <columns>autreProprietaire__c</columns>
+    <columns>rue__c</columns>
+    <columns>codePostal__c</columns>
+    <columns>ville__c</columns>
+    <columns>libelleMagasinActuel__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Chantier__c.Chantier</value>
+    </filters>
+    <filters>
+        <field>libelleMagasinActuel__c</field>
+        <operation>equals</operation>
+        <value>PAYS BASQUE</value>
+    </filters>
+    <label>Tous les chantiers</label>
+</ListView>

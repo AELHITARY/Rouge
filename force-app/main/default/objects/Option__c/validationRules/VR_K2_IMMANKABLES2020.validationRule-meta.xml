@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K2_IMMANKABLES2020</fullName>
+    <active>false</active>
+    <description>Bloquer la promo Immankables 2020 si pas DV0056 CHAMPAGNE</description>
+    <errorConditionFormula>Codeoption__c = &apos;OPIMK2020&apos; &amp;&amp;
+ligneDevis__r.Quote.Opportunity.Owner.CodeDV__c != &apos;DV0056&apos;</errorConditionFormula>
+    <errorMessage>Promotion IMMANKABLES KPARK 2020 réservée uniquement à la DV Champagne!</errorMessage>
+</ValidationRule>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GDPR_nombreEssais__c</fullName>
+    <description>Nombre d’essais et d’échecs de la suppression</description>
+    <externalId>false</externalId>
+    <label>Nombre d’essais (GDPR)</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

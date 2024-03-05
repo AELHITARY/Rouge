@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Collaborator</fullName>
+    <fields>Name</fields>
+    <fields>RecordTypeId</fields>
+    <fields>reference__c</fields>
+    <fields>job__c</fields>
+    <fields>employedBy__c</fields>
+    <fields>phone__c</fields>
+    <fields>mobilePhone__c</fields>
+    <fields>email__c</fields>
+    <label>Collaborateur</label>
+</CompactLayout>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR003_K2_Option_LibelleNonModifiable</fullName>
+    <active>true</active>
+    <errorConditionFormula>ISCHANGED(Libelleoption__c)</errorConditionFormula>
+    <errorDisplayField>Libelleoption__c</errorDisplayField>
+    <errorMessage>Libellé de l&apos;option non modifiable!</errorMessage>
+</ValidationRule>

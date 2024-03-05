@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>customValue__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Champs technique permettant de ne pas écraser un montant de malus modifié par un supérieur hirarchique dans le cadre des malus.</description>
+    <externalId>false</externalId>
+    <label>Valeur personnalisée</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

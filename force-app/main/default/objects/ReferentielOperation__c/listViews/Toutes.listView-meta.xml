@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Toutes</fullName>
+    <columns>NAME</columns>
+    <columns>Ville__c</columns>
+    <columns>Datedebut__c</columns>
+    <columns>Datefin__c</columns>
+    <columns>Code2__c</columns>
+    <columns>SurfaceduStand__c</columns>
+    <columns>Autrescouts__c</columns>
+    <columns>Coutemplacement__c</columns>
+    <columns>Coutsmontagedemontage__c</columns>
+    <columns>Precisions_autres_couts__c</columns>
+    <columns>OWNER.LAST_NAME</columns>
+    <columns>Code_DV__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Toutes</label>
+    <language>fr</language>
+    <sharedTo>
+        <group>Support185343</group>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,115 @@
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:address" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Auto-complétion d'adresse">Auto-complétion d'adresse</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container">
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto" padding="around-small">
+                    <fieldset class="fieldset" id="id_fieldset_address">
+                        <div class="lookup-module">
+                           <c-dqe-Lookup-Address
+                                    label="Recherche d'une adresse postal"
+                                    icon="standard:address"
+                                    street={street}
+                                    zip={postalCode}
+                                    city={city}
+                                    state={state}
+                                    country={country}
+                                    lat={latitude}
+                                    lng={longitude}
+                                    onselecteditemevent={handleItemSelectedEvent}>
+                            </c-dqe-Lookup-Address>
+                        </div>
+                        
+                        <div class="slds-m-top_xx-small">
+                            <lightning-input-address
+                                variant="label-hidden"
+                                address-label="Adresse postal"
+                                street-label="Rue"
+                                city-label="Ville"
+                                country-label="Pays"
+                                province-label="Région / Province"
+                                postal-code-label="Code postal"
+                                street={street}
+                                postal-code={postalcode}
+                                city={city}
+                                province={state}
+                                country={country}
+                                onchange={handleInputAddressChange}
+                                required>
+                            </lightning-input-address>
+                            <template if:true={displayComplementAddress}>
+                                <div>
+                                    <lightning-input type="text" 
+                                                    label="Complément d'adresse"
+                                                    value={complementAddress}
+                                                    placeholder="Résidence, bâtiment, zone, etc." 
+                                                    field-level-help="Informations affichées comme 2nd ligne sur l’adresse postale"
+                                                    onchange={handleComplementAddressChange}></lightning-input>
+                                </div>
+                            </template>
+                            <template if:true={displayEtage}>
+                                <div>
+                                    <lightning-input type="number" 
+                                                    label="Etage"
+                                                    value={etage}
+                                                    placeholder="Numéro de l'étage" 
+                                                    max="99"
+                                                    onchange={handleEtageChange}></lightning-input>
+                                </div>
+                            </template>
+                        </div>
+                    </fieldset>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+              
+        <div slot="footer">
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-m-vertical_xx-small">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            <!-- BUTTONS -->   
+            <lightning-button variant="brand" label="Enregistrer" title="Enregistrer" onclick={handleSave}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

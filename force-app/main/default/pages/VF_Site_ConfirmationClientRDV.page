@@ -1,0 +1,161 @@
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="Ctrl_Site_ConfirmationClientRDV" applyHtmlTag="false" standardStylesheets="false" cache="false">
+    <html>
+        <head>
+            <title>Confirmation du rendez-vous</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="robots" content="noindex, follow" />
+            <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+            <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+            <apex:includescript value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/js/bootstrap.min.js')}" />
+            <script type="text/javascript">
+                j$ = jQuery.noConflict();
+                var rdvId = "{!rdvId}";
+                var errorDetected = false
+
+                j$(document).ready(function(){
+                    // Affichage d'une alerte si la date de confirmation client est déjà renseignée.
+                    if('{!rdvExist}' == 'false'){
+                        displayError('Une erreur interne ne permet pas d\'afficher le détail de votre rendez-vous. Merci de contacter le service client pour avoir plus d\'informations.');
+                        j$('#content-start').addClass("hidden").removeClass("show");
+                    } else if('{!rdv.dateConfirmationClient__c}' != undefined && '{!rdv.dateConfirmationClient__c}' != ''){
+                        j$('#content-stop').addClass("show").removeClass("hidden");
+                    } else {
+                        confirmRDV('e');
+                    } 
+                });
+
+                // Confirmation du RDV
+                function confirmRDV(temp){
+                    j$('#confirmerRDV').blur();
+                    // Désactive les boutons pendant le traitement
+                    j$("button").button('loading');
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.Ctrl_Site_ConfirmationClientRDV.confirmRDV}', rdvId, 
+                        function(result, event) {
+                            if (event.status) {
+                                // Affiche le message de remerciement
+                                j$('#content-end').addClass("show").removeClass("hidden");
+                            } else if (event.type === 'exception') {
+                                displayError(event.message);
+                            } else {
+                                displayError(event.message);
+                            }
+                        },
+                        {escape: true}
+                    );
+                }
+
+                /* Fonction pour afficher une erreur                                               */
+                /*---------------------------------------------------------------------------------*/
+                function displayError(message){                    
+                    var content = '<div class="alert alert-danger"><apex:outputtext escape="false" value="'+message+'"/></div>';
+                    j$("[id$=content-errors]").html(content);
+                    scroll(0,0);                    
+                    // Réactive les boutons
+                    j$("button").button('reset');
+                }
+
+            </script>
+            <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+            <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}"/>
+            <style type="text/css" media="all">
+                
+                #content-rdv table{
+                    margin-bottom:30px !important;
+                    margin-top:25px !important;
+                }
+
+                #content-rdv td{
+                    padding-left:12px !important;
+                    padding-bottom:2px !important;
+                }
+
+            </style>
+        </head>
+        <body>
+            <div class="container" id="container">
+                <div class="row">
+                    <form class="form-horizontal">
+                        <img alt="Logo K par K" class="img-responsive center-block logo" src="{!URLFOR($Resource.Logo_kpark)}" style="max-width: 190px;"/>
+                        <div id="content-errors" class="col-md-12" style="margin-top: 20px;">
+                            <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                                <div class="alert {!IF(message.SeverityStr=='confirm','alert-success',
+                                                    IF(message.SeverityStr=='info','alert-info',
+                                                    IF(message.SeverityStr=='warning','alert-warning','alert-danger')))}">
+                                    <apex:outputtext escape="false" value="{!message.Message}"/>
+                                </div>
+                            </apex:repeat>
+                        </div>
+
+                        
+                        <div id="content-start" class="col-lg-offset-2 col-lg-8 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 col-xm-12 alert alert-success">
+                            <div id="content-end" class="hidden">
+                                <div class="col-md-12 text-center alert alert-success">
+                                    {!$Label.confirmationRDV_msg_merci}
+                                </div>
+                            </div>
+                            <div id="content-stop" class="hidden">
+                                <div class="col-md-12 text-center alert alert-success">
+                                    {!$Label.confirmationRDV_msg_dejaConfirme}
+                                </div>
+                            </div>
+                        
+                            <div class="col-md-12">
+                                Pour rappel, voici les informations relatives à votre rendez-vous :
+                            </div>
+                            <div class="col-md-12">
+                                <div id="content-rdv">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            Identifiant du RDV :
+                                        </td>
+                                        <td>
+                                            {!rdv.fsl_externalId__c}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Type de RDV :
+                                        </td>
+                                        <td>
+                                            {!rdv.WorkType.Name}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Arrivée du métreur entre :
+                                        </td>
+                                        <td>
+                                            {!SchedStartTimeString}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            et :
+                                        </td>
+                                        <td>
+                                            {!SchedEndTimeString}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Adresse du RDV :
+                                        </td>
+                                        <td>
+                                            {!IF(rdv.Street == null,
+                                                rdv.PostalCode & ' ' & rdv.City,
+                                                rdv.Street & ', '& rdv.PostalCode & ' ' & rdv.City
+                                            )}
+                                        </td>
+                                    </tr>
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>

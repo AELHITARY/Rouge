@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Objectif_ContPassif_S4</fullName>
+    <active>true</active>
+    <description>Contact passif semaine 4 toujours positif</description>
+    <errorConditionFormula>nbContactsPassifsS4__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>nbContactsPassifsS4__c</errorDisplayField>
+    <errorMessage>Vous devez saisir une valeur positive !</errorMessage>
+</ValidationRule>

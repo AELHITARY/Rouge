@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TEST</fullName>
+    <columns>NAME</columns>
+    <columns>codeContrat__c</columns>
+    <columns>dateVente__c</columns>
+    <columns>IDTiers__c</columns>
+    <columns>numeroMDC__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>codeContrat__c</field>
+        <operation>equals</operation>
+        <value>CNT/0657060522</value>
+    </filters>
+    <label>TEST</label>
+    <language>fr</language>
+</ListView>

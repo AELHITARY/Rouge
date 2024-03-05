@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>Notification_Annulation_des_RDV_commerciaux_par_les_calls</fullName>
+        <description>RDV - Notification Annulation des RDV commerciaux par les calls</description>
+        <protected>false</protected>
+        <recipients>
+            <type>owner</type>
+        </recipients>
+        <senderAddress>support@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>Batch_technique/NotificationAnnulationRDV</template>
+    </alerts>
+    <alerts>
+        <fullName>RDV_Notification_RV_pour_vendeur_recommand</fullName>
+        <description>RDV - Notification RV pour vendeur recommandé</description>
+        <protected>false</protected>
+        <recipients>
+            <field>salesManagerEmail__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>support@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>unfiled$public/RDV_Notification_vendeur_recommand</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>MAJAnnulationVendeur</fullName>
+        <field>Motifsannulationvendeur__c</field>
+        <name>MAJAnnulationVendeur</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Null</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJMotifAnnulationClient</fullName>
+        <field>Motifsannulationclient__c</field>
+        <name>MAJMotifAnnulationClient</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Null</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MaJObjet</fullName>
+        <description>MàJ de l&apos;objet en lui ajoutant le type de l&apos;événement</description>
+        <field>Subject</field>
+        <formula>Subject &amp;&quot;_&quot;&amp; Text(Type)</formula>
+        <name>MàJ_Objet</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MotifAnnulationDevisable</fullName>
+        <field>MotifsAnnulationnondevisable__c</field>
+        <name>MotifAnnulationDevisable</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Null</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_EventRDVDateExpiration</fullName>
+        <field>GDPR_dateExpiration__c</field>
+        <formula>ActivityDate + 1050</formula>
+        <name>UR001_K2_EventRDVDateExpiration</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Event_Areaffecter</fullName>
+        <field>StatutRDV__c</field>
+        <literalValue>Pris</literalValue>
+        <name>UR001_K2_Event_Areaffecter</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Event_AutreDateExpiration</fullName>
+        <field>GDPR_dateExpiration__c</field>
+        <formula>ActivityDate + 365</formula>
+        <name>UR001_K2_Event_AutreDateExpiration</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Event_Emplacement</fullName>
+        <field>Location</field>
+        <formula>IF(ISNULL(rue__c), &apos;&apos;, rue__c+&apos;, &apos;) +
+codePostal__c + &apos; &apos; +
+ville__c</formula>
+        <name>UR001_K2_Event_Emplacement</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <rules>
+        <fullName>FRA- RDVStatutAconfirmer</fullName>
+        <actions>
+            <name>Attendre_requalif</name>
+            <type>Task</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>Event.StatutRDV__c</field>
+            <operation>equals</operation>
+            <value>Non confirmé</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <description>Si le superviseur ne valide pas un RDV (statut reste &quot;A confirmer&quot;) dans 48h alors le Directeur du Call doit recevoir une tâche avec un objet &quot;Attendre requalif&quot;.</description>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>FRA_ObjetEvenement</fullName>
+        <actions>
+            <name>MaJObjet</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>Event.RecordTypeId</field>
+            <operation>notEqual</operation>
+            <value>FRA- Activité commerciale</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <description>Cette règle change automatiquement l&apos;Objet d&apos;un événement pour devenir Objet_Type</description>
+        <triggerType>onCreateOnly</triggerType>
+    </rules>
+    <rules>
+        <fullName>FRA_ViderLesJustifEvenementNonEffectue</fullName>
+        <actions>
+            <name>MAJAnnulationVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>MAJMotifAnnulationClient</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>MotifAnnulationDevisable</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>false</active>
+        <formula>AND ( $User.ByPassWorkflowRule__c =False,or( ISPICKVAL( StatutRDV__c , &quot;Pris&quot;) , AND( ISPICKVAL(StatutRDV__c,&quot;Effectué&quot; ), not(ispickval(ResultatduRDV__c , &quot;Non devisable&quot;))))   )</formula>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Event_AutreDateExpiration</fullName>
+        <actions>
+            <name>UR001_K2_Event_AutreDateExpiration</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>Event.RecordTypeId</field>
+            <operation>notEqual</operation>
+            <value>FRA- Activité commerciale</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Event.StartDateTime</field>
+            <operation>notEqual</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <description>GDPR - Mise à jour de la date d&apos;expiration selon la date de début</description>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Event_InsertOrUpdate</fullName>
+        <actions>
+            <name>UR001_K2_Event_Areaffecter</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>false</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Event.StatutRDV__c</field>
+            <operation>equals</operation>
+            <value>A réaffecter</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>User.Username</field>
+            <operation>notEqual</operation>
+            <value>franck.gourdeaux@kpark.fr</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>User.Username</field>
+            <operation>notEqual</operation>
+            <value>isabelle.jambon@kpark.fr</value>
+        </criteriaItems>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Event_Prospection_MAJChampEmplacement</fullName>
+        <actions>
+            <name>UR001_K2_Event_Emplacement</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <description>Mise à jour du champ Emplacement pour les activités de prospection selon l&apos;adresse</description>
+        <formula>$User.ByPassWorkflowRule__c = false &amp;&amp;  RecordType.DeveloperName = &apos;FRAActivitprospection&apos; &amp;&amp;  (rue__c != PRIORVALUE(rue__c) || codePostal__c != PRIORVALUE(codePostal__c) || ville__c != PRIORVALUE(ville__c))</formula>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Event_RDVDateExpiration</fullName>
+        <actions>
+            <name>UR001_K2_EventRDVDateExpiration</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>Event.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>FRA- Activité commerciale</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Event.StartDateTime</field>
+            <operation>notEqual</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <description>GDPR - Mise à jour de la date d&apos;expiration selon la date de début</description>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <tasks>
+        <fullName>Attendre_requalif</fullName>
+        <assignedToType>owner</assignedToType>
+        <dueDateOffset>0</dueDateOffset>
+        <notifyAssignee>false</notifyAssignee>
+        <offsetFromField>Event.EndDateTime</offsetFromField>
+        <priority>Élevé</priority>
+        <protected>false</protected>
+        <status>A faire</status>
+        <subject>Attendre requalif</subject>
+    </tasks>
+</Workflow>

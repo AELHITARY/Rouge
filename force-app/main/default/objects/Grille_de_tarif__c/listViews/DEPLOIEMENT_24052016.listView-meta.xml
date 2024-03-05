@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DEPLOIEMENT_24052016</fullName>
+    <columns>NAME</columns>
+    <columns>Datedapplication__c</columns>
+    <columns>Date_fin_validite__c</columns>
+    <columns>Dimension__c</columns>
+    <columns>Prix1vantail__c</columns>
+    <columns>Prix2vantaux__c</columns>
+    <columns>Prix3vantaux__c</columns>
+    <columns>Prix4vantaux__c</columns>
+    <columns>Prix5vantaux__c</columns>
+    <columns>Prix6vantaux__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>5/24/2016 12:00 AM</value>
+    </filters>
+    <label>DEPLOIEMENT DU 24/05/2016</label>
+    <language>fr</language>
+</ListView>

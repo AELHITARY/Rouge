@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>chauffages__c</fullName>
+    <externalId>false</externalId>
+    <label>Mode(s) de chauffe</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Individuel Electrique</fullName>
+                <default>false</default>
+                <label>Individuel Electrique</label>
+            </value>
+            <value>
+                <fullName>Individuel Fuel</fullName>
+                <default>false</default>
+                <label>Individuel Fuel</label>
+            </value>
+            <value>
+                <fullName>Individuel Gaz</fullName>
+                <default>false</default>
+                <label>Individuel Gaz</label>
+            </value>
+            <value>
+                <fullName>Individuel Autre</fullName>
+                <default>false</default>
+                <label>Individuel Autre</label>
+            </value>
+            <value>
+                <fullName>Collectif</fullName>
+                <default>false</default>
+                <label>Collectif</label>
+            </value>
+            <value>
+                <fullName>Energie renouvelable</fullName>
+                <default>false</default>
+                <label>Energie renouvelable</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

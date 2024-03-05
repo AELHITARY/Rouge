@@ -1,0 +1,877 @@
+<apex:page standardcontroller="Chantier__c" extensions="Ctrl_ChantierMerge" title="Kube - Fusion de chantier" doctype="html-5.0">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <script type="text/javascript">
+        j$ = jQuery.noConflict();
+        // Liste des regex et des champs à fusionner sur la page
+        var anneeRegex = /^([0-9]{4})(\+{1})?$/;
+        var nombreRegex = /^[0-9]{1,2}$/;
+        var deviseRegex = /^([0-9]{1,8})(([,][0-9]{1,2}))?$/;
+        var dateRegex = /^(0[1-9]|[12][0-9]|3[01])[- \/.](0[1-9]|1[012])[- \/.](19|20)\d\d$/;
+        var mergeCustomValueEnabled = '{!mergeCustomValueEnabled}';
+        var chantierMaitre = 'doublon';
+        var masterId = '';
+        var fieldNames = [];
+        var reglesFusion = new Object();
+        var fieldNamesOld = ['Name','rue__c','complementAdresse__c','codePostal__c','ville__c','departement__c','pays__c','etage__c','proprietaire__c',
+                            'autreProprietaire__c','locataire__c','autreLocataire__c','occupant__c','autreOccupant__c','anneeConstruction__c','caracteristiquesUrbanisme__c',
+                            'typeHabitation__c','typeResidence__c','chauffages__c','nbPortesEtFenetres__c','description__c'];
+        var caracteristiquesUrbanismeList = [];
+        var modesDeChauffeList = [];
+        var variablesList = Object(); // Utilisée pour stocker les listes des champs spéciaux
+
+        /* Initialisation à la page                                                        */
+        /*---------------------------------------------------------------------------------*/
+        $(document).ready(function() {
+            
+            // Récupération de la liste des champs à fusionner
+            reglesFusion = JSON.parse('{!reglesFusionJSONMap}');
+            for (var key in reglesFusion) {
+                if (reglesFusion.hasOwnProperty(key))
+                    fieldNames.push(key);
+            }
+
+            for(var i=0; i<fieldNamesOld.length; i++) {
+                var champ = fieldNamesOld[i];
+
+                // Suppression de l'affichage des cases du tableau réglées comme non-modifiables par les règles de fusion
+                if(reglesFusion != undefined && reglesFusion != null){
+                    // Cas ou aucune règle n'est définie
+                    if(reglesFusion[champ] == undefined || (!((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("libre")
+                                                        &&  !((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("sélection"))){
+                        j$('#mergeTable > tbody > tr.tr-'+champ).remove();
+                    } else {
+                        // Cas ou l'écriture libre est interdite
+                        if(reglesFusion[champ] == undefined || !((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("libre")){
+                            j$('#mergeTable > tbody > tr > td.td-custom-'+champ+' > *').remove(); // Cache le selecteur libre
+                            j$('#'+champ+'1').prop('checked', true);
+                        }
+                        // Cas ou la sélection des valeurs de compte est interdite
+                        if(reglesFusion[champ] == undefined || !((reglesFusion[champ].regleManuelle__c).toLowerCase()).includes("sélection")){
+                            j$('#mergeTable > tbody > tr > td.td-select-'+champ+' > input').remove(); // Cache tous les selecteurs mais garde le label
+                            j$('#'+champ+'0').prop('checked', true);
+                        }
+                    }
+                }
+
+                // Selectionne un champ custom si modifié (initialisation selectRadio)
+                j$("[id$="+champ+"-custom]").change(function() {
+                    var fieldId=j$(this).prop('id').substring(j$(this).prop('id').lastIndexOf(':')+1).split('-')[0];
+                    selectRadio(fieldId+'0');
+                });
+            }
+
+            // Cache la colonne "Valeur personnalisé" selon paramètre global
+            if(mergeCustomValueEnabled!='true') {
+                j$('#mergeTable > thead > tr > th:nth-child(2)').remove();
+                j$('#mergeTable > tbody > tr > td:nth-child(2)').remove();
+                j$('#column1').css('width','37.5%');
+                j$('#column2').css('width','37.5%');
+            }
+            // Définit le chantier existant comme principal si insertion
+            if('{!chantier.Id}' == '') {
+                j$("[id$=values2]").prop('checked', true);
+                selectAllChantier('1');
+                selectAllChantier('2');
+                defineMasterRecord(j$("[id$=principal2"));
+                // Désactivation du bouton (chantier existant obligatoirement maitre)
+                j$("[id$=principal2]").prop ('disabled', true);
+            } else {
+                chantierMaitre = '{!chantierPlusAncien}';
+                console.debug(chantierMaitre);
+                if(chantierMaitre == 'chantier'){
+                    j$("[id$=values1]").prop('checked', true);
+                    selectAllChantier('2');
+                    selectAllChantier('1');
+                    defineMasterRecord(j$("[id$=principal1"));
+                } else if(chantierMaitre == 'doublon'){
+                    j$("[id$=values2]").prop('checked', true);
+                    selectAllChantier('1');
+                    selectAllChantier('2');
+                    defineMasterRecord(j$("[id$=principal2"));
+                }
+            }
+
+            // Selectionne un champ custom si modifié (initialisation selectRadio)
+             j$("[id$=-custom]").change(function() {
+                var fieldId=j$(this).prop('id').substring(j$(this).prop('id').lastIndexOf(':')+1).split('-')[0];
+                selectRadio(fieldId+'0');
+            });
+
+        });
+
+        /* Fonction pour déterminer l'enregistrement maitre                                */
+        /*---------------------------------------------------------------------------------*/
+        function defineMasterRecord(field) {
+            // Ne fait rien si déjà actif
+            if(!j$(field).hasClass('active')){
+                j$(field).toggleClass('active');
+                masterId = j$(field).prop('name');
+                // Récupération du numero de l'index
+                var index= j$(field).prop('id').substr(j$(field).prop('id').length - 1);
+                var columnIndex1=(mergeCustomValueEnabled=='true') ? parseInt(index)+2 : parseInt(index)+1;
+                // Fond gris
+                j$('#mergeTable > thead > tr > th:nth-child('+columnIndex1+')').addClass('master-column');
+                j$('#mergeTable > tbody > tr > td:nth-child('+columnIndex1+')').addClass('master-column');
+                index = (index=='2') ? '1' : '2';
+                var columnIndex2=(mergeCustomValueEnabled=='true') ? parseInt(index)+2 : parseInt(index)+1;
+                j$("[id$=principal"+index+"]").removeClass('active');
+                j$('#mergeTable > thead > tr > th:nth-child('+columnIndex2+')').removeClass('master-column');
+                j$('#mergeTable > tbody > tr > td:nth-child('+columnIndex2+')').removeClass('master-column');
+            }
+        }
+
+        /* Fonction qui selectionne toutes les valeurs non nulles du doublon               */
+        /*---------------------------------------------------------------------------------*/
+        function selectAllChantier(nb){
+            for(var i=0; i<fieldNames.length; i++) {
+                var fieldId = fieldNames[i]+nb;
+                if(j$('#'+fieldId)[0] && j$('#'+fieldId).val()!='') {
+                    j$('#'+fieldId).prop('checked', true);
+                } /*else if(j$('#'+fieldNames[i]+'0')[0] && j$('#'+fieldNames[i]+'0').val()!='') {
+                    j$('#'+fieldNames[i]+'0').prop('checked', true);
+                }*/
+            }
+        }
+
+        /* Fonction qui remet à jour les champs en erreur                                  */
+        /*---------------------------------------------------------------------------------*/
+        function resetError(){
+            j$(".has-field-error").removeClass('has-field-error');
+            j$("[id$=save]").html('Sauvegarder');
+            j$(".btn").prop ('disabled', false);
+        }
+
+        /* Fonction pour afficher une erreur                                               */
+        /*---------------------------------------------------------------------------------*/
+        function displayError(message, errorList){
+            resetError();
+            var content = '<div class="alert alert-danger"><apex:outputtext escape="false" value="'+message+'"/></div>';
+            j$("[id$=error]").html(content);
+            if(errorList) {
+                for (var i = 0; i < errorList.length; i++) {
+                    j$("[id$="+errorList[i]+"-custom]").addClass('has-field-error');
+                }
+            }
+            if('{!chantier.Id}' == '') {
+                j$("[id$=principal2").prop ('disabled', true);
+            }
+            scroll(0,0);
+        }
+
+        /* Fonction appellée via onChange qui selectionne un champ custom si modifié       */
+        /*---------------------------------------------------------------------------------*/
+        function selectRadio(fieldId){
+            j$("[id$="+fieldId+"]").prop('checked', true);
+        }
+
+        /* Fonction pour cocher la case selon la valeur pour un champ picklist             */
+        /*---------------------------------------------------------------------------------*/
+        function refreshCheckBoxObject(fieldName, value){
+            var triggerValue = false;
+            var tempList = [];
+            if(variablesList[fieldName] != undefined && variablesList[fieldName] != null && variablesList[fieldName] != '') tempList = variablesList[fieldName];
+            for(var i=0; i<tempList.length;i++){
+                if(tempList[i] == value) triggerValue = true;
+            }
+            if(triggerValue == false) tempList.push(value);
+            else {
+                for(var i=0; i<tempList.length;i++){
+                    if(tempList[0] != value) tempList.push(tempList.shift());
+                }
+                tempList.shift();
+            }
+            selectRadio(fieldName+'0');
+            variablesList[fieldName] = tempList;
+        }
+
+        /* Fonction pour cocher la case selon la valeur pour le champ caracteristiquesUrbanisme__c    */
+        /*-----------------------------------------------------------------------------------------*/
+        /*function refreshCheckBoxCaracteristiquesUrbanisme(field){
+            var triggerValue = false;
+            for(var i=0; i<caracteristiquesUrbanismeList.length;i++){
+                if(caracteristiquesUrbanismeList[i] == field) triggerValue = true;
+            }
+            if(triggerValue == false) caracteristiquesUrbanismeList.push(field);
+            else {
+                for(var i=0; i<caracteristiquesUrbanismeList.length;i++){
+                    if(caracteristiquesUrbanismeList[0] != field) caracteristiquesUrbanismeList.push(caracteristiquesUrbanismeList.shift());
+                }
+                caracteristiquesUrbanismeList.shift();
+            }
+            selectRadio('caracteristiquesUrbanisme__c0');
+        }*/
+
+        /* Fonction pour cocher la case selon la valeur pour le champ chauffages__c       */
+        /*---------------------------------------------------------------------------------*/
+        /*function refreshCheckBoxModesDeChauffe(field){
+            var triggerValue = false;
+            for(var i=0; i<modesDeChauffeList.length;i++){
+                if(modesDeChauffeList[i] == field) triggerValue = true;
+            }
+            if(triggerValue == false) modesDeChauffeList.push(field);
+            else {
+                for(var i=0; i<modesDeChauffeList.length;i++){
+                    if(modesDeChauffeList[0] != field) modesDeChauffeList.push(modesDeChauffeList.shift());
+                }
+                modesDeChauffeList.shift();
+            }
+            selectRadio('chauffages__c0');
+        }*/
+
+        /* Fonction permettant de récupérer la valeur personnalisée ou sélectionnée        */
+        /*---------------------------------------------------------------------------------*/
+        function getCustomOrCheckedValue(fieldName){
+            var value = j$("input[name="+fieldName+"]:checked").val();
+            if(value == 'custom') value = j$("[id$="+fieldName+"-custom]").val();
+            return value;
+        }
+
+        /* Fonction pour afficher le message de confirmation                               */
+        /*---------------------------------------------------------------------------------*/
+        function showConfirmationMessage() {
+            var masterText = ''; var slaveText = '';
+            if(masterId=='{!doublonToMerge.Id}') {
+                masterText="{!doublonToMerge.numeroChantier__c} {!doublonToMerge.Name}";
+                slaveText="{!chantier.numeroChantier__c} {!chantier.Name}";
+            } else {
+                slaveText="{!doublonToMerge.numeroChantier__c} {!doublonToMerge.Name}";
+                masterText="{!chantier.numeroChantier__c} {!chantier.Name}";
+            }
+            return confirm('Confirmez-vous la fusion des données du chantier '+slaveText.trim()+' dans le chantier '+masterText.trim()+' ?')
+        }
+
+        /* Lancement de la fusion                                                          */
+        /*---------------------------------------------------------------------------------*/
+        function saveFusion(){
+            // Récupération des types de champs à fusionner
+            var fieldsType = JSON.parse('{!fieldsTypeJSONMap}');
+            var newChantier = new Object();
+            resetError();
+            var errorList = [];
+
+            // Récupération des valeurs selectionnées et gestion des erreurs par type
+            for(var i=0; i<fieldNames.length; i++) {
+                var champ = fieldNames[i];
+                console.log(champ+' : '+fieldsType[champ]);
+
+                if(fieldsType[champ] == 'STRING' || fieldsType[champ] == 'TEXTAREA' || fieldsType[champ] == 'PICKLIST' || fieldsType[champ] == 'BOOLEAN'){
+                    newChantier[champ] = getCustomOrCheckedValue(champ);
+
+                } else if(fieldsType[champ] == 'DOUBLE'){
+                    newChantier[champ] = getCustomOrCheckedValue(champ);
+                    if(newChantier[champ] != '' && newChantier[champ] != undefined) newChantier[champ]=parseInt(newChantier[champ]);
+                    if(champ == 'anneeConstruction__c')
+                        if(newChantier[champ] != null && newChantier[champ] != '' && !(anneeRegex).test(newChantier[champ])) errorList.push(champ);
+                    else 
+                        if(newChantier[champ] != null && newChantier[champ] != '' && !(nombreRegex).test(newChantier[champ])) errorList.push(champ);
+
+                } else if(fieldsType[champ] == 'CURRENCY'){
+                    newChantier[champ] = getCustomOrCheckedValue(champ);
+                    if(newChantier[champ] != '' && newChantier[champ] != undefined) newChantier[champ]=parseInt(newChantier[champ]);
+                    if(newChantier[champ] != null && newChantier[champ] != '' && !(deviseRegex).test(newChantier[champ])) errorList.push(champ);
+
+                } else if(fieldsType[champ] == 'MULTIPICKLIST'){
+                    var tempVar = j$("input[name='"+champ+"']:checked").val();
+                    if(tempVar == 'custom'){
+                        tempVar = '';
+                        tempList = variablesList[champ];
+                        if(tempList != undefined){
+                            for(var j=0;j<tempList.length;j++){
+                                if(j != 0) tempVar+= ';';
+                                tempVar += tempList[j];
+                            }
+                        } else
+                            tempVar = null;
+                    }
+                    newChantier[champ] = tempVar;
+
+                } else if(fieldsType[champ] == 'REFERENCE'){
+                    var tempVar = j$("input[name='"+champ+"']:checked").val();
+                    if(tempVar == 'custom'){
+                        tempVar = j$("[id$="+champ+"-custom]").val();
+                        var champId = j$("[id$="+champ+"-custom_lkid]").val();
+                    } else {
+                        var champId = tempVar;
+                    }
+                    newChantier[champ] = champId;
+                    if(newChantier[champ] != null && newChantier[champ] != '' && (champId == null || champId == '')) errorList.push(champ);
+                }  
+
+                // Gestions des champs avec vérifications particulières
+                if(champ == 'Name'){
+                    if(newChantier[champ] == null || newChantier[champ] == '') errorList.push(champ);
+                } else if(champ == 'anneeConstruction__c'){
+                    if(newChantier[champ] != null && newChantier[champ] != '' && !(anneeRegex).test(newChantier[champ])) errorList.push(champ);
+                }
+            }
+
+            // Affiche l'erreur
+            if(errorList.length != 0){
+                displayError("{!$Label.merge_msg_errorsFieldRequired}", errorList);
+            } else {
+                // Sinon fusion
+                j$("[id$=save]").html('{!$Label.merge_text_processMerge}');
+                j$(".btn").prop ('disabled', true);
+                var myJSONString = JSON.stringify('{!newChantierJSON}');
+                var myEscapedJSONString = myJSONString.replace(/\\\n/g, " ").replace(/\\\r/g, " ");
+                var myEscapedJSONString2 = JSON.parse(myEscapedJSONString);
+
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_ChantierMerge.manualMerge}', newChantier, myEscapedJSONString2,'{!doublonKeyId}',masterId, fieldNames,
+                    function(result, event) {
+                        if (event.status) {
+                            var link = '/apex/VF_ChantierDetails?id=' + result;
+                            window.open(link, '_self');
+                        } else if (event.type === 'exception') {
+                            displayError("{!$Label.merge_msg_errorsInMerge} "+event.message, null);
+                        } else {
+                            displayError("{!$Label.merge_msg_errorsInMerge} "+event.message, null);
+                        }
+                    },
+                    {escape: true}
+                );
+            }
+        }
+
+    </script>
+    <style type="text/css">
+        .lookupInput input {
+            width: 198px;
+            padding: 5px 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            border-radius: 3px;
+            color: #555555;
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing: border-box;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+
+        .select-all {
+            margin-top: 5px;
+        }
+
+            .select-all label {
+                margin-bottom: 0px;
+            }
+
+        .input-merge {
+            width: 198px !important;
+            margin-left: 2px !important;
+        }
+
+        .input-merge-dqe {
+            margin-left: 0px !important;
+        }
+
+        .master-column {
+            background-color: #f5f5f5;
+        }
+    </style>
+    <c:importvisualstrap theme="default" />
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/smoothness/jquery-ui-1.11.2.autocomplete.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Page_CSS)}" />
+    <div id="visualstrap-body" class="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero">
+        <div class="text-center">
+            <div class="page-header" style="margin-bottom: 10px;">
+                <h2>
+                    <span class="glyphicon glyphicon-import "></span>
+                    <span class="page-header-title">{!$label.merge_text_mergeChantierSubTitle} <small> {!$User.FirstName} {!$User.LastName} </small></span>
+                </h2>
+            </div>
+        </div>
+        <div id="error"></div>
+        <apex:form styleclass="form-inline">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <div class="panel-title">{!$Label.merge_text_mergeSubTitle}</div>
+                </div>
+                <div class="panel-body">
+                    <span id="helpBlock" class="help-block">
+                        <apex:outputtext escape="false" value="{!$Label.merge_text_helpText}" />
+                    </span>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="mergeTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:25%;">Nom du champ</th>
+                                    <th style="width:25%;">Valeur personnalisée</th>
+                                    <th style="width:25%;" id="column1">
+                                        <div class="text-center">{!chantier.numeroChantier__c} (Chantier)</div>
+                                        <apex:outputpanel layout="none" rendered="{!NOT(ISBLANK(chantier.Id))}">
+                                            <div class="btn-group btn-group-justified" role="group">
+                                                <a role="button" class="btn btn-primary btn-xs" id="principal1" name="{!chantier.Id}" onclick="defineMasterRecord(this);">{!$label.merge_text_chantierToKeep}</a>
+                                                <apex:outputpanel layout="none" rendered="{!NOT(ISBLANK(chantier.Id))}">
+                                                    <a class="btn btn-primary btn-xs" href="/{!chantier.Id}" target="_blank">Voir</a>
+                                                </apex:outputpanel>
+                                            </div>
+                                        </apex:outputpanel>
+                                        <div class="select-all">
+                                            <label>
+                                                <input type="radio" name="values" id="values1" onclick="selectAllChantier('1');" /> {!$label.merge_text_selectAllValues}
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th style="width:25%;" id="column2">
+                                        <div class="text-center">{!doublonToMerge.numeroChantier__c} (Doublon détecté)</div>
+                                        <div class="btn-group btn-group-justified" role="group">
+                                            <a role="button" class="btn btn-primary btn-xs" id="principal2" name="{!doublonToMerge.Id}" onclick="defineMasterRecord(this);">{!$label.merge_text_chantierToKeep}</a>
+                                            <apex:outputpanel layout="none" rendered="{!NOT(ISBLANK(doublonToMerge.Id))}">
+                                                <a class="btn btn-primary btn-xs" href="/{!doublonToMerge.Id}" target="_blank">Voir</a>
+                                            </apex:outputpanel>
+                                        </div>
+                                        <div class="select-all">
+                                            <label>
+                                                <input type="radio" name="values" id="values2" onclick="selectAllChantier('2');" /> {!$label.merge_text_selectAllValues}
+                                            </label>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="tr-Name">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.Name.Label}</td>
+                                    <td class="td-custom-Name">
+                                        <input type="radio" name="Name" id="Name0" value="custom" />
+                                        <input type="text" id="Name-custom" class="form-control" maxlength="80" />
+                                    </td>
+                                    <td class="td-select-Name">
+                                        <input type="radio" name="Name" id="Name1" value="{!chantier.name}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.Name}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-Name">
+                                        <input type="radio" name="Name" id="Name2" value="{!doublonToMerge.name}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.Name}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-rue__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.rue__c.Label}</td>
+                                    <td class="td-custom-rue__c">
+                                        <input type="radio" name="rue__c" id="rue__c0" value="custom" />
+                                        <input type="text" id="rue__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-rue__c">
+                                        <input type="radio" name="rue__c" id="rue__c1" value="{!chantier.rue__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.rue__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-rue__c">
+                                        <input type="radio" name="rue__c" id="rue__c2" value="{!doublonToMerge.rue__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.rue__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-codePostal__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.codePostal__c.Label}</td>
+                                    <td class="td-custom-codePostal__c">
+                                        <input type="radio" name="codePostal__c" id="codePostal__c0" value="custom" />
+                                        <input type="text" id="codePostal__c-custom" class="form-control" maxlength="5" />
+                                    </td>
+                                    <td class="td-select-codePostal__c">
+                                        <input type="radio" name="codePostal__c" id="codePostal__c1" value="{!chantier.codePostal__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.codePostal__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-codePostal__c">
+                                        <input type="radio" name="codePostal__c" id="codePostal__c2" value="{!doublonToMerge.codePostal__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.codePostal__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-ville__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.ville__c.Label}</td>
+                                    <td class="td-custom-ville__c">
+                                        <input type="radio" name="ville__c" id="ville__c0" value="custom" />
+                                        <input type="text" id="ville__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-ville__c">
+                                        <input type="radio" name="ville__c" id="ville__c1" value="{!chantier.ville__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.ville__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-ville__c">
+                                        <input type="radio" name="ville__c" id="ville__c2" value="{!doublonToMerge.ville__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.ville__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-departement__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.departement__c.Label}</td>
+                                    <td class="td-custom-departement__c">
+                                        <input type="radio" name="departement__c" id="departement__c0" value="custom" />
+                                        <input type="text" id="departement__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-departement__c">
+                                        <input type="radio" name="departement__c" id="departement__c1" value="{!chantier.departement__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.departement__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-departement__c">
+                                        <input type="radio" name="departement__c" id="departement__c2" value="{!doublonToMerge.departement__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.departement__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-pays__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.pays__c.Label}</td>
+                                    <td class="td-custom-pays__c">
+                                        <input type="radio" name="pays__c" id="pays__c0" value="custom" />
+                                        <input type="text" id="pays__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-pays__c">
+                                        <input type="radio" name="pays__c" id="pays__c1" value="{!chantier.pays__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.pays__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-pays__c">
+                                        <input type="radio" name="pays__c" id="pays__c2" value="{!doublonToMerge.pays__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.pays__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-complementAdresse__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.complementAdresse__c.Label}</td>
+                                    <td class="td-custom-complementAdresse__c">
+                                        <input type="radio" name="complementAdresse__c" id="complementAdresse__c0" value="custom" />
+                                        <input type="text" id="complementAdresse__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-complementAdresse__c">
+                                        <input type="radio" name="complementAdresse__c" id="complementAdresse__c1" value="{!chantier.complementAdresse__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.complementAdresse__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-complementAdresse__c">
+                                        <input type="radio" name="complementAdresse__c" id="complementAdresse__c2" value="{!doublonToMerge.complementAdresse__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.complementAdresse__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-etage__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.etage__c.Label}</td>
+                                    <td class="td-custom-etage__c">
+                                        <input type="radio" name="etage__c" id="etage__c0" value="custom" />
+                                        <input type="number" id="etage__c-custom" class="form-control" maxlength="2" />
+                                    </td>
+                                    <td class="td-select-etage__c">
+                                        <input type="radio" name="etage__c" id="etage__c1" value="{!chantier.etage__c}" />
+                                        <label class="checkbox-inline">
+                                            <apex:outputfield value="{!chantier.etage__c}" />
+                                        </label>
+                                    </td>
+                                    <td class="td-select-etage__c">
+                                        <input type="radio" name="etage__c" id="etage__c2" value="{!doublonToMerge.etage__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.etage__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-proprietaire__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.proprietaire__c.Label}</td>
+                                    <td class="td-custom-proprietaire__c">
+                                        <input type="radio" name="proprietaire__c" id="proprietaire__c0" value="custom" />
+                                        <apex:outputpanel id="proprietaire__c-custom-panel" layout="inline">
+                                            <apex:inputfield value="{!chantierCustom.proprietaire__c}" id="proprietaire__c-custom" />
+                                        </apex:outputpanel>
+                                    </td>
+                                    <td class="td-select-proprietaire__c">
+                                        <input type="radio" name="proprietaire__c" id="proprietaire__c1" value="{!chantier.proprietaire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantierProprietaireReformate}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-proprietaire__c">
+                                        <input type="radio" name="proprietaire__c" id="proprietaire__c2" value="{!doublonToMerge.proprietaire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonProprietaireReformate}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-autreProprietaire__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.autreProprietaire__c.Label}</td>
+                                    <td class="td-custom-autreProprietaire__c">
+                                        <input type="radio" name="autreProprietaire__c" id="autreProprietaire__c0" value="custom" />
+                                        <apex:outputpanel id="autreProprietaire__c-custom-panel" layout="inline">
+                                            <apex:inputfield value="{!chantierCustom.autreProprietaire__c}" id="autreProprietaire__c-custom" />
+                                        </apex:outputpanel>
+                                    </td>
+                                    <td class="td-select-autreProprietaire__c">
+                                        <input type="radio" name="autreProprietaire__c" id="autreProprietaire__c1" value="{!chantier.autreProprietaire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantierAutreProprietaireReformate}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-autreProprietaire__c">
+                                        <input type="radio" name="autreProprietaire__c" id="autreProprietaire__c2" value="{!doublonToMerge.autreProprietaire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonAutreProprietaireReformate}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-locataire__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.locataire__c.Label}</td>
+                                    <td class="td-custom-locataire__c">
+                                        <input type="radio" name="locataire__c" id="locataire__c0" value="custom" />
+                                        <apex:outputpanel id="locataire__c-custom-panel" layout="inline">
+                                            <apex:inputfield value="{!chantierCustom.locataire__c}" id="locataire__c-custom" />
+                                        </apex:outputpanel>
+                                    </td>
+                                    <td class="td-select-locataire__c">
+                                        <input type="radio" name="locataire__c" id="locataire__c1" value="{!chantier.locataire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantierLocataireReformate}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-locataire__c">
+                                        <input type="radio" name="locataire__c" id="locataire__c2" value="{!doublonToMerge.locataire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonLocataireReformate}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-autreLocataire__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.autreLocataire__c.Label}</td>
+                                    <td class="td-custom-autreLocataire__c">
+                                        <input type="radio" name="autreLocataire__c" id="autreLocataire__c0" value="custom" />
+                                        <apex:outputpanel id="autreLocataire__c-custom-panel" layout="inline">
+                                            <apex:inputfield value="{!chantierCustom.autreLocataire__c}" id="autreLocataire__c-custom" />
+                                        </apex:outputpanel>
+                                    </td>
+                                    <td class="td-select-autreLocataire__c">
+                                        <input type="radio" name="autreLocataire__c" id="autreLocataire__c1" value="{!chantier.autreLocataire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantierAutreLocataireReformate}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-autreLocataire__c">
+                                        <input type="radio" name="autreLocataire__c" id="autreLocataire__c2" value="{!doublonToMerge.autreLocataire__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonAutreLocataireReformate}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-occupant__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.occupant__c.Label}</td>
+                                    <td class="td-custom-occupant__c">
+                                        <input type="radio" name="occupant__c" id="occupant__c0" value="custom" />
+                                        <apex:outputpanel id="occupant__c-custom-panel" layout="inline">
+                                            <apex:inputfield value="{!chantierCustom.occupant__c}" id="occupant__c-custom" />
+                                        </apex:outputpanel>
+                                    </td>
+                                    <td class="td-select-occupant__c">
+                                        <input type="radio" name="occupant__c" id="occupant__c1" value="{!chantier.occupant__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantierOccupantReformate}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-occupant__c">
+                                        <input type="radio" name="occupant__c" id="occupant__c2" value="{!doublonToMerge.occupant__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonOccupantReformate}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-autreOccupant__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.autreOccupant__c.Label}</td>
+                                    <td class="td-custom-autreOccupant__c">
+                                        <input type="radio" name="autreOccupant__c" id="autreOccupant__c0" value="custom" />
+                                        <apex:outputpanel id="autreOccupant__c-custom-panel" layout="inline">
+                                            <apex:inputfield value="{!chantierCustom.autreOccupant__c}" id="autreOccupant__c-custom" />
+                                        </apex:outputpanel>
+                                    </td>
+                                    <td class="td-select-autreOccupant__c">
+                                        <input type="radio" name="autreOccupant__c" id="autreOccupant__c1" value="{!chantier.autreOccupant__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantierAutreOccupantReformate}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-autreOccupant__c">
+                                        <input type="radio" name="autreOccupant__c" id="autreOccupant__c2" value="{!doublonToMerge.autreOccupant__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonAutreOccupantReformate}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-anneeConstruction__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.anneeConstruction__c.Label}</td>
+                                    <td class="td-custom-anneeConstruction__c">
+                                        <input type="radio" name="anneeConstruction__c" id="anneeConstruction__c0" value="custom" />
+                                        <input type="text" id="anneeConstruction__c-custom" class="form-control" maxlength="4" />
+                                    </td>
+                                    <td class="td-select-anneeConstruction__c">
+                                        <input type="radio" name="anneeConstruction__c" id="anneeConstruction__c1" value="{!chantier.anneeConstruction__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.anneeConstruction__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-anneeConstruction__c">
+                                        <input type="radio" name="anneeConstruction__c" id="anneeConstruction__c2" value="{!doublonToMerge.anneeConstruction__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.anneeConstruction__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-typeHabitation__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.typeHabitation__c.Label}</td>
+                                    <td class="td-custom-typeHabitation__c">
+                                        <input type="radio" name="typeHabitation__c" id="typeHabitation__c0" value="custom" />
+                                        <apex:selectlist styleclass="form-control input-merge" size="1" id="typeHabitation__c-custom" value="{!typeHabitation}">
+                                            <apex:selectoptions value="{!typeHabitationList}" />
+                                        </apex:selectlist>
+                                    </td>
+                                    <td class="td-select-typeHabitation__c">
+                                        <input type="radio" name="typeHabitation__c" id="typeHabitation__c1" value="{!chantier.typeHabitation__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.typeHabitation__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-typeHabitation__c">
+                                        <input type="radio" name="typeHabitation__c" id="typeHabitation__c2" value="{!doublonToMerge.typeHabitation__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.typeHabitation__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-typeResidence__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.typeResidence__c.Label}</td>
+                                    <td class="td-custom-typeResidence__c">
+                                        <input type="radio" name="typeResidence__c" id="typeResidence__c0" value="custom" />
+                                        <apex:selectlist styleclass="form-control input-merge" size="1" id="typeResidence__c-custom" value="{!typeResidence}">
+                                            <apex:selectoptions value="{!typeResidenceList}" />
+                                        </apex:selectlist>
+                                    </td>
+                                    <td class="td-select-typeResidence__c">
+                                        <input type="radio" name="typeResidence__c" id="typeResidence__c1" value="{!chantier.typeResidence__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.typeResidence__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-typeResidence__c">
+                                        <input type="radio" name="typeResidence__c" id="typeResidence__c2" value="{!doublonToMerge.typeResidence__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.typeResidence__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-caracteristiquesUrbanisme__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.caracteristiquesUrbanisme__c.Label}</td>
+                                    <td class="td-custom-caracteristiquesUrbanisme__c">
+                                        <input type="radio" name="caracteristiquesUrbanisme__c" id="caracteristiquesUrbanisme__c0" value="custom" />
+                                        <table style="display:inline; margin-left:8px;">
+                                            <apex:repeat value="{!caracteristiquesUrbanisme}" var="fieldName" id="checkBoxesUrbanisme">
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" value="{!fieldName.value}" id="caracteristiquesUrbanisme__c-{!fieldName.value}" onclick="refreshCheckBoxObject('caracteristiquesUrbanisme__c', this.value);" />
+                                                        {!fieldName.label}
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                        </table>
+                                    </td>
+                                    <td class="td-select-caracteristiquesUrbanisme__c">
+                                        <input type="radio" name="caracteristiquesUrbanisme__c" id="caracteristiquesUrbanisme__c1" value="{!chantier.caracteristiquesUrbanisme__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.caracteristiquesUrbanisme__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-caracteristiquesUrbanisme__c">
+                                        <input type="radio" name="caracteristiquesUrbanisme__c" id="caracteristiquesUrbanisme__c2" value="{!doublonToMerge.caracteristiquesUrbanisme__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.caracteristiquesUrbanisme__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-chauffages__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.chauffages__c.Label}</td>
+                                    <td class="td-custom-chauffages__c">
+                                        <input type="radio" name="chauffages__c" id="chauffages__c0" value="custom" />
+                                        <table style="display:inline; margin-left:8px;">
+                                            <apex:repeat value="{!modesDeChauffe}" var="fieldName" id="checkBoxesChauffe">
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" value="{!fieldName.value}" id="chauffages__c-{!fieldName.value}" onclick="refreshCheckBoxObject('chauffages__c', this.value);" />
+                                                        {!fieldName.label}
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                        </table>
+                                    </td>
+                                    <td class="td-select-chauffages__c">
+                                        <input type="radio" name="chauffages__c" id="chauffages__c1" value="{!chantier.chauffages__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.chauffages__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-chauffages__c">
+                                        <input type="radio" name="chauffages__c" id="chauffages__c2" value="{!doublonToMerge.chauffages__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.chauffages__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-nbPortesEtFenetres__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.nbPortesEtFenetres__c.Label}</td>
+                                    <td class="td-custom-CSPnbPortesEtFenetres__c__c">
+                                        <input type="radio" name="nbPortesEtFenetres__c" id="nbPortesEtFenetres__c0" value="custom" />
+                                        <input type="text" id="nbPortesEtFenetres__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-nbPortesEtFenetres__c">
+                                        <input type="radio" name="nbPortesEtFenetres__c" id="nbPortesEtFenetres__c1" value="{!chantier.nbPortesEtFenetres__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.nbPortesEtFenetres__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-nbPortesEtFenetres__c">
+                                        <input type="radio" name="nbPortesEtFenetres__c" id="nbPortesEtFenetres__c2" value="{!doublonToMerge.nbPortesEtFenetres__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.nbPortesEtFenetres__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr class="tr-description__c">
+                                    <td class="field">{!$ObjectType.Chantier__c.fields.description__c.Label}</td>
+                                    <td class="td-custom-description__c">
+                                        <input type="radio" name="description__c" id="description__c0" value="custom" />
+                                        <input type="text" id="description__c-custom" class="form-control" />
+                                    </td>
+                                    <td class="td-select-description__c">
+                                        <input type="radio" name="description__c" id="description__c1" value="{!chantier.description__c}" />
+                                        <label class="checkbox-inline">
+                                            {!chantier.description__c}
+                                        </label>
+                                    </td>
+                                    <td class="td-select-description__c">
+                                        <input type="radio" name="description__c" id="description__c2" value="{!doublonToMerge.description__c}" />
+                                        <label class="checkbox-inline">
+                                            {!doublonToMerge.description__c}
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="btn btn-xs btn-success btn-sm" id="save" style="float:right; padding: 5px 10px; min-width:80px;" onclick="if(showConfirmationMessage()) saveFusion();">Sauvegarder</div>
+                    <apex:commandlink style=" float:right;" styleclass="btn btn-primary btn-sm" id="Annuler" value="Annuler" action="{!cancelMerge}" />
+                </div>
+            </div>
+        </apex:form>
+    </div>
+</apex:page>

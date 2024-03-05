@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MF_FundingAgency</fullName>
+    <active>true</active>
+    <description>Organisme de financement interdit pour un comptant !</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;FinancingMethod&apos; &amp;&amp;
+ISPICKVAL(financingType__c, &apos;Cash&apos;) &amp;&amp;
+NOT(ISBLANK(fundingAgency__c))</errorConditionFormula>
+    <errorMessage>Organisme de financement interdit pour un comptant !</errorMessage>
+</ValidationRule>

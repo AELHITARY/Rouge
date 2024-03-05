@@ -1,0 +1,284 @@
+<apex:page title="Feuille de route" controller="Ctrl_Feuillederoute_PDF" renderAs="pdf" showHeader="false" applyHtmlTag="false" applyBodyTag="false" sidebar="false" standardStylesheets="false">
+	<head>
+		<title>Feuille de route</title>
+		<style type="text/css" media="all">
+			@page {
+				size:landscape;
+				font-family: 'Arial', 'Helvetica', sans-serif;
+				margin-left: 5px;
+				margin-top: 5px;
+				margin-right: 5px;
+				@bottom-right {
+					content: "Page " counter(page) " / " counter(pages);
+				}
+				@bottom-left {
+					content: element(footer_left);
+				}
+				@top-right {
+					content: element(header_right);
+				}
+				@top-center {
+					content: element(header_center);
+				}
+				@top-left {
+					content: element(header_left);
+				}
+			}
+
+			html {
+				font-size:10px;
+			}
+
+			.header_left {
+				text-align: left;
+				position: running(header_left);
+				font-size:14px;
+				margin-left: 10px;
+			}
+
+			.header_center {
+				text-align: center;
+				position: running(header_center);
+			}
+
+			.header_right {
+				text-align: right;
+				position: running(header_right);
+				margin-right: 10px;
+			}
+
+			.footer_left {
+				text-align: left;
+				position: running(footer_left);
+				font-size:14px;
+			}
+
+			thead {
+				background-color: #f9f9f9;
+				font-weight: bold;
+			}
+
+			.pb {
+				page-break-after: always;
+			}
+			
+			.page-break {
+				page-break-inside: avoid;
+			}
+
+			.titre {
+				font-weight: lighter;
+				text-align:center;
+				font-size:20px;
+				padding-bottom:12px;
+			}
+
+			.logo {
+				display:block;
+				margin-left:auto;
+			}
+
+			.visualstrap .panel-title {
+				font-size:12px;
+			}
+
+			.visualstrap .panel-body {
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="header_right" id="header_right">
+			<img class="logo" src="/servlet/servlet.FileDownload?file={!LogoKparKId}" width="110" height="75"/>
+		</div>
+		<div class="header_center" id="header_center">
+			<div class="titre"></div>
+		</div>
+		<div class="header_left" id="footer_left">
+			<apex:outputText value="Créé le {0}">
+				<apex:param value="{!dateTodayFormated}" />
+			</apex:outputText>
+		</div>
+
+		<c:importvisualstrap theme="pdf" />
+		<c:visualstrapblock >
+			<apex:variable var="count" value="{!1}"/>
+			<apex:repeat value="{!vendeurForPDF}" var="vendeur"> 
+				<apex:outputPanel layout="block" rendered="{!isDataAvailable && informationsVendeurSize[vendeur] > 0}" styleclass="{!IF(count == nbDisplayVendeur, '', 'pb')}">
+					<div class="titre">Feuille de route<br/>{!vendeur.FirstName} {!vendeur.LastName}</div>					
+					<div class="panel panel-primary page-break">
+				        <apex:outputPanel layout="block" styleClass="panel-heading">
+				            <h3 class="panel-title">Poses du jour</h3>
+				        </apex:outputPanel>
+				        <div class="panel-body">
+				            <apex:outputPanel layout="block" rendered="{!posesSize[vendeur] = 0}"><div class="well well-sm" style="margin-bottom: 0px;">Pas de poses aujourd'hui</div></apex:outputPanel>
+							<apex:dataTable value="{!posesVendeurs[vendeur]}" var="pose" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;" rendered="{!posesSize[vendeur] > 0}">
+								<apex:column width="10%" headerValue="Nom" value="{!pose.name}"/>
+								<apex:column width="12%" headerValue="Adresse" value="{!pose.address}"/>
+								<apex:column width="8%" headerValue="Ville" value="{!pose.city}"/>
+								<apex:column width="5%" headerValue="CP" value="{!pose.postalCode}"/>
+								<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!pose.telephone}" escape="false"/></apex:column>
+								<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!pose.isOwner}"/>
+								<apex:column width="6%" headerValue="Date CNT" value="{!pose.contractDate}"/>
+								<apex:column width="7%" headerValue="Date SAV" value="{!pose.lastSAVdate}"/>
+								<apex:column width="32%" headerValue="Liste des produits" value="{!pose.productList}"/>
+								<apex:column width="5%" headerValue="Interdit" value="{!pose.prohibited}"/>
+							</apex:dataTable>
+				        </div>
+				    </div>
+					<div class="panel panel-primary page-break">
+				        <apex:outputPanel layout="block" styleClass="panel-heading">
+				            <h3 class="panel-title">Métrages du jour</h3>
+				        </apex:outputPanel>
+				        <div class="panel-body">
+				            <apex:outputPanel layout="block" rendered="{!metragesSize[vendeur] = 0}"><div class="well well-sm" style="margin-bottom: 0px;">Pas de métrages aujourd'hui</div></apex:outputPanel>
+							<apex:dataTable value="{!metragesVendeurs[vendeur]}" var="metrage" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;" rendered="{!metragesSize[vendeur] > 0}">
+								<apex:column width="10%" headerValue="Nom" value="{!metrage.name}"/>
+								<apex:column width="12%" headerValue="Adresse" value="{!metrage.address}"/>
+								<apex:column width="8%" headerValue="Ville" value="{!metrage.city}"/>
+								<apex:column width="5%" headerValue="CP" value="{!metrage.postalCode}"/>
+								<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!metrage.telephone}" escape="false"/></apex:column>
+								<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!metrage.isOwner}"/>
+								<apex:column width="6%" headerValue="Date CNT" value="{!metrage.contractDate}"/>
+								<apex:column width="7%" headerValue="Date SAV" value="{!metrage.lastSAVdate}"/>
+								<apex:column width="32%" headerValue="Liste des produits" value="{!metrage.productList}"/>
+								<apex:column width="5%" headerValue="Interdit" value="{!metrage.prohibited}"/>
+							</apex:dataTable>
+				        </div>
+				    </div>
+					<div class="panel panel-primary page-break">
+				        <apex:outputPanel layout="block" styleClass="panel-heading">
+				            <h3 class="panel-title">Interventions SAV du jour</h3>
+				        </apex:outputPanel>
+				        <div class="panel-body">
+				            <apex:outputPanel layout="block" rendered="{!interventionSize[vendeur] = 0}"><div class="well well-sm" style="margin-bottom: 0px;">Pas d'interventions SAV aujourd'hui</div></apex:outputPanel>
+							<apex:dataTable value="{!interventionsVendeurs[vendeur]}" var="intervention" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;" rendered="{!interventionSize[vendeur] > 0}">
+								<apex:column width="10%" headerValue="Nom" value="{!intervention.name}"/>
+								<apex:column width="12%" headerValue="Adresse" value="{!intervention.address}"/>
+								<apex:column width="8%" headerValue="Ville" value="{!intervention.city}"/>
+								<apex:column width="5%" headerValue="CP" value="{!intervention.postalCode}"/>
+								<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!intervention.telephone}" escape="false"/></apex:column>
+								<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!intervention.isOwner}"/>
+								<apex:column width="6%" headerValue="Date CNT" value="{!intervention.contractDate}"/>
+								<apex:column width="7%" headerValue="Date SAV" value="{!intervention.lastSAVdate}"/>
+								<apex:column width="32%" headerValue="Liste des produits" value="{!intervention.productList}"/>
+								<apex:column width="5%" headerValue="Interdit" value="{!intervention.prohibited}"/>
+							</apex:dataTable>
+				        </div>
+				    </div>
+					
+					<div class="panel panel-primary page-break">
+				        <apex:outputPanel layout="block" styleClass="panel-heading">
+				            <h3 class="panel-title">R1 du jour</h3>
+				        </apex:outputPanel>
+				        <div class="panel-body">
+				            <apex:outputPanel layout="block" rendered="{!r1Size[vendeur] = 0}"><div class="well well-sm" style="margin-bottom: 0px;">Pas de R1 aujourd'hui</div></apex:outputPanel>
+							<apex:dataTable value="{!r1Vendeurs[vendeur]}" var="event" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;" rendered="{!r1Size[vendeur] > 0}">
+								<apex:column width="10%" headerValue="Nom" value="{!event.name}"/>
+								<apex:column width="12%" headerValue="Adresse" value="{!event.address}"/>
+								<apex:column width="8%" headerValue="Ville" value="{!event.city}"/>
+								<apex:column width="5%" headerValue="CP" value="{!event.postalCode}"/>
+								<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!event.telephone}" escape="false"/></apex:column>
+								<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!event.isOwner}"/>
+								<apex:column width="5%" headerValue="Interdit" value="{!event.prohibited}"/>
+							</apex:dataTable>
+				        </div>
+				    </div>
+					<div class="panel panel-primary page-break">
+				        <apex:outputPanel layout="block" styleClass="panel-heading">
+				            <h3 class="panel-title">R2 du jour</h3>
+				        </apex:outputPanel>
+				        <div class="panel-body">
+				            <apex:outputPanel layout="block" rendered="{!r2Size[vendeur] = 0}"><div class="well well-sm" style="margin-bottom: 0px;">Pas de R2 aujourd'hui</div></apex:outputPanel>
+							<apex:dataTable value="{!r2Vendeurs[vendeur]}" var="event" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;" rendered="{!r2Size[vendeur] > 0}">
+								<apex:column width="10%" headerValue="Nom" value="{!event.name}"/>
+								<apex:column width="12%" headerValue="Adresse" value="{!event.address}"/>
+								<apex:column width="8%" headerValue="Ville" value="{!event.city}"/>
+								<apex:column width="5%" headerValue="CP" value="{!event.postalCode}"/>
+								<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!event.telephone}" escape="false"/></apex:column>
+								<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!event.isOwner}"/>
+								<apex:column width="5%" headerValue="Interdit" value="{!event.prohibited}"/>
+							</apex:dataTable>
+				        </div>
+				    </div>
+					<div class="panel panel-primary page-break">
+				        <apex:outputPanel layout="block" styleClass="panel-heading">
+				            <h3 class="panel-title">R+ du jour</h3>
+				        </apex:outputPanel>
+				        <div class="panel-body">
+				            <apex:outputPanel layout="block" rendered="{!rPlusSize[vendeur] = 0}"><div class="well well-sm" style="margin-bottom: 0px;">Pas de R+ aujourd'hui</div></apex:outputPanel>
+							<apex:dataTable value="{!rPlusVendeurs[vendeur]}" var="event" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;" rendered="{!rPlusSize[vendeur] > 0}">
+								<apex:column width="10%" headerValue="Nom" value="{!event.name}"/>
+								<apex:column width="12%" headerValue="Adresse" value="{!event.address}"/>
+								<apex:column width="8%" headerValue="Ville" value="{!event.city}"/>
+								<apex:column width="5%" headerValue="CP" value="{!event.postalCode}"/>
+								<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!event.telephone}" escape="false"/></apex:column>
+								<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!event.isOwner}"/>
+								<apex:column width="5%" headerValue="Interdit" value="{!event.prohibited}"/>
+							</apex:dataTable>
+				        </div>
+				    </div>
+					<div class="panel panel-primary page-break">
+				        <apex:outputPanel layout="block" styleClass="panel-heading">
+				            <h3 class="panel-title">Prospections du jour</h3>
+				        </apex:outputPanel>
+				        <div class="panel-body">
+				            <apex:outputPanel layout="block" rendered="{!prospectionsSize[vendeur] = 0}"><div class="well well-sm" style="margin-bottom: 0px;">Pas de prospections aujourd'hui</div></apex:outputPanel>
+							<apex:dataTable value="{!prospectionsVendeurs[vendeur]}" var="event" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;" rendered="{!prospectionsSize[vendeur] > 0}">
+								<apex:column width="10%" headerValue="Nom" value="{!event.Name}"/>
+								<apex:column width="12%" headerValue="Adresse" value="{!event.Address}"/>
+								<apex:column width="8%" headerValue="Ville" value="{!event.City}"/>
+								<apex:column width="5%" headerValue="CP" value="{!event.PostalCode}"/>
+								<apex:column width="7%" headerValue="Type" value="{!event.RdvType}"/>
+							</apex:dataTable>
+				        </div>
+				    </div>
+					
+					<apex:outputPanel rendered="{!chantiersAvecContratsSize[vendeur] > 0}">
+						<div class="panel panel-primary page-break">
+					        <apex:outputPanel layout="block" styleClass="panel-heading">
+					            <h3 class="panel-title">Chantiers avec contrats</h3>
+					        </apex:outputPanel>
+					        <div class="panel-body">
+					            <apex:dataTable value="{!chantiersAvecContratsVendeurs[vendeur]}" var="chantier" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;">
+									<apex:column width="10%" headerValue="Nom" value="{!chantier.name}"/>
+									<apex:column width="12%" headerValue="Adresse" value="{!chantier.address}"/>
+									<apex:column width="8%" headerValue="Ville" value="{!chantier.city}"/>
+									<apex:column width="5%" headerValue="CP" value="{!chantier.postalCode}"/>
+									<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!chantier.telephone}" escape="false"/></apex:column>
+									<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!chantier.isOwner}"/>
+									<apex:column width="6%" headerValue="Date CNT" value="{!chantier.contractDate}"/>
+									<apex:column width="7%" headerValue="Date SAV" value="{!chantier.lastSAVdate}"/>
+									<apex:column width="32%" headerValue="Liste des produits" value="{!chantier.productList}"/>
+									<apex:column width="5%" headerValue="Interdit" value="{!chantier.prohibited}"/>
+								</apex:dataTable>
+					        </div>
+					    </div>
+					</apex:outputPanel>
+					<apex:outputPanel rendered="{!chantiersSansContratsSize[vendeur] > 0}">
+						<div class="panel panel-primary page-break">
+					        <apex:outputPanel layout="block" styleClass="panel-heading">
+					            <h3 class="panel-title">Chantiers sans contrats</h3>
+					        </apex:outputPanel>
+					        <div class="panel-body">
+					            <apex:dataTable value="{!chantiersSansContratsVendeurs[vendeur]}" var="chantier" styleClass="table table-bordered" style="-fs-table-paginate: paginate; margin-bottom: 0px;">
+									<apex:column width="10%" headerValue="Nom" value="{!chantier.name}"/>
+									<apex:column width="12%" headerValue="Adresse" value="{!chantier.address}"/>
+									<apex:column width="8%" headerValue="Ville" value="{!chantier.city}"/>
+									<apex:column width="5%" headerValue="CP" value="{!chantier.postalCode}"/>
+									<apex:column width="7%" headerValue="Téléphone"><apex:outputText value="{!chantier.telephone}" escape="false"/></apex:column>
+									<apex:column width="7%" headerValue="Propriétaire / Locataire" value="{!chantier.isOwner}"/>
+									<apex:column width="6%" headerValue="Date CNT" value="{!chantier.contractDate}"/>
+									<apex:column width="7%" headerValue="Date SAV" value="{!chantier.lastSAVdate}"/>
+									<apex:column width="32%" headerValue="Liste des produits" value="{!chantier.productList}"/>
+									<apex:column width="5%" headerValue="Interdit" value="{!chantier.prohibited}"/>
+								</apex:dataTable>
+					        </div>
+					    </div>
+					</apex:outputPanel>
+					<apex:variable var="count" value="{!count + 1}"/>
+				</apex:outputPanel>
+			</apex:repeat>
+		</c:visualstrapblock>
+	</body>
+</apex:page>

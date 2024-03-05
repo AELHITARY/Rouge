@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_DelayBeforeControl</fullName>
+    <active>true</active>
+    <description>Pour les &quot;source&quot; et &quot;Mode de financement&quot;, le délai entre la vente et le rendez-vous de contrôle doit être supérieur ou égal à 0!</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+ (RecordType.DeveloperName = &apos;Source&apos; || RecordType.DeveloperName = &apos;FinancingMethod&apos;) &amp;&amp; delayBeforeControl__c &lt;= 0</errorConditionFormula>
+    <errorDisplayField>delayBeforeControl__c</errorDisplayField>
+    <errorMessage>Le délai de contrôle doit être supérieur ou égal à 0!</errorMessage>
+</ValidationRule>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Site_demande_de_devis</fullName>
+    <columns>NAME</columns>
+    <columns>prenomCompte__c</columns>
+    <columns>nomCompte__c</columns>
+    <columns>idEulerian__c</columns>
+    <columns>integrable__c</columns>
+    <columns>sourceWeb__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>nomFichierSource__c</field>
+        <operation>equals</operation>
+        <value>formulaire_site_kpark.fr</value>
+    </filters>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>12/16/2016 12:00 AM</value>
+    </filters>
+    <label>Site demande de devis</label>
+    <language>fr</language>
+</ListView>

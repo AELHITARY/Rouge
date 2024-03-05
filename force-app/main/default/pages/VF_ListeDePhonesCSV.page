@@ -1,0 +1,136 @@
+<apex:page controller="Ctrl_ListeDePhones" cache="true" showHeader="false" applyhtmltag="false" sidebar="false" standardStylesheets="false" contenttype="application/vnd.ms-excel#{!fileName}.xls;charset=UTF-8">{!bom}
+	<head>
+		<style type="text/css" media="all" >
+			.titre{
+				font-weight: lighter;
+				font-size:35px;
+				margin-bottom:20px;
+			}
+		</style>
+	</head>
+
+	<div class="header_center KparK_listeCompte" id="header_center">
+		<div style="font-size:16px;">
+			<apex:outputText value="Créé par {1} {2} le {0,date,dd/MM/yyyy 'à' HH:mm:ss}">
+				<apex:param value="{!NOW()+offset}" />
+				<apex:param value="{!$User.FirstName}"/>
+				<apex:param value="{!$User.LastName}"/>
+			</apex:outputText>
+		</div>
+		<div class="titre">Liste des Comptes</div>
+	</div>
+
+	<apex:pageBlock >
+		<apex:pageBlockTable value="{!listAccountsExport1}" var="export">
+			<apex:column value="{!export.AccountNumber}"/>
+			<apex:column value="{!export.Name}"/>
+			<apex:column value="{!export.Type}"/>
+			<apex:column value="{!export.rue__c}"/>
+			<apex:column value="{!export.codePostal__c}"/>
+			<apex:column value="{!export.ville__c}"/>
+			<apex:column headerValue="Téléphone Domicile" style="text-align: center">
+				<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneDomicileKparK__c)}" />
+				<apex:outputText value="{!export.telephoneDomicile__c}" rendered="{!export.optinTelephoneDomicileKparK__c}" />
+			</apex:column>
+			<apex:column headerValue="Téléphone mobile" style="text-align: center">
+				<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneMobileKparK__c)}" />
+				<apex:outputText value="{!export.telephoneMobile__c}" rendered="{!export.optinTelephoneMobileKparK__c}" />
+			</apex:column>
+			<apex:column headerValue="Autre téléphone" style="text-align: center">
+				<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneDomicileKparK__c)}" />
+				<apex:outputText value="{!export.autreTelephone__c}" rendered="{!export.optinTelephoneDomicileKparK__c}" />
+			</apex:column>
+			<apex:column headerValue="Nb Appels sortants" value="{!export.nbPhonings__c} / {!export.nbAppelsSortants__c}" style="text-align: center"/>
+			<apex:column headerValue="Dernier appel sortant" style="text-align: center">
+				<apex:outputText value="{0,date,dd/MM/yyyy}">
+					<apex:param value="{!export.dateDernierAppelSortantKparK__c}" />
+				</apex:outputText>
+			</apex:column>
+			<apex:column headerValue="Appel" style="text-align: center">
+			</apex:column>
+			<apex:column headerValue="Argu" style="text-align: center">
+			</apex:column>
+			<apex:column headerValue="RDV">
+				 ____/____/_______ de ____h____ à ____h____
+			</apex:column>
+			<apex:column headerValue="Commentaires">
+			</apex:column>
+		</apex:pageBlockTable>
+
+		<apex:outputPanel rendered="{!listAccountsExport2.size != 0}">
+				<apex:dataTable value="{!listAccountsExport2}" var="export">
+					<apex:column value="{!export.AccountNumber}"/>
+					<apex:column value="{!export.Name}"/>
+					<apex:column value="{!export.Type}"/>
+					<apex:column value="{!export.rue__c}"/>
+					<apex:column value="{!export.codePostal__c}"/>
+					<apex:column value="{!export.ville__c}"/>
+					<apex:column headerValue="Téléphone Domicile" style="text-align: center">
+						<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneDomicileKparK__c)}" />
+						<apex:outputText value="{!export.telephoneDomicile__c}" rendered="{!export.optinTelephoneDomicileKparK__c}" />
+					</apex:column>
+					<apex:column headerValue="Téléphone mobile" style="text-align: center">
+						<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneMobileKparK__c)}" />
+						<apex:outputText value="{!export.telephoneMobile__c}" rendered="{!export.optinTelephoneMobileKparK__c}" />
+					</apex:column>
+					<apex:column headerValue="Autre téléphone" style="text-align: center">
+						<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneDomicileKparK__c)}" />
+						<apex:outputText value="{!export.autreTelephone__c}" rendered="{!export.optinTelephoneDomicileKparK__c}" />
+					</apex:column>
+					<apex:column headerValue="Nb Appels sortants" value="{!export.nbPhonings__c} / {!export.nbAppelsSortants__c}" style="text-align: center"/>
+					<apex:column headerValue="Dernier appel sortant" style="text-align: center">
+						<apex:outputText value="{0,date,dd/MM/yyyy}">
+							<apex:param value="{!export.dateDernierAppelSortantKparK__c}" />
+						</apex:outputText>
+					</apex:column>
+					<apex:column headerValue="Appel" style="text-align: center">
+					</apex:column>
+					<apex:column headerValue="Argu" style="text-align: center">
+					</apex:column>
+					<apex:column headerValue="RDV">
+						 ____/____/_______ de ____h____ à ____h____
+					</apex:column>
+					<apex:column headerValue="Commentaires">
+					</apex:column>
+				</apex:dataTable>
+			</apex:outputPanel>
+
+			<apex:outputPanel rendered="{!listAccountsExport3.size != 0}">
+				<apex:dataTable value="{!listAccountsExport3}" var="export">
+					<apex:column value="{!export.AccountNumber}"/>
+					<apex:column value="{!export.Name}"/>
+					<apex:column value="{!export.Type}"/>
+					<apex:column value="{!export.rue__c}"/>
+					<apex:column value="{!export.codePostal__c}"/>
+					<apex:column value="{!export.ville__c}"/>
+					<apex:column headerValue="Téléphone Domicile" style="text-align: center">
+						<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneDomicileKparK__c)}" />
+						<apex:outputText value="{!export.telephoneDomicile__c}" rendered="{!export.optinTelephoneDomicileKparK__c}" />
+					</apex:column>
+					<apex:column headerValue="Téléphone mobile" style="text-align: center">
+						<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneMobileKparK__c)}" />
+						<apex:outputText value="{!export.telephoneMobile__c}" rendered="{!export.optinTelephoneMobileKparK__c}" />
+					</apex:column>
+					<apex:column headerValue="Autre téléphone" style="text-align: center">
+						<apex:outputText style="font-style:italic" value="Refus" rendered="{!NOT(export.optinTelephoneDomicileKparK__c)}" />
+						<apex:outputText value="{!export.autreTelephone__c}" rendered="{!export.optinTelephoneDomicileKparK__c}" />
+					</apex:column>
+					<apex:column headerValue="Nb Appels sortants" value="{!export.nbPhonings__c} / {!export.nbAppelsSortants__c}" style="text-align: center"/>
+					<apex:column headerValue="Dernier appel sortant" style="text-align: center">
+						<apex:outputText value="{0,date,dd/MM/yyyy}">
+							<apex:param value="{!export.dateDernierAppelSortantKparK__c}" />
+						</apex:outputText>
+					</apex:column>
+					<apex:column headerValue="Appel" style="text-align: center">
+					</apex:column>
+					<apex:column headerValue="Argu" style="text-align: center">
+					</apex:column>
+					<apex:column headerValue="RDV">
+						 ____/____/_______ de ____h____ à ____h____
+					</apex:column>
+					<apex:column headerValue="Commentaires">
+					</apex:column>
+				</apex:dataTable>
+			</apex:outputPanel>
+	</apex:pageBlock>
+</apex:page>

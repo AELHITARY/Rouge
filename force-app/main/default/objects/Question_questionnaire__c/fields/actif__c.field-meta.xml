@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>actif__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Est-ce une question active? Si la question est désactivée, celle-ci est supprimée du questionnaire, mais son intitulé et ses réponses sont archivées sur Salesforce sans être détruits</description>
+    <externalId>false</externalId>
+    <label>Actif</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

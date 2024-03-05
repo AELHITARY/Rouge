@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>reinitialiserMotDePasseClient__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>CRM : 702 : Affiche ou non le bouton de réinitialisation du mot de passe espace client</description>
+    <externalId>false</externalId>
+    <label>Réinitialiser mot de passe client</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

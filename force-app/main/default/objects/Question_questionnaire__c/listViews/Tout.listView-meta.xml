@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tout</fullName>
+    <columns>NAME</columns>
+    <columns>question__c</columns>
+    <columns>questionnaire__c</columns>
+    <columns>commentaire__c</columns>
+    <columns>numQuestion__c</columns>
+    <columns>obligatoire__c</columns>
+    <columns>typeReponse__c</columns>
+    <columns>questionParent__c</columns>
+    <columns>page__c</columns>
+    <columns>ordre__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Tout</label>
+    <language>fr</language>
+</ListView>

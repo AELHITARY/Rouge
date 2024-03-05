@@ -1,0 +1,317 @@
+<apex:page title="Attestation TVA PDF" renderAs="pdf" controller="Ctrl_DevisContrat_PDF" sidebar="false" showheader="false" standardstylesheets="false" applyhtmltag="false" doctype="html-5.0">
+    <head>
+        <style type="text/css" media="all">
+            a,
+            b,
+            body,
+            div,
+            em,
+            fieldset,
+            font,
+            form,
+            h4,
+            html,
+            i,
+            iframe,
+            label,
+            li,
+            p,
+            small,
+            span,
+            strong,
+            table,
+            tbody,
+            td,
+            tfoot,
+            th, C thead,
+            tr,
+            u,
+            ul {
+                border: 0;
+                margin: 0;
+                padding: 0;
+            }
+
+            html,
+            body{                
+                height: 100%;
+            }
+
+            p {
+                text-align: justify;
+                text-justify: newspaper;
+            }
+
+            @page {
+                size: auto; /* auto is the initial value */
+                /* this affects the margin in the printer settings */
+                margin: 6.35mm 6.35mm 6.35mm 6.35mm;
+            }
+
+            b,
+            strong {
+                font-weight: bold;
+            }
+
+            img {
+                color: transparent;
+                font-size: 0;
+            }
+
+            table {
+                border-collapse: collapse;
+                border-spacing: 0;
+            }
+
+            th,
+            td,
+            caption {
+                font-weight: normal;
+                vertical-align: top;
+                text-align: left;
+            }
+
+            /* `Basic HTML
+            ----------------------------------------------------------------------------------------------------*/
+            body {
+                font: 8pt/1.5 Arial, 'Liberation Sans', FreeSans, sans-serif;
+            }
+
+            hr {
+                border: 0 #ccc solid;
+                border-top-width: 1pt;
+                clear: both;
+                height: 0;
+            }
+
+            /* `Spacing
+            ----------------------------------------------------------------------------------------------------*/
+            p,
+            dl,
+            hr,
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            ol,
+            ul,
+            pre,
+            address,
+            fieldset,
+            figure {
+                margin-bottom: 4pt;
+            }
+
+            /********************** Content ***********************/
+            .paragraph-no-spaces {
+                margin: 0px;
+            }
+
+            .text-bold {
+                font-weight: bold;
+            }
+
+            .text-italic {
+                font-style: italic;
+            }
+
+            .text-underline {
+                text-decoration: underline;
+            }
+
+            .text-justify {
+                text-align: justify;
+                text-justify: inter-word;
+            }
+
+            .break {
+                clear: both;
+                page-break-after: always;
+            }
+
+            .block-title-center {
+                text-align: center;
+                margin: auto;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .block-display-inline {
+                width:200px;
+                display:inline-block;
+                font-size:9px;
+            }
+        </style>
+    </head>
+    <body>
+        <c:importvisualstrap theme="pdf" />
+        <c:visualstrapblock >
+            <apex:outputpanel rendered="{!quote == null}">
+                <div style="color:red; font-size:16px; text-align:center; font-weight:bold; margin-top: 350px;">Erreur, l'enregistrement n'existe pas</div>
+            </apex:outputpanel>
+            <apex:outputpanel id="content" rendered="{!quote != null}">
+                <div class="block-title-center">
+                    <apex:image value="{!URLFOR($Resource.Logo_kpark)}" width="25%" />
+                </div><br />
+                <apex:outputpanel layout="none" rendered="{!quote.tvaIntermediaire__c != 0 || quote.tvaReduite__c != 0}">
+                    <!--VALEUR DES PICKLIST -->
+                    <apex:variable var="localHabitation" value="Local affecté à l'habitation" />
+                    <apex:variable var="pieceHabitation" value="Pièces d'habitation (local < 50%)" />
+                    <apex:variable var="localTransformeHabitation" value="Local transformé à l'habitation" />                    
+                    <div style="page-break-inside: avoid;">
+                        <div style="text-align: center;font-size:15px;" class="text-bold">ATTESTATION SIMPLIFIEE*</div><br />
+                        <span class="text-bold" style="font-size:12px;">1 - Identité du client ou de son représentant</span><br />
+                        <div class="line_info spacer">Je soussigné(e) :</div>
+                        <div class="line_info">
+                            <span>Nom :</span>
+                            <span style="width:200px; display:inline-block;">{!quote.nomDemandeurs__c}</span>
+                            <span>Prénom :</span>
+                            <span>{!quote.prenomDemandeurs__c}</span>
+                        </div>
+                        <div class="line_info">
+                            <span>Adresse :</span>
+                            <span>{!quote.rueDemandeurs__c}</span>
+                        </div>
+                        <div class="line_info">
+                            <span>Code Postal :</span>
+                            <span style="width:165px; display:inline-block;">{!quote.codePostalDemandeurs__c}</span>
+                            <span>Commune :</span>
+                            <span>{!quote.villeDemandeurs__c}</span>
+                        </div><br />
+                        <span class="text-bold" style="font-size:12px;">2 - Nature des locaux</span><br />
+                        <span>J'atteste que les travaux à réaliser portent sur un immeuble achevé depuis plus de deux ans à la date de commencement des travaux et
+affecté à l'habitation à l'issue de ces travaux :</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.natureLocaux__c == 'Maison ou immeuble individuel'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.natureLocaux__c != 'Maison ou immeuble individuel'}" />
+                        <span class="block-display-inline">maison ou immeuble individuel</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.natureLocaux__c == 'Immeuble collectif'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.natureLocaux__c != 'Immeuble collectif'}" />
+                        <span class="block-display-inline">immeuble collectif</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.natureLocaux__c == 'Appartement individuel'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.natureLocaux__c != 'Appartement individuel'}" />
+                        <span class="block-display-inline">appartement individuel</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.natureLocaux__c == 'Autre'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.natureLocaux__c != 'Autre'}" />
+                        <span style="font-size:9px;">autre </span>
+                        <apex:outputlabel value="{!quote.autreNatureLocaux__c}" rendered="{!quote.natureLocaux__c == 'Autre'}" style="display:inline-block; font-size:9px;" />
+                        <apex:outputlabel value=" (précisez la nature du local à usage d'habitation) : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." rendered="{!quote.natureLocaux__c == 'Autre'}" style="display:inline-block; font-size:9px;" /><br /><br />
+
+                        <span>Les travaux sont réalisés dans :</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.localisationTravaux__c == localHabitation}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.localisationTravaux__c != localHabitation}" />
+                        <span style="font-size:9px;">un local affecté exclusivement ou principalement à l'habitation</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.localisationTravaux__c == pieceHabitation}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.localisationTravaux__c != pieceHabitation}" />
+                        <span style="font-size:9px;">des pièces affectées exclusivement à l'habitation situées dans un local affecté pour moins de 50 % à cet usage</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.localisationTravaux__c == 'Parties communes'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.localisationTravaux__c != 'Parties communes'}" />
+                        <span style="font-size:9px;">des parties communes de locaux affectés exclusivement ou principalement à l'habitation dans une proportion de </span>
+                        <apex:outputlabel value="{!quote.milliemesLocalisationTravaux__c}" rendered="{!IF(quote.localisationTravaux__c == 'Parties communes' && !ISBLANK(quote.milliemesLocalisationTravaux__c), TRUE, FALSE)}" style="display:inline-block; font-size:9px;" />
+                        <apex:outputlabel value=". . . . . . . . . . . . . . . . . . . . . " rendered="{!quote.localisationTravaux__c != 'Parties communes' || ISBLANK(quote.milliemesLocalisationTravaux__c)}" style="display:inline-block; font-size:9px;" />
+                        <span style="font-size:9px;">millièmes de l'immeuble.</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.localisationTravaux__c == localTransformeHabitation}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.localisationTravaux__c != localTransformeHabitation}" />
+                        <span style="font-size:9px;">un local antérieurement affecté à un usage autre que d'habitation et transformé à cet usage</span><br />
+                        
+                        <span class="text-bold" style="font-size:10px;">Adresse : </span>
+                        <apex:outputlabel style="width:250px; display:inline-block;font-size:10px;" rendered="{!isSameAddress}" value="{!quote.rueDemandeurs__c}" />
+                        <apex:outputlabel style="width:250px; display:inline-block;font-size:10px;" rendered="{!NOT(isSameAddress)}" value="{!quote.rueChantier__c}" />
+                        <span class="text-bold" style="font-size:10px;">Commune : </span>
+                        <apex:outputlabel style="width:150px; display:inline-block;font-size:10px;" rendered="{!isSameAddress}" value="{!quote.villeDemandeurs__c}" />
+                        <apex:outputlabel style="width:150px; display:inline-block;font-size:10px;" rendered="{!NOT(isSameAddress)}" value="{!quote.villeChantier__c}" />
+                        <span class="text-bold" style="font-size:10px;">Code postal : </span>
+                        <apex:outputlabel style="width:50px; display:inline-block;font-size:10px;" rendered="{!isSameAddress}" value="{!quote.codePostalDemandeurs__c}" />
+                        <apex:outputlabel style="width:50px; display:inline-block;font-size:10px;" rendered="{!NOT(isSameAddress)}" value="{!quote.codePostalChantier__c}" />
+                        <br />
+
+                        <span class="text-bold" style="font-size:10px;">dont je suis : </span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.typeAdresse__c == 'Propriétaire'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.typeAdresse__c != 'Propriétaire'}" />
+                        <span class="text-bold" style="width:100px;display:inline-block;font-size:10px;">propriétaire</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.typeAdresse__c == 'Locataire'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.typeAdresse__c != 'Locataire'}" />
+                        <span class="text-bold" style="width:100px;display:inline-block;font-size:10px;">locataire</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!quote.typeAdresse__c == 'Autre'}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!quote.typeAdresse__c != 'Autre'}" />
+                        <span class="text-bold" style="width:33px;display:inline-block; font-size:10px;">autre</span>
+                        <apex:outputlabel value="(précisez votre qualité) : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ." rendered="{!quote.typeAdresse__c == 'Autre'}" style="display:inline-block; font-size:9px;" />
+                        <br /><br />
+                        
+                        <span class="text-bold" style="font-size:12px;">3 - Nature des travaux</span><br />
+                        J'atteste que <span class="text-underline">sur la période de deux ans précédant ou suivant la réalisation des travaux décrits dans la présente attestation</span>, les travaux :<br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c,'Sans impact sur les fondations'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c,'Sans impact sur les fondations'), FALSE, TRUE)}" />
+                        <span style="font-size:9px;">n'affectent ni les fondations, ni les éléments, hors fondations, déterminant la résistance et la rigidité de l'ouvrage, ni la
+consistance des façades (hors ravalement).</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Sans impact sur > 5/6 éléments suivants'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Sans impact sur > 5/6 éléments suivants'), FALSE, TRUE)}" />
+                        <span style="font-size:9px;">n'affectent pas plus de cinq des six éléments de second oeuvre suivants :</span><br />
+                        <span style="font-size:9px;font-style: italic;" class="text-bold">Cochez la case correspondant aux éléments affectés : </span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Planchers'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Planchers'), FALSE, TRUE)}" />
+                        <span style="font-size:9px; display:inline-block; padding-right:8px;" class="text-bold">planchers qui ne déterminent pas la résistance ou la rigidité de
+l'ouvrage</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Huisseries extérieures'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Huisseries extérieures'), FALSE, TRUE)}" />
+                        <span style="font-size:9px; display:inline-block; padding-right:8px;" class="text-bold">huisseries extérieures</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Cloisons intérieures'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Cloisons intérieures'), FALSE, TRUE)}" />
+                        <span style="font-size:9px; display:inline-block; padding-right:8px;" class="text-bold">cloisons intérieures</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Installations sanitaires'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Installations sanitaires'), FALSE, TRUE)}" />
+                        <span style="font-size:9px; display:inline-block; padding-right:8px;" class="text-bold">installations sanitaires et de plomberie</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Installations électriques'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Installations électriques'), FALSE, TRUE)}" />
+                        <span style="font-size:9px; display:inline-block; padding-right:8px;" class="text-bold">installations électriques</span>
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Chauffage'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.elementsTravaux__c, 'Chauffage'), FALSE, TRUE)}" />
+                        <span style="font-size:9px; display:inline-block; " class="text-bold">système de chauffage <span style="font-style: italic;">(pour les immeubles situés en métropole)</span></span><br />
+                        <span style="font-size:9px;font-style: italic;color:#303030;">NB : tous autres travaux sont sans incidence sur le bénéfice du taux réduit.</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Sans augmentation de surface'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Sans augmentation de surface'), FALSE, TRUE)}" />
+                        <span style="font-size:9px;">n'entraînent pas une augmentation de la surface de plancher de la construction existante supérieure à 10 %.</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Sans surélévation, ni construction'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Sans surélévation, ni construction'), FALSE, TRUE)}" />
+                        <span style="font-size:9px;">ne consistent pas en une surélévation ou une addition de construction.</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Amélioration de la qualité énergétique du logement'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Amélioration de la qualité énergétique du logement'), FALSE, TRUE)}" />
+                        <span style="font-size:9px;" class="text-justify">J'atteste que les travaux visent à améliorer la qualité énergétique du logement et portent sur la fourniture, la pose, l'installation ou
+l'entretien des matériaux, appareils et équipements dont la liste figure dans la notice (1 de l'article 200 quater du code général des
+impôts – CGI) et respectent les caractéristiques techniques et les critères de performances minimales fixés par un arrêté du ministre
+du budget (article 18 bis de l'annexe IV au CGI).</span><br />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOnContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Travaux soumis au taux de TVA de 5,5%'), TRUE, FALSE)}" />
+                        <apex:image value="{!URLFOR($Resource.Checkboxes, 'checkboxOffContrat.jpg')}" rendered="{!IF(CONTAINS(quote.naturesTravaux__c, 'Travaux soumis au taux de TVA de 5,5%'), FALSE, TRUE)}" />
+                        <span style="font-size:9px;">J'atteste que les travaux ont la nature de travaux induits indissociablement liés à des travaux d'amélioration de la qualité
+énergétique soumis au taux de TVA de 5,5 %.</span>
+                        <br /><br />
+
+                        <span class="text-bold" style="font-size:12px;">4 - Conservation d'une copie de l'attestation et des pièces justificatives</span><br />
+                        <span style="font-size:9px;" class="text-justify">
+                            Je conserve une copie de cette attestation ainsi que de toutes les factures ou notes émises par les entreprises prestataires jusqu'au
+31 décembre de la cinquième année suivant la réalisation des travaux et m'engage à en produire une copie à l'administration fiscale
+sur sa demande.
+                        </span><br /><br />
+
+                        <span style="font-size:9px;" class="text-justify">
+                            Si les mentions portées sur l'attestation s'avèrent inexactes de votre fait et ont eu pour conséquence l'application erronée du taux
+réduit de la TVA, vous êtes solidairement tenu au paiement du complément de taxe résultant de la différence entre le montant de la
+taxe due (TVA au taux de 20 % ou 10 %) et le montant de la TVA effectivement payé au taux de :
+<ul style="font-size:9px;"><li>- 10 % pour les travaux d'amélioration, de transformation, d'aménagement et d'entretien portant sur des locaux à usage
+d'habitation achevés depuis plus de 2 ans ;</li>
+<li>- 5,5 % pour les travaux d'amélioration de la qualité énergétique des locaux à usage d'habitation achevés depuis plus de 2 ans
+ainsi que sur les travaux induits qui leur sont indissociablement liés.</li></ul>
+                        </span><br />
+
+                        <span style="font-size:9px;">Fait à . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .,  le  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</span><br />
+                        <span style="font-size:9px;">Signature du client ou de son représentant légal :</span>
+                        <div style="font-size:7px;margin-top:60px">
+                            <p class="paragraph-no-spaces">* Pour remplir cette attestation, cochez les cases correspondant à votre situation et complétez les rubriques en pointillés.</p>                            
+                        </div>
+                    </div>
+                </apex:outputpanel>
+            </apex:outputpanel>
+        </c:visualstrapblock>
+    </body>
+</apex:page>

@@ -1,0 +1,448 @@
+<template>
+    <lightning-card variant="base" >
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:orders" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Gestion de suivi des commandes fournisseur">Gestion de suivi des commandes fournisseur</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+            
+        <!-- BODY -->
+        <div class="c-container slds-scrollable" style="height:39vh">
+
+            <!-- Spinner -->
+            <div if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </div>
+
+            <!-- NON DISPONIBLE -->
+            <template if:false={activeWizard}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>La date de transmission doit être remplie pour commencer le suivi d'une commande.</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+                
+            <template if:true={activeWizard}>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+    
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+    
+                    </lightning-layout-item>
+                </lightning-layout>
+            
+                <lightning-messages></lightning-messages>
+                
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <!-- STEP 1 (SELECTION DE LA COMMANDE CLIENT) --> 
+                        <template if:true={showStep1Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection de la commande fournisseur à suivre
+                            </h3>
+
+                            <!-- NON DISPONIBLE -->
+                            <template if:false={hasProviderOrders}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>
+                                                    Pas de commandes fournisseur éligibles.<br />
+                                                    Seul les commandes fournisseurs ayant une date de transmission peuvent être traitées par cet assistant.
+                                                </p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={hasProviderOrders}>
+                                <div class="slds-m-bottom_medium">
+                                    <p>
+                                        Seul les commandes fournisseurs ayant une date de transmission peuvent être traitées par cet assistant.
+                                    </p>
+                                </div>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <select class="slds-select" onchange={handleProviderChange}>
+                                            <template for:each={providerOrderPicklistValues} for:item="option">
+                                                <option key={option.label} value={option.value} selected={option.checked}>{option.label}</option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <br/>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 2 (ACTION) --> 
+                        <template if:true={showStep2Form}>
+                            <h3 class="slds-text-heading_small">
+                                Sélection de l'action
+                            </h3>
+                            <div>
+                                <lightning-radio-group name="radioButtonGroup" 
+                                                        onchange={handleActionChange} 
+                                                        options={actionValues}
+                                                        value={selectedActionValue}
+                                                        type="radio">
+                                </lightning-radio-group>
+                            </div>
+                        </template>
+
+                        <!-- STEP 3 (SELECTION DES COMMANDES FOURNISSEUR) --> 
+                        <template if:true={showStep3Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des lignes de commandes
+                            </h3>
+                            <template if:true={orderItemsActionData}>
+                                <p class="slds-m-bottom_medium">
+                                    Veuillez sélectionner au minimum une ligne de commande à modifier.
+                                </p>
+                                <div>
+                                    <lightning-datatable data={orderItemsActionData}
+                                                        columns={orderItemsActionColumns}
+                                                        key-field="Id"
+                                                        onrowselection={handleSelectedOrderItemsChange}
+                                                        selected-rows={selectedRecords}>
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 4 (SAISIE GLOBALE) --> 
+                        <template if:true={showStep4Form}> 
+                            <lightning-accordion allow-multiple-sections-open
+                                                active-section-name={activeSaisieSections}>
+                                <template if:true={showGlobalDataField}>
+                                    <lightning-accordion-section name="orderGlobalData" label="Données globales de la commande">
+                                        <div class="slds-form" role="list">
+                                            <template if:true={showCostPrevField}>
+                                                <div class="slds-form__row">
+                                                    <div class="slds-form__item" role="listitem">
+                                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                            <lightning-input type="number" name="Coûts d'expédition (prévisionnels)" 
+                                                                            label="Coûts d'expédition (prévisionnel)" 
+                                                                            value={expeditionCostPrev} 
+                                                                            formatter="currency" 
+                                                                            step="0.01"
+                                                                            min="0"
+                                                                            onchange={handleChangeCostPrev}>
+                                                            </lightning-input>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <template if:true={showCostRealField}>
+                                                <div class="slds-form__row">
+                                                    <div class="slds-form__item" role="listitem">
+                                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                            <lightning-input type="number" name="Coûts d'expédition (réels)" 
+                                                                            label="Coûts d'expédition (réels)" 
+                                                                            value={expeditionCostReal} 
+                                                                            formatter="currency" 
+                                                                            step="0.01"
+                                                                            min="0"
+                                                                            onchange={handleChangeCostReal}>
+                                                            </lightning-input>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+                                <lightning-accordion-section name="lineGlobalData" label="Données d'initialisation des lignes"> 
+                                    <div class="slds-form" role="list">
+                                        <template if:true={showConfirmationDateField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date de confirmation" 
+                                                                        label="Date de confirmation" 
+                                                                        value={startConfirmationDate}
+                                                                        onchange={handleChangeConfirmationDate}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showConfirmationNumberField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="text" name="Numéro de confirmation" 
+                                                                        label="Numéro de confirmation" 
+                                                                        value={confirmationNumber}
+                                                                        onchange={handleChangeConfirmationNumber}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showStartFabricationDateField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date de début de fabrication" 
+                                                                        label="Date de début de fabrication" 
+                                                                        value={startFabricationDate}
+                                                                        onchange={handleChangeStartFabricationDate}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showEndFabricationDateField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date de fin de fabrication" 
+                                                                        label="Date de fin de fabrication" 
+                                                                        value={endFabricationDate}
+                                                                        onchange={handleChangeEndFabricationDate}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showDeliveryDateField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date de livraison" 
+                                                                        label="Date de livraison" 
+                                                                        value={deliveryDate}
+                                                                        onchange={handleChangeDeliveryDate}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showCostProductPrevField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="number" name="Coûts des produits (prévisionnels)" 
+                                                                        label="Coûts des produits (prévisionnel)" 
+                                                                        value={productCostPrev} 
+                                                                        formatter="currency" 
+                                                                        step="0.01"
+                                                                        min="0"
+                                                                        onchange={handleChangeProductCostPrev}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showDeliveryDatePrevField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date de livraison (prévisionnelle)" 
+                                                                        label="Date de livraison (prévisionnelle)" 
+                                                                        value={deliveryDatePrev}
+                                                                        onchange={handleChangeDeliveryDatePrev}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showDeliveryNumberField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="text" name="Numéro BL" 
+                                                                        label="Numéro BL" 
+                                                                        value={deliveryNumber}
+                                                                        onchange={handleChangeDeliveryNumber}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showInvoiceDateField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date de facturation" 
+                                                                        label="Date de facturation" 
+                                                                        value={invoiceDate}
+                                                                        onchange={handleChangeInvoiceDate}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showInvoiceNumberField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="text" name="N° de facture" 
+                                                                        label="N° de facture" 
+                                                                        value={invoiceNumber}
+                                                                        onchange={handleChangeInvoiceNumber}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showPaiementDateField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date de réception" 
+                                                                        label="Date de réception" 
+                                                                        value={paiementDate}
+                                                                        onchange={handleChangePaiementDate}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showCostRealField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="number" name="Coûts des produits (réels)" 
+                                                                        label="Coûts des produits (réels)" 
+                                                                        value={productCostReal} 
+                                                                        formatter="currency" 
+                                                                        step="0.01"
+                                                                        min="0"
+                                                                        onchange={handleChangeProductCostReal}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showCancelDateField}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <lightning-input type="date" name="Date d'annulation" 
+                                                                        label="Date d'annulation" 
+                                                                        value={cancelDate}
+                                                                        onchange={handleChangeCancelDate}>
+                                                        </lightning-input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showCancellingReasonField}>
+                                                <div class="slds-form__row">
+                                                    <div class="slds-form__item" role="listitem">
+                                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                            <lightning-combobox
+                                                                name="Motif d'annulation"
+                                                                label="Motif d'annulation"
+                                                                value={cancellingReason}
+                                                                placeholder="-- Aucun motif --"                                                             
+                                                                options={cancellingReasonsPicklistValues}
+                                                                onchange={handleChangeCancellingReason}>
+                                                            </lightning-combobox>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+                        </template>
+                        <!-- STEP 5 (SAISIE DES NOUVELLES INFORMATIONS) --> 
+                        <template if:true={showStep5Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Saisie des valeurs
+                            </h3>
+                            <template if:true={selectedRecords}>
+                                <p class="slds-m-bottom_medium">
+                                    Veuillez saisir les valeurs demandées pour chaque ligne de commande.
+                                    Pour saisir une valeur dans plusieurs lignes à la fois, sélectionner à gauche les lignes conservées puis lors de la modification d'une cellule, appliquer les modifications à toutes les lignes sélectionnées (cocher la case et cliquer sur "Appliquer").
+                                </p>
+                                <div>
+                                    <c-custom-data-table key-field="Id" 
+                                                        data={orderItemsInputData}
+                                                        columns={orderItemsInputColumns}
+                                                        onsave={handleOrderItemsSave} 
+                                                        oncancel={removeDraftValues}
+                                                        onpicklistchanged={handleDatatablePicklistChanged}
+                                                        draft-values={draftValuesTest}
+                                                        onrowselection={getSelectedRows}
+                                                        hide-checkbox-column=true>
+                                    </c-custom-data-table>
+                                </div>
+                            </template>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+        </div>    
+    
+        <div slot="footer">
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            <!-- BUTTONS -->   
+            <template if:true={showPreviousButton}> 
+                <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+            </template>
+            <template if:true={showNextButton}> 
+                <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+            </template>
+        </div>
+    </lightning-card>
+    
+</template>

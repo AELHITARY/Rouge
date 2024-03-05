@@ -1,0 +1,17 @@
+<apex:page controller="Ctrl_AdwordsGenerateCSV" showHeader="false" applyhtmltag="false" sidebar="false" standardStylesheets="false" 
+    action="{!init}" contentType="text/csv#AdwordsImportConversions.csv;charset=UTF-8">
+Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency
+	<apex:repeat value="{!csvRowValues1}" var="export">
+{!export.GCLID},{!export.conversionName},{!export.conversionTime},{!export.conversionValue},EUR
+	<apex:outputPanel rendered="{!csvRowValues2.size != 0}">
+		<apex:repeat value="{!csvRowValues2}" var="export">
+{!export.GCLID},{!export.conversionName},{!export.conversionTime},{!export.conversionValue},EUR
+		</apex:repeat>
+	</apex:outputPanel>
+		<apex:outputPanel rendered="{!csvRowValues3.size != 0}">
+			<apex:repeat value="{!csvRowValues3}" var="export">
+{!export.GCLID},{!export.conversionName},{!export.conversionTime},{!export.conversionValue},EUR
+			</apex:repeat>
+		</apex:outputPanel>
+	</apex:repeat>
+</apex:page>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>dueDate__c</fullName>
+    <description>Date limite de paiement.
+Alimentée automatiquement avec Date de facture + XX jours, XX étant défini par la propriété globale &quot;invoice.core.dueDate.delay&quot;</description>
+    <externalId>false</externalId>
+    <label>Date d&apos;échéance</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

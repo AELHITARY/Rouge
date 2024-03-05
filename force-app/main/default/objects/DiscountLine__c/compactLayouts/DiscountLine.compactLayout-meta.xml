@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DiscountLine</fullName>
+    <fields>operation__c</fields>
+    <fields>Name</fields>
+    <fields>RecordTypeId</fields>
+    <fields>salesEntity__c</fields>
+    <fields>product__c</fields>
+    <fields>discount__c</fields>
+    <fields>origin__c</fields>
+    <label>Ligne de promotion</label>
+</CompactLayout>

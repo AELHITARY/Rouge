@@ -1,0 +1,372 @@
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="Ctrl_Site_Demande_de_Devis" action="{!initVerifParameters}" applyHtmlTag="false" standardStylesheets="false" cache="false">
+    <html>
+        <head>
+            <title>Demande de devis gratuit | Etape 2 | K par K</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="robots" content="noindex, follow" />
+            <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+            <script type="text/javascript" src="//try.abtasty.com/16d36d066bc474b3d95da9dadef85481.js"></script>
+            <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+            <apex:includeScript value="{!URLFOR($Resource.Site_Demande_de_Devis, 'js/demande_devis.min.js')}" />
+            <script type="text/javascript"> 
+                j$ = jQuery.noConflict();
+                j$(document).ready(function(){
+                    var radioFenetreMateriau = j$('input[type=radio][name=radioFenetreMateriau]');
+                    var radioGarageType = j$('input[type=radio][name=radioGarageType]');
+                    // Initialisation des champs radio
+                    radioFenetreMateriau.change(function() {
+                        onChangeFenetreMateriau(this.value);
+                    });
+                    radioGarageType.change(function() {
+                        onChangeGarageType(this.value);
+                    });
+                    // Initialise la valeur des champs radio
+                    if('{!materiauFenetre}' != '') {
+                        radioFenetreMateriau.filter('[value={!materiauFenetre}]').prop('checked', true);
+                    }
+                    if('{!typeGarage}' != '') {
+                        radioGarageType.filter('[value={!typeGarage}]').prop('checked', true);
+                    }
+                });    
+                
+                /* Fonction pour modifier valider l'étape 2 (désactive les boutons)             */
+                /*------------------------------------------------------------------------------*/
+                function valideEtape2() {
+                    // Désactivation boutton sauvegarde et annuler
+                    j$('[id$=jevalide]').button('loading');
+                    j$('[id$=jevalide]').attr('disabled', true);
+                    j$('[id$=retour]').attr('disabled', true);
+                    // Traitement
+                    setTimeout(processValidationEtape2, 2000);
+                    //processValidationEtape2();
+                }           
+            </script>           
+            <script type="text/javascript"> (function() { var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 
+                ('https:' == document.location.protocol ? 'https://' : 'http://' )+'js-project-eu.s3.amazonaws.com/AS-2313604.js'; 
+                var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); })();
+            </script>
+            <c:importvisualstrap theme="default" />
+            <apex:stylesheet value="{!URLFOR($Resource.Site_Demande_de_Devis, 'css/demande_devis.min.css')}"/>
+        </head>
+        <body class="body-quote">
+            <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+            <div class="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero">
+                <div class="container" id="container">
+                    <div class="row">
+                        <apex:form >
+                            <div class="hidden-xs col-md-12 text-center">
+                                <img src="{!URLFOR($Resource.Site_Demande_de_Devis, 'img/etape02.png')}" />
+                            </div>
+                            <div class="hidden-sm hidden-md hidden-lg text-center">
+                                <img src="{!URLFOR($Resource.Site_Demande_de_Devis, 'img/etape02_light_circle.png')}" />
+                            </div>
+                            <div id="error" class="col-md-12" style="margin-top: 20px;">
+                                <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                                    <div class="alert {!IF(message.SeverityStr=='confirm','alert-success',
+                                                        IF(message.SeverityStr=='info','alert-info',
+                                                        IF(message.SeverityStr=='warning','alert-warning','alert-danger')))}">
+                                        <apex:outputtext escape="false" value="{!message.Message}"/>
+                                    </div>
+                                </apex:repeat>
+                            </div>
+                            <!-- Fenetre -->
+                            <apex:outputPanel id="panel_fenetre" layout="block" rendered="{!CONTAINS(projet,'1')}">
+                                <div class="form-group div-quote-project">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.fenetre}" class="label-quote">Votre projet <span class="text-red">fenêtres</span></label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <apex:selectList size="1" styleClass="select-quote" id="fenetre" value="{!quantiteFenetre}">
+                                            <apex:selectOption itemValue="0" itemLabel="Quantité"/>
+                                            <apex:selectOption itemValue="1" itemLabel="1"/>
+                                            <apex:selectOption itemValue="2" itemLabel="2"/>
+                                            <apex:selectOption itemValue="3" itemLabel="3"/>
+                                            <apex:selectOption itemValue="4" itemLabel="4"/>
+                                            <apex:selectOption itemValue="5" itemLabel="5"/>
+                                            <apex:selectOption itemValue="6" itemLabel="6"/>
+                                            <apex:selectOption itemValue="7" itemLabel="7"/>
+                                            <apex:selectOption itemValue="8" itemLabel="8"/>
+                                            <apex:selectOption itemValue="9" itemLabel="9"/>
+                                            <apex:selectOption itemValue="10" itemLabel="10 et plus"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.fenetretype}" class="label-quote">Type de fenêtres</label>
+                                        <apex:selectRadio id="fenetretype" value="{!typeFenetre}" styleClass="radio-quote">
+                                            <apex:selectOption id="fenetretype1" itemValue="1" itemLabel="Fenêtres" />
+                                            <apex:selectOption id="fenetretype2" itemValue="2" itemLabel="Baies vitrées"/>
+                                            <apex:selectOption id="fenetretype3" itemValue="3" itemLabel="Portes-fenêtres"/>
+                                        </apex:selectRadio>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="label-quote">Matériau</label>
+                                    </div>
+                                    <apex:actionFunction name="onChangeFenetreMateriau" rerender="hiddenFields">
+                                        <apex:param name="firstParam" assignTo="{!materiauFenetre}" value="" />
+                                    </apex:actionFunction>
+                                    <div class="col-md-12">
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioFenetreMateriau" id="fenetremateriau1" value="1" />
+                                            <span class="check"><span></span></span> Bois
+                                        </label>
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioFenetreMateriau" id="fenetremateriau2" value="2" />
+                                            <span class="check"><span></span></span> PVC
+                                        </label>
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioFenetreMateriau" id="fenetremateriau3" value="3" />
+                                            <span class="check"><span></span></span> Aluminium
+                                        </label>
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioFenetreMateriau" id="fenetremateriau4" value="4" />
+                                            <span class="check"><span></span></span> Bois-aluminium
+                                        </label>
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioFenetreMateriau" id="fenetremateriau5" value="5" />
+                                            <span class="check"><span></span></span> Je ne sais pas
+                                        </label>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <div class="clear-quote-project"></div>
+
+                            <!-- Volet -->
+                            <apex:outputPanel id="panel_volet" layout="block" rendered="{!CONTAINS(projet,'2')}">
+                                <div class="form-group div-quote-project">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.volet}" class="label-quote">Votre projet <span class="text-red">volets</span></label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <apex:selectList size="1" styleClass="select-quote" id="volet" value="{!quantiteVolet}">
+                                            <apex:selectOption itemValue="0" itemLabel="Quantité"/>
+                                            <apex:selectOption itemValue="1" itemLabel="1"/>
+                                            <apex:selectOption itemValue="2" itemLabel="2"/>
+                                            <apex:selectOption itemValue="3" itemLabel="3"/>
+                                            <apex:selectOption itemValue="4" itemLabel="4"/>
+                                            <apex:selectOption itemValue="5" itemLabel="5"/>
+                                            <apex:selectOption itemValue="6" itemLabel="6"/>
+                                            <apex:selectOption itemValue="7" itemLabel="7"/>
+                                            <apex:selectOption itemValue="8" itemLabel="8"/>
+                                            <apex:selectOption itemValue="9" itemLabel="9"/>
+                                            <apex:selectOption itemValue="10" itemLabel="10 et plus"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.volettype}" class="label-quote">Type de volets</label>
+                                        <apex:selectRadio id="volettype" value="{!typeVolet}" styleClass="radio-quote">
+                                            <apex:selectOption id="volettype1" itemValue="1" itemLabel="Battants" />
+                                            <apex:selectOption id="volettype2" itemValue="2" itemLabel="Roulants"/>
+                                            <apex:selectOption id="volettype3" itemValue="3" itemLabel="Persiennes"/>
+                                        </apex:selectRadio>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.voletmateriau}" class="label-quote">Matériau</label>
+                                        <apex:selectRadio id="voletmateriau" value="{!materiauVolet}" styleClass="radio-quote">
+                                            <apex:selectOption id="voletmateriau1" itemValue="1" itemLabel="Bois" />
+                                            <apex:selectOption id="voletmateriau2" itemValue="2" itemLabel="PVC" />
+                                            <apex:selectOption id="voletmateriau3" itemValue="3" itemLabel="Aluminium"/>
+                                            <apex:selectOption id="voletmateriau4" itemValue="4" itemLabel="Je ne sais pas"/>
+                                        </apex:selectRadio>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <div class="clear-quote-project"></div>
+
+                            <!-- Porte -->
+                            <apex:outputPanel id="panel_porte" layout="block" rendered="{!CONTAINS(projet,'5')}">
+                                <div class="form-group div-quote-project">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.porte}" class="label-quote">Votre projet <span class="text-red">portes</span></label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <apex:selectList size="1" styleClass="select-quote" id="porte" value="{!quantitePorte}">
+                                            <apex:selectOption itemValue="0" itemLabel="Quantité"/>
+                                            <apex:selectOption itemValue="1" itemLabel="1"/>
+                                            <apex:selectOption itemValue="2" itemLabel="2"/>
+                                            <apex:selectOption itemValue="3" itemLabel="3"/>
+                                            <apex:selectOption itemValue="4" itemLabel="4"/>
+                                            <apex:selectOption itemValue="5" itemLabel="5"/>
+                                            <apex:selectOption itemValue="6" itemLabel="6"/>
+                                            <apex:selectOption itemValue="7" itemLabel="7"/>
+                                            <apex:selectOption itemValue="8" itemLabel="8"/>
+                                            <apex:selectOption itemValue="9" itemLabel="9"/>
+                                            <apex:selectOption itemValue="10" itemLabel="10 et plus"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.portetype}" class="label-quote">Type de portes</label>
+                                        <apex:selectRadio id="portetype" value="{!typePorte}" styleClass="radio-quote">
+                                            <apex:selectOption id="portetype1" itemValue="1" itemLabel="D'entrée"/>
+                                            <apex:selectOption id="portetype2" itemValue="2" itemLabel="Blindées"/>
+                                            <apex:selectOption id="portetype3" itemValue="3" itemLabel="Intérieures"/>
+                                            <apex:selectOption id="portetype4" itemValue="4" itemLabel="De service"/>
+                                        </apex:selectRadio>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <div class="clear-quote-project"></div>
+
+                            <!-- Store -->
+                            <apex:outputPanel id="panel_store" layout="block" rendered="{!CONTAINS(projet,'6')}">
+                                <div class="form-group div-quote-project">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.store}" class="label-quote">Votre projet <span class="text-red">stores</span></label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <apex:selectList size="1" styleClass="select-quote" id="store" value="{!quantiteStore}">
+                                            <apex:selectOption itemValue="0" itemLabel="Quantité"/>
+                                            <apex:selectOption itemValue="1" itemLabel="1"/>
+                                            <apex:selectOption itemValue="2" itemLabel="2"/>
+                                            <apex:selectOption itemValue="3" itemLabel="3"/>
+                                            <apex:selectOption itemValue="4" itemLabel="4"/>
+                                            <apex:selectOption itemValue="5" itemLabel="5"/>
+                                            <apex:selectOption itemValue="6" itemLabel="6"/>
+                                            <apex:selectOption itemValue="7" itemLabel="7"/>
+                                            <apex:selectOption itemValue="8" itemLabel="8"/>
+                                            <apex:selectOption itemValue="9" itemLabel="9"/>
+                                            <apex:selectOption itemValue="10" itemLabel="10 et plus"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.storetype}" class="label-quote">Type de stores</label>
+                                        <apex:selectRadio id="storetype" value="{!typeStore}" styleClass="radio-quote">
+                                            <apex:selectOption id="storetype1" itemValue="1" itemLabel="Stores bannes"/>
+                                            <apex:selectOption id="storetype2" itemValue="2" itemLabel="Moustiquaires"/>
+                                        </apex:selectRadio>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <div class="clear-quote-project"></div>
+
+                            <!-- Portes de garage -->
+                            <apex:outputPanel id="panel_garage" layout="block" rendered="{!CONTAINS(projet,'3')}">
+                                <div class="form-group div-quote-project">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.garage}" class="label-quote">Votre projet <span class="text-red">portes de garage</span></label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <apex:selectList size="1" styleClass="select-quote" id="garage" value="{!quantiteGarage}">
+                                            <apex:selectOption itemValue="0" itemLabel="Quantité"/>
+                                            <apex:selectOption itemValue="1" itemLabel="1"/>
+                                            <apex:selectOption itemValue="2" itemLabel="2"/>
+                                            <apex:selectOption itemValue="3" itemLabel="3"/>
+                                            <apex:selectOption itemValue="4" itemLabel="4"/>
+                                            <apex:selectOption itemValue="5" itemLabel="5"/>
+                                            <apex:selectOption itemValue="6" itemLabel="6"/>
+                                            <apex:selectOption itemValue="7" itemLabel="7"/>
+                                            <apex:selectOption itemValue="8" itemLabel="8"/>
+                                            <apex:selectOption itemValue="9" itemLabel="9"/>
+                                            <apex:selectOption itemValue="10" itemLabel="10 et plus"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label class="label-quote">Type de portes de garage</label>
+                                    </div>
+                                    <apex:actionFunction name="onChangeGarageType" rerender="hiddenFields">
+                                        <apex:param name="firstParam" assignTo="{!typeGarage}" value="" />
+                                    </apex:actionFunction>
+                                    <div class="col-md-12">
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioGarageType" id="garagetype1" value="1" />
+                                            <span class="check"><span></span></span> Sectionnelles
+                                        </label>
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioGarageType" id="garagetype2" value="2" />
+                                            <span class="check"><span></span></span> A enroulement
+                                        </label>
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioGarageType" id="garagetype3" value="3" />
+                                            <span class="check"><span></span></span> Battantes
+                                        </label>
+                                        <label class="radio-inline checkbox-quote">
+                                            <input type="radio" name="radioGarageType" id="garagetype4" value="4" />
+                                            <span class="check"><span></span></span> Je ne sais pas
+                                        </label>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <div class="clear-quote-project"></div>
+
+                            <!-- Portails et clôtures -->
+                            <apex:outputPanel id="panel_cloture" layout="block" rendered="{!CONTAINS(projet,'4')}">
+                                <div class="form-group div-quote-project">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.portail}" class="label-quote">Votre projet <span class="text-red">portails et clôtures</span></label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <apex:selectList size="1" styleClass="select-quote" id="portail" value="{!quantitePortail}">
+                                            <apex:selectOption itemValue="0" itemLabel="Quantité"/>
+                                            <apex:selectOption itemValue="1" itemLabel="1"/>
+                                            <apex:selectOption itemValue="2" itemLabel="2"/>
+                                            <apex:selectOption itemValue="3" itemLabel="3"/>
+                                            <apex:selectOption itemValue="4" itemLabel="4"/>
+                                            <apex:selectOption itemValue="5" itemLabel="5"/>
+                                            <apex:selectOption itemValue="6" itemLabel="6"/>
+                                            <apex:selectOption itemValue="7" itemLabel="7"/>
+                                            <apex:selectOption itemValue="8" itemLabel="8"/>
+                                            <apex:selectOption itemValue="9" itemLabel="9"/>
+                                            <apex:selectOption itemValue="10" itemLabel="10 et plus"/>
+                                        </apex:selectList>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <label for="{!$Component.portailmateriau}" class="label-quote">Matériau</label>
+                                        <apex:selectRadio id="portailmateriau" value="{!materiauPortail}" styleClass="radio-quote">
+                                            <apex:selectOption id="portailmateriau1" itemValue="1" itemLabel="PVC" />
+                                            <apex:selectOption id="portailmateriau2" itemValue="2" itemLabel="Aluminium"/>
+                                        </apex:selectRadio>
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            <div class="clear-quote-project"></div>
+
+                            <apex:actionFunction name="processValidationEtape2" action="{!validationEtape2}" />
+                            <div class="col-md-12 text-center">
+                                <apex:commandButton action="{!index}" id="retour" style="margin-right: 15px;" styleClass="button-quote button-quote-white" value="RETOUR À L'ÉTAPE 1" />
+                                <apex:commandButton onClick="scrollParent();valideEtape2();return false;" id="jevalide" styleClass="button-quote button-quote-red" value="VALIDER VOTRE DEMANDE" html-data-loading-text="VEUILLEZ PATIENTER..."/>
+                            </div>
+                            <apex:outputPanel id="hiddenFields">
+                                <apex:inputHidden id="materiauFenetreHidden" value="{!materiauFenetre}" />
+                                <apex:inputHidden id="typeGarageHidden" value="{!typeGarage}" />
+                            </apex:outputPanel>
+                        </apex:form>
+                    </div>
+                </div>
+            </div>
+            <!-- Start : Google Analytics -->
+            <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                    ga('create', 'UA-4421249-13', 'auto');
+                    ga('send', 'pageview');
+            </script>
+            <!-- End : Google Analytics -->
+            <!-- Start : Google Tag Manager -->
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MBF8W2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                        })(window,document,'script','dataLayer','GTM-MBF8W2');</script>
+            <!-- End : Google Tag Manager -->
+            <!-- Start : Iframe resizer -->
+            <script src="{!URLFOR($Resource.Site_Demande_de_Devis, 'js/iframeResizer.contentWindow.min.js')}" type="text/javascript"></script>
+            <!-- End : Iframe resizer -->
+        </body>
+    </html>
+</apex:page>

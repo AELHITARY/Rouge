@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_FieldsInvalidDoubt</fullName>
+    <active>true</active>
+    <description>Impossible de saisir les données suivantes pour les Créance douteuse :
+- Facture
+- Avoir
+- Pièce annulée
+- Compte bancaire (Entité)
+- Motif de remboursement
+- Mode de règlement
+- Banque et référence externe
+- Date d’échéance</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+RecordType.DeveloperName == &apos;DoubtfulDebt&apos; &amp;&amp;
+(
+				NOT(ISBLANK(creditMemo__c)) || 
+				NOT(ISBLANK(invoice__c)) || 
+				NOT(ISBLANK(cancelledPiece__c)) || 
+				NOT(ISBLANK(entityBankAccount__c)) || 
+				NOT(ISBLANK(refundReason__c)) || 
+				NOT(ISBLANK(paymentMethod__c)) || 
+				NOT(ISBLANK(externalBank__c)) || 
+				NOT(ISBLANK(externalReference__c)) || 
+				NOT(ISNULL(dueDate__c))
+)</errorConditionFormula>
+    <errorMessage>Impossible de saisir les données suivantes pour les créances douteuse : Facture / Avoir / Pièce annulée / Compte bancaire (Entité) / Motif de remboursement / Mode de règlement / Banque / Référence externe / Date d’échéance</errorMessage>
+</ValidationRule>

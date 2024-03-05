@@ -1,0 +1,130 @@
+<apex:page tabStyle="Feuille_de_route_V2__tab"  controller="CTRL_FSL_FDR_DateType"  showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0">
+    <html>
+        <head>
+            <title>Formulaire DateType</title>
+            <apex:stylesheet value="{!URLFOR($Resource.CSS_Form, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        </head>
+        
+        <body>
+            <div class="slds">
+                <apex:form id="fdrForm">
+                    <div class="slds-card">
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 0px; ">
+                            <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                    <h1 class="slds-text-heading--small slds-truncate" style="font-weight: bold; font-size : 1.5em;">Feuille de route</h1><br/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 15px; font-weight: bold;">
+                            <div class="slds-media__body">
+                                <h2 class="slds-text-heading--small slds-truncate">Saisie des paramètres (2/3)</h2><br/>
+                                <h2 class="slds-text-heading--small slds-truncate">
+                                    Territoire(s) : <apex:outputText value="{!UPPER(nameTerritory)}" style="white-space:pre;"></apex:outputText>
+                                </h2>
+                                <h2 class="slds-text-heading--small slds-truncate">
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}">Date du début d'édition : </apex:outputText>
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}" value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!debutPlanning}" /></apex:outputText> 
+                                </h2>
+                                <h2 class="slds-text-heading--small slds-truncate">
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}">Date de fin d'édition : </apex:outputText>
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}" value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!finPlanning}" /></apex:outputText>
+                                </h2>
+                                <h2 class="slds-text-heading--small slds-truncate">
+                                    <apex:outputText rendered="{!sameDate = 'hidden'}">Date d'édition : </apex:outputText>
+                                    <apex:outputText rendered="{!sameDate = 'hidden'}" value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!debutPlanning}" /></apex:outputText> 
+                                </h2>
+                                <h2 class="slds-text-heading--small slds-truncate" style="font-style: italic;">Type de ressources</h2>
+                            </div>
+                        </div>
+                        
+
+                        <div id="dateTypeSection" >                            
+                            <!-- Sélection Type de ressource-->
+                            <apex:pageBlock id="pb2" >
+                                <apex:pageBlockTable value="{!listTypeRessourceCustom}" var="item" id="pbt" style="font-size : 1.1em;">
+                                    
+                                    <apex:column style="width:5%">
+                                        <apex:facet name="header">
+                                            <input style="margin-left:43%;" type="checkbox" onclick="selectAllResource(this.checked)"/>
+                                        </apex:facet>
+                                        <apex:inputCheckbox value="{!item.isSelected}" style="margin-left:45%;"></apex:inputCheckbox>
+                                    </apex:column>
+                                    
+                                    <apex:column >
+                                        <apex:facet name="header">
+                                            Type de ressources
+                                        </apex:facet>
+                                        <apex:outputText value="{!item.typeResource}" style="margin-left: 15px; font-size: 0.9em;"></apex:outputText>
+                                    </apex:column>
+                                    
+                                </apex:pageBlockTable>
+                            </apex:pageBlock>
+                            
+                            <!-- Commandes -->
+                            <div class="slds-card__footer" style="text-align: right;">
+                                <apex:outputPanel layout="none">
+                                    <input type ="button" value="Précédent" onclick="history.go(-1)" class="slds-button slds-button--brand slds-button--small"/>
+                                </apex:outputPanel>
+                                
+                                <apex:commandButton style="display: none;"  value="Suivant" action="{!displayPage}" id="Voir" />
+                                <apex:outputPanel layout="none">
+                                    <input type ="button" value="Suivant" onclick="checkBeforeSubmitDisplay();" class="slds-button slds-button--brand slds-button--small"/>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <script language="javascript">
+                    /*Script pour vérifier qu'une case est bien cochée*/
+                    function checkBeforeSubmitDisplay()
+                    {
+                        var table = document.getElementById('{!$Component.fdrForm.pb2.pbt}');
+                        var checkboxes = table.getElementsByTagName('input');
+                        var isValid = false;
+                        var i = 1;
+                        
+                        while(i < checkboxes.length)
+                        {
+                            if(checkboxes[i].checked){
+                                isValid = true;
+                            }
+                            i++;
+                        }
+                        
+                        if(!isValid)
+                        {
+                            alert('Merci de sélectionner au moins un type de ressource avant de valider.');
+                        }
+                        else
+                        {
+                            document.getElementById('{!$Component.fdrForm.Voir}').click();
+                        }
+                    }
+                    
+
+                    /* Script pour sélectionner toutes les checkboxes type de ressources*/
+                    function selectAllResource(isChecked){
+                        var table = document.getElementById("{!$Component.fdrForm.pb2.pbt}");
+                        var checkboxes = table.getElementsByTagName('input');
+                        
+                        for(var i=0 ; i < checkboxes.length ; i++)
+                        {
+                            checkboxes[i].checked = isChecked;
+                            if(isChecked)
+                            {
+                                checkboxes[i].value = true;
+                            }
+                            else
+                            {
+                                checkboxes[i].value = false;
+                            }
+                        }
+                    } 
+                    </script>
+                    
+                </apex:form>  
+            </div>
+        </body>
+    </html>
+</apex:page>

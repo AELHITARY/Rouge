@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_Invoice_CantUpdate</fullName>
+    <active>false</active>
+    <description>Impossible de modifier ce(s) champ(s) si la facture a une date de facture</description>
+    <errorConditionFormula>$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+(
+    (
+        ISCHANGED(invoiceDate__c) &amp;&amp; ISNULL(invoiceDate__c)
+    ) 
+    ||
+    (
+        NOT(ISNULL(invoiceDate__c)) &amp;&amp;
+        NOT(ISNULL(PRIORVALUE(invoiceDate__c))) &amp;&amp;
+        (
+												ISCHANGED(invoiceReference__c) ||
+												ISCHANGED(afterSalesService__c) ||
+												ISCHANGED(customerOrder__c) ||
+												ISCHANGED(parentInvoice__c) ||
+												ISCHANGED(invoiceDate__c) ||
+												/*ISCHANGED(dueDate__c) ||*/
+												ISCHANGED(VATAmount1__c) ||
+												ISCHANGED(VATAmount2__c) ||
+												ISCHANGED(VATAmount3__c) ||
+												ISCHANGED(VATRate1__c) ||
+												ISCHANGED(VATRate2__c) ||
+												ISCHANGED(VATRate3__c) ||
+												ISCHANGED(billingPostalCode__c) ||
+												ISCHANGED(billingAdditionalAddress__c) ||
+												ISCHANGED(billingAccount__c) ||
+												ISCHANGED(billingContact__c) ||
+												ISCHANGED(billingName__c) ||
+												ISCHANGED(billingCountry__c) ||
+												ISCHANGED(billingState__c) ||
+												ISCHANGED(billingStreet__c) ||
+												ISCHANGED(billingCity__c) ||
+												ISCHANGED(shippingPostalCode__c) ||
+												ISCHANGED(shippingAdditionalAddress__c) ||
+												ISCHANGED(shippingContact__c) ||
+												ISCHANGED(shippingName__c) ||
+												ISCHANGED(shippingCountry__c) ||
+												ISCHANGED(shippingState__c) ||
+												ISCHANGED(shippingStreet__c) ||
+												ISCHANGED(shippingCity__c) ||
+												ISCHANGED(worksite__c) ||
+												ISCHANGED(sellerPostalCode__c) ||
+												ISCHANGED(sellerAdditionalAddress__c) ||
+												ISCHANGED(sellerEmail__c) ||
+												ISCHANGED(sellerSIRET__c) ||
+												ISCHANGED(sellerName__c) ||
+												ISCHANGED(sellerCountry__c) ||
+												ISCHANGED(sellerState__c) ||
+												ISCHANGED(sellerStreet__c) ||
+												ISCHANGED(sellerPhone__c) ||
+												ISCHANGED(seller__c) ||
+												ISCHANGED(sellerCity__c)||
+												ISCHANGED(headOfficeShareCapital__c) ||
+												ISCHANGED(headOfficePostalCode__c) ||
+												ISCHANGED(headOfficeAdditionalAddress__c) ||
+												ISCHANGED(headOfficeEmail__c) ||
+												ISCHANGED(headOfficeLegalForm__c) ||
+												ISCHANGED(headOfficeSIREN__c) ||
+												ISCHANGED(headOfficeSIRET__c) ||
+												ISCHANGED(headOfficeName__c) ||
+												ISCHANGED(headOfficeCountry__c) ||
+												ISCHANGED(headOfficeState__c) ||
+												ISCHANGED(headOfficeStreet__c) ||
+												ISCHANGED(headOfficePhone__c) ||
+												ISCHANGED(headOffice__c) ||
+												ISCHANGED(headOfficeCity__c)||
+												ISCHANGED(RCSNumber__c) ||
+												ISCHANGED(RCSCity__c)
+        )
+    )
+)</errorConditionFormula>
+    <errorMessage>Impossible de modifier ce(s) champ(s) si la facture a une date de facture.</errorMessage>
+</ValidationRule>

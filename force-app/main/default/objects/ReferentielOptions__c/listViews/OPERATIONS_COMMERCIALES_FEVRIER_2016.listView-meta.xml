@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPERATIONS_COMMERCIALES_FEVRIER_2016</fullName>
+    <columns>NAME</columns>
+    <columns>LibelleOption__c</columns>
+    <columns>CodeOption__c</columns>
+    <columns>Debutvalidite__c</columns>
+    <columns>FinValidite__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>equals</operation>
+        <value>OP0216FEN,OP0216PORT</value>
+    </filters>
+    <label>OPERATIONS COMMERCIALES FEVRIER 2016</label>
+    <language>fr</language>
+</ListView>

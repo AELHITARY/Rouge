@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>oldCompositeStatus2__c</fullName>
+    <externalId>false</externalId>
+    <label>Statut pipeline GC</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Etat Inconnu</fullName>
+                <default>false</default>
+                <label>Etat Inconnu</label>
+            </value>
+            <value>
+                <fullName>SAV Terminé Refusé</fullName>
+                <default>false</default>
+                <label>SAV Terminé Refusé</label>
+            </value>
+            <value>
+                <fullName>SAV Terminé Non Soldé</fullName>
+                <default>false</default>
+                <label>SAV Terminé Non Soldé</label>
+            </value>
+            <value>
+                <fullName>SAV Terminé</fullName>
+                <default>false</default>
+                <label>SAV Terminé</label>
+            </value>
+            <value>
+                <fullName>SAV Non Diagnostiqué Non préparé</fullName>
+                <default>false</default>
+                <label>SAV Non Diagnostiqué Non préparé</label>
+            </value>
+            <value>
+                <fullName>SAV Non Diagnostiqué Non programmé</fullName>
+                <default>false</default>
+                <label>SAV Non Diagnostiqué Non programmé</label>
+            </value>
+            <value>
+                <fullName>SAV Non Diagnostiqué programmé</fullName>
+                <default>false</default>
+                <label>SAV Non Diagnostiqué programmé</label>
+            </value>
+            <value>
+                <fullName>SAV Diagnostiqué Non Devisé</fullName>
+                <default>false</default>
+                <label>SAV Diagnostiqué Non Devisé</label>
+            </value>
+            <value>
+                <fullName>SAV Diagnostiqué Non Accepté</fullName>
+                <default>false</default>
+                <label>SAV Diagnostiqué Non Accepté</label>
+            </value>
+            <value>
+                <fullName>SAV Non Commandé Programmé</fullName>
+                <default>false</default>
+                <label>SAV Non Commandé Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV Non Commandé</fullName>
+                <default>false</default>
+                <label>SAV Non Commandé</label>
+            </value>
+            <value>
+                <fullName>SAV Non Confirmé Programmé</fullName>
+                <default>false</default>
+                <label>SAV Non Confirmé Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV Non Confirmé</fullName>
+                <default>false</default>
+                <label>SAV Non Confirmé</label>
+            </value>
+            <value>
+                <fullName>SAV Non livré Programmé</fullName>
+                <default>false</default>
+                <label>SAV Non livré Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV Non livré Non Programmé</fullName>
+                <default>false</default>
+                <label>SAV Non livré Non Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV Non livré Non Préparé</fullName>
+                <default>false</default>
+                <label>SAV Non livré Non Préparé</label>
+            </value>
+            <value>
+                <fullName>SAV Attente d&apos;Intervention programmée</fullName>
+                <default>false</default>
+                <label>SAV Attente d&apos;Intervention programmée</label>
+            </value>
+            <value>
+                <fullName>SAV Attente d&apos;Interv Non Programmé</fullName>
+                <default>false</default>
+                <label>SAV Attente d&apos;Interv Non Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV Attente d&apos;Interv Non Préparé</fullName>
+                <default>false</default>
+                <label>SAV Attente d&apos;Interv Non Préparé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Diagnostiqué Non Préparé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Diagnostiqué Non Préparé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Diagnostiqué Non Programmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Diagnostiqué Non Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Diagnostiqué Programmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Diagnostiqué Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Commandé Programmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Commandé Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Commandé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Commandé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Confirmé Programmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Confirmé Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Confirmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Confirmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Livré Programmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Livré Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Livré Non Programmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Livré Non Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Non Livré Non Préparé</fullName>
+                <default>false</default>
+                <label>SAV ECI Non Livré Non Préparé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Attente d&apos;Interv programmée</fullName>
+                <default>false</default>
+                <label>SAV ECI Attente d&apos;Interv programmée</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Attente d&apos;Interv Non Programmé</fullName>
+                <default>false</default>
+                <label>SAV ECI Attente d&apos;Interv Non Programmé</label>
+            </value>
+            <value>
+                <fullName>SAV ECI Attente d&apos;Interv Non Préparé</fullName>
+                <default>false</default>
+                <label>SAV ECI Attente d&apos;Interv Non Préparé</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

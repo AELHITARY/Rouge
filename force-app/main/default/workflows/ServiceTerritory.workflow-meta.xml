@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldUpdates>
+        <fullName>FSL_MAJChampActifTrue</fullName>
+        <description>CGI - FSL : Territoire = Actif</description>
+        <field>IsActive</field>
+        <literalValue>1</literalValue>
+        <name>FSL_Champ Actif True</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>FSL_MajChampActifFalse</fullName>
+        <description>CGI - FSL : Territoire =  Inactif</description>
+        <field>IsActive</field>
+        <literalValue>0</literalValue>
+        <name>FSL_Champ Actif False</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <rules>
+        <fullName>FSL_Territoire_ActivationTerritoire</fullName>
+        <actions>
+            <name>FSL_MAJChampActifTrue</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <description>CGI - FSL : Modification du champ Actif à True</description>
+        <formula>AND(  	(fsl_dateOuverture__c &lt;= TODAY()),  	OR( 		ISBLANK(fsl_dateFermeture__c), 		(fsl_dateFermeture__c &gt;= TODAY()) 	)  )</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>FSL_Territoire_DesactivationTerritoire</fullName>
+        <actions>
+            <name>FSL_MajChampActifFalse</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <description>CGI - FSL : Modification du champ Actif à False</description>
+        <formula>AND( 	IsActive = true, 	OR( 	  (fsl_dateOuverture__c &gt;  TODAY()), 	   AND( 		(NOT(ISBLANK(fsl_dateFermeture__c ))), 		(fsl_dateFermeture__c &lt;  TODAY()) 	  ) 	) )</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+</Workflow>

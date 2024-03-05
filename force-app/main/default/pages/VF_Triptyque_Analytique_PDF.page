@@ -1,0 +1,362 @@
+<apex:page title="Triptyque Analytique" controller="Ctrl_Triptyque_Analytique" showHeader="false" renderAs="pdf" applyBodyTag="false" sidebar="false" expires="600" cache="true" standardStylesheets="false">
+		<head>
+				<title>Triptyque - Analyse Ponctuelle - Export PDF</title>
+				<style type="text/css" media="all">
+						@page {
+								size:landscape;
+								font-family: 'Arial', 'Helvetica', sans-serif;
+								margin-left: 5px;
+								margin-right: 5px;
+								margin-top: 5px;
+								margin-bottom: 0.25in;
+								@bottom-right {
+										content: "Page " counter(page) " / " counter(pages);
+								}
+								@bottom-left {
+										content: element(footer_left);
+								}
+								@top-right {
+										content: element(header_right);
+								}
+								@top-center {
+										content: element(header_center);
+								}
+								@top-left {
+										content: element(header_left);
+								}
+						}
+
+						html {
+								font-size:10px;
+						}
+
+						.header_left {
+								text-align: left;
+								position: running(header_left);
+								font-size:14px;
+						}
+
+						.header_center {
+								text-align: center;
+								position: running(header_center);
+						}
+
+						.header_right {
+								text-align: right;
+								position: running(header_right);
+						}
+
+						.footer_left {
+								text-align: left;
+								position: running(footer_left);
+								font-size:14px;
+						}
+
+						thead {
+								display: table-header-group;
+								background-color: #a1c8ef;
+						}
+
+						tfoot {
+								background-color: #f9f9f9;
+								font-weight: bold;
+						}
+
+						table {
+								text-align:center;
+								border-spacing: 0;
+								margin-right:auto;
+								margin-left:auto;
+								border-right: 1px solid black;
+								border-top: 1px solid black;
+						}
+
+						td, th {
+								border-left: 1px solid black;
+								border-bottom: 1px solid black;
+						}
+
+
+						.titre {
+								font-weight: lighter;
+								text-align:center;
+								font-size:25px;
+								padding-bottom:12px;
+						}
+
+						.logo {
+								display:block;
+								margin-left:auto;
+						}
+
+						.no-lr-border {
+								border-left : 0px;
+								border-right : 0px;
+						}
+						.no-l-border {
+								border-left : 0px;
+						}
+						.no-r-border {
+								border-right : 0px;
+						}
+						.legend-css tr {
+								border : none;
+						}
+						.legend-css td {
+								border : none;
+								text-align:left;
+								padding-top:5px;
+								padding-bottom:5px;
+						}
+				</style>
+		</head>
+		<body>
+			<div class="header_right" id="header_right">
+				<img class="logo" src="/servlet/servlet.FileDownload?file={!LogoKparKId}" width="110" height="75"/>
+			</div>
+			<div class="header_center" id="header_center">
+				<div class="titre"></div>
+			</div>
+			<div class="header_left" id="header_left">
+				<apex:outputText value="Du {0} au {1} / {2}">
+					<apex:param value="{!dateDebutExport}"/>
+					<apex:param value="{!dateFinExport}"/>
+					<apex:param value="{!libelleMagasinActuel}" />
+				</apex:outputText>
+			</div>
+				<div class="footer_left" id="footer_left">
+					<apex:outputText value="Créé par {1} {2} le {0}">
+					<apex:param value="{!dateExportFormated}" />
+					<apex:param value="{!$User.FirstName}"/>
+					<apex:param value="{!$User.LastName}"/>
+				</apex:outputText>
+			</div>
+
+			<!-- VARIABLE -->
+			<apex:variable var="totaux" value="{!valeursExportPDF[valeursExportPDF.size-1].IVT}" />
+
+			<!-- PREMIER TABLEAU -->
+			<div class="titre">Triptyque<br/>Analyse Ponctuelle</div>
+			<table style="-fs-table-paginate: paginate;" cellspacing="0">
+				<thead>
+					<tr>
+						<th colspan="3">Vendeur</th>
+						<th colspan="11">Contact et RDV</th>
+						<th colspan="17">Contact par origine</th>
+						<th colspan="4">Vente</th>
+					</tr>
+					<tr>
+						<th>Nom</th>
+						<th class="no-r-border">Cnx</th>
+						<th class="no-l-border">J. Trv.</th>
+						<th>Total</th>
+						<th>Actifs</th>
+						<th>Passifs</th>
+						<th colspan="2">RDV/Vente</th>
+						<th>Créés à posteriori</th><th>DREA</th>
+						<th colspan="4">R1/R2+</th>
+						<th colspan="3">50</th>
+						<th colspan="3">51</th>
+						<th>52</th>
+						<th>53</th>
+						<th colspan="3">55</th>
+						<th colspan="2">42</th>
+						<th colspan="2">43</th>
+						<th colspan="2">54</th>
+						<th colspan="2">Nb. RDV</th>
+						<th colspan="2">Réal.</th>
+					</tr>
+					<tr>
+						<th colspan="10"></th>
+						<th>P</th>
+						<th>E</th>
+						<th>P</th>
+						<th>E</th>
+						<th colspan="21"></th>
+					</tr>
+				</thead>
+				<apex:repeat value="{!valeursExportPDF}" var="export">
+					<tr>
+						<td rowspan="2" width="120px;">{!export.vendeurName} <apex:outputText style="font-style:italic" value=" (Inactif)" rendered="{!NOT(export.vendeurActive)}" /></td>
+						<td class="no-r-border" rowspan="2" width="47px;">
+							<apex:outputText value="{0,date,dd/MM}">
+								<apex:param value="{!export.vendeurLastLoginDate}" />
+							</apex:outputText>
+							<br/>{!export.vendeurNbLogin}
+						</td>
+						<td class="no-l-border" rowspan="2" width="25px;">{!export.IVH.joursTravaille}</td>
+
+						<td width="16px">{!export.IVH.nbContactTotal}</td>
+						<td width="16px">{!export.IVH.nbContactActif}</td>
+						<td width="16px">{!export.IVH.nbContactPassif}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVTotal}</td>
+						<td width="16px" class="no-l-border">{!export.IVH.nbDevisVendu}</td>
+						<td width="30px">{!export.IVH.nbRDVCreatedRdvDate}</td>
+						<td width="30px">{!export.IVH.nbRDVDebrief}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVR1_Pris}</td>
+						<td width="16px" class="no-l-border">{!export.IVH.nbRDVR1_Effec}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVR2_Pris}</td>
+						<td width="16px" class="no-l-border">{!export.IVH.nbRDVR2_Effec}</td>
+
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVBAL50}</td>
+						<td colspan="2" width="16px" class="no-l-border">{!export.IVH.nbContactBAL}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVTAP51}</td>
+						<td colspan="2" width="16px" class="no-l-border">{!export.IVH.nbContactTAP}</td>
+						<td width="16px">{!export.IVH.nbContactComplement}</td>
+						<td width="16px">{!export.IVH.nbContactParrainage}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVPhone55}</td>
+						<td colspan="2" width="16px" class="no-l-border">{!export.IVH.nbContactPhone}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVGalerieMarchande}</td>
+						<td width="16px" class="no-l-border">{!export.IVH.nbContactGalerieMarchande}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVFoire}</td>
+						<td width="16px" class="no-l-border">{!export.IVH.nbContactFoire}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVMarche}</td>
+						<td width="16px" class="no-l-border">{!export.IVH.nbContactMarche}</td>
+
+						<td width="16px" class="no-r-border">{!export.IVH.nbRDVAccompagne}</td>
+						<td width="16px" class="no-l-border">{!export.IVH.nbRDVAccompagnant}</td>
+						<td width="16px" class="no-r-border">{!export.IVH.nbDevisVendu}</td>
+						<td width="32px" class="no-l-border"><apex:outputText value="{!IF(CONTAINS(TEXT( export.IVH.nbCADevisVendu ), '.' ), SUBSTITUTE( TEXT( export.IVH.nbCADevisVendu ),'.',','), TEXT( export.IVH.nbCADevisVendu ))}" /></td>
+					</tr>
+
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td>{!export.IVH.tauxTransformationRDV} %</td>
+						<td>{!export.IVH.tauxTransformationVentes} %</td>
+						<td></td>
+						<td></td>
+						<td colspan="4"></td>
+
+						<td width="24px">{!export.IVH.tauxPartContactBAL} %</td>
+						<td width="20px">{!export.IVH.ratioParJourBAL} / j</td>
+						<td width="26px">{!export.IVH.ratioParContactBAL} / cts</td>
+						<td width="24px">{!export.IVH.tauxPartContactTAP} %</td>
+						<td width="20px">{!export.IVH.ratioParJourTAP} / j</td>
+						<td width="26px">{!export.IVH.ratioParContactTAP} / cts</td>
+						<td>{!export.IVH.tauxPartContactCOMP} %</td>
+						<td></td>
+						<td width="24px">{!export.IVH.tauxPartContactPHONE} %</td>
+						<td width="20px">{!export.IVH.ratioParJourPhone} / j</td>
+						<td width="26px">{!export.IVH.ratioParContactPhone} / cts</td>
+						<td colspan="2">{!export.IVH.tauxPartContactGM} %</td>
+						<td colspan="2">{!export.IVH.tauxPartContactFOIRE} %</td>
+						<td colspan="2">{!export.IVH.tauxPartContactMARCHE} %</td>
+
+						<td colspan="2"><apex:outputText value="" /></td>
+						<td colspan="2"><apex:outputText value="{!IF(CONTAINS(TEXT( export.IVH.panierMoyenRealiseVente ), '.' ), SUBSTITUTE( TEXT( export.IVH.panierMoyenRealiseVente ),'.',','), TEXT( export.IVH.panierMoyenRealiseVente ))}" /></td>
+					</tr>
+				</apex:repeat>
+
+				<tfoot>
+					<tr>
+						<td rowspan="2" colspan="3">
+							<apex:outputText value="Total" rendered="{!IF(valeursExportPDF.size <= 1, TRUE, FALSE)}" />
+							<apex:outputText value="Total des {!valeursExportPDF.size} vendeurs" rendered="{!IF(valeursExportPDF.size > 1, TRUE, FALSE)}" />
+						</td>
+
+						<td>{!totaux.Somme_nbContactTotal}</td>
+						<td>{!totaux.Somme_nbContactActif}</td>
+						<td>{!totaux.Somme_nbContactPassif}</td>
+						<td>{!totaux.Somme_nbRDVTotal}</td>
+						<td>{!totaux.Somme_nbDevisVendu}</td>
+						<td>{!totaux.Somme_nbRDVCreatedRdvDate}</td>
+						<td>{!totaux.Somme_nbRDVDebrief}</td>
+						<td>{!totaux.Somme_nbRDVR1_Pris}</td>
+						<td>{!totaux.Somme_nbRDVR1_Effec}</td>
+						<td>{!totaux.Somme_nbRDVR2_Pris}</td>
+						<td>{!totaux.Somme_nbRDVR2_Effec}</td>
+
+						<td class="no-r-border">{!totaux.Somme_nbRDVBAL50}</td>
+						<td colspan="2" class="no-l-border">{!totaux.Somme_nbContactBAL}</td>
+						<td class="no-r-border">{!totaux.Somme_nbRDVTAP51}</td>
+						<td colspan="2" class="no-l-border">{!totaux.Somme_nbContactTAP}</td>
+						<td>{!totaux.Somme_nbContactComplement}</td>
+						<td>{!totaux.Somme_nbContactParrainage}</td>
+						<td class="no-r-border">{!totaux.Somme_nbRDVPhone55}</td>
+						<td colspan="2" class="no-l-border">{!totaux.Somme_nbContactPhone}</td>
+						<td class="no-r-border">{!totaux.Somme_nbRDVGalerieMarchande}</td>
+						<td class="no-l-border">{!totaux.Somme_nbContactGalerieMarchande}</td>
+						<td class="no-r-border">{!totaux.Somme_nbRDVFoire}</td>
+						<td class="no-l-border">{!totaux.Somme_nbContactFoire}</td>
+						<td class="no-r-border">{!totaux.Somme_nbRDVMarche}</td>
+						<td class="no-l-border">{!totaux.Somme_nbContactMarche}</td>
+
+						<td class="no-r-border">{!totaux.Somme_nbRDVHebdoAccompagne}</td>
+						<td class="no-l-border">{!totaux.Somme_nbRDVHebdoAccompagnant}</td>
+						<td class="no-r-border">{!totaux.Somme_nbDevisVendu}</td>
+						<td class="no-l-border"><apex:outputText value="{!IF(CONTAINS(TEXT( totaux.Somme_nbCADevisVendu ), '.' ), SUBSTITUTE( TEXT( totaux.Somme_nbCADevisVendu ),'.',','), TEXT( totaux.Somme_nbCADevisVendu ))}" /></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td colspan="4"></td>
+						<td colspan="3"></td>
+						<td colspan="3"></td>
+						<td></td>
+						<td></td>
+						<td colspan="3"></td>
+						<td colspan="2"></td>
+						<td colspan="2"></td>
+						<td colspan="2"></td>
+						<td colspan="2"></td>
+						<td colspan="2"><apex:outputText value="{!IF(CONTAINS(TEXT( totaux.Somme_panierMoyenRealiseVente ), '.' ), SUBSTITUTE( TEXT( totaux.Somme_panierMoyenRealiseVente ),'.',','), TEXT( totaux.Somme_panierMoyenRealiseVente ))}" /></td>
+					</tr>
+				</tfoot>
+			</table>
+
+		<apex:outputpanel rendered="{!showLegende}">
+			<div style="page-break-inside: avoid;">
+				<table class="legend-css" cellspacing="10px;" style="padding-top:30px; font-size:12px; border:none;">
+					<tr>
+						<td></td>
+						<td style="font-size:25px; text-align:center; padding-right:130px;">Légende</td>
+					</tr><tr>
+						<td style="padding-top:15px; padding-bottom:15px;"><strong>Légende (colonnes) :</strong></td>
+					</tr><tr>
+						<td>Contacts</td>
+						<td>Nombre de R1 créés déduit du nombre de R1 planifiés mais «non effectués» (avec ou sans déplacement) pendant la semaine commerciale</td>
+					</tr><tr>
+						<td>R1/R2+</td>
+						<td>Nombre de rendez-vous planifiés pendant la semaine commerciale, et dont le statut est « pris » (colonne P) ou « effectué » (colonne E)</td>
+					</tr><tr>
+						<td>Créés a posteriori</td>
+						<td>Nombre de rendez-vous créés pendant la semaine commerciale et dont la date de planification est antérieure ou égale à la date de création</td>
+					</tr><tr>
+						<td>DREA</td>
+						<td>Débriefing Rapide En Attente. Nombre de rendez-vous « pris » dans la semaine commerciale et dont la date de rendez-vous est passée</td>
+					</tr><tr>
+						<td>Nb RDV</td>
+						<td>Nombre de rendez-vous commercial en tant qu'accompagné et en tant qu'accompagnant</td>
+					</tr><tr>
+						<td>Vente</td>
+						<td>Nombre de devis ayant une date d’acceptation client comprise dans la semaine commerciale</td>
+					</tr><tr>
+						<td>K€ Réalisés</td>
+						<td>Somme des montants TTC des devis ayant une date d’acceptation client comprise dans la semaine commerciale</td>
+					</tr><tr>
+						<td style="padding-top:15px; padding-bottom:15px;"><strong>Légende (lignes) :</strong></td>
+					</tr><tr>
+						<td>Contact par origine</td>
+						<td>Taux de contribution de chaque origine sur l’ensemble des contacts actifs pris</td>
+					</tr><tr>
+						<td style="padding-right:20px;">RDV/Vente (gauche)</td>
+						<td>Taux de concrétisation des rendez-vous par rapport aux contacts pris</td>
+					</tr><tr>
+						<td>RDV/Vente (droite)</td>
+						<td>Taux de transformation des devis acceptés par rapport aux rendez-vous planifiés dont le statut est « pris » ou « effectué »</td>
+					</tr><tr>
+						<td>K€ réalisés</td>
+						<td>Panier moyen</td>
+					</tr>
+				</table>
+			</div>
+		</apex:outputpanel>
+	</body>
+</apex:page>

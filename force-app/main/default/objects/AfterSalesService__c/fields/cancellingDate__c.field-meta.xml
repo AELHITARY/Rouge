@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>cancellingDate__c</fullName>
+    <description>Date d&apos;annulation, à renseigner pour différencier les clôtures par annulation de dossier</description>
+    <externalId>false</externalId>
+    <label>Date d&apos;annulation</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

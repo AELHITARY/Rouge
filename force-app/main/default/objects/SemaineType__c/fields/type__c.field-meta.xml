@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>type__c</fullName>
+    <description>CRM-514 : Type de la semaine (magasin ou vendeur)</description>
+    <externalId>false</externalId>
+    <label>Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Magasin</fullName>
+                <default>false</default>
+                <label>Magasin</label>
+            </value>
+            <value>
+                <fullName>Vendeur</fullName>
+                <default>false</default>
+                <label>Vendeur</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

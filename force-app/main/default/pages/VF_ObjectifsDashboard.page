@@ -1,0 +1,662 @@
+<apex:page sidebar="false" showHeader="true" controller="Ctrl_ObjectifsDashboard" docType="html-5.0">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery.mobile.1.4.5.touch.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/numeral.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/languages.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_Knob_js, 'JQuery-Knob/dist/jquery.knob.min.js')}" />
+    
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+        Visualforce.remoting.maxretries = 2; // Set maximum number of retries at page level
+        j$ = jQuery.noConflict();
+        
+        // Initialisation des fonction jQuery mobile pour l'action "Swipe"
+        if(isMobile) {
+            $(document).on("swipeleft", switchWeek);
+            $(document).on("swiperight", switchWeek);
+        }
+
+        // Variables
+        var vendeursMagasin = new Array();
+        var removeWeek, removeMonth = false;
+        var decimalFormat = "'0.00"; 
+        var NotDecimalFormat = "0";
+        var red = '#d9534f';
+        var orange = '#f0ad4e';
+        var green = '#5cb85c';
+        var blue = '#428bca';
+
+        //Initialisation à la page
+        j$(document).ready(function() {
+            // Fix taille boutons IPAD
+            if(navigator.userAgent.match(/iPad/i)) {
+                j$("[id$=filter-field-semaine]").css('max-width', '40%');
+            }
+        
+            // Parse des valeurs des vendeurs
+            vendeursMagasin = JSON.parse(j$("[id$=input-hidden-vendeursList]").val());
+            // Numeral
+            numeral.language('fr', {
+                delimiters: {
+                    thousands: ' ',
+                    decimal: ','
+                },
+                abbreviations: {
+                    thousand: 'k',
+                    million: 'm',
+                    billion: 'b',
+                    trillion: 't'
+                },
+                ordinal : function (number) {
+                    return number === 1 ? 'er' : 'ème';
+                },
+                currency: {
+                    symbol: '€'
+                }
+            });
+            numeral.language('fr');
+
+            // Désactivation de la liste de valeurs Magasin si pas de magasin
+            if(j$("[id$=magasin] option").length == "1")
+                j$("[id$=magasin]").attr ('disabled', 'disabled');
+
+            // initialisation des indicateurs (jauges)
+            $("[class*=jauge]").each(function(index) { 
+                $(this).knob({ 'format' : function (value) { return value + '%'; }});
+            });
+            
+            // Initialisation valeurs des indicateurs
+            loadObjectifVendeur();
+            loadObjectifMagasin();
+        });
+
+        function refreshHidden(newmag){
+            j$("[id$=magHidden]")[0].value = newmag;
+        }
+
+        function refreshValues(){
+            var anneeField = j$("[id$=filter-field-annee]")[0];
+            var monthField = j$("[id$=filter-field-mois]")[0];
+            var weekField = j$("[id$=filter-field-semaine]")[0];
+            
+            // Parse des valeurs JSON suite au rafraichissement des vendeurs
+            vendeursMagasin = JSON.parse(j$("[id$=input-hidden-vendeursList]").val());
+            // Traitement si +/- ou swipe
+            if(removeWeek || removeMonth) {
+                weekField.selectedIndex = weekField.length - 1;
+                removeWeek = false;
+            } 
+            if(removeMonth) {
+                monthField.selectedIndex = monthField.length - 1;
+                removeMonth = false;
+            }
+            // Refresh
+            loadObjectifVendeur();
+            loadObjectifMagasin();
+        }
+
+        /* Récupère les objectifs de l'utilisateur courant pour la semaine et le mois   */
+        /*------------------------------------------------------------------------------*/
+        function loadObjectifVendeur(){
+            var anneeAct = j$("[id$=filter-field-annee]")[0].value;
+            var moisAct = j$("[id$=filter-field-mois]")[0].value;
+            var semaineAct = j$("[id$=filter-field-semaine]")[0].value;
+            var userID = new Array(); userID.push('{!actualUser.Id}');
+            var periodId = j$("[id$=periodId]")[0].value;   
+            var fiscalSettingsId = j$("[id$=fiscalSettingsId]")[0].value;       
+            // Loading
+            loading(true, "perso-hebdo");
+            loading(true, "perso-mens");
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ObjectifsDashboard.getObjectifsVendeursHebdomadaire}', anneeAct, moisAct, semaineAct, periodId, userID,
+                function(result, event) {
+                    if (event.status) {
+                        processIndicatorsObjectifs(result, "hebdomadaire", "vendeur");
+                        loading(false, "perso-hebdo");
+                    } else if (event.type === 'exception') {
+                        loading(false, "perso-hebdo");
+                        displayMessage('Erreur lors du chargement des objectifs vendeur : ' + event.message);
+                    } else {
+                        loading(false, "perso-hebdo");
+                        displayMessage('Erreur lors du chargement des objectifs vendeur : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ObjectifsDashboard.getObjectifsVendeursMensuel}', anneeAct, moisAct, fiscalSettingsId, userID,
+                function(result, event) {
+                    if (event.status) {
+                        processIndicatorsObjectifs(result, "mensuel", "vendeur");
+                        loading(false, "perso-mens");
+                    } else if (event.type === 'exception') {
+                        loading(false, "perso-mens");
+                        displayMessage('Erreur lors du chargement des objectifs vendeur : ' + event.message);
+                    } else {
+                        loading(false, "perso-mens");
+                        displayMessage('Erreur lors du chargement des objectifs vendeur : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Récupère les objectifs du magasin courant pour la semaine et le mois         */
+        /*------------------------------------------------------------------------------*/
+        function loadObjectifMagasin(){
+            var anneeAct = j$("[id$=filter-field-annee]")[0].value;
+            var moisAct = j$("[id$=filter-field-mois]")[0].value;
+            var semaineAct = j$("[id$=filter-field-semaine]")[0].value;
+            var periodId = j$("[id$=periodId]")[0].value;   
+            var fiscalSettingsId = j$("[id$=fiscalSettingsId]")[0].value;
+            var vendeursList = new Array();
+            vendeursMagasin.forEach(function(vendeur) { vendeursList.push(vendeur.Id) });
+            // Loading
+            loading(true, "mag-hebdo");
+            loading(true, "mag-mens");
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ObjectifsDashboard.getObjectifsVendeursHebdomadaire}', anneeAct, moisAct, semaineAct, periodId, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        processIndicatorsObjectifs(result, "hebdomadaire", "magasin");
+                        loading(false, "mag-hebdo");
+                    } else if (event.type === 'exception') {
+                        loading(false, "mag-hebdo");
+                        displayMessage('Erreur lors du chargement des objectifs magasin : ' + event.message);
+                    } else {
+                        loading(false, "mag-hebdo");
+                        displayMessage('Erreur lors du chargement des objectifs magasin : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ObjectifsDashboard.getObjectifsVendeursMensuel}', anneeAct, moisAct, fiscalSettingsId, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        processIndicatorsObjectifs(result, "mensuel", "magasin");
+                        loading(false, "mag-mens");
+                    } else if (event.type === 'exception') {
+                        loading(false, "mag-mens");
+                        displayMessage('Erreur lors du chargement des objectifs magasin : ' + event.message);
+                    } else {
+                        loading(false, "mag-mens");
+                        displayMessage('Erreur lors du chargement des objectifs magasin : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+        
+        /* Fonction de pour les indicateurs des objectifs                               */
+        /*------------------------------------------------------------------------------*/
+        function processIndicatorsObjectifs(result, period, type) {
+            var selector = "";
+            // Récupération des éléments HTML
+            if(type == "vendeur" && period == "hebdomadaire")
+                selector = "perso-hebdo";
+            else if(type == "vendeur" && period == "mensuel")
+                selector = "perso-mens";
+            else if(type == "magasin" && period == "hebdomadaire")
+                selector = "mag-hebdo";
+            else if(type == "magasin" && period == "mensuel")
+                selector = "mag-mens";
+                
+            var objectifContactActif = j$("[id$=obj-"+selector+"-contactActif]")[0];
+            var objectifContactActifEff = j$("[id$=obj-"+selector+"-contactActifEff]")[0];
+            var objectifNbVente = j$("[id$=obj-"+selector+"-nbvente]")[0];
+            var objectifCA = j$("[id$=obj-"+selector+"-cavente]")[0];
+            var objectifContactActifIc = j$("[id$=obj-"+selector+"-contactActif-ic]");
+            var objectifContactActifEffIc = j$("[id$=obj-"+selector+"-contactActifEff-ic]");
+            var objectifNbVenteIc = j$("[id$=obj-"+selector+"-nbvente-ic]");
+            var objectifCAVenteIc = j$("[id$=obj-"+selector+"-cavente-ic]");            
+            var jaugeContactActif = $(".jauge-"+selector+"-contactActif");          
+            var jaugeContactActifEff = $(".jauge-"+selector+"-contactActifEff");
+            var jaugeNbVente = $(".jauge-"+selector+"-nbvente");
+            var jaugeCAVente = $(".jauge-"+selector+"-cavente");
+
+            // Mise à jour des objectifs
+            var objectifContactActifText = numeral(result.nbContactActif).format(NotDecimalFormat) + ' / ' + numeral(result.objectifContactActif).format(NotDecimalFormat);
+            var objectifContactActifEffText = numeral(result.nbContactActif).format(NotDecimalFormat) + ' / ' + numeral(result.nbVendeurEffectif).format(NotDecimalFormat) 
+                                                + ' / ' + numeral(result.nbContactActifEff).format(NotDecimalFormat);
+            var objectifNbVenteText = numeral(result.nbDevisVendu).format(NotDecimalFormat) + ' / ' + numeral(result.objectifnbDevisVendu).format(NotDecimalFormat);
+            var objectifCAText = numeral(result.nbCADevisVendu).format(decimalFormat) + ' / ' + numeral(result.objectifCADevisVendu).format(decimalFormat);
+            // Fix pour Firefox
+            if(document.all){
+                objectifContactActif.innerText = objectifContactActifText;
+                if(type == "magasin") objectifContactActifEff.innerText = objectifContactActifEffText;
+                objectifNbVente.innerText = objectifNbVenteText;
+                objectifCA.innerText = objectifCAText;
+            } else{
+                objectifContactActif.textContent = objectifContactActifText;
+                if(type == "magasin") objectifContactActifEff.textContent = objectifContactActifEffText;
+                objectifNbVente.textContent = objectifNbVenteText;
+                objectifCA.textContent = objectifCAText;
+            }
+
+            var contactActifColor;
+            var contactActifEffColor;
+            var nbVenteColor;
+            var CAVenteColor;
+            // Couleur - Contact Actif
+            if(result.realisationContactActif >= 95 && result.realisationContactActif <= 100)
+                contactActifColor = green;
+            else if(result.realisationContactActif > 100)
+                contactActifColor = blue;
+            else if(result.realisationContactActif >= 80 && result.realisationContactActif < 95)
+                contactActifColor = orange;
+            else
+                contactActifColor = red;
+            // Couleur - Contact Actif Effectif
+            if(result.realisationContactActifEffectif >= 95 && result.realisationContactActifEffectif <= 100)
+                contactActifEffColor = green;
+            else if(result.realisationContactActifEffectif > 100)
+                contactActifEffColor = blue;
+            else if(result.realisationContactActifEffectif >= 80 && result.realisationContactActifEffectif < 95)
+                contactActifEffColor = orange;
+            else
+                contactActifEffColor = red;
+            // Couleur - Nb de vente
+            if(result.realisationNbDevis >= 95 && result.realisationNbDevis <= 100)
+                nbVenteColor = green;
+            else if(result.realisationNbDevis > 100)
+                nbVenteColor = blue;
+            else if(result.realisationNbDevis >= 80 && result.realisationNbDevis < 95)
+                nbVenteColor = orange;
+            else
+                nbVenteColor = red;
+            // Couleur - CA de vente
+            if(result.realisationCADevis >= 95 && result.realisationCADevis <= 100)
+                CAVenteColor = green;
+            else if(result.realisationCADevis > 100)
+                CAVenteColor = blue;
+            else if(result.realisationCADevis >= 80 && result.realisationCADevis < 95)
+                CAVenteColor = orange;
+            else
+                CAVenteColor = red;
+
+            // Paramètrage des jauges
+            if(result.realisationContactActif > 100){  jaugeContactActif.trigger('configure', {'max':result.realisationContactActif}); }
+            if(result.realisationNbDevis > 100){  jaugeNbVente.trigger('configure', {'max':result.realisationNbDevis}); }
+            if(result.realisationCADevis > 100){  jaugeCAVente.trigger('configure', {'max':result.realisationCADevis}); }
+            jaugeContactActif.trigger('configure', {  "fgColor":contactActifColor, "inputColor":contactActifColor });
+            jaugeContactActif.val(result.realisationContactActif).trigger('change');
+            objectifContactActifIc.css('color', contactActifColor);
+            if(type == "magasin") {
+                if(result.realisationContactActifEffectif > 100){  jaugeContactActifEff.trigger('configure', {'max':result.realisationContactActifEffectif}); }
+                jaugeContactActifEff.trigger('configure', {  "fgColor":contactActifEffColor, "inputColor":contactActifEffColor });
+                jaugeContactActifEff.val(result.realisationContactActifEffectif).trigger('change');
+                objectifContactActifEffIc.css('color', contactActifEffColor);
+            }
+            jaugeNbVente.trigger('configure', {  "fgColor":nbVenteColor, "inputColor":nbVenteColor });
+            jaugeNbVente.val(result.realisationNbDevis).trigger('change');
+            objectifNbVenteIc.css('color', nbVenteColor);
+            jaugeCAVente.trigger('configure', {  "fgColor":CAVenteColor, "inputColor":CAVenteColor });
+            jaugeCAVente.val(result.realisationCADevis).trigger('change');
+            objectifCAVenteIc.css('color', CAVenteColor);
+        }
+        
+        /* Fonction de changement de semaine                                            */
+        /*------------------------------------------------------------------------------*/
+        function switchWeek(event) {
+            var refresh = false;
+            var anneeField = j$("[id$=filter-field-annee]")[0];
+            var monthField = j$("[id$=filter-field-mois]")[0];
+            var weekField = j$("[id$=filter-field-semaine]")[0];
+            
+            // Ajout d'une semaine
+            if(event.type == 'swipeleft' || event == 'clickright') {
+                if(weekField.selectedIndex+1 == weekField.length && anneeField.selectedIndex+1 != anneeField.length && monthField.selectedIndex+1 == monthField.length) {
+                    anneeField.selectedIndex = anneeField.selectedIndex + 1;
+                    monthField.selectedIndex = 0;
+                    weekField.selectedIndex = 0;
+                    rerendermoisdelannee(anneeField.value);
+                } else if(weekField.selectedIndex+1 == weekField.length && monthField.selectedIndex+1 != monthField.length) {
+                    monthField.selectedIndex = monthField.selectedIndex + 1;
+                    weekField.selectedIndex = 0;
+                    rerendermois(monthField.value);
+                } else if(weekField.selectedIndex+1 < weekField.length) {
+                    weekField.selectedIndex = weekField.selectedIndex + 1;
+                    refresh = true;
+                }
+            }
+            // Retrait d'une semaine                
+            if(event.type == 'swiperight' || event == 'clickleft') {
+                if(weekField.selectedIndex == 0 && anneeField.selectedIndex != 0 && monthField.selectedIndex == 0) {
+                    anneeField.selectedIndex = anneeField.selectedIndex - 1;
+                    monthField.selectedIndex = monthField.length - 1;
+                    weekField.selectedIndex = weekField.length - 1;
+                    rerendermoisdelannee(anneeField.value);
+                    removeMonth = true;
+                } else if(weekField.selectedIndex == 0 && monthField.selectedIndex != 0) {
+                    monthField.selectedIndex = monthField.selectedIndex - 1;
+                    weekField.selectedIndex = weekField.length - 1;
+                    rerendermois(monthField.value);
+                    removeWeek = true;
+                } else if(weekField.selectedIndex > 0) {
+                    weekField.selectedIndex = weekField.selectedIndex - 1;
+                    refresh = true;
+                }
+            }
+            if(refresh) rerenderVendeurs();
+        }
+
+        /* Affiche message d'information ou d'erreur                                    */
+        /*------------------------------------------------------------------------------*/
+        function displayMessage(message) {
+            var htmlAlertErrorMsg = j$("[id$=alertErrorMsg]");
+            var htmlAlertError = j$("[id$=alertError]");
+            htmlAlertError.removeClass("hidden").addClass("show");
+            htmlAlertErrorMsg.html(message);
+        }
+        
+        /* Affiche ou non le chargement                                                 */
+        /*------------------------------------------------------------------------------*/
+        function loading(isLoading, selector) {
+            var htmlLoading = j$("#loading-"+selector);
+            var htmlIndicators = j$("#indicators-"+selector);
+        
+            if(isLoading) {
+                htmlLoading.removeClass("hidden").addClass("show");
+                htmlIndicators.removeClass("show").addClass("hidden");
+            } else {
+                htmlLoading.removeClass("show").addClass("hidden");
+                htmlIndicators.removeClass("hidden").addClass("show");
+            }
+        }
+
+        /* Check if the browser agent in Mobile                                         */
+        /*------------------------------------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                    || navigator.userAgent.match(/webOS/i)
+                // || navigator.userAgent.match(/iPhone/i)
+                // || navigator.userAgent.match(/iPad/i)
+                // || navigator.userAgent.match(/iPod/i)
+                    || navigator.userAgent.match(/BlackBerry/i)
+                    || navigator.userAgent.match(/Windows Phone/i)
+                    || ((typeof sforce != 'undefined') && (sforce != null) )
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    </script>
+    
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Page_CSS)}"/>
+    <c:importvisualstrap theme="default" />
+    <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+    <apex:outputPanel styleClass="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero" layout="block">
+        <center>
+            <c:pageheader title="Atteinte des objectifs" icon="dashboard" subtitle="{!$User.FirstName} {!$User.LastName}"/>
+        </center>
+        
+        <div class="alert alert-danger alert-dismissible hidden" id="alertError" role="alert">
+            <button type="button" class="close alert-button-close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <apex:outputPanel styleClass="glyphicon glyphicon-alert" />&nbsp;<div id="alertErrorMsg"></div>
+        </div>
+        
+        <c:panel title="Filtres" type="primary">
+            <apex:form styleClass="form-inline">
+                <apex:actionFunction name="rerendermois" rerender="filter-field-semaine" oncomplete="rerenderVendeurs();">
+                    <apex:param name="firstParam" assignTo="{!moisActuel}" value="" />
+                </apex:actionFunction>
+                <apex:actionFunction name="rerenderannee" rerender="filter-field-semaine" oncomplete="rerenderVendeurs();">
+                    <apex:param name="firstParam" assignTo="{!anneeActuelle}" value="" />
+                </apex:actionFunction>
+                <apex:actionFunction name="rerendermoisdelannee" rerender="filter-field-mois" oncomplete="rerenderannee(this.value);">
+                    <apex:param name="firstParam" assignTo="{!anneeActuelle}" value="" />
+                </apex:actionFunction>
+                <apex:actionFunction name="rerendermagasin" action="{!refreshVendeurs}" rerender="hiddenFields" oncomplete="refreshValues();">
+                    <apex:param name="firstParam" assignTo="{!codeMagasinActuel}" value="" />
+                </apex:actionFunction>
+                <apex:actionFunction name="rerenderVendeurs" action="{!refreshVendeurs}" rerender="hiddenFields" oncomplete="refreshValues();"/>
+
+                <div class="col-md-6">
+                    <div class="form-group">                        
+                        <div class="col-md-1">
+                            <apex:outputLabel styleClass="control-label">Date</apex:outputLabel>
+                        </div>
+                        <div class="col-md-11">
+                            <apex:selectlist styleClass="form-control " id="filter-field-annee" size="1" value="{!anneeActuelle}" onChange="rerendermoisdelannee(this.value);">
+                                <apex:selectOptions value="{!annee}" />
+                            </apex:selectlist>
+                            <apex:selectlist styleClass="form-control " id="filter-field-mois" size="1" value="{!moisActuel}" onChange="rerendermois(this.value);">
+                                <apex:selectOptions value="{!mois}" />
+                            </apex:selectlist>
+                            <apex:selectlist styleClass="form-control" style="max-width: 75%; display: inline-block;" id="filter-field-semaine" size="1" value="{!semaineActuelle}" onChange="rerenderVendeurs();  ">
+                                <apex:selectOptions value="{!semaine}" />
+                            </apex:selectlist>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-default" id="filter-button-weekBefore" onClick="switchWeek('clickleft');"><span class="glyphicon glyphicon-minus"></span></button>
+                                <button type="button" class="btn btn-default" id="filter-button-weekAfter" onClick="switchWeek('clickright');"><span class="glyphicon glyphicon-plus"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">                    
+                        <div class="col-md-3">
+                            <apex:outputLabel styleClass="control-label">Magasin</apex:outputLabel>     
+                        </div>
+                        <div class="col-md-9">
+                            <apex:selectlist styleClass="form-control" id="magasin" size="1" value="{!codeMagasinActuel}" onChange="refresh = true; refreshHidden(this.value); rerendermagasin(this.value);">
+                                <apex:selectOptions value="{!magasinOptionList}" />
+                            </apex:selectlist>
+                        </div>
+                    </div>
+                </div>
+                <apex:outputPanel id="hiddenFields">
+                    <apex:inputHidden id="input-hidden-vendeursList" value="{!allVendeursMagasinJSON}" />
+                    <apex:inputHidden id="periodId" value="{!periodId}"/>
+                    <apex:inputHidden id="fiscalSettingsId" value="{!fiscalSettingsId}"/>
+                    <apex:inputHidden id="magHidden" value="{!codeMagasinActuel}" />
+                </apex:outputPanel>
+            </apex:form>
+        </c:panel>
+        
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h5 style="cursor: pointer;">
+                    <a id="panelHebdomadaireTitle" data-toggle="collapse" data-target="#panelHebdomadaire" class="panel-title">Hebdomadaire</a>
+                </h5>
+            </div>
+            <div class="panel-body" id="panelHebdomadaire">
+                <c:panel title="Atteinte des objectifs personnels" type="default">
+                    <div id="loading-perso-hebdo" class="section section-loading show">
+                        <span class="loader loader-quart"></span>
+                        Chargement en cours... Veuillez patienter
+                    </div>
+                    <div id="indicators-perso-hebdo" class="hidden">
+                        <div class="col-md-4">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-perso-hebdo-contactActif" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-user" style="font-size:26px" id="obj-perso-hebdo-contactActif-ic" />&nbsp;
+                                    <span id="obj-perso-hebdo-contactActif" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">contacts actifs</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-4">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-perso-hebdo-nbvente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-shopping-cart" style="font-size:26px" id="obj-perso-hebdo-nbvente-ic" />&nbsp;
+                                    <span id="obj-perso-hebdo-nbvente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">ventes</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-4">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-perso-hebdo-cavente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-euro" style="font-size:26px" id="obj-perso-hebdo-cavente-ic" />&nbsp;
+                                    <span id="obj-perso-hebdo-cavente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">CA (K&euro;)</p>
+                                </div>
+                            </c:well>
+                        </div>
+                    </div>
+                </c:panel>
+                
+                <c:panel title="Atteintes des objectifs équipe" type="default">
+                    <div id="loading-mag-hebdo" class="section section-loading show">
+                        <span class="loader loader-quart"></span>
+                        Chargement en cours... Veuillez patienter
+                    </div>
+                    <div id="indicators-mag-hebdo" class="hidden">
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-hebdo-contactActif" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-user" style="font-size:26px" id="obj-mag-hebdo-contactActif-ic" />&nbsp;
+                                    <span id="obj-mag-hebdo-contactActif" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">contacts actifs</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-hebdo-contactActifEff" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-exclamation-sign" style="font-size:26px" id="obj-mag-hebdo-contactActifEff-ic" />&nbsp;
+                                    <span id="obj-mag-hebdo-contactActifEff" style="font-size:40px">0 / 0 / 0</span>
+                                    <p class="text-muted">contacts actifs par effectifs</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-hebdo-nbvente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-shopping-cart" style="font-size:26px" id="obj-mag-hebdo-nbvente-ic" />&nbsp;
+                                    <span id="obj-mag-hebdo-nbvente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">ventes</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-hebdo-cavente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-euro" style="font-size:26px" id="obj-mag-hebdo-cavente-ic" />&nbsp;
+                                    <span id="obj-mag-hebdo-cavente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">CA (K&euro;)</p>
+                                </div>
+                            </c:well>
+                        </div>
+                    </div>
+                </c:panel>
+            </div>  
+        </div>
+        
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h5 style="cursor: pointer;">
+                    <a id="panelMensuelTitle" data-toggle="collapse" data-target="#panelMensuel" class="panel-title">Mensuel</a>
+                </h5>
+            </div>
+            <div class="panel-body" id="panelMensuel">
+                <c:panel title="Atteinte des objectifs personnels" type="default">
+                    <div id="loading-perso-mens" class="section section-loading show">
+                        <span class="loader loader-quart"></span>
+                        Chargement en cours... Veuillez patienter
+                    </div>
+                    <div id="indicators-perso-mens" class="hidden">
+                        <div class="col-md-4">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-perso-mens-contactActif" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-user" style="font-size:26px" id="obj-perso-mens-contactActif-ic" />&nbsp;
+                                    <span id="obj-perso-mens-contactActif" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">contacts actifs</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-4">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-perso-mens-nbvente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-shopping-cart" style="font-size:26px" id="obj-perso-mens-nbvente-ic" />&nbsp;
+                                    <span id="obj-perso-mens-nbvente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">ventes</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-4">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-perso-mens-cavente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-euro" style="font-size:26px" id="obj-perso-mens-cavente-ic" />&nbsp;
+                                    <span id="obj-perso-mens-cavente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">CA (K&euro;)</p>
+                                </div>
+                            </c:well>
+                        </div>
+                    </div>
+                </c:panel>
+                
+                <c:panel title="Atteintes des objectifs équipe" type="default">
+                    <div id="loading-mag-mens" class="section section-loading show">
+                        <span class="loader loader-quart"></span>
+                        Chargement en cours... Veuillez patienter
+                    </div>
+                    <div id="indicators-mag-mens" class="hidden">
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-mens-contactActif" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-user" style="font-size:26px" id="obj-mag-mens-contactActif-ic" />&nbsp;
+                                    <span id="obj-mag-mens-contactActif" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">contacts actifs</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-mens-contactActifEff" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-exclamation-sign" style="font-size:26px" id="obj-mag-mens-contactActifEff-ic" />&nbsp;
+                                    <span id="obj-mag-mens-contactActifEff" style="font-size:40px">0 / 0 / 0</span>
+                                    <p class="text-muted">contacts actifs par effectifs</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-mens-nbvente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-shopping-cart" style="font-size:26px" id="obj-mag-mens-nbvente-ic" />&nbsp;
+                                    <span id="obj-mag-mens-nbvente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">ventes</p>
+                                </div>
+                            </c:well>
+                        </div>
+                        <div class="col-md-3">
+                            <c:well style="text-align:center;">
+                                <input type="text" class="jauge-mag-mens-cavente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                                <div>
+                                    <apex:outputPanel styleClass="glyphicon glyphicon-euro" style="font-size:26px" id="obj-mag-mens-cavente-ic" />&nbsp;
+                                    <span id="obj-mag-mens-cavente" style="font-size:40px">0 / 0</span>
+                                    <p class="text-muted">CA (K&euro;)</p>
+                                </div>
+                            </c:well>
+                        </div>
+                    </div>
+                </c:panel>
+            </div>  
+        </div>
+    </apex:outputPanel>
+</apex:page>

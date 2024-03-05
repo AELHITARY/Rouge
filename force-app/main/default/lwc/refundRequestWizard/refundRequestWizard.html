@@ -1,0 +1,147 @@
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="custom:custom17" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Demande de remboursement">Demande de remboursement</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container slds-scrollable" style="height:39vh">
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>        
+
+            <!-- ASSISTANT -->
+            <template if:true={activeWizard}>
+
+                <lightning-layout multiple-rows="true">
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <div class="slds-form" role="list">
+
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input type="date" date-style="short" label="Date de demande" value={pieceDate} 
+                                                            min={creditMemoDate} max={todaysDate} onchange={handlePieceDateChange} required></lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <c-custom-Lookup label="Entité de saisie" 
+                                                        object-name="Account"
+                                                        object-type-record-name="Entity"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        required
+                                                        custom-filter="isActive__c=true"
+                                                        subtitle-field="KparKReference__c"
+                                                        icon-name = "standard:account" 
+                                                        select-record-id={pieceInputEntityId}
+                                                        select-record-name={pieceInputEntityName}
+                                                        onselectionchange={handleInputEntityLookupChange} >   
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <c-custom-Lookup label="Motif de remboursement" 
+                                                        object-name="Referencial__c"
+                                                        object-type-record-name="RefundReason"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        required
+                                                        custom-filter="active__c=true"
+                                                        subtitle-field="KparKReference__c"
+                                                        icon-name = "custom:custom18" 
+                                                        select-record-id={pieceRefundReasonId}
+                                                        select-record-name={pieceRefundReasonName}
+                                                        onselectionchange={handleRefundReasonLookupChange} >   
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input type="number" label="Montant à rembourser" value={pieceAmount} formatter="currency" 
+                                                            min={creditMemoAmountMin} max="0" step=".01" required
+                                                            onchange={handlePieceAmountChange} 
+                                                            message-when-range-underflow="Montant invalide !" >
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <c-custom-Lookup label="Mode de règlement" 
+                                                        object-name="Referencial__c"
+                                                        object-type-record-name="PaymentMethod"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        required
+                                                        custom-filter="active__c=true"
+                                                        subtitle-field="KparKReference__c"
+                                                        icon-name = "custom:custom41"
+                                                        select-record-id={piecePaymentMethodId}
+                                                        select-record-name={piecePaymentMethodName}
+                                                        onselectionchange={handlePaymentMethodLookupChange} >   
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+        </div>
+
+        <div slot="footer">
+            <template if:true={activeWizard}>
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <lightning-button variant="brand" label="Valider" class="slds-m-around_medium" onclick={handleCreateRefundRequestPiece}></lightning-button>
+            </template>
+        </div>
+
+    </lightning-card>
+    
+</template>

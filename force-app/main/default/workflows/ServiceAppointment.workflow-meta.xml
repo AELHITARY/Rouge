@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>Confirmation_RDV_Service</fullName>
+        <ccEmails>valerie.agnard@kpark.fr</ccEmails>
+        <ccEmails>sebastien.treussard@kpark.fr</ccEmails>
+        <description>Confirmation d’un RDV de Service Métrage</description>
+        <protected>false</protected>
+        <recipients>
+            <field>ContactId</field>
+            <type>contactLookup</type>
+        </recipients>
+        <recipients>
+            <field>LastModifiedById</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>relationclients@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>Batch_technique/FSL_Email_Confirmation_RDV_Service_Metrage</template>
+    </alerts>
+    <alerts>
+        <fullName>Confirmation_RDV_Service_LastModifiedUserCopy</fullName>
+        <ccEmails>valerie.agnard@kpark.fr</ccEmails>
+        <ccEmails>sebastien.treussard@kpark.fr</ccEmails>
+        <description>Confirmation d’un RDV de Service Pose</description>
+        <protected>false</protected>
+        <recipients>
+            <field>ContactId</field>
+            <type>contactLookup</type>
+        </recipients>
+        <recipients>
+            <field>LastModifiedById</field>
+            <type>userLookup</type>
+        </recipients>
+        <senderAddress>relationclients@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>Batch_technique/FSL_Email_Confirmation_RDV_Service_Pose</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>FSL_calculDureeIntervention</fullName>
+        <description>CGI - FSL : Calcul de la durée d&apos;intervention à partir des dates de début et de fin planifiées</description>
+        <field>Duration</field>
+        <formula>SchedEndTime -  SchedStartTime</formula>
+        <name>FSL_Calcul durée</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>FSL_calculTypeDureeIntervention</fullName>
+        <description>CGI - FSL : Type de durée calculée égal &quot;Minutes&quot;</description>
+        <field>DurationType</field>
+        <literalValue>Minutes</literalValue>
+        <name>FSL_Calcul type durée</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <rules>
+        <fullName>FSL_RendezVous_CalculDuree</fullName>
+        <actions>
+            <name>FSL_calculDureeIntervention</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>FSL_calculTypeDureeIntervention</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>ServiceAppointment.fsl_libelleDuree__c</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>ServiceAppointment.SchedStartTime</field>
+            <operation>notEqual</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>ServiceAppointment.SchedEndTime</field>
+            <operation>notEqual</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>ServiceAppointment.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>K/K - FSL Rendez-vous Planification</value>
+        </criteriaItems>
+        <description>CGI - FSL : Calcul automation de la durée d&apos;intervention</description>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+</Workflow>

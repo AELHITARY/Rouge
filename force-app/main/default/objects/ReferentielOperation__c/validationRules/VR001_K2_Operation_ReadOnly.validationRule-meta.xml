@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Operation_ReadOnly</fullName>
+    <active>false</active>
+    <description>Modification impossible (sauf pour le sièege) des caractéristiques de l&apos;opération si celle-ci a commencé</description>
+    <errorConditionFormula>AND(
+  $User.ByPassValidationRule__c == FALSE,
+  $Profile.Name != &apos;Administrateur système&apos;,
+  $Profile.Name != &apos;K/K - DAF&apos;,
+  $Profile.Name != &apos;K/K - Contrôle de gestion&apos;,
+  Datedebut__c &lt;=  TODAY()
+)</errorConditionFormula>
+    <errorMessage>Modification des caractéristiques de l&apos;opération impossible après le début de l&apos;opération! Merci de contacter le Directeur Administratif et Financier pour toute modification.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_GridRevision_CoefRevisionDates</fullName>
+    <active>true</active>
+    <description>Vérifie que la révision de grille de coefficient de décote est disponible sur au moins une partie de la durée de validité de la révision de grille de contrat de travail</description>
+    <errorConditionFormula>AND(!$User.ByPassValidationRule__c, RecordType.DeveloperName = &apos;workingContract&apos;, OR( AND(!ISBLANK(endDate__c), discountGridRevision__r.startDate__c &gt; endDate__c), AND(!ISBLANK(discountGridRevision__r.endDate__c), discountGridRevision__r.endDate__c &lt; startDate__c)))</errorConditionFormula>
+    <errorDisplayField>discountGridRevision__c</errorDisplayField>
+    <errorMessage>La commission de coefficient de décote doit avoir au moins une partie de la durée de validité du contrat de travail en commun avec la révision de grille du contrat de travail.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,63 @@
+<apex:page applybodytag="false" applyhtmltag="false" showheader="false" sidebar="false" doctype="html-5.0" language="{!$CurrentPage.parameters.windowLanguage}" standardStylesheets="false" cache="false">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Formulaire de contact pour discussion en ligne</title>
+        <apex:includescript value=" {!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js' )}" />
+        <apex:includescript value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/js/bootstrap.min.js')}" />
+        <script>
+            $ = jQuery.noConflict();
+            $(document).ready(function () {
+                var chatDetails=JSON.parse('{!$CurrentPage.parameters.chatDetails}');
+                var valuePreChat=chatDetails.prechatDetails;
+                var langCode;
+                var countryCode;
+                // Error message
+                if('{!$CurrentPage.parameters.disconnectedBy}'=='error') {
+                    $('#postMessage').html("{!HTMLENCODE($CurrentPage.parameters.error)}");
+                } else {
+                    $('#postMessage').html("{!$Label.liveagent_msg_postMessage}");
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <!-- HEADER -->
+        <div class="container-fluid">
+            <div style="float: left;">
+                <img src="{!URLFOR($Resource.Site_Espace_Client, 'img/logo_kpark.png')}" alt="Logo K par K" class="img-responsive header-logo" />
+            </div>
+        </div>
+        <div class="vertical-center">
+            <div class="container">
+                <p class="center">
+                    <label id="postMessage"></label>
+                </p>
+                <p class="center">
+                    <button type="button" class="btn-lg btn-custom btn-custom-red" onclick="window.close();">{!$Label.liveagent_msg_postCloseWindow}</button>
+                </p>
+            </div>
+        </div>
+    </body>
+    <!-- CSS Bootstrap -->
+    <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}" />
+    <style>
+        body {
+            overflow: hidden;
+            padding-right: 20px;
+            padding-left: 20px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .vertical-center {
+          min-height: 100%;  
+          min-height: 100vh; 
+
+          display: flex;
+          align-items: center;
+        }
+    </style>
+</apex:page>

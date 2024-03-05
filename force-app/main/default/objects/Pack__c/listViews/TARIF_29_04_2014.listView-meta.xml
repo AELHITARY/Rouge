@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TARIF_29_04_2014</fullName>
+    <columns>NAME</columns>
+    <columns>IDPack__c</columns>
+    <columns>IDRevision__c</columns>
+    <columns>CodePere__c</columns>
+    <columns>CodeFils__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>4/29/2014 12:00 AM</value>
+    </filters>
+    <label>TARIF 29/04/2014</label>
+    <language>fr</language>
+</ListView>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPERATIONS_COMMERCIALES_AVRIL_2018</fullName>
+    <columns>NAME</columns>
+    <columns>Debutvalidite__c</columns>
+    <columns>FinValidite__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>contains</operation>
+        <value>0418</value>
+    </filters>
+    <label>OPERATIONS COMMERCIALES AVRIL 2018</label>
+    <language>fr</language>
+</ListView>

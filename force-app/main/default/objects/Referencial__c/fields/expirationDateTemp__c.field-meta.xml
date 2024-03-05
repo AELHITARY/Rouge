@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>expirationDateTemp__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(NOT(ISBLANK(TEXT(expirationDay__c ))),
+	IF(
+		CASE(expirationDay__c, &quot;Dimanche&quot;, 0, &quot;Lundi&quot;, 1, &quot;Mardi&quot;, 2, &quot;Mercredi&quot;, 3, &quot;Jeudi&quot;, 4, &quot;Vendredi&quot;, 5, &quot;Samedi&quot;, 6, 0) &gt;= MOD( (TODAY() + expirationDelay__c) - DATE(1900, 1, 7), 7),
+
+		TODAY() + expirationDelay__c +
+		(CASE(expirationDay__c, &quot;Dimanche&quot;, 0, &quot;Lundi&quot;, 1, &quot;Mardi&quot;, 2, &quot;Mercredi&quot;, 3, &quot;Jeudi&quot;, 4, &quot;Vendredi&quot;, 5, &quot;Samedi&quot;, 6, 0) - MOD( (TODAY() + expirationDelay__c) - DATE(1900, 1, 7), 7)),
+
+		TODAY() + expirationDelay__c +
+		(7 + CASE(expirationDay__c, &quot;Dimanche&quot;, 0, &quot;Lundi&quot;, 1, &quot;Mardi&quot;, 2, &quot;Mercredi&quot;, 3, &quot;Jeudi&quot;, 4, &quot;Vendredi&quot;, 5, &quot;Samedi&quot;, 6, 0) - MOD( (TODAY() + expirationDelay__c) - DATE(1900, 1, 7), 7))
+	),
+	TODAY() + expirationDelay__c
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Date d&apos;expiration (à instant T)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

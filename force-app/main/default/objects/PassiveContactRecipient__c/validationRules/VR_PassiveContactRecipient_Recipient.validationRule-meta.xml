@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_PassiveContactRecipient_Recipient</fullName>
+    <active>true</active>
+    <description>1 seul des 2 doit être renseigné entre recipientType__c  et  recipientUser__c (erreur si aucun ou si les 2 champs sont renseignés)</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+(
+				( NOT(ISBLANK(TEXT(recipientType__c))) &amp;&amp; NOT(ISBLANK(recipientUser__c)) )
+				|| ( ISBLANK(TEXT(recipientType__c)) &amp;&amp; ISBLANK(recipientUser__c) )
+)</errorConditionFormula>
+    <errorMessage>Vous devez définir un destinataire ou un type de destinataire mais pas les deux!</errorMessage>
+</ValidationRule>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">    
+    <masterLabel>Custom Lookup</masterLabel>
+    <apiVersion>55.0</apiVersion>
+    <description>KPK - Composant pour afficher un lookup personnalisable dans les Flow ou les composants LWC.</description>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <!-- Filter Parameters -->
+            <property name="objectName" label="Object API Name" type="String" role="inputOnly" description="API Name of the object"/>
+            <property name="objectTypeRecordName" label="RecordType API Name" type="String" role="inputOnly" description="API Name of the RecordType for the filter"/>
+            <property name="fieldNameSearch" label="API Name field to search" type="String" role="inputOnly" description="API Name of the field to use for the search"/>
+            <property name="customFilter" label="Custom filter" type="String" role="inputOnly" description="Custom filter to apply of the search"/>
+            <property name="orderBy" label="Order by" type="String" role="inputOnly" description="Order the result by fields"/>
+
+            <!-- Record Display Parameters -->
+            <property name="fieldName" label="API Name field to display" type="String" role="inputOnly" description="Value to display as principal value in the lookup"/>
+            <property name="subtitleField" label="API Name subtitle field" type="String" role="inputOnly" description="Value to display below the principal field in the lookup"/>
+
+            <!-- Other Parameters -->
+            <property name="label" label="Label" type="String" role="inputOnly" description="Label to display on the lookup"/>
+            <property name="placeholder" label="Placeholder" type="String" role="inputOnly" description="Label to display in the lookup field"/>
+            <property name="required" label="Required?" type="Boolean" default="false" role="inputOnly" description="Require a selection?"/>
+            <property name="iconName" label="Icon" type="String" role="inputOnly" description="Icon to display. Example: standard:account"/>
+
+            <!-- Output Parameters -->
+            <property name="selectRecordId" label="Id of the record" type="String" role="outputOnly" description="Id of the record selected in the lookup"/>
+            <property name="selectRecordName" label="Name of the record" type="String" role="outputOnly" description="Name of the record selected in the lookup"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

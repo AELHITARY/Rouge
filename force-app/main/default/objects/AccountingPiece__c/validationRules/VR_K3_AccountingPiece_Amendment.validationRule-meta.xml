@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_Amendment</fullName>
+    <active>true</active>
+    <description>Impossible de créer cet enregistrement sur une commande avenant!</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+NOT(ISBLANK( order__c )) &amp;&amp;
+ISPICKVAL(order__r.Type, &quot;Avenant&quot;)</errorConditionFormula>
+    <errorDisplayField>order__c</errorDisplayField>
+    <errorMessage>Impossible de créer une pièce comptable sur une commande avenant!</errorMessage>
+</ValidationRule>

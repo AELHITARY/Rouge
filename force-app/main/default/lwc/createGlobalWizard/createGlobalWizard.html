@@ -1,0 +1,1207 @@
+<template>
+    <div>
+        <!-- HEADER -->
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <lightning-icon icon-name="standard:record_create" size="medium"></lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-truncate" title="Saisie rapide">Saisie rapide</span>
+                                    </h1>
+                                    <span>Assistant pour créer les enregistrements nécessaire à l'enregistrement désiré (compte / chantier / projet ou devis)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <!-- BODY -->
+        <div class="c-container">
+
+            <!-- Spinner -->
+            <div if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </div>
+
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto" padding="around-small">
+
+                    <!-- Path assistant -->              
+                    <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                        <template for:each={steps} for:item="step">
+                            <template if:true={step.display}>
+                                <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                            </template>
+                        </template>
+                    </lightning-progress-indicator>
+                </lightning-layout-item>
+            </lightning-layout>
+        
+            <lightning-messages></lightning-messages>
+            
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto" padding="around-small">
+                    <!-- STEP 1 (SELECTION ACTIFS) -->             
+                    <template if:true={showStep1Form}>
+                        <h3 class="slds-text-heading_small">
+                            Sélection du type d'objet à créer
+                        </h3>
+                        <div class="slds-m-bottom_medium">
+                            <p>Veuillez sélectionner le type d'objet à créer.</p>
+                        </div>
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-align_absolute-center">
+                                    <lightning-radio-group name="radioButtonGroup" 
+                                                            onchange={handleTypeObjectChange} 
+                                                            options={actionTypeValues}
+                                                            value={selectedActionTypeValue}
+                                                            type="button">
+                                    </lightning-radio-group>
+                                </div>
+                            </div>
+                        </div>      
+                        <template if:true={originePicklistValues.data}>
+                            <template if:true={isSales}>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                            <lightning-combobox name="origine"
+                                                                label="Source"
+                                                                value={origine}
+                                                                placeholder="Source"
+                                                                options={originePicklistValues.data.values}
+                                                                onchange={handleOrigineChange} 
+                                                                required>
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:true={origineCallPicklistValues.data}>
+                            <template if:true={isCall}>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                            <lightning-combobox name="origineCall"
+                                                                label="Source (Call)"
+                                                                value={origineCall}
+                                                                placeholder="Source (call)"
+                                                                options={origineCallPicklistValues.data.values}
+                                                                onchange={handleOrigineCallChange} 
+                                                                required>
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                    </template>
+                    
+                    <!-- STEP 2 (SELECTION CHAMPS COMPTE) --> 
+                    <template if:true={showStep2Form}> 
+                        <h3 class="slds-text-heading_small">
+                            Création du compte
+                        </h3>                        
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <c-custom-Lookup label="Compte" 
+                                                    placeholder="Vous pouvez choisir un compte existant pour pré-remplir les champs ci-dessous"
+                                                    object-name="Account"
+                                                    field-name="Name" 
+                                                    field-name-search="Name" 
+                                                    subtitle-field="AccountNumber"
+                                                    select-record-id={accId} 
+                                                    select-record-name={accName}
+                                                    icon-name = "standard:account" 
+                                                    custom-filter = {accFilter}
+                                                    onselectionchange={handleAccountLookupChange} >
+                                    </c-custom-Lookup>
+                                </div>
+                            </div>
+                        </div>            
+                        <template if:true={salutationPicklistValues.data}>                        
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <lightning-combobox name="civilite"
+                                                            label="Civilité"
+                                                            value={civility}
+                                                            options={salutationPicklistValues.data.values}
+                                                            onchange={handleCiviliteChange}
+                                                            required>
+                                        </lightning-combobox>
+                                    </div>
+                                </div>
+                            </div>  
+                        </template>            
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="text" 
+                                                    label="Nom"
+                                                    value={lastName}
+                                                    placeholder="Dupont" 
+                                                    onchange={handleLastNameChange}
+                                                    required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>    
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="text" 
+                                                    label="Prénom"
+                                                    value={firstName}
+                                                    placeholder="Charles" 
+                                                    onchange={handleFirstNameChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <c-dqe-Lookup-Address label="Recherche d'une adresse postal"
+                                                        icon="standard:address"
+                                                        street={accStreet}
+                                                        zip={accPostalcode}
+                                                        city={accCity}
+                                                        state={accState}
+                                                        country={accCountry}
+                                                        lat={accLatitude}
+                                                        lng={accLongitude}
+                                                        onselecteditemevent={handleAccountSelectedEvent}>
+                                    </c-dqe-Lookup-Address>
+                                </div>
+                            </div>
+                        </div>   
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input-address variant="label-hidden"
+                                                            address-label="Adresse postal"
+                                                            street-label="Rue"
+                                                            city-label="Ville"
+                                                            country-label="Pays"
+                                                            province-label="Région / Province"
+                                                            postal-code-label="Code postal"
+                                                            street={accStreet}
+                                                            postal-code={accPostalcode}
+                                                            city={accCity}
+                                                            province={accState}
+                                                            country={accCountry}
+                                                            onchange={handleInputAccAddressChange}
+                                                            required>
+                                    </lightning-input-address>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="text" 
+                                                    label="Complément d'adresse"
+                                                    value={accComplementAddress}
+                                                    placeholder="Résidence, bâtiment, zone, etc." 
+                                                    field-level-help="Informations affichées comme 2nd ligne sur l’adresse postale"
+                                                    onchange={handleAccComplementAddressChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="number" 
+                                                    label="Etage"
+                                                    value={etage}
+                                                    placeholder="Numéro de l'étage" 
+                                                    max="99"
+                                                    onchange={handleEtageChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="email" 
+                                                    label="Adresse e-mail"
+                                                    value={email}
+                                                    placeholder="toto@test.com" 
+                                                    field-level-help="E-mail du compte"
+                                                    onchange={handleEmailChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="tel" 
+                                                    label="Téléphone domicile"
+                                                    value={telDomicile}
+                                                    placeholder="0123456789"
+                                                    pattern="[0-9]{10}" 
+                                                    field-level-help="Numéro de téléphone fixe du compte"
+                                                    onchange={handleTelDomicileChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="tel" 
+                                                    label="Téléphone mobile"
+                                                    value={telMobile}
+                                                    placeholder="0623456789"
+                                                    pattern="[0-9]{10}" 
+                                                    field-level-help="Numéro de téléphone mobile du compte"
+                                                    onchange={handleTelMobileChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div> 
+                    </template>                    
+
+                    <!-- STEP 3 (SELECTION CHAMPS CHANTIER) --> 
+                    <template if:true={showStep3Form}> 
+                        <h3 class="slds-text-heading_small">
+                            Création du chantier
+                        </h3>         
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <c-custom-Lookup label="Chantier" 
+                                                    placeholder="Vous pouvez choisir un chantier existant pour pré-remplir les champs ci-dessous"
+                                                    object-name="Chantier__c"
+                                                    field-name="Name" 
+                                                    field-name-search="Name" 
+                                                    subtitle-field="Name"
+                                                    select-record-id={chaId} 
+                                                    select-record-name={chaName}
+                                                    icon-name = "custom:custom24" 
+                                                    custom-filter = {chaFilter}
+                                                    onselectionchange={handleChantierLookupChange} >
+                                    </c-custom-Lookup>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-m-bottom_xx-small slds-m-top_xx-small">
+                            <span>Si l’adresse n’est pas renseignée, alors elle sera initialisée à partir de celle du compte.</span>
+                        </div>
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <c-dqe-Lookup-Address label="Recherche d'une adresse postal"
+                                                        icon="standard:address"
+                                                        street={chaStreet}
+                                                        zip={chaPostalCode}
+                                                        city={chaCity}
+                                                        state={chaState}
+                                                        country={chaCountry}
+                                                        lat={chaLatitude}
+                                                        lng={chaLongitude}
+                                                        onselecteditemevent={handleChantierSelectedEvent}>
+                                    </c-dqe-Lookup-Address>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input-address variant="label-hidden"
+                                                            address-label="Adresse postal"
+                                                            street-label="Rue"
+                                                            city-label="Ville"
+                                                            country-label="Pays"
+                                                            province-label="Région / Province"
+                                                            postal-code-label="Code postal"
+                                                            street={chaStreet}
+                                                            postal-code={chaPostalcode}
+                                                            city={chaCity}
+                                                            province={chaState}
+                                                            country={chaCountry}
+                                                            onchange={handleInputChaAddressChange}
+                                                            required>
+                                    </lightning-input-address>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="text" 
+                                                    label="Complément d'adresse"
+                                                    value={chaComplementAddress}
+                                                    placeholder="Résidence, bâtiment, zone, etc." 
+                                                    field-level-help="Informations affichées comme 2nd ligne sur l’adresse postale"
+                                                    onchange={handleChaComplementAddressChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-combobox name="typeHabitation"
+                                                        label="Type d'habitation"
+                                                        value={typeHabitation}
+                                                        options={typeHabitationPicklistValues.data.values}
+                                                        onchange={handleTypeHabitationChange} >
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-combobox name="typeResidence"
+                                                        label="Type de résidence"
+                                                        value={typeResidence}
+                                                        options={typeResidencePicklistValues.data.values}
+                                                        onchange={handleTypeResidenceChange} >
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="number" 
+                                                    label="Nombre de portes fenêtres"
+                                                    value={nbPortesFenetres}
+                                                    placeholder="" 
+                                                    max="99"
+                                                    onchange={handleNbPortesFenetresChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div>  
+                    </template>
+
+                    <!-- STEP 4 (SELECTION CHAMPS PROJET) --> 
+                    <template if:true={showStep4Form}> 
+                        <h3 class="slds-text-heading_small">
+                            Création du projet
+                        </h3>  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <c-custom-Lookup label="Projet" 
+                                                    placeholder="Vous pouvez choisir un projet existant pour pré-remplir les champs ci-dessous"
+                                                    object-name="Opportunity"
+                                                    field-name="Name" 
+                                                    field-name-search="Name" 
+                                                    subtitle-field="numeroProjet__c"
+                                                    select-record-id={oppId} 
+                                                    select-record-name={oppName}
+                                                    icon-name = "standard:opportunity" 
+                                                    custom-filter = {oppFilter}
+                                                    onselectionchange={handleOpportunityLookupChange} >
+                                    </c-custom-Lookup>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-combobox name="type"
+                                                        label="Type"
+                                                        value={type}
+                                                        options={typeOppPicklistValues.data.values}
+                                                        onchange={handleTypeChange} 
+                                                        required>
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="date" 
+                                                    label="Date prévisionelle de signature"
+                                                    value={datePrevisionelleSignature}
+                                                    onchange={handleDatePrevisionelleSignatureChange}
+                                                    required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <c-custom-Lookup label="Opération" 
+                                                    object-name="ReferentielOperation__c"
+                                                    field-name="Name" 
+                                                    field-name-search="Name" 
+                                                    subtitle-field="Name"
+                                                    select-record-id={opeId} 
+                                                    select-record-name={opeName}
+                                                    icon-name = "custom:custom59" 
+                                                    onselectionchange={handleOperationLookupChange} >
+                                    </c-custom-Lookup>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                    <lightning-input type="text" 
+                                                    label="Campagne (Call)"
+                                                    value={campagneCall}
+                                                    onchange={handleCampagneCallChange}>
+                                    </lightning-input>
+                                </div>
+                            </div>
+                        </div> 
+                    </template>
+
+                    <!-- STEP 5 (SELECTION CHAMPS DEVIS) --> 
+                    <template if:true={showStep5Form}> 
+                        <h3 class="slds-text-heading_small">
+                            Création du devis
+                        </h3>  
+                        <!-- QUOTE SALES -->
+                        <template if:false={createQuoteCPQ}> 
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <c-custom-Lookup label="Devis" 
+                                                        placeholder="Vous pouvez choisir un devis existant pour pré-remplir les champs ci-dessous"
+                                                        object-name="Quote"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        subtitle-field="QuoteNumber"
+                                                        select-record-id={quoteId} 
+                                                        select-record-name={quoteName}
+                                                        icon-name = "standard:quote" 
+                                                        custom-filter = {quoFilter}
+                                                        onselectionchange={handleQuoteLookupChange} >
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <lightning-input type="date" 
+                                                        label="Date de devis"
+                                                        value={dateDevis}
+                                                        placeholder="" 
+                                                        onchange={handleDateDevisChange}
+                                                        required>
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <lightning-input type="number" 
+                                                        label="Montant"
+                                                        value={montant} formatter="currency" 
+                                                        step=".01" 
+                                                        min="1"
+                                                        max="999999999"
+                                                        onchange={handleMontantChange}>
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                            <template if:true={modeFinancementPicklistValues.data}>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                            <lightning-combobox name="modeFinancement"
+                                                                label="Mode de financement"
+                                                                value={modeFinancement}
+                                                                options={modeFinancementPicklistValues.data.values}
+                                                                onchange={handleModeFinancementChange} >
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template if:true={typeContratPicklistValues.data}>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                            <lightning-combobox name="typeContrat"
+                                                                label="Type de contrat"
+                                                                value={typeContrat}
+                                                                options={typeContratPicklistValues.data.values}
+                                                                onchange={handleTypeContratChange} >
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template> 
+                        </template>
+                        <!-- QUOTE CPQ -->
+                        <template if:true={createQuoteCPQ}> 
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <c-custom-Lookup label="Devis" 
+                                                        placeholder="Vous pouvez choisir un devis existant pour pré-remplir les champs ci-dessous"
+                                                        object-name="SBQQ__Quote__c"
+                                                        field-name="nomDevis__c" 
+                                                        field-name-search="nomDevis__c" 
+                                                        subtitle-field="NDevis__c"
+                                                        select-record-id={quoteId} 
+                                                        select-record-name={quoteName}
+                                                        icon-name = "custom:custom93" 
+                                                        custom-filter = {quoCPQFilter}
+                                                        onselectionchange={handleQuoteCPQLookupChange} >
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <lightning-input type="date" 
+                                                        label="Date de devis"
+                                                        value={dateDevis}
+                                                        placeholder="" 
+                                                        onchange={handleDateDevisChange}
+                                                        required>
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <c-custom-Lookup label="Source" 
+                                                        object-name="Referencial__c"
+                                                        object-type-record-name="Source"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        custom-filter="active__c=true"
+                                                        subtitle-field="KparKReference__c"
+                                                        icon-name = "custom:custom62"
+                                                        select-record-id={quoteSourceId}
+                                                        select-record-name={quoteSourceName}
+                                                        onselectionchange={handleSourceLookupChange} 
+                                                        required>   
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <c-custom-Lookup label="Mode de financement" 
+                                                        object-name="Referencial__c"
+                                                        object-type-record-name="FinancingMethod"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        custom-filter="active__c=true"
+                                                        subtitle-field="KparKReference__c"
+                                                        icon-name = "custom:custom41"
+                                                        select-record-id={quoteFinancingMethodId}
+                                                        select-record-name={quoteFinancingMethodName}
+                                                        onselectionchange={handleFinancingMethodLookupChange} 
+                                                        required>   
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                        <c-custom-Lookup label="CGV" 
+                                                        object-name="Referencial__c"
+                                                        object-type-record-name="TermsAndConditions"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        custom-filter="active__c=true"
+                                                        subtitle-field="KparKReference__c"
+                                                        icon-name = "custom:custom14"
+                                                        select-record-id={quoteTermsAndConditionsId}
+                                                        select-record-name={quoteTermsAndConditionsName}
+                                                        onselectionchange={handleTermsAndConditionsLookupChange}
+                                                        required>   
+                                        </c-custom-Lookup>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+
+                    <!-- STEP 6 (CONFIRMATION) --> 
+                    <template if:true={showStep6Form}> 
+                        <h3 class="slds-text-heading_small">
+                            Confirmation
+                        </h3>  
+                        <lightning-accordion allow-multiple-sections-open
+                                                active-section-name={activeSummarySections}>
+                            <lightning-accordion-section name="accountSummary" label="Informations du compte">
+                                <div class="slds-form" role="list">
+                                    <div class="slds-m-bottom_medium">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Type d'enregistrement</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            Compte personnel
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Compte de référence</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {accName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Origine du compte</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {origine}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>      
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Origine call du compte</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {origineCall}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Civilité</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {civility}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Prénom</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {firstName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Nom</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {lastName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Rue</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {accStreet}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Code Postal</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {accPostalcode}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Région / Département</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {accState}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Ville</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {accCity}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Complément d'adresse</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {accComplementAddress}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Etage</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {etage}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Pays</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {accCountry}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>     
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">E-mail</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {email}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Téléphone domicile</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {telDomicile}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Téléphone mobile</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {telMobile}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>                                 
+                                    </div>
+                                </div>
+                            </lightning-accordion-section>
+                            <template if:true={hasChantier}>
+                                <lightning-accordion-section name="chantierSummary" label="Informations du chantier">
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Chantier de référence</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {chaName}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Rue</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {chaStreet}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>     
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Code Postal</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {chaPostalcode}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>     
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Région / Département</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {chaState}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>     
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Ville</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {chaCity}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Complément d'adresse</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {chaComplementAddress}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Type d'habitation</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {typeHabitation}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Type de résidence</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {typeResidence}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Nombre de portes fenêtres</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {nbPortesFenetres}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                            </template>
+                            <template if:true={hasOpportunity}>
+                                <lightning-accordion-section name="opportunitySummary" label="Informations du projet">
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Projet de référence</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {oppName}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Type</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {type}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Date prévisionelle de signature</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        <lightning-formatted-date-time value={datePrevisionelleSignature} year="numeric" month="long" day="numeric" weekday="long"></lightning-formatted-date-time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Opération</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {opeName}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                <span class="slds-form-element__label">Campagne (Call)</span>
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-form-element__static">
+                                                        {campagneCall}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                            </template>
+                            <template if:true={hasQuote}>
+                                <!-- CPQ QUOTE -->
+                                <template if:true={createQuoteCPQ}>
+                                    <lightning-accordion-section name="quoteSummary" label="Informations du devis">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Devis de référence</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {quoteName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Date du devis</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            <lightning-formatted-date-time value={dateDevis} year="numeric" month="long" day="numeric" weekday="long"></lightning-formatted-date-time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Source</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {quoteSourceName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Mode de financement</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {quoteFinancingMethodName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">CGV</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {quoteTermsAndConditionsName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+                                <!-- SALES QUOTE -->
+                                <template if:false={createQuoteCPQ}>
+                                    <lightning-accordion-section name="quoteSummary" label="Informations du devis">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Devis de référence</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {quoteName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Date du devis</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            <lightning-formatted-date-time value={dateDevis} year="numeric" month="long" day="numeric" weekday="long"></lightning-formatted-date-time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Montant</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {montant}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Mode de financement</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {modeFinancement}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Type de contrat</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {typeContrat}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+                            </template>
+                        </lightning-accordion>
+                    </template>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>    
+
+        <div slot="footer" class="slds-card__footer">
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            <!-- BUTTONS -->   
+            <template if:true={showPreviousButton}> 
+                <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+            </template>
+            <template if:true={showNextButton}> 
+                <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+            </template>
+            <template if:true={showSubmitButton}> 
+                <lightning-button variant="brand" label="Créer les objets" class="slds-m-around_medium" onclick={handleSave}></lightning-button>
+            </template>
+        </div>
+    </div>
+</template>

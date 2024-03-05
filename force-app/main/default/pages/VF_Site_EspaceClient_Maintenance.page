@@ -1,0 +1,27 @@
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" applyHtmlTag="false" standardStylesheets="false">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="robots" content="noindex, follow" />
+        <meta name="keywords" content="KparK, K par K, client, espace client, fenêtre, porte, garage, portail" />
+        <title>Espace Client | K par K</title>
+        <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+        <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}"/>        
+    </head>
+    <body class="auth-maintenance">
+        <div class="espaceclient">
+            <div id="container">
+                <div class="col-md-12 cold-sm-12 cold-xs-12 block-maintenance">
+                    <div>
+                        <img src="{!URLFOR($Resource.Logo_kpark)}" alt="Logo KparK" class="img-responsive center-block logo" style="max-width: 190px;"/>
+                    </div>
+                    <div class="text-center">
+                        <h3><span class="maintenance-text">Votre espace client K par K est fermé pour maintenance</span></h3>
+                        <p>Veuillez nous excuser pour les désagréments occasionnés. Nous serons bientôt de retour.</p>
+                    </div>
+                </div><!-- /.block-maintenance -->
+            </div><!-- /.container -->
+        </div>
+    </body>
+</apex:page>

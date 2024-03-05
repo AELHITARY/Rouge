@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_CreditMemo_RefFieldsRequired</fullName>
+    <active>true</active>
+    <description>Lorsqu&apos;un n° fiscal de facture est renseigné, les montants HT et TTC sont obligatoires</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+NOT(ISBLANK( creditMemoReference__c )) &amp;&amp;
+isLegacy__c == false &amp;&amp;
+(
+    ISNULL( pretaxAmount__c ) ||
+    ISNULL( amount__c )
+)</errorConditionFormula>
+    <errorMessage>Les montants HT et TTC sont obligatoires!</errorMessage>
+</ValidationRule>

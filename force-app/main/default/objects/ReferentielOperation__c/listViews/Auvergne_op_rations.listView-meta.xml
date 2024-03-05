@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Auvergne_op_rations</fullName>
+    <booleanFilter>1 OR 2</booleanFilter>
+    <columns>Ville__c</columns>
+    <columns>Datedebut__c</columns>
+    <columns>Datefin__c</columns>
+    <columns>NAME</columns>
+    <columns>Code__c</columns>
+    <columns>SurfaceduStand__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>OWNER.LAST_NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Code2__c</field>
+        <operation>startsWith</operation>
+        <value>AUV</value>
+    </filters>
+    <filters>
+        <field>Code__c</field>
+        <operation>startsWith</operation>
+        <value>AUV</value>
+    </filters>
+    <label>Auvergne - opérations</label>
+    <language>fr</language>
+    <sharedTo>
+        <role>ContrleurdExploitation</role>
+        <role>ContrleurdeGestion</role>
+        <role>DirecteurAdminetFinancier</role>
+        <role>DirecteurExcutif</role>
+        <role>MAG0343_MAG_CLERMONT_FERRAND</role>
+        <role>MAG0343_REF_CLERMONT_FERRAND</role>
+        <role>MAG0344_MAG_VICHY</role>
+        <role>MAG0344_REF_VICHY</role>
+    </sharedTo>
+</ListView>

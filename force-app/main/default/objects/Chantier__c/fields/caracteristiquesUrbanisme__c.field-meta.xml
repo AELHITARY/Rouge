@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>caracteristiquesUrbanisme__c</fullName>
+    <externalId>false</externalId>
+    <label>Caractéristique(s) urbanisme</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Accord mairie</fullName>
+                <default>false</default>
+                <label>Accord mairie</label>
+            </value>
+            <value>
+                <fullName>Accord syndic</fullName>
+                <default>false</default>
+                <label>Accord syndic</label>
+            </value>
+            <value>
+                <fullName>Aéroport</fullName>
+                <default>false</default>
+                <label>Aéroport</label>
+            </value>
+            <value>
+                <fullName>Bâtiment de France</fullName>
+                <default>false</default>
+                <label>Bâtiment de France</label>
+            </value>
+            <value>
+                <fullName>Littoral</fullName>
+                <default>false</default>
+                <label>Littoral</label>
+            </value>
+            <value>
+                <fullName>Monument historique</fullName>
+                <default>false</default>
+                <label>Monument historique</label>
+            </value>
+            <value>
+                <fullName>Respect façade</fullName>
+                <default>false</default>
+                <label>Respect façade</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

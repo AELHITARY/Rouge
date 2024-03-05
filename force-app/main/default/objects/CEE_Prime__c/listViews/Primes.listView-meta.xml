@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Primes</fullName>
+    <columns>NAME</columns>
+    <columns>dateDebutValidite__c</columns>
+    <columns>dateFinValidite__c</columns>
+    <columns>categorie__c</columns>
+    <columns>zone__c</columns>
+    <columns>produit__c</columns>
+    <columns>montant__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Primes</label>
+    <language>fr</language>
+</ListView>

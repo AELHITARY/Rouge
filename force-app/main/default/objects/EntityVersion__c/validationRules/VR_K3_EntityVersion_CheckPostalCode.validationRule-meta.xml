@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_EntityVersion_CheckPostalCode</fullName>
+    <active>false</active>
+    <description>Lorsqu&apos;un élément de l&apos;adresse est saisie, le champ postalCode__c devient obligatoire
+/* FGO le 04/01/2023, certains magasins n&apos;ont aucune adresse physique (ex: LANGON). De même, certains types d&apos;entité n&apos;en ont pas non plus (ex: DV) */</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+ISBLANK(postalCode__c) &amp;&amp;
+(NOT(ISBLANK(country__c)) ||
+NOT(ISBLANK(street__c)) ||
+NOT(ISBLANK(city__c)))</errorConditionFormula>
+    <errorDisplayField>postalCode__c</errorDisplayField>
+    <errorMessage>Le code postal de l&apos;entité est obligatoire.</errorMessage>
+</ValidationRule>

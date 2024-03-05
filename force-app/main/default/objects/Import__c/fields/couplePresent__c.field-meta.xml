@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>couplePresent__c</fullName>
+    <description>Couple présent lors du rendez-vous</description>
+    <externalId>false</externalId>
+    <label>Couple présent</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Oui</fullName>
+                <default>false</default>
+                <label>Oui</label>
+            </value>
+            <value>
+                <fullName>Non</fullName>
+                <default>false</default>
+                <label>Non</label>
+            </value>
+            <value>
+                <fullName>A confirmer</fullName>
+                <default>false</default>
+                <label>A confirmer</label>
+            </value>
+            <value>
+                <fullName>Seul</fullName>
+                <default>false</default>
+                <label>Seul</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

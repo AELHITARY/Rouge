@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_CodeDVobligatoire</fullName>
+    <active>true</active>
+    <description>Si le Code DV automatique n&apos;est pas renseigné alors la saisie du CodeDV devient obligatoire</description>
+    <errorConditionFormula>and( $User.ByPassValidationRule__c =false, ISNULL( Code_DV_automatique__c ), ISNULL( Code_DV__c )  )</errorConditionFormula>
+    <errorDisplayField>Code_DV__c</errorDisplayField>
+    <errorMessage>Merci de renseigner le Code DV pour pouvoir enregistrer l&apos;opération</errorMessage>
+</ValidationRule>

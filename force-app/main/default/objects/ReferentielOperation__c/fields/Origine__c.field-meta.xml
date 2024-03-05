@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Origine__c</fullName>
+    <externalId>false</externalId>
+    <label>Origine (K2)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CCM</fullName>
+                <default>false</default>
+                <label>CCM</label>
+            </value>
+            <value>
+                <fullName>CAMPAGNES MARKETING</fullName>
+                <default>false</default>
+                <label>CAMPAGNES MARKETING</label>
+            </value>
+            <value>
+                <fullName>JPO</fullName>
+                <default>false</default>
+                <label>JPO</label>
+            </value>
+            <value>
+                <fullName>PASSAGE MAGASIN</fullName>
+                <default>false</default>
+                <label>PASSAGE MAGASIN</label>
+            </value>
+            <value>
+                <fullName>TELEPRO MAGASIN</fullName>
+                <default>false</default>
+                <label>TELEPRO MAGASIN</label>
+            </value>
+            <value>
+                <fullName>COLLABORATEUR K PAR K</fullName>
+                <default>false</default>
+                <label>COLLABORATEUR K PAR K</label>
+            </value>
+            <value>
+                <fullName>COLLABORATEUR+RETRAIT S-GOBAIN</fullName>
+                <default>false</default>
+                <label>COLLABORATEUR+RETRAIT S-GOBAIN</label>
+            </value>
+            <value>
+                <fullName>STAND GM</fullName>
+                <default>false</default>
+                <label>STAND GM</label>
+            </value>
+            <value>
+                <fullName>FOIRE</fullName>
+                <default>false</default>
+                <label>FOIRE</label>
+            </value>
+            <value>
+                <fullName>WEB</fullName>
+                <default>false</default>
+                <label>WEB</label>
+            </value>
+            <value>
+                <fullName>WEB CONFIGURATEUR</fullName>
+                <default>false</default>
+                <label>WEB CONFIGURATEUR</label>
+            </value>
+            <value>
+                <fullName>BAL VENDEUR</fullName>
+                <default>false</default>
+                <label>BAL VENDEUR</label>
+            </value>
+            <value>
+                <fullName>PORTE A PORTE VENDEUR</fullName>
+                <default>false</default>
+                <label>PORTE A PORTE VENDEUR</label>
+            </value>
+            <value>
+                <fullName>COMPLEMENT VENDEUR</fullName>
+                <default>false</default>
+                <label>COMPLEMENT VENDEUR</label>
+            </value>
+            <value>
+                <fullName>PARRAINAGE VENDEUR</fullName>
+                <default>false</default>
+                <label>PARRAINAGE VENDEUR</label>
+            </value>
+            <value>
+                <fullName>STAND MARCHE VENDEUR</fullName>
+                <default>false</default>
+                <label>STAND MARCHE VENDEUR</label>
+            </value>
+            <value>
+                <fullName>TELEPHONE VENDEUR</fullName>
+                <default>false</default>
+                <label>TELEPHONE VENDEUR</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

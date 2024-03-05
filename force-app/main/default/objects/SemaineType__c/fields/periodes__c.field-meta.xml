@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>periodes__c</fullName>
+    <description>CRM-514 : Périodes de prises de RDV de la semaine par jour avec heures de début et de fin</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Une ligne par périodes au format &lt;jour&gt;;&lt;heure de debut&gt;;&lt;heure de fin&gt;</inlineHelpText>
+    <label>Périodes</label>
+    <length>32768</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

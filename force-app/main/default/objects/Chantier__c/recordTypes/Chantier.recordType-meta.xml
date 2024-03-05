@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chantier</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>Chantier</compactLayoutAssignment>
+    <label>Chantier</label>
+    <picklistValues>
+        <picklist>anneeConstruction__c</picklist>
+        <values>
+            <fullName>1950</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1960</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1970</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1980</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>1990</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2000</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2010%2B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Avant 1940</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>NSP</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>caracteristiquesUrbanisme__c</picklist>
+        <values>
+            <fullName>Accord mairie</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Accord syndic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aéroport</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bâtiment de France</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Littoral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Monument historique</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Respect façade</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>chauffages__c</picklist>
+        <values>
+            <fullName>Collectif</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Energie renouvelable</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Autre</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Electrique</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Fuel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Gaz</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>etatPortail__c</picklist>
+        <values>
+            <fullName>A rénover</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuf</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>etatPorteGarage__c</picklist>
+        <values>
+            <fullName>A rénover</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Neuf</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>heatingMode__c</picklist>
+        <values>
+            <fullName>Collectif</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Energie renouvelable</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Autre</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Electrique</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Fuel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Individuel Gaz</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>legacySource__c</picklist>
+        <values>
+            <fullName>GC%2FChaude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GC%2FFroide</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>methodeGeocodage__c</picklist>
+        <values>
+            <fullName>Automatique</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Batch</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Manuel</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>typeHabitation__c</picklist>
+        <values>
+            <fullName>Appartement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pavillon</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>typeResidence__c</picklist>
+        <values>
+            <fullName>Locative</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Principale</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Professionnelle</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Secondaire</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

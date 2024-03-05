@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CONTROLE</fullName>
+    <columns>IDRevision__c</columns>
+    <columns>IDPack__c</columns>
+    <columns>NAME</columns>
+    <columns>CodePere__c</columns>
+    <columns>CodeFils__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeFils__c</field>
+        <operation>equals</operation>
+        <value>OP0318PORT</value>
+    </filters>
+    <label>CONTROLE</label>
+    <language>fr</language>
+</ListView>

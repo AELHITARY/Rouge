@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_Source_Category</fullName>
+    <active>true</active>
+    <description>Catégorie obligatoire</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;Source&apos; &amp;&amp;
+ISBLANK(TEXT(category__c))</errorConditionFormula>
+    <errorDisplayField>category__c</errorDisplayField>
+    <errorMessage>Catégorie obligatoire</errorMessage>
+</ValidationRule>

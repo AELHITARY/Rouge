@@ -1,0 +1,89 @@
+<template>
+    <div class="slds-form-element__control">
+        <label class="slds-form-element__label">{label}</label>
+
+        <div class="slds-combobox_container slds-has-inline-listbox">
+            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open"
+                aria-expanded="true" aria-haspopup="listbox" role="combobox" style="width:95%">
+
+                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right">
+                    <div>
+                        <!-- NO ADDRESS -->
+                        <template if:true={isEmptySelItem}>
+                            <!-- INPUT -->
+                            <input type="text" class="slds-input slds-combobox__input" id="id_search_field"
+                                aria-activedescendant="listbox-option-unique-id-01"
+                                aria-autocomplete="list" 
+                                aria-controls="listbox-unique-id" 
+                                autocomplete="off"
+                                role="combobox" 
+                                onkeyup={handleKeyUpAutocomplete} 
+                                placeholder={placeholder} />
+                                
+                            <template if:true={showLoadingSpinner}>
+                                <lightning-icon size="xx-small"
+                                    class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default"
+                                    icon-name="utility:spinner" alternative-text="Chargement">
+                                </lightning-icon>
+                            </template>                            
+                            <template if:false={showLoadingSpinner}>
+                                <lightning-icon size="xx-small"
+                                    class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default"
+                                    icon-name="utility:search" alternative-text="Rechercher">
+                                </lightning-icon>
+                            </template>
+                        </template>
+
+                        <!-- ADDRESS SELECTED -->
+                        <template if:false={isEmptySelItem}>
+                            <span class="slds-pill slds-pill_link fullWidth">
+                                <a href="javascript:void(0);" class="slds-pill__action slds-p-left_x-small" title={selItem.text}>
+                                    <lightning-icon icon-name="utility:search" size="x-small" class="sl-search-icon"></lightning-icon>
+                                    <span class="slds-pill__label slds-p-left_x-small">{selItem.text}</span>
+                                </a>
+                                <button onclick={clearSelection}
+                                        class="slds-button slds-button_icon slds-button_icon slds-pill__remove"
+                                        title="Supprimer">
+                                    <lightning-icon icon-name="utility:close" size="small"
+                                                    alternative-text="Appuyer sur DEL ou retour en arrière pour supprimer">
+                                    </lightning-icon>
+                                    <span class="slds-assistive-text">Supprimer</span>
+                                </button>
+                            </span>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- LIST OF RESULT -->
+                <template if:true={displayServerResult}>
+                    <div id="listbox-unique-id" role="listbox">
+                        <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid"
+                            role="presentation" style="display: block; min-width: auto; max-width: 100% ; width: 100%;">
+                            <template iterator:it={serverResultList}>
+                                <li role="presentation" key={it.value.IDVoie} data-selected-index={it.value.IDVoie} onclick={handleItemSelected}>
+                                    <span id={it.index}
+                                        class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                                        role="option">
+
+                                        <span class="slds-media__figure">
+                                            <span class="slds-icon_container">
+                                                <lightning-icon icon-name={icon} size="small"></lightning-icon>
+                                                <span class="slds-assistive-text"></span>
+                                            </span>
+                                        </span>
+
+                                        <span class="slds-media__body">
+                                            <span class="slds-listbox__option-text_entity">
+                                                {it.value.label}
+                                            </span>
+                                        </span>
+                                    </span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>

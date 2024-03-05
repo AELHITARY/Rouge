@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>codeOptionUnique__c</fullName>
+    <description>Concaténation de l&apos;ID ligne de devis avec le code option pour éviter les doublons d&apos;option sur la même ligne de devis.</description>
+    <externalId>false</externalId>
+    <label>Code option unique</label>
+    <length>255</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

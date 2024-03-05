@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_CNCT_Delay</fullName>
+    <active>true</active>
+    <description>Pour les &quot;Type de non-conformité contrat&quot;, le délai d&apos;expiration doit être strictement supérieur à 0!</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+ RecordType.DeveloperName = &apos;ContractNonComplianceType&apos; &amp;&amp; expirationDelay__c &lt;= 0</errorConditionFormula>
+    <errorDisplayField>expirationDelay__c</errorDisplayField>
+    <errorMessage>Le délai d&apos;expiration doit être strictement supérieur à 0!</errorMessage>
+</ValidationRule>

@@ -1,0 +1,12 @@
+:host(.slds-card) {
+    border: 1px solid, rgb(221, 219, 218) !important;
+    border-radius: 0.25rem !important;
+}
+
+.slds-card__header {
+    padding: 0px !important;
+}
+
+.slds-form-element__legend {
+    font-weight: normal !important;
+}

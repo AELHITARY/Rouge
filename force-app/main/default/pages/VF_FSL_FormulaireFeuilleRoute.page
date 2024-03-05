@@ -1,0 +1,115 @@
+<apex:page controller="VF_FSL_FormulaireFeuilleRouteController"  showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0">
+    <html>
+        <head>
+            <title>Formulaire Territoire</title>
+            <apex:stylesheet value="{!URLFOR($Resource.CSS_Form, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        </head>
+        
+        <body>
+            <div class="slds">
+                <apex:form id="fdrForm">
+                    <div class="slds-card">
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 0px; ">
+                            <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                <div class="slds-media__body">
+                                    <h1 class="slds-text-heading--small slds-truncate" style="font-weight: bold; font-size : 1.5em;">Feuille de route</h1><br/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 15px; font-weight: bold;">
+                            <div class="slds-media__body">
+                                <h2 class="slds-text-heading--small slds-truncate">Saisie des paramètres (1/2)</h2>
+                                <h2 class="slds-text-heading--small slds-truncate">Saisie Territoire(s)</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-card__body" id="territorySection" style="display:block;">
+                            <!-- Sélection du territoire -->
+                            <apex:pageBlock id="pb3">
+                                <apex:pageBlockTable value="{!listServiceTerritoryCustom}" var="item" id="pbt" style="font-size : 1.1em;">
+                                    
+                                    <apex:column style="width:5%">
+                                        <apex:facet name="header">
+                                            <input style="margin-left:43%;" type="checkbox" onclick="selectAllTerritory(this.checked)"/>
+                                        </apex:facet>
+                                        <apex:inputCheckbox value="{!item.isSelectedTerritory}" style="margin-left:45%;"></apex:inputCheckbox>
+                                    </apex:column>
+                                    
+                                    <apex:column style="width:95%">
+                                        <apex:facet name="header">
+                                            Liste des territoires
+                                        </apex:facet>
+                                        <apex:outputText value="{!item.nameTerritory}" style="margin-left: 15px; font-size: 0.9em;"></apex:outputText>
+                                    </apex:column>
+                                    
+                                </apex:pageBlockTable>
+                                
+                            </apex:pageBlock>
+                            
+                            <!-- Commandes -->
+                            <div class="slds-card__footer" style="text-align: right;">
+                                <apex:commandButton style="display: none;"  value="Afficher les ressources" action="{!displayResource}" id="Res" reRender="none" />
+                                <apex:outputPanel layout="none">
+                                    <input type ="button" value="Afficher les ressources" onclick="checkBeforeSubmitTerritory();" class="slds-button slds-button--brand slds-button--small"/>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <script language="javascript">
+
+                    /* Script pour sélectionner toute les checkboxes  Territory*/
+                    function selectAllTerritory(isChecked){
+                        var table = document.getElementById("{!$Component.fdrForm.pb3.pbt}");
+                        var checkboxes = table.getElementsByTagName('input');
+                        
+                        for(var i=0 ; i < checkboxes.length ; i++)
+                        {
+                            checkboxes[i].checked = isChecked;
+                            if(isChecked)
+                            {
+                                checkboxes[i].value = true;
+                            }
+                            else
+                            {
+                                checkboxes[i].value = false;
+                            }
+                        }
+                    }
+                    
+                    /*Script pour vérifier qu'une case est bien cochée*/
+                    function checkBeforeSubmitTerritory()
+                    {
+                        var table = document.getElementById('{!$Component.fdrForm.pb3.pbt}');
+                        var checkboxes = table.getElementsByTagName('input');
+                        var isValid = false;
+                        var i = 1;
+                        
+                        while(i < checkboxes.length)
+                        {
+                            if(checkboxes[i].checked){
+                                isValid = true;
+                            }
+                            i++;
+                        }
+                        
+                        if(!isValid)
+                        {
+                            alert('Merci de sélectionner au moins un territoire.');
+                        }
+                        else
+                        {
+                            document.getElementById('{!$Component.fdrForm.Res}').click();
+                        }
+                    }
+
+                    </script>
+                    
+                </apex:form>  
+            </div>
+        </body>
+    </html>
+</apex:page>

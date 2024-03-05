@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR002_K2_Chantier_CompteObligatoire</fullName>
+    <active>true</active>
+    <description>Au moins 1 compte est obligatoire en phase de création d&apos;un nouveau chantier.
+par la suite, le chantier peut devenir orphelin, mais il ne peut l&apos;être en création.</description>
+    <errorConditionFormula>!$User.ByPassValidationRule__c &amp;&amp;
+Id = null &amp;&amp;
+proprietaire__c = null &amp;&amp;
+autreProprietaire__c = null &amp;&amp;
+locataire__c = null &amp;&amp;
+autreLocataire__c = null &amp;&amp;
+occupant__c = null &amp;&amp;
+autreOccupant__c = null</errorConditionFormula>
+    <errorMessage>Chantier orphelin interdit en phase de création (Au moins un compte doit être renseigné)!</errorMessage>
+</ValidationRule>

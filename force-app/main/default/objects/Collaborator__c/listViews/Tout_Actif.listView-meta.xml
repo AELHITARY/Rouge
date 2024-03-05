@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tout_Actif</fullName>
+    <columns>NAME</columns>
+    <columns>reference__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <columns>isActive__c</columns>
+    <columns>job__c</columns>
+    <columns>employedBy__c</columns>
+    <columns>manager__c</columns>
+    <columns>user__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>isActive__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>employedBy__c</field>
+        <operation>contains</operation>
+        <value>genis</value>
+    </filters>
+    <label>Tout (Actif)</label>
+</ListView>

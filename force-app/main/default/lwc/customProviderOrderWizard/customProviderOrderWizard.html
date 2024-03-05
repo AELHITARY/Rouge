@@ -1,0 +1,575 @@
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:orders" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Assistant de création de commande fournisseur">Assistant de création de commande fournisseur</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+            
+        <!-- BODY -->
+        <div class="c-container slds-scrollable" style="height:39vh">
+        
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+
+            <!-- NON DISPONIBLE -->
+            <template if:false={activeWizard}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>La création de commande fournisseur n'est pas disponible car il n'existe pas de produit commandable (non métrable ou métrable et métré).</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            
+            <template if:true={activeWizard}>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+
+                    </lightning-layout-item>
+                </lightning-layout>
+            
+                <lightning-messages></lightning-messages>
+                
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        
+                        <!-- STEP 1 (Saisie de valeur globale) -->
+                        <template if:true={showStep1Form}>
+                            <lightning-accordion allow-multiple-sections-open
+                                                active-section-name={activeSaisieSections}>
+                                <lightning-accordion-section name="orderGlobalData" label="Données globales de la commande">
+                                    <div class="slds-form" role="list">  
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-combobox name="Type de commande" label="Type de commande" placeholder="Sélectionner un type"
+                                                                        value={orderType} options={orderTypePicklistValues}
+                                                                        onchange={handleChangeOrderType}>
+                                                    </lightning-combobox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem" if:true={showResposibilityField}>
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-combobox name="Responsabilité" label="Responsabilité" placeholder="Sélectionner une responsabilité"
+                                                                        value={responsability} options={responsabilityPicklistValues}
+                                                                        onchange={handleChangeResponsability}
+                                                                        required>
+                                                    </lightning-combobox>
+                                                </div>
+                                            </div>
+                                        </div>   
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-input type="date" name="Date de transmission" 
+                                                                    label="Date de transmission" aria-label="Date de transmission" 
+                                                                    value={transmissionDate} onchange={handleChangeTransmissionDate}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>                                      
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-combobox name="Moyen de transmission" label="Moyen de transmission" placeholder="Sélectionner un motif"
+                                                                        value={transmissionReason} options={transmissionChannelPicklistValues}
+                                                                        onchange={handleChangeTransmissionReason}>
+                                                    </lightning-combobox>
+                                                </div>
+                                            </div>
+                                        </div>        
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-input type="date" name="Date de confirmation" 
+                                                                        label="Date de confirmation" aria-label="Date de confirmation" 
+                                                                        value={confirmationDate} onchange={handleChangeConfirmationDate}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                                <lightning-accordion-section name="lineGlobalData" label="Données d'initialisation des lignes">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-combobox name="productProviders-preference" label="Fournisseurs" placeholder="Sélectionner un fournisseur"
+                                                                        value={copyIdProvider} options={allProvidersData} onchange={handleChangeAllProviderValue}>
+                                                    </lightning-combobox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-input type="number" name="Coûts des produits (prévisionnel)" 
+                                                                    label="Coûts des produits (prévisionnel)" aria-label="Coûts des produits (prévisionnel)" 
+                                                                    value={productCostPrevAll} 
+                                                                    formatter="currency" step="0.01" min="0"
+                                                                    onchange={handleChangeCostValueAll}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-input type="date" name="Date de livraison (prévisionnelle)" 
+                                                                        label="Date de livraison (prévisionnelle)" aria-label="Date de livraison (prévisionnelle)" 
+                                                                        value={deliveryDatePrevAll} onchange={handleChangeDateValueAll}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-input name="Référence fournisseur (Commande)" 
+                                                                        label="Référence fournisseur (Commande)" aria-label="Référence fournisseur (Commande)" 
+                                                                        value={refProvider} onchange={handleChangeRefProvider}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                                <lightning-accordion-section name="lineUnknownProductData" label="Lignes de produit inconnu / d'accessoires">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <lightning-input type="number" name="Nombre de produits inconnus" 
+                                                                    label="Nombre de produits inconnus" aria-label="Nombre de produits inconnus" 
+                                                                    value={unknownLineCount}
+                                                                    step="1" min="0"
+                                                                    onchange={handleChangeUnknownValue}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+                        </template>
+                        
+                        <!-- STEP 2 (FOURNISSEURS) -->
+                        <template if:true={showStep2Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des produits à commander
+                            </h3>
+                            
+                            <!-- NON DISPONIBLE -->
+                            <template if:false={providersData}>
+                                <div class="slds-var-m-top_xx-small slds-var-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de produits éligibles pour une commande fournisseur.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={providersData}>
+                                <div class="slds-var-m-bottom_medium">
+                                    <p>
+                                        Veuillez sélectionner les fournisseurs pour chaque produits à commander.<br />
+                                        Seul les produits non métrables ou métrables et métrés sont affichés.
+                                    </p>
+                                </div>
+                                <div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Actif">Actif</div>
+                                                </th>
+                                                <template if:false={isAfterSalesService}>
+                                                    <th scope="col">
+                                                        <div class="slds-truncate" title="Dimensions">Dimensions</div>
+                                                    </th>
+                                                </template>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Coûts produits prévisionnels">Coûts prév.</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Date de livraison prévisionnelle">Date livr. prév.</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Fournisseur">Fournisseur</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Référence fournisseur (Commande)">Référence fournisseur (Commande)</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="N° de ligne">N° de ligne</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={providersData} for:item="productProviders">
+                                                <tr class="slds-hint-parent" key={productProviders.assetId}>
+                                                    <th data-label="Actif" scope="row">
+                                                        <div class="slds-truncate" title={productProviders.assetName}>{productProviders.assetName}</div>
+                                                    </th>
+                                                    <template if:false={isAfterSalesService}>
+                                                        <td data-label="Dimensions">
+                                                            <div class="slds-truncate">{productProviders.dimensions}</div>
+                                                        </td>
+                                                    </template>
+                                                    <td data-label="Coûts produits prévisionnels">
+                                                        <lightning-input type="number" name={productProviders.assetId}
+                                                                        data-productproviders-assetid={productProviders.assetId}  
+                                                                        label="Coûts des produits (prévisionnel)" aria-label="Coûts des produits (prévisionnel)" 
+                                                                        value={productProviders.productCostPrev} 
+                                                                        formatter="currency" step="0.01" min ="0" variant="label-hidden"
+                                                                        onchange={handleChangeCostValue}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="Date de livraison prévisionnelle">
+                                                        <lightning-input type="date" name={productProviders.assetId} 
+                                                                        data-productproviders-assetid={productProviders.assetId} 
+                                                                        label="Date de livraison (prévisionnelle)" aria-label="Date de livraison (prévisionnelle)" 
+                                                                        value={productProviders.deliveryDatePrev} variant="label-hidden"
+                                                                        onchange={handleChangeDateValue}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="Fournisseur">
+                                                        <lightning-combobox id={productProviders.assetId}
+                                                                            name={productProviders.assetId}
+                                                                            data-productproviders-assetid={productProviders.assetId}    
+                                                                            data-productproviders-assetname={productProviders.assetName}
+                                                                            data-productproviders-productcostprev={productProviders.productCostPrev}    
+                                                                            data-productproviders-deliverydateprev={productProviders.deliveryDatePrev}   
+                                                                            data-productproviders-linenumber={productProviders.lineNumber}   
+                                                                            data-productproviders-providerreferenceorder={productProviders.providerReferenceOrder}  
+                                                                            data-productproviders-provid={productProviders.provId} 
+                                                                            label="Fournisseurs"
+                                                                            placeholder="Sélectionner un fournisseur"
+                                                                            variant="label-hidden"
+                                                                            value={productProviders.supId}
+                                                                            options={productProviders.providers}
+                                                                            onchange={handleChangeProviderValue}>
+                                                        </lightning-combobox>
+                                                    </td>
+                                                    <td data-label="Référence fournisseur (Commande)">
+                                                        <lightning-input name={productProviders.assetId} 
+                                                                        data-productproviders-assetid={productProviders.assetId} 
+                                                                        label="Référence fournisseur (Commande)" aria-label="Référence fournisseur (Commande)" 
+                                                                        value={productProviders.providerReferenceOrder} variant="label-hidden"
+                                                                        onchange={handleChangeProviderReferenceOrder}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="N° de ligne">
+                                                        <lightning-input type="number" name={productProviders.assetId} 
+                                                                        data-productproviders-assetid={productProviders.assetId} 
+                                                                        label="N° de ligne" aria-label="N° de ligne" 
+                                                                        value={productProviders.lineNumber} variant="label-hidden"
+                                                                        onchange={handleChangelineNumber}>
+                                                        </lightning-input>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                </div>
+                            </template>
+                            <template if:true={showTableUnknown}>
+                                <div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Description du produit">Description du produit</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Quantité">Quantité</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Coûts produits prévisionnels">Coûts prév.</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Date de livraison prévisionnelle">Date livr. prév.</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Fournisseur">Fournisseur</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Référence fournisseur (Commande)">Référence fournisseur (Commande)</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="N° de ligne">N° de ligne</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={unknownProductData} for:item="unknownProduct">
+                                                <tr class="slds-hint-parent" key={unknownProduct.id}>
+                                                    <td data-label="Description du produit">
+                                                        <lightning-input name={unknownProduct.id}
+                                                                        data-unknownproduct-id={unknownProduct.id}  
+                                                                        label="Description du produit" aria-label="Description du produit" 
+                                                                        value={unknownProduct.description} variant="label-hidden"
+                                                                        onchange={handleChangeDescriptionUnknownValue}> 
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="Quantité">
+                                                        <lightning-input type="number" name={unknownProduct.id} step=".01" min="0.01"
+                                                                        data-unknownproduct-id={unknownProduct.id} 
+                                                                        label="Quantité" aria-label="Quantité" 
+                                                                        value={unknownProduct.quantity} variant="label-hidden"
+                                                                        onchange={handleChangeQuantityUnknownNumber}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="Coûts produits prévisionnels">
+                                                        <lightning-input type="number" name={unknownProduct.id}
+                                                                        data-unknownproduct-id={unknownProduct.id}  
+                                                                        label="Coûts produits prévisionnels" aria-label="Coûts produits prévisionnels" 
+                                                                        value={unknownProduct.productCostPrev} 
+                                                                        formatter="currency" step="0.01" min ="0" variant="label-hidden"
+                                                                        onchange={handleChangeCostUnknownValue}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="Date de livraison prévisionnelle">
+                                                        <lightning-input type="date" name={unknownProduct.id} 
+                                                                        data-unknownproduct-id={unknownProduct.id} 
+                                                                        label="Date de livraison prévisionnelle" aria-label="Date de livraison prévisionnelle" 
+                                                                        value={unknownProduct.deliveryDatePrev} variant="label-hidden"
+                                                                        onchange={handleChangeDateUnknownValue}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="Fournisseur">
+                                                        <lightning-combobox id={unknownProduct.id}
+                                                                            name={unknownProduct.id}
+                                                                            data-unknownproduct-id={unknownProduct.id}    
+                                                                            data-unknownproduct-productcostprev={unknownProduct.productCostPrev}    
+                                                                            data-unknownproduct-deliverydateprev={unknownProduct.deliveryDatePrev} 
+                                                                            data-unknownproduct-linenumber={unknownProduct.lineNumber} 
+                                                                            data-unknownproduct-providerreferenceorder={unknownProduct.providerReferenceOrder}          
+                                                                            label="Fournisseurs"
+                                                                            placeholder="Sélectionner un fournisseur"
+                                                                            variant="label-hidden"
+                                                                            value={unknownProduct.supId}
+                                                                            options={allProvidersUnknownData}
+                                                                            onchange={handleChangeProviderUnknownValue}>
+                                                        </lightning-combobox>
+                                                    </td>
+                                                    <td data-label="Référence fournisseur (Commande)">
+                                                        <lightning-input name={unknownProduct.id} 
+                                                                        data-unknownproduct-id={unknownProduct.id} 
+                                                                        label="Référence fournisseur (Commande)" aria-label="Référence fournisseur (Commande)" 
+                                                                        value={unknownProduct.providerReferenceOrder} variant="label-hidden"
+                                                                        onchange={handleChangeUnknownProviderReferenceOrder}>
+                                                        </lightning-input>
+                                                    </td>
+                                                    <td data-label="N° de ligne">
+                                                        <lightning-input type="number" name={unknownProduct.id} 
+                                                                        data-unknownproduct-id={unknownProduct.id} 
+                                                                        label="N° de ligne" aria-label="N° de ligne" 
+                                                                        value={unknownProduct.lineNumber} variant="label-hidden"
+                                                                        onchange={handleChangeLineUnknownNumber}>
+                                                        </lightning-input>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 3 (RESUME) -->
+                        <template if:true={showStep3Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Résumé des fournisseurs choisis
+                            </h3>
+                            <template if:true={providersData}>
+                                <div class="slds-var-m-bottom_medium">
+                                    <p>
+                                        Veuillez vérifier que la sélection est correcte avant de valider.<br />
+                                        Une commande sera créée par fournisseur.
+                                    </p>
+                                </div>
+                                <div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Actif">Actif</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Quantité">Quantité</div>
+                                                </th>
+                                                <template if:false={isAfterSalesService}>
+                                                    <th scope="col">
+                                                        <div class="slds-truncate" title="Dimensions">Dimensions</div>
+                                                    </th>
+                                                </template>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Coûts produits prévisionnels">Coûts prév.</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Date de livraison prévisionnelle">Date livr. prév.</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Fournisseur">Fournisseur</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Référence fournisseur (Commande)">Référence fournisseur (Commande)</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="N° de ligne">N° de ligne</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={productProvidersData} for:item="productProviders">
+                                                <tr class="slds-hint-parent" key={productProviders.assetId}>
+                                                    <th data-label="Actif" scope="row">
+                                                        <lightning-formatted-text value={productProviders.assetName}></lightning-formatted-text>
+                                                    </th>
+                                                    <th data-label="Quantité" scope="row">
+                                                        <lightning-formatted-text value=""></lightning-formatted-text>
+                                                    </th>
+                                                    <template if:false={isAfterSalesService}>
+                                                        <td data-label="Dimensions">
+                                                            <lightning-formatted-text value={productProviders.dimensions}></lightning-formatted-text>
+                                                        </td>
+                                                    </template>
+                                                    <td data-label="Coûts produits prévisionnels">
+                                                        <lightning-formatted-number format-style="currency" currency-code="EUR" value={productProviders.productCostPrev}></lightning-formatted-number>
+                                                    </td>
+                                                    <td data-label="Date de livraison prévisionnelle">
+                                                        <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={productProviders.deliveryDatePrev}></lightning-formatted-date-time>
+                                                    </td>
+                                                    <td data-label="Fournisseur">
+                                                        <lightning-formatted-text value={productProviders.supName}></lightning-formatted-text>
+                                                    </td>
+                                                    <td data-label="Référence fournisseur (Commande)">
+                                                        <lightning-formatted-text value={productProviders.providerReferenceOrder}></lightning-formatted-text>
+                                                    </td>
+                                                    <td data-label="N° de ligne">
+                                                        <lightning-formatted-text value={productProviders.lineNumber}></lightning-formatted-text>
+                                                    </td>
+                                                </tr>
+                                            </template><template for:each={unknownProductData} for:item="unknownProduct">
+                                                <tr class="slds-hint-parent" key={unknownProduct.assetId}>
+                                                    <th data-label="Actif" scope="row">
+                                                        <lightning-formatted-text value={unknownProduct.description}></lightning-formatted-text>
+                                                    </th>
+                                                    <td data-label="Quantité">
+                                                        <lightning-formatted-number value={unknownProduct.quantity}></lightning-formatted-number>
+                                                    </td>
+                                                    <template if:false={isAfterSalesService}>
+                                                        <td data-label="Dimensions">
+                                                        </td>
+                                                    </template>
+                                                    <td data-label="Coûts produits prévisionnels">
+                                                        <lightning-formatted-number format-style="currency" currency-code="EUR" value={unknownProduct.productCostPrev}></lightning-formatted-number>
+                                                    </td>
+                                                    <td data-label="Date de livraison prévisionnelle">
+                                                        <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={unknownProduct.deliveryDatePrev}></lightning-formatted-date-time>
+                                                    </td>
+                                                    <td data-label="Fournisseur">
+                                                        <lightning-formatted-text value={unknownProduct.supName}></lightning-formatted-text>
+                                                    </td>
+                                                    <td data-label="Référence fournisseur (Commande)">
+                                                        <lightning-formatted-text value={unknownProduct.providerReferenceOrder}></lightning-formatted-text>
+                                                    </td>
+                                                    <td data-label="N° de ligne">
+                                                        <lightning-formatted-text value={unknownProduct.lineNumber}></lightning-formatted-text>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout> 
+            </template>  
+        </div>
+        
+        
+        <div slot="footer">
+            <template if:true={activeWizard}>
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-var-m-top_xx-small slds-var-m-bottom_x-small">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <template if:true={showPreviousButton}> 
+                    <lightning-button label="Précédent" class="slds-var-m-around_medium" onclick={handlePrevious}></lightning-button>
+                </template>
+                <template if:true={showNextButton}> 
+                    <lightning-button variant="brand" label="Suivant" class="slds-var-m-around_medium" onclick={handleNext}></lightning-button>
+                </template>
+                <template if:true={showSubmitButton}> 
+                    <lightning-button variant="brand" label="Confirmation" class="slds-var-m-around_medium" onclick={handleCreateOrder}></lightning-button>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,32 @@
+<apex:page controller="Ctrl016_SendQuote" action="{!sendEmail}" sidebar="false" showHeader="false" >
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="/support/console/49.0/integration.js" />
+    
+    <body>
+        <script type="text/javascript">
+            var isLightningEx = ("{!$User.UIThemeDisplayed}" == "Theme3") ? false : true; // Detect if Classic or LEX
+            var tabId;
+            // Fonction pour cloturer l'onglet dans Lightning
+            function getTabId(result) {
+                tabId = result.id;
+                console.log("tabId " + tabId);
+            }
+            // Fonction pour cloturer l'onglet dans Lightning
+            function callCloseTab() {
+                sforce.console.closeTab(tabId);
+            }
+            
+            $(document).ready(function(){
+                alert("{!msgSuccess}");
+                if (isLightningEx && sforce.one) {
+                    callCloseTab();
+                } else {
+                    //var uRL = '/apex/VF_QuoteDetails?id={!devis.Id}';
+                    //window.location.href = uRL;
+                }
+            });
+        </script>
+        <apex:pageMessages ></apex:pageMessages>
+     
+    </body>
+</apex:page>

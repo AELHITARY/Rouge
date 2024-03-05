@@ -1,0 +1,56 @@
+<apex:page controller="Ctrl_SATCLI_GenerationManuelle" docType="html-5.0">
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.VisualStrap_Resources, 'js/bootstrap.min.js')}" />
+    <script>
+        var j$ = jQuery.noConflict();
+
+        j$(document).ready(function() {
+        });
+
+        function showResult(){
+            var successDiv = j$("#result-success");             
+            successDiv.removeClass("hidden").addClass("show");
+        }
+
+        function clearMessage(){
+            var successDiv = j$("#result-success");             
+            successDiv.removeClass("show").addClass("hidden");
+        }
+        
+    </script>
+    <style type="text/css">
+        .page-header{
+            font-size: 30px;
+            text-align: center;
+            margin: 15px 0px 10px;
+        }
+    </style>
+    <c:pageheader title="Génération du fichier SATCLI"/>
+
+    <div id="calPanel">
+        <div id="cal-options" class="row">
+            <apex:form styleClass="form-inline col-md-12">
+                <apex:actionFunction name="refreshVariables" id="refreshVariables" onComplete="genererSATCLI();"/>
+                <apex:actionFunction name="genererSATCLI" id="executeSATCLI" action="{!executeSATCLI}" onComplete="showResult();"/>
+                <div class="form-group col-md-12">
+                    <label class="checkboxLabel" style="margin-left:10px;">Mois à génerer : </label>
+                    <apex:selectlist style="margin-left:1%; margin-right:1%;" styleClass="fc-button fc-state-default fc-corner-right" id="filter-startHours" size="1" value="{!moisSelected}">
+                        <apex:selectOptions value="{!mois}" />
+                    </apex:selectlist>
+                    <label class="checkboxLabel"> de l'année : </label>
+                    <apex:selectlist style="margin-left:1%;" styleClass="fc-button fc-state-default fc-corner-right" id="filter-endHours" size="1" value="{!anneeSelected}">
+                        <apex:selectOptions value="{!annee}" />
+                    </apex:selectlist>
+                </div><br/><br/>
+                <div class="form-group col-md-12">
+                        <button type="button" class="btn btn-primary" onClick="refreshVariables(); clearMessage();">Générer le fichier SATCLI</button>
+                </div><br/><br/>
+                <div class="form-group col-md-12">
+                    <div id="result-success" class="alert alert-success hidden" role="alert">
+                        Le fichier généré a été envoyé.
+                    </div>
+                </div>
+            </apex:form>
+        </div>
+    </div>
+</apex:page>

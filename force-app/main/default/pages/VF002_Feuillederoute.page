@@ -1,0 +1,220 @@
+<apex:page Title="Feuille de route" controller="Ctrl002_Feuillederoute" showheader="false" action="{!insertUserStats}" readonly="true">
+    <apex:stylesheet value="{!URLFOR($Resource.Geoconcept, 'css/crm.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Geoconcept, 'js/ext-4.0.7/resources/css/ext-all.css')}"/>
+
+    <apex:includeScript value="{!URLFOR($Resource.Geoconcept, 'js/ext-4.0.7/ext-all.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <script type="text/javascript">
+        var layers = {};
+        layers.names = !! '{!$CurrentPage.parameters.layers}' ? '{!$CurrentPage.parameters.layers}'.split (',') : [];
+        layers.showAll = ! '{!$CurrentPage.parameters.layers}';
+
+        layers.show = {};
+        if (!layers.showAll) {
+            for (var i = layers.names.length - 1; i >= 0; -- i)
+                layers.show [layers.names [i]] = true;
+        }
+
+        // Définition de l'apparence des colonnes dans EXT
+        var sorters = [ { property : 'name', direction: 'ASC' } ];
+        var contractColumns = [
+            { text: 'Nom',                          dataIndex: 'name'                           },
+            { text: 'Adresse',                      dataIndex: 'address', flex: 12 / 100        },
+            { text: 'Ville',                        dataIndex: 'city'                           },
+            { text: 'CP',                           dataIndex: 'postalCode', width: 45          },
+            { text: 'Téléphone',                    dataIndex: 'telephone'                      },
+            { text: 'Propriétaire<br />Locataire',  dataIndex: 'isOwner'                        },
+            { text: 'Date CNT',                     dataIndex: 'contractDate',  width: 72       },
+            { text: 'Date SAV',                     dataIndex: 'lastSAVdate',   width: 70       },
+            { text: 'Liste produits',               dataIndex: 'productList', flex: 20 / 100    },
+            { text: 'Interdit',                     dataIndex: 'prohibited', width: 50          }
+        ];
+        var RDVColumns = [
+            { text: 'Nom',                          dataIndex: 'name'                           },
+            { text: 'Adresse',                      dataIndex: 'address',                       },
+            { text: 'Ville',                        dataIndex: 'city'                           },
+            { text: 'CP',                           dataIndex: 'postalCode',                    },
+            { text: 'Téléphone',                    dataIndex: 'telephone'                      },
+            { text: 'Propriétaire<br />Locataire',  dataIndex: 'isOwner'                        },
+            { text: 'Type',                         dataIndex: 'rdvType',                       }
+        ];
+        var ProspectionColumns = [
+            { text: 'Nom',                          dataIndex: 'Name'                           },
+            { text: 'Adresse',                      dataIndex: 'Address',                       },
+            { text: 'Ville',                        dataIndex: 'City'                           },
+            { text: 'CP',                           dataIndex: 'PostalCode',                    },
+            { text: 'Type',                         dataIndex: 'RdvType'                            },
+        ];
+
+        // Définition des colonnes dans EXT
+        Ext.define('fdrContractDataModel', {
+            extend: 'Ext.data.Model',
+            fields: [
+                { name: 'name',           type: 'string'  },
+                { name: 'address',        type: 'string'  },
+                { name: 'postalCode',     type: 'string'  },
+                { name: 'city',           type: 'string'  },
+                { name: 'telephone',      type: 'string'  },
+                { name: 'isOwner',        type: 'string'  },
+                { name: 'contractDate',   type: 'string'  },
+                { name: 'lastSAVdate',    type: 'string'  },
+                { name: 'productList',    type: 'string'  },
+                { name: 'prohibited',     type: 'string' }
+            ]
+        });
+        Ext.define('fdrRDVDataModel', {
+            extend: 'Ext.data.Model',
+            fields: [
+                { name: 'name',           type: 'string'  },
+                { name: 'address',        type: 'string'  },
+                { name: 'postalCode',     type: 'string'  },
+                { name: 'city',           type: 'string'  },
+                { name: 'telephone',      type: 'string'  },
+                { name: 'isOwner',        type: 'string'  },
+                { name: 'rdvType',        type: 'string' }
+            ]
+        });
+        Ext.define('fdrProspectionDataModel', {
+            extend: 'Ext.data.Model',
+            fields: [
+                { name: 'Name',           type: 'string'  },
+                { name: 'Address',        type: 'string'  },
+                { name: 'PostalCode',     type: 'string'  },
+                { name: 'City',           type: 'string'  },
+                { name: 'RdvType',        type: 'string'  },
+            ]
+        });
+        var contractStoreCfg = { model: 'fdrContractDataModel', sorters: sorters };
+        var RDVStoreCfg = { model: 'fdrRDVDataModel', sorters: sorters };
+        var ProspectionStoreCfg = { model: 'fdrProspectionDataModel', sorters: sorters };
+
+        // Création des panneaux EXT
+        var storeChantierAvecContrats         = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storeChantierSansContrats         = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storePoseDuJour       = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storePoseDuDemain     = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storeSAV              = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storeMetrageDuJour    = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storeMetrageDeDemain  = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storeInterventionSAVDuJour = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storeInterventionSAVDeDemain = Ext.create ('Ext.data.Store', contractStoreCfg);
+        var storeR1DuJour = Ext.create ('Ext.data.Store', RDVStoreCfg);
+        var storeR2DuJour = Ext.create ('Ext.data.Store', RDVStoreCfg);
+        var storeRPlusDuJour = Ext.create ('Ext.data.Store', RDVStoreCfg);
+        var storeProspectionDuJour = Ext.create ('Ext.data.Store', ProspectionStoreCfg);
+
+        createPanel = function (store, title, renderTo, columns) {
+            return Ext.create('Ext.grid.Panel', {
+                    forceFit         : true,
+                    layout           : 'fit',
+                    viewConfig       : { forceFit: true },
+                    store            : store,
+                    columns          : columns,
+                    features         : [ { ftype : 'grouping' } ],
+                    frame            : true,
+                    autoHeight       : true,
+                    autoWidth        : true,
+                    title            : title,
+                    cls              : 'decale',
+                    enableColumnHide : false,
+                    enableColumnMove : true,
+                    enableHdMenu     : false,
+                    renderTo         : renderTo,
+                    collapsible      : true,
+            });
+        }
+        var panels = new Array();
+
+        // Initialisation
+        $(document).ready(function () {
+            Ext.QuickTips.init();
+
+            <apex:outputText rendered="{!isShowAll || isShow['ChantierAvecContrats']}">
+                storeChantierAvecContrats.loadData({!ChantiersAvecContratsJSON});
+                panels.ChantierAvecContrats = createPanel (storeChantierAvecContrats, 'Chantiers avec contrats', 'divChantierAvecContrats', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['ChantierSansContrats']}">
+                storeChantierSansContrats.loadData({!ChantiersSansContratsJSON});
+                panels.ChantierSansContrats = createPanel(storeChantierSansContrats, 'Chantiers sans contrats', 'divChantierSansContrats', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['PoseDuJour']}">
+                storePoseDuJour.loadData({!PoseDuJourJSON});
+                panels.PoseDuJour = createPanel(storePoseDuJour, 'Poses du jour', 'divPoseDuJour', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['PoseDeDemain']}">
+                storePoseDuDemain.loadData({!PoseDuDemainJSON});
+                panels.PoseDuDemain = createPanel(storePoseDuDemain, 'Poses de demain', 'divPoseDuDemain', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['SAV']}">
+                storeSAV.loadData({!SAVJSON});
+                panels.SAV = createPanel(storeSAV, 'SAV', 'divSAV', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['MetrageDuJour']}">
+                storeMetrageDuJour.loadData({!MetrageDuJourJSON});
+                panels.MetrageDuJour = createPanel(storeMetrageDuJour, 'Métrages du jour', 'divMetrageDuJour', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['MetrageDeDemain']}">
+                storeMetrageDeDemain.loadData({!MetrageDeDemainJSON});
+                panels.MetrageDeDemain = createPanel(storeMetrageDeDemain, 'Metrages de demain', 'divMetrageDeDemain', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['Intervention_SAVDuJour']}">
+                storeInterventionSAVDuJour.loadData({!InterventionSAVDuJourJSON});
+                panels.Intervention_SAVDuJour = createPanel(storeInterventionSAVDuJour, 'Interventions SAV du jour', 'divInterventionSAVDuJour', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['Intervention_SAVDeDemain']}">
+                storeInterventionSAVDeDemain.loadData({!InterventionSAVDeDemainJSON});
+                panels.Intervention_SAVDeDemain = createPanel(storeInterventionSAVDeDemain, 'Interventions SAV de demain', 'divInterventionSAVDeDemain', contractColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['R1DuJour']}">
+                storeR1DuJour.loadData({!R1DuJourJSON});
+                panels.R1DuJour = createPanel(storeR1DuJour, 'R1 du jour', 'divR1DuJour', RDVColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['R2DuJour']}">
+                storeR2DuJour.loadData({!R2DuJourJSON});
+                panels.R2DuJour = createPanel(storeR2DuJour, 'R2 du jour', 'divR2DuJour', RDVColumns);
+            </apex:outputText>
+            <apex:outputText rendered="{!isShowAll || isShow['RPlusDuJour']}">
+                storeRPlusDuJour.loadData({!RPlusDuJourJSON});
+                panels.RPlusDuJour = createPanel(storeRPlusDuJour, 'R+ du jour', 'divRPlusDuJour', RDVColumns);
+            </apex:outputText> 
+            <apex:outputText rendered="{!isShowAll || isShow['ProspectionsDuJour']}">
+                storeProspectionDuJour.loadData({!ProspectionDuJourJSON});
+                panels.RProspectionDuJour = createPanel(storeProspectionDuJour, 'Prospections du jour', 'divProspectionDuJour', ProspectionColumns);
+            </apex:outputText> 
+        });
+ 
+    </script>
+
+    <div class="x-tab-panel-header decale">
+        <table>
+            <tr>
+                <td class="titre">FEUILLE DE ROUTE</td>
+                <td><apex:image height="90" url="{!URLFOR($Resource.Feuillederoute, './KparK_logo.jpg')}" /></td>
+            </tr>
+        </table>
+    </div>
+    <br/>
+
+    <a href="#" class="commandButtons" onclick="for (var k in panels) panels [k].expand ();">Déplier tout</a>
+    <a href="#" class="commandButtons" onclick="for (var k in panels) panels [k].collapse (Ext.Component.DIRECTION_TOP);">Replier tout</a>
+
+    <style type="text/css"> .reportBox { margin: 1em; } .x-grid-cell-inner { white-space: normal; } </style>
+    <div>
+        <div id='divChantierAvecContrats'        class="reportBox"></div>
+        <div id='divChantierSansContrats'        class="reportBox"></div>
+        <div id='divPoseDuJour'      class="reportBox"></div>
+        <div id='divPoseDuDemain'    class="reportBox"></div>
+        <div id='divSAV'             class="reportBox"></div>
+        <div id='divMetrageDuJour'   class="reportBox"></div>
+        <div id='divMetrageDeDemain' class="reportBox"></div>
+        <div id='divInterventionSAVDuJour' class="reportBox"></div>
+        <div id='divInterventionSAVDeDemain' class="reportBox"></div>
+        <div id='divR1DuJour' class="reportBox"></div>
+        <div id='divR2DuJour' class="reportBox"></div>
+        <div id='divRPlusDuJour' class="reportBox"></div>
+        <div id='divProspectionDuJour' class="reportBox"></div>
+    </div>
+
+    <a href="#" class="commandButtons" onclick="for (var k in panels) panels [k].expand ();">Déplier tout</a>
+    <a href="#" class="commandButtons" onclick="for (var k in panels) panels [k].collapse (Ext.Component.DIRECTION_TOP);">Replier tout</a>
+</apex:page>

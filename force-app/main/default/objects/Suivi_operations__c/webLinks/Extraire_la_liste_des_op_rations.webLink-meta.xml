@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Extraire_la_liste_des_op_rations</fullName>
+    <availability>online</availability>
+    <description>génère un fichier csv sur les opérations</description>
+    <displayType>button</displayType>
+    <encodingKey>UTF-8</encodingKey>
+    <height>600</height>
+    <linkType>url</linkType>
+    <masterLabel>Extraire</masterLabel>
+    <openType>sidebar</openType>
+    <protected>false</protected>
+    <url>/apex/VF020_Export_Operation?suiviOptId={!Suivi_operations__c.Id}</url>
+</WebLink>

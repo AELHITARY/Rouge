@@ -1,0 +1,4 @@
+<apex:page action="{!CTIScreenPop}" controller="CTISearchPageController">
+  <h1>CTISearchPage</h1>
+  This the search page
+</apex:page>

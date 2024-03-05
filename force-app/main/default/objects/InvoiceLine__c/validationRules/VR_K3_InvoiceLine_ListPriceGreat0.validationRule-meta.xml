@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_InvoiceLine_ListPriceGreat0</fullName>
+    <active>true</active>
+    <description>Le prix catalogue doit être supérieur ou égal à 0.</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+NOT( ISNULL( listPrice__c )) &amp;&amp;
+listPrice__c &lt; 0 &amp;&amp;
+invoice__r.isLegacy__c == false</errorConditionFormula>
+    <errorDisplayField>listPrice__c</errorDisplayField>
+    <errorMessage>Le prix catalogue doit être supérieur ou égal à 0!</errorMessage>
+</ValidationRule>

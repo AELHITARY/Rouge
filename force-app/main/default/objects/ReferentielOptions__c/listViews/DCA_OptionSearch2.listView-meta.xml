@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DCA_OptionSearch2</fullName>
+    <columns>NAME</columns>
+    <columns>Actif__c</columns>
+    <columns>CodeOption__c</columns>
+    <columns>LibelleOption__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>contains</operation>
+        <value>ALLIA</value>
+    </filters>
+    <label>DCA_OptionSearch2</label>
+</ListView>

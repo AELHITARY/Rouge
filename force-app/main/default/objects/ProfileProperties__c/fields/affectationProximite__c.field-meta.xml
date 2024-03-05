@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>affectationProximite__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>CRM : 751 : Affiche ou non le bouton Affectation proximité</description>
+    <externalId>false</externalId>
+    <label>Affectation proximité</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

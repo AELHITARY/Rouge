@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_CNCT_OrderNonComplianceType</fullName>
+    <active>true</active>
+    <description>Type de non-conformité obligatoire</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;ContractNonComplianceType&apos; &amp;&amp; 
+ISBLANK(TEXT(orderNonComplianceType__c))</errorConditionFormula>
+    <errorDisplayField>orderNonComplianceType__c</errorDisplayField>
+    <errorMessage>Type de non-conformité obligatoire</errorMessage>
+</ValidationRule>

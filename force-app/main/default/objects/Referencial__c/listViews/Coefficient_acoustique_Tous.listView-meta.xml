@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Coefficient_acoustique_Tous</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>product__c</columns>
+    <columns>option__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <columns>valueRA__c</columns>
+    <columns>valueRATR__c</columns>
+    <columns>valueRW__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.ProductAcousticCoefficient</value>
+    </filters>
+    <label>Coefficient acoustique (Tous)</label>
+    <language>fr</language>
+</ListView>

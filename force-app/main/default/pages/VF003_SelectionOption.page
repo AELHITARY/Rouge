@@ -1,0 +1,497 @@
+<apex:page standardController="QuoteLineItem" extensions="Ctrl003_SelectionOption" tabStyle="Opportunity">
+    <c:importvisualstrap theme="default" />
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'css/cartographie.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Page_CSS)}" />
+    <apex:stylesheet value="{!URLFOR($Resource.TreeView,'jquery.treeview.css')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui.1.12.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_NewsTicker/jquery.newsTicker.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.TreeView,'lib/jquery.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.TreeView,'lib/jquery.cookie.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.TreeView,'jquery.treeview.js')}" />
+    <script type="text/javascript">
+        $(document).ready(function(){
+            oldVersion = "{!JSENCODE(versionLibelle)}";
+            initPacks();
+            initConflict();
+            $('.TreePanel').css('display','inline');
+            $('.versionClass').find('option')[0].disabled = true;
+        });
+
+        var categSelected = null;
+        var categCode = null;
+        var oldVersion;
+
+        function refreshTree(){
+            initPacks();
+            initConflict();
+            $('.TreePanel').css('display','inline');
+            $('body').css('cursor','auto');
+            $('body').css('opacity','1');
+            $('.versionClass').find('option')[0].disabled = true;
+        }
+
+        function initPacks(){
+            $('#browser').treeview();
+            disableInput();
+            $('.columnClass').css('display','none');
+            $('.radioOpt').each(function(index, Element){
+                if($(Element).prev()[0].checked)
+                    $(Element).attr('checked','checked');
+            });
+        }
+
+        var conflictTable;
+        function initConflict(){
+            conflictTable = [];
+            // Parse des valeurs des incompatibilites
+            var incompString = $("[id$=incompatibleOptJSON]").val();
+            var listIncompObj = JSON.parse(incompString);
+            listIncompObj.forEach(function(inc) {
+                var codeOptPere=inc.CodePere__r.CodeOption__c;
+                var codeOptFils=inc.CodeFils__r.CodeOption__c;
+                if(conflictTable[codeOptPere] == null)
+                    conflictTable[codeOptPere] = [];
+                conflictTable[codeOptPere][codeOptFils] = true;
+                if(conflictTable[codeOptFils] == null)
+                    conflictTable[codeOptFils] = [];
+                conflictTable[codeOptFils][codeOptPere] = true;
+            });
+        }
+
+        function isConflict(codeOpt){
+            var conf = false;
+            $('.selectOpt').each(function(index, Element){
+                if(Element.checked && conflictTable[codeOpt] != null && conflictTable[codeOpt][Element.title] == true){
+                    conf = true;
+                }
+            });
+            return conf;
+        }
+
+        function isSubstituable(codeOpt){
+            var subtituable = $('.'+codeOpt).prev()[0].value
+            return (subtituable == 'true');
+        }
+
+        function isAllConflictSubstituable(codeOpt){
+            var conflictArr = getConflict(codeOpt);
+            for(var i in conflictArr){
+                if(!isSubstituable(conflictArr[i]))
+                    return false;
+            }
+            return true;
+        }
+
+        function getLibelle(codeOpt){
+            return $('.'+codeOpt).prev()[0].title;
+        }
+
+        function deselectConflicts(codeOpt){
+            var conflictArr = getConflict(codeOpt);
+            for(var i=0; i < conflictArr.length; i++){
+                var otherOpt = conflictArr[i];
+                if($('.'+otherOpt)[0].checked)
+                    $('.'+otherOpt)[0].click($('.'+otherOpt)[0]);
+            }
+        }
+
+        function getConflict(codeOpt){
+                var conflictArr = new Array();
+                $('.selectOpt').each(function(index, Element){
+                        if(Element.checked && conflictTable[codeOpt] != null && conflictTable[codeOpt][Element.title] == true){
+                                conflictArr.push(Element.title);
+                        }
+                });
+                return conflictArr;
+        }
+
+        function clickRadio(obj){
+            var checkBox = $(obj).prev();
+            if(checkBox[0].checked){
+                obj.checked = false;
+                checkBox[0].checked = false;
+                optionClick(checkBox[0]);
+                return;
+            }
+            selectAll(false);
+            checkBox[0].checked = true;
+            var success = optionClick(checkBox[0]);
+            if(!success)
+                obj.checked = false;
+        }
+
+        function checkVersion(isSearched){
+            var version = $('.versionClass')[0].value;
+            if(version == null || version == ''){
+                alert('{!ChooseVersion}');
+                return false;
+            }
+            var optionVersion = $('.optionVersionClass')[0].value;
+            if(optionVersion == null || optionVersion == ''){
+                alert('{!ChooseOpt}');
+                return false;
+            }
+            if(isSearched && !confirm('{!LoseModif}')){
+                return false;
+            }
+            $('body').css('cursor','wait');
+            return true;
+        }
+
+        function setSelectAll(){
+            var isSelectAll = true;
+            $('.'+categCode).find('.selectOpt').each(function(index, Element){
+                if(!Element.checked)
+                    isSelectAll = false;
+            });
+            $('.selectAll').children()[0].checked = isSelectAll;
+        }
+
+        function copyCateg(categ,obj){
+            if(categSelected != null)
+                $(categSelected).removeClass('red');
+            categSelected = obj;
+            categ = categ.replace(" ",".");
+            categCode = categ;
+            $(obj).addClass('red');
+            $('.columnClass').css('display','none');
+            $('.'+categ).css('display','');
+            if($('.'+categ).length == 0 || $('.'+categ).find('.radioOpt').length > 0)
+                $('.selectAll').css('display','none');
+            else{
+                $('.selectAll').css('display','');
+                setSelectAll();
+            }
+        }
+        function selectAll(isSelected){
+            var opts = $('.'+categCode).find('.selectOpt');
+            for(var i=0; i < opts.length; i++){
+                opts[i].checked = !isSelected;
+                opts[i].click(opts[i]);
+            }
+        }
+
+        function isIncomPatibleOptVers(optionVersion){
+            if(isConflict(optionVersion)){
+                var msg = '{!IncompatibleOptVers}';
+                var arrConf = getConflict(optionVersion);
+                for(var i in arrConf){
+                    msg += getLibelle(arrConf[i]);
+                    if(i < arrConf.length-1)
+                        msg += ', ';
+                }
+                alert(msg);
+                return true;
+            }
+            return false;
+        }
+
+        function checkAjout(){
+            var version = $('.versionClass')[0].value;
+            if(version == null || version == ''){
+                alert('{!ChooseVersion}');
+                return false;
+            }
+            var optionVersion = $('.optionVersionClass')[0].value;
+            if(optionVersion == null || optionVersion == ''){
+                alert('{!ChooseOpt}');
+                return false;
+            }
+            if(isIncomPatibleOptVers(optionVersion)){
+                return false;
+            }
+            $('.inputText').removeAttr('disabled');
+            $("#buttonShow").css('display', 'none');
+            $("#buttonDisabled").css('display', 'block');
+            return true;
+        }
+
+        function disableInput(){
+            $('.inputText').attr('disabled','disabled');
+            $('.inputText').addClass('inputDisable');
+            $('.loadingIcon').css('display','none');
+            $('.optionTable').css('display','');
+        }
+
+        function optionClick(optObj){
+            if(optObj.checked && isConflict(optObj.title)){
+                if(isAllConflictSubstituable(optObj.title))
+                    deselectConflicts(optObj.title);
+                else{
+                    optObj.checked = false;
+                    var msg = '{!IncompatibleOpt}';
+                    var arrConf = getConflict(optObj.title);
+                    for(var i in arrConf){
+                        msg += getLibelle(arrConf[i]);
+                        if(i < arrConf.length-1)
+                            msg += ', ';
+                    }
+                    alert(msg+'.\nVeuillez les désélectionner.');
+                    return false;
+                }
+            }
+            var parentTD = $(optObj).parent();
+            var parentObj = parentTD.parent();
+            if(optObj.checked){
+                if(parseInt(parentObj.find('.quantiteClass')[0].value)==0)
+                    parentObj.find('.quantiteClass')[0].value = 1;
+            }
+            else{
+                parentObj.find('.quantiteClass')[0].value = 0;
+            }
+            if(parentTD.find('.radioOpt').length  > 0)
+                parentTD.find('.radioOpt')[0].checked = optObj.checked;
+            setSelectAll();
+            return true;
+        }
+
+        function disableOneInput(obj){
+            obj.attr('disabled','disabled');
+            obj.removeClass('inputEnable');
+            obj.addClass('inputDisable');
+        }
+
+        function enableOneInput(obj){
+            obj.removeAttr('disabled');
+            obj.removeClass('inputDisable');
+            obj.addClass('inputEnable');
+        }
+
+        function versionChanged(obj,isSearched){
+            if(isSearched && !confirm('{!LoseModif}')){
+                obj.value = oldVersion;
+                return;
+            }
+            oldVersion = obj.value;
+            updateOptions();
+        }
+
+        function editLine(obj,libelleEditable,valeurEditable,qttEditable){
+            if(!libelleEditable && !valeurEditable && !qttEditable)
+                return;
+            var parentObj = $(obj).parent().parent();
+            if($(obj).hasClass('editLine')){
+                $(obj).removeClass('editLine');
+                $(obj).addClass('notEditLine');
+                if(libelleEditable){
+                    enableOneInput(parentObj.find('.libelleClass'));
+                }
+                if(valeurEditable){
+                    enableOneInput(parentObj.find('.valeurClass'));
+                }
+                if(qttEditable){
+                    enableOneInput(parentObj.find('.quantiteClass'));
+                }
+            }
+            else{
+                $(obj).removeClass('notEditLine');
+                $(obj).addClass('editLine');
+                if(libelleEditable){
+                    disableOneInput(parentObj.find('.libelleClass'));
+                }
+                if(valeurEditable){
+                    disableOneInput(parentObj.find('.valeurClass'));
+                }
+                if(qttEditable){
+                    disableOneInput(parentObj.find('.quantiteClass'));
+                }
+            }
+        }
+    </script>
+    <style type="text/css">
+        .file:hover {
+            color: red;
+            cursor: pointer;
+        }
+
+        .inputDisable {
+            color: black;
+            border: none;
+            background-color: transparent;
+            width: 100%;
+        }
+
+        .inputEnable {
+            width: 100%;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .editLine {
+            background: url("/img/func_icons/util/pencil12.gif") no-repeat scroll center 2px transparent;
+            cursor: pointer;
+            height: 14px;
+            width: 50px;
+        }
+
+        .disabledLine {
+            background: url("{!URLFOR($Resource.pencildisabled)}") no-repeat scroll center 2px transparent;
+            height: 14px;
+            width: 50px;
+        }
+
+        .notEditLine {
+            background: url("/img/func_icons/util/checkmark16.gif") no-repeat scroll center 2px transparent;
+            cursor: pointer;
+            height: 14px;
+            width: 50px;
+        }
+
+        .loadingIcon {
+            height: 100px;
+            width: 200px;
+            background: url("/img/loading32.gif") no-repeat scroll left 2px transparent;
+            font-size: 18px;
+            padding-left: 40px;
+            padding-top: 7px;
+        }
+
+        .labelTitle {
+            font-size: 12px;
+            margin: 20px 0 10px;
+            display: block;
+            background: #ddd;
+            border-top: 1px solid #fff;
+            padding: 5px 10px;
+        }
+
+            .labelTitle.left {
+                margin-right: 10px;
+            }
+
+            .labelTitle.right {
+            }
+
+        .choosePacks {
+            border: 1px solid #D4DADC;
+            background: #fff;
+            padding: 10px;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            margin-right: 10px;
+        }
+    </style>
+    <apex:form id="myform">
+        <apex:inputhidden id="incompatibleOptJSON" value="{!incompatibleOptJSON}" />
+        <apex:actionstatus onstart="$('body').css('cursor','wait');$('body').css('opacity','0.8');" onstop="refreshTree();" id="searching" />
+        <apex:sectionheader title="Produit {!qli.PricebookEntry.Product2.name}" subtitle="Sélection des Options" />
+        <apex:pagemessages />
+        <apex:outputpanel styleclass="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero" layout="block" id="account-detail">
+            <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                <div role="alert" class="col-md-12 col-sm-12 col-xs-12 alert {!IF(message.SeverityStr=='confirm','alert-success',IF(message.SeverityStr=='info',
+                            'alert-info',IF(message.SeverityStr=='warn','alert-warning','alert-danger')))}">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <apex:outputtext value="{!message.Message}" escape="false" />
+                </div>
+            </apex:repeat>
+        </apex:outputpanel>
+        <apex:pageblock id="filterBlock" title="Rechercher des Options">
+            <apex:actionfunction name="updateOptions" action="{!initOptionVersionList}" status="searching" rerender="myform" />
+            <apex:pageblockbuttons location="top">
+                <div id="buttonShow" style="display:block;">
+                    <apex:commandbutton value="Ajouter" onclick="return checkAjout();" action="{!AjouterOPT}" />
+                    <apex:commandbutton value="Annuler" action="{!Annuler}" />
+                </div>
+                <div id="buttonDisabled" style="display:none;">
+                    <apex:commandbutton value="Ajouter" onclick="return checkAjout();" action="{!AjouterOPT}" disabled="true" />
+                    <apex:commandbutton value="Annuler" action="{!Annuler}" />
+                </div>
+            </apex:pageblockbuttons>
+            <style>
+                .searchFilter {
+                    width: 96%;
+                    background: #FFF;
+                    ;
+                    border-radius: 6px;
+                    border: 1px solid #D4DADC;
+                    padding: 1% 2%;
+                }
+            </style>
+            <div class="searchFilter">
+                <table>
+                    <tr>
+                        <td><span style="font-weight: bold;">Liste des versions</span></td>
+                        <td><span style="font-weight: bold;">Options</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <apex:selectlist styleclass="versionClass" id="version" onchange="versionChanged(this,{!isSearched})" value="{!versionLibelle}" size="1">
+                                <apex:selectoptions value="{!versionList}" />
+                            </apex:selectlist>
+                        </td>
+                        <td>
+                            <apex:selectlist styleclass="optionVersionClass" id="optionVersion" value="{!optionVersionLibelle}" size="1">
+                                <apex:selectoptions value="{!optionVersionList}" />
+                            </apex:selectlist>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <apex:outputpanel rendered="{!isSearched}" id="treeSection" styleclass="TreePanel" style="display:none">
+                <table width="100%" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="25%">
+                            <div> <h2 class="labelTitle left">Choisir vos packs</h2></div>
+                            <div class="choosePacks">
+                                <div>
+                                    <ul id="browser" class="filetree">
+                                        <apex:repeat value="{!root.FileList}" var="file">
+                                            <li class="closed">
+                                                <span class="{!file.class}">{!file.NameFile}</span>
+                                                <ul>
+                                                    <apex:repeat value="{!file.FileList}" var="file2">
+                                                        <li onclick="copyCateg('{!file2.classOpt}',this)"><span class="file">{!file2.NameFile}</span></li>
+                                                    </apex:repeat>
+                                                </ul>
+                                            </li>
+                                        </apex:repeat>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div> <h2 class="labelTitle right">Gérez vos Options</h2></div>
+                            <div class="manageOptions">
+                                <apex:outputpanel id="tableOption" layout="none">
+                                    <div class="loadingIcon" style="display: none">
+                                        Chargement...
+                                    </div>
+                                    <apex:pageblocktable styleclass="optionTable" rendered="{!selectableOptionList.size > 0}" value="{!selectableOptionList}" var="selection">
+                                        <apex:column styleclass="columnClass {!selection.ClassName}" width="5px">
+                                            <apex:facet name="header">
+                                                <apex:outputpanel styleclass="selectAll" style="display:none">
+                                                    <input type="checkbox" onclick="selectAll(this.checked)" />
+                                                </apex:outputpanel>
+                                            </apex:facet>
+                                            <input title="{!selection.opt.Libelleoption__c}" type="text" value="{!selection.IsSubstituable}" style="display:none" />
+                                            <apex:inputcheckbox styleclass="selectOpt {!selection.CodeOpt}" title="{!selection.CodeOpt}" onclick="optionClick(this)" value="{!selection.selected}" style="display: {!IF(selection.isRadio, 'none', '')}" />
+                                            <apex:outputpanel layout="none" rendered="{!selection.isRadio}">
+                                                <input type="radio" onclick="clickRadio(this)" class="radioOpt" name="radioOption_{!selection.ClassName}" />
+                                            </apex:outputpanel>
+                                        </apex:column>
+                                        <apex:column styleclass="columnClass {!selection.ClassName}" headervalue="{!$ObjectType.Option__c.Fields.Libelleoption__c.label}">
+                                            <apex:inputfield styleclass="inputText libelleClass" value="{!selection.opt.Libelleoption__c}" />
+                                        </apex:column>
+                                        <apex:column styleclass="columnClass {!selection.ClassName}" headervalue="{!$ObjectType.Option__c.Fields.Valorisation__c.label}">
+                                            <apex:inputfield styleclass="inputText valeurClass" value="{!selection.opt.Valorisation__c}" />
+                                        </apex:column>
+                                        <apex:column styleclass="columnClass {!selection.ClassName}" headervalue="{!$ObjectType.Option__c.Fields.Quantite__c.label}">
+                                            <apex:inputfield styleclass="inputText quantiteClass" value="{!selection.opt.Quantite__c}" />
+                                        </apex:column>
+                                        <apex:column styleclass="columnClass {!selection.ClassName}" headervalue="Action" width="5px">
+                                            <div class="{!IF(selection.isEditable,'editLine','disabledLine')}" onclick="editLine(this,{!selection.pack.codeFils__r.LibelleModifiable__c},{!selection.pack.codeFils__r.Valorisationmodifiable__c},{!selection.pack.codeFils__r.Quantitemodifiable__c})"></div>
+                                        </apex:column>
+                                    </apex:pageblocktable>
+                                </apex:outputpanel>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </apex:outputpanel>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

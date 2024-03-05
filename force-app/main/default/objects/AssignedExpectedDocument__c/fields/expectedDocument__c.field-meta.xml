@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>expectedDocument__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <description>Document attendu pour le contrat</description>
+    <externalId>false</externalId>
+    <label>Document attendu</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Referencial__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>ExpectedDocument</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Referencial__c</referenceTo>
+    <relationshipLabel>Documents attendus d&apos;une commande (Document attendu)</relationshipLabel>
+    <relationshipName>AssignedExpectedDocuments</relationshipName>
+    <required>true</required>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

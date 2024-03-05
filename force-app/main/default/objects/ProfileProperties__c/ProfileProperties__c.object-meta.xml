@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Permet de modifier des paramètres selon le profil (Drag&amp;Drop calendrier etc...)</description>
+    <enableFeeds>false</enableFeeds>
+    <label>Propriétés par profils</label>
+    <visibility>Protected</visibility>
+</CustomObject>

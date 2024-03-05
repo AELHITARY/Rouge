@@ -1,0 +1,836 @@
+<apex:page title="Triptyque Analytique" docType="html-5.0" showHeader="true" sidebar="false" controller="Ctrl_Triptyque_Analytique" action="{!insertUserStats}">
+    <head><meta name="viewport" content="initial-scale=1.0, user-scalable=no" /></head>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/numeral.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/languages.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Swiper, 'Swiper-master/src/idangerous.swiper.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/bootstrap-datepicker.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/locales/bootstrap-datepicker.fr.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.FullCalendar, 'lib/moment.min.js')}" />
+    <!-- <script type="text/javascript">(function() {var walkme = document.createElement('script'); walkme.type = 'text/javascript'; walkme.async = true; walkme.src = '{!walkMeURL}'; 
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(walkme, s); window._walkmeConfig = {smartLoad:true}; })();
+    </script> -->
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+        Visualforce.remoting.maxretries = 2; // Set maximum number of retries at page level
+        j$ = jQuery.noConflict();
+
+        // Variables vendeurs
+        var vendeursInfo = new Array();
+        var vendeursNbConnexions = new Object();
+        // Variable flag
+        var flagActualPage =  "page1";
+        var flagPage1 = false;
+        var flagPage2 = false;
+        var flagPage3 = false;
+        var refresh = false;
+        var decimalFormat = "'0.00";
+        var NotDecimalFormat = "0";
+        var currencyFormat = "0,0";
+
+        // Variable HTML
+        var htmlLoading;
+        var htmlExportButton;
+
+        //Initialisation à la page
+        j$(document).ready(function() {
+            // Init variables
+            htmlLoading = j$("#loading");
+            htmlExportButton = j$('#boutonExportPdf');
+            // Parse des valeurs des vendeurs
+            vendeursInfo = JSON.parse(j$("[id$=input-hidden-vendeursList]").val());
+            vendeursNbConnexions = JSON.parse(j$("[id$=input-hidden-vendeursNbConnexions]").val());
+            // Init Numeral (Affichage des chiffres)
+            numeral.language('fr', {
+                delimiters: {
+                    thousands: ' ',
+                    decimal: ','
+                },
+                abbreviations: {
+                    thousand: 'k',
+                    million: 'm',
+                    billion: 'b',
+                    trillion: 't'
+                },
+                ordinal : function (number) {
+                    return number === 1 ? 'er' : 'ème';
+                },
+                currency: {
+                    symbol: '€'
+                }
+            });
+            numeral.language('fr');
+
+            $('#input-datetimepicker-start').datepicker({
+                format: "dd/mm/yyyy",
+                language: "fr",
+                autoclose: true,
+                todayHighlight: true,
+                showOnFocus: false
+            });
+            $('#input-datetimepicker-end').datepicker({
+                format: "dd/mm/yyyy",
+                language: "fr",
+                autoclose: true,
+                todayHighlight: true,
+                showOnFocus: false
+            });
+            $('#input-datetimepicker-start').datepicker().on('changeDate', function(e){
+                if(validateDate(e.currentTarget.firstElementChild.value))
+                    updateStartDate(e.currentTarget.firstElementChild.value);
+            });
+            $('#input-datetimepicker-end').datepicker().on('changeDate', function(e){
+                if(validateDate(e.currentTarget.firstElementChild.value))
+                    updateEndDate(e.currentTarget.firstElementChild.value);
+            });
+            // Evite le rechargement de la page lors de l'appuie sur Entrée pour les champs date
+            j$('#dateDebut').keypress(function(e) {
+                if (e.which == 13) {
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+            j$('#dateFin').keypress(function(e) {
+                if (e.which == 13) {
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+
+            // Cache le bouton EXPORT si pas de vendeurs
+            if(vendeursInfo.length > 0)
+                htmlExportButton.css('visibility', 'visible');
+            else
+                htmlExportButton.css('visibility', 'hidden');
+
+            // Désactivation de la liste de valeurs Magasin si pas de magasin
+            if(j$("[id$=magasin] option").length == "1")
+                j$("[id$=magasin]").attr ('disabled', 'disabled');
+
+            // Chargement page 1
+            loadPage1();
+        });
+
+        /* Swiper                                                                       */
+        /*------------------------------------------------------------------------------*/
+        $(function(){
+            var mySwiper = $('.swiper-container').swiper({
+                //Your options here:
+                pagination: '.pagination',
+                mode:'horizontal',
+                grabCursor: true,
+                paginationClickable: true,
+                onSlideChangeEnd : function(swiperHere) {
+                    var swiperPage = mySwiper.activeSlide();
+                    var swiperPageId = mySwiper.activeSlide().id;
+                    changeNav(swiperPageId);
+                }
+            });
+
+            function changeNav(swiperPageId) {
+                if (swiperPageId == 'page1') {
+                    document.getElementById("pageActuelle").innerHTML = "1";
+                    document.getElementById("infos").innerHTML = "Contact et RDV";
+                    flagActualPage = 'page1';
+                    if(flagPage1 == false){
+                        loadPage1();
+                    }
+                }
+                if (swiperPageId == 'page2') {
+                    document.getElementById("pageActuelle").innerHTML = "2";
+                    document.getElementById("infos").innerHTML = "Contact par origine";
+                    flagActualPage = 'page2';
+                    if(flagPage2 == false){
+                        loadPage2();
+                    }
+                }
+                if (swiperPageId == 'page3') {
+                    document.getElementById("pageActuelle").innerHTML = "3";
+                    document.getElementById("infos").innerHTML = "Vente";
+                    flagActualPage = 'page3';
+                    if(flagPage3 == false){
+                        loadPage3();
+                    }
+                }
+            }
+
+            $('.arrow-left').on('click', function(e){
+                e.preventDefault()
+                mySwiper.swipeTo(mySwiper.activeIndex-1);
+            })
+            $('.arrow-right').on('click', function(e){
+                e.preventDefault()
+                mySwiper.swipeTo(mySwiper.activeIndex+1);
+            })
+        })
+
+        function refreshHidden(newmag){
+            j$("[id$=magHidden]")[0].value = newmag;
+        }
+
+        function validateDate(dat) {
+            var regexDateTime = /^(((0[1-9])|(1\d)|(2\d)|(3[0-1])|([1-9]))\/((0[1-9])|(1[0-2])|([1-9]))\/(\d{4}))$/;
+            return regexDateTime.test(dat);
+        }
+
+        function refreshValues(timeChanged){
+            flagPage1 = false;
+            flagPage2 = false;
+            flagPage3 = false;
+
+            var stringDebut = j$("[id$=dateDebut]")[0].value;
+            var stringFin = j$("[id$=dateFin]")[0].value;
+            var splitDebut = stringDebut.split("/");
+            var splitFin = stringFin.split("/");
+
+            if(splitDebut[0] == '' || splitDebut[1] == '' || splitDebut[2] == '' || splitFin[0] == '' || splitFin[1] == '' || splitFin[2] == '' || splitDebut[0] == 'undefined' || splitDebut[1] == 'undefined' || splitDebut[2] == 'undefined' || splitFin[0] == 'undefined' || splitFin[1] == 'undefined' || splitFin[2] == 'undefined' || splitDebut[3] != undefined || splitFin[3] != undefined){
+                displayMessage('Erreur : Les dates de début et de fin doivent être des dates valide.');
+            } else {
+                var tdy = new Date();
+                var deb = new Date(splitDebut[2], splitDebut[1]-1, splitDebut[0], 0, 0, 0, 0);
+                var fin = new Date(splitFin[2], splitFin[1]-1, splitFin[0], 0, 0, 0, 0);
+
+                if(fin < deb){
+                    displayMessage('Erreur : La date de début doit être inférieure à la date de fin.');
+                } else if(fin > tdy) {
+                    displayMessage('Erreur : La date de fin doit être inférieure ou égale à la date du jour.');
+                } else {
+                    eraseMessages(); // Supprime message d'info ou d'erreur
+                    // Parse des valeurs JSON suite au rafraichissement des vendeurs
+                    vendeursInfo = JSON.parse(j$("[id$=input-hidden-vendeursList]").val());
+                    vendeursNbConnexions = JSON.parse(j$("[id$=input-hidden-vendeursNbConnexions]").val());
+                    // Cache le bouton EXPORT si pas de vendeurs
+                    if(vendeursInfo.length > 0)
+                        htmlExportButton.css('visibility', 'visible');
+                    else
+                        htmlExportButton.css('visibility', 'hidden');
+                    // Rechargement des tableaux
+                    if(flagActualPage == 'page1'){
+                        loadPage1();
+                    }
+                    if(flagActualPage == 'page2'){
+                        loadPage2();
+                    }
+                    if(flagActualPage == 'page3'){
+                        loadPage3();
+                    }
+                    if(flagActualPage == 'magasin')
+                        refresh = false;
+                }
+            }
+        }
+
+        /* Chargement de la page 1 (Hebdo/Contact)                                      */
+        /*------------------------------------------------------------------------------*/
+        function loadPage1(){
+            var dateDebut = j$("[id$=dateDebut]")[0].value;
+            var dateFin = j$("[id$=dateFin]")[0].value;
+            var vendeursList = new Array();
+            var Somme_nbContactActif = 0;
+            var Somme_nbContactPassif = 0;
+            var Somme_nbRDVTotal = 0;
+            var Somme_nbDevisVendu = 0;
+            var Somme_nbRDVR1_Pris = 0;
+            var Somme_nbRDVR1_Effec = 0;
+            var Somme_nbRDVR2_Pris = 0;
+            var Somme_nbRDVR2_Effec = 0;
+            var Somme_nbContactTotal = 0;
+            var Somme_nbRDVCreatedRdvDate = 0;
+            var Somme_nbRDVDebrief = 0;
+            var contenu='';
+
+            // Init des variables
+            vendeursInfo.forEach(function(vendeur) { vendeursList.push(vendeur.Id) });
+            j$("#tableau1").html(contenu);
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.Ctrl_Triptyque_Analytique.getHebdomadaireData}', dateDebut, dateFin, vendeursList,
+            function(result, event) {
+                if (event.status) {
+                    if(result.length > 0) {
+                        contenu+= '<table class="table-hover triptyque">';
+                        contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="11">Contact & RDV</th></tr>';
+                        contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J. Trv.</th><th colspan="1" class="case">Total</th>';
+                        contenu+= '<th colspan="1" class="case">Actifs</th> <th class="case">Passifs</th> <th colspan="2" class="case">RDV / Vente</th> <th class="case">Créés à posteriori</th> <th class="case">DREA</th> <th colspan="4" class="case">R1 / R2+</th></tr>';
+                        contenu+= '<tr><th colspan="10" class="case"></th><th class="case">Pris</th><th class="case">Effectué</th><th class="case">Pris</th><th class="case">Effectué</th></tr>';
+                        contenu+= '</thead>';
+
+                        vendeursInfo.forEach(function(vendeur) {
+                            contenu+= '<tr>';
+                            if(vendeur.IsActive == true)
+                                contenu+= '<td rowspan="2" class="case">' + vendeur.Name + '</td> ';
+                            else
+                                contenu+= '<td rowspan="2" class="case">' + vendeur.Name + ' (Inactif)</td> ';
+                            contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeur.LastLoginDate))) + '<br/>' + vendeursNbConnexions[vendeur.Id] + '</td>';
+                            result.forEach(function(indicateur) {
+                                if(indicateur.vendeurId == vendeur.Id){
+                                    contenu+= '<td rowspan="2" class="case">' + indicateur.joursTravaille + '</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactTotal).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactActif).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactPassif).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVTotal).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbDevisVendu).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVCreatedRdvDate).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVDebrief).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVR1_Pris).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVR1_Effec).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVR2_Pris).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVR2_Effec).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '</tr><tr>';
+                                    contenu+= '<td class="case"></td>';
+                                    contenu+= '<td class="case"></td>';
+                                    contenu+= '<td class="case"></td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.tauxTransformationRDV).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.tauxTransformationVentes).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td class="case"></td><td class="case"></td><td colspan="4" class="case"></td></tr>';
+
+                                    Somme_nbContactActif += indicateur.nbContactActif;
+                                    Somme_nbContactPassif += indicateur.nbContactPassif;
+                                    Somme_nbRDVTotal += indicateur.nbRDVTotal;
+                                    Somme_nbDevisVendu += indicateur.nbDevisVendu;
+                                    Somme_nbRDVR1_Pris += indicateur.nbRDVR1_Pris;
+                                    Somme_nbRDVR1_Effec += indicateur.nbRDVR1_Effec;
+                                    Somme_nbRDVR2_Pris += indicateur.nbRDVR2_Pris;
+                                    Somme_nbRDVR2_Effec += indicateur.nbRDVR2_Effec;
+                                    Somme_nbContactTotal += indicateur.nbContactTotal;
+                                    Somme_nbRDVCreatedRdvDate += indicateur.nbRDVCreatedRdvDate;
+                                    Somme_nbRDVDebrief += indicateur.nbRDVDebrief;
+                                }
+                            });
+                        });
+
+                        // Calcul des sommes de tous les utilisateurs
+                        contenu+= '<tfoot><tr>';
+                        if(vendeursInfo.length != 1)
+                            contenu+= '<td colspan="3" class="case">Total des ' + vendeursInfo.length + ' vendeurs</td>';
+                        else
+                            contenu+= '<td colspan="3" class="case">Total</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactTotal).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactActif).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactPassif).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVTotal).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbDevisVendu).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVCreatedRdvDate).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVDebrief).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVR1_Pris).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVR1_Effec).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVR2_Pris).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVR2_Effec).format(NotDecimalFormat) + '</td>';
+                        contenu+= '</tr></tfoot>';
+                        contenu+= '</table>';
+                    }
+                    j$("#tableau1").html(contenu);
+                    flagPage1 = true;
+                    htmlLoading.removeClass("show").addClass("hidden");
+                    j$('.swiper-slide').css( "height", "auto" );
+                } else if (event.type === 'exception') {
+                    htmlLoading.removeClass("show").addClass("hidden");
+                    alert(event.message);
+                } else {
+                    htmlLoading.removeClass("show").addClass("hidden");
+                    alert(event.message);
+                }
+            },
+            {escape: true}
+            );
+        }
+
+        /* Chargement de la page 2 (Contacts)                                           */
+        /*------------------------------------------------------------------------------*/
+        function loadPage2(){
+            var dateDebut = j$("[id$=dateDebut]")[0].value;
+            var dateFin = j$("[id$=dateFin]")[0].value;
+            var vendeursList = new Array();
+            var Somme_nbRDVBAL50 = 0;
+            var Somme_nbContactBAL = 0;
+            var Somme_nbRDVTAP51 = 0;
+            var Somme_nbContactTAP = 0;
+            var Somme_nbContactComplement = 0;
+            var Somme_nbContactParrainage = 0;
+            var Somme_nbRDVPhone55 = 0;
+            var Somme_nbContactPhone = 0;
+            var Somme_nbRDVGalerieMarchande = 0;
+            var Somme_nbContactGalerieMarchande = 0;
+            var Somme_nbRDVFoire = 0;
+            var Somme_nbContactFoire = 0;
+            var Somme_nbRDVMarche = 0;
+            var Somme_nbContactMarche = 0;
+            var contenu='';
+
+            // Init des variables
+            vendeursInfo.forEach(function(vendeur) { vendeursList.push(vendeur.Id) });
+            j$("#tableau2").html(contenu);
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+            '{!$RemoteAction.Ctrl_Triptyque_Analytique.getHebdomadaireData}', dateDebut, dateFin, vendeursList,
+            function(result, event) {
+                if (event.status) {
+                    if(result.length > 0) {
+                        contenu+= '<table class="table-hover triptyque">';
+                        contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="20">Contact par origine</th></tr>';
+                        contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J. Trv.</th><th colspan="3" class="case">50 - BAL</th>';
+                        contenu+= '<th colspan="3" class="case">51 - TAP</th> <th class="case">52 - Comp</th> <th class="case">53 - Parr</th> <th colspan="3" class="case">55 - Phone</th>';
+                        contenu+= '<th colspan="2" class="case">42 - GM</th> <th colspan="2" class="case">43 - Foire</th> <th colspan="2" class="case">54 - Marché</th></tr></thead>';
+
+                        vendeursInfo.forEach(function(vendeur) {
+                            contenu+= '<tr>';
+                            if(vendeur.IsActive == true)
+                                contenu+= '<td rowspan="2" class="case">' + vendeur.Name + '</td> ';
+                            else
+                                contenu+= '<td rowspan="2" class="case">' + vendeur.Name + ' (Inactif)</td> ';
+                            contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeur.LastLoginDate))) + '<br/>' + vendeursNbConnexions[vendeur.Id] + '</td>';
+                            result.forEach(function(indicateur) {
+                                if(indicateur.vendeurId == vendeur.Id){
+                                    contenu+= '<td rowspan="2" class="case">' + indicateur.joursTravaille + '</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVBAL50).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td colspan="2" class="case">' + numeral(indicateur.nbContactBAL).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVTAP51).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td colspan="2" class="case">' + numeral(indicateur.nbContactTAP).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactComplement).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactParrainage).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVPhone55).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td colspan="2" class="case">' + numeral(indicateur.nbContactPhone).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVGalerieMarchande).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactGalerieMarchande).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVFoire).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactFoire).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbRDVMarche).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '<td class="case">' + numeral(indicateur.nbContactMarche).format(NotDecimalFormat) + '</td> ';
+                                    contenu+= '</tr><tr>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.tauxPartContactBAL).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.ratioParJourBAL).format(decimalFormat) + ' / j</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.ratioParContactBAL).format(decimalFormat) + ' / cts</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.tauxPartContactTAP).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.ratioParJourTAP).format(decimalFormat) + ' / j</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.ratioParContactTAP).format(decimalFormat) + ' / cts</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.tauxPartContactCOMP).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td class="case"></td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.tauxPartContactPHONE).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.ratioParJourPhone).format(decimalFormat) + ' / j</td>';
+                                    contenu+= '<td class="case">' + numeral(indicateur.ratioParContactPhone).format(decimalFormat) + ' / cts</td>';
+                                    contenu+= '<td colspan="2" class="case">' + numeral(indicateur.tauxPartContactGM).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td colspan="2" class="case">' + numeral(indicateur.tauxPartContactFOIRE).format(decimalFormat) + ' %</td>';
+                                    contenu+= '<td colspan="2" class="case">' + numeral(indicateur.tauxPartContactMARCHE).format(decimalFormat) + ' %</td></tr>';
+
+                                    Somme_nbRDVBAL50 += indicateur.nbRDVBAL50;
+                                    Somme_nbContactBAL += indicateur.nbContactBAL;
+                                    Somme_nbRDVTAP51 += indicateur.nbRDVTAP51;
+                                    Somme_nbContactTAP += indicateur.nbContactTAP;
+                                    Somme_nbContactComplement += indicateur.nbContactComplement;
+                                    Somme_nbContactParrainage += indicateur.nbContactParrainage;
+                                    Somme_nbRDVPhone55 += indicateur.nbRDVPhone55;
+                                    Somme_nbContactPhone += indicateur.nbContactPhone;
+                                    Somme_nbRDVGalerieMarchande += indicateur.nbRDVGalerieMarchande;
+                                    Somme_nbContactGalerieMarchande += indicateur.nbContactGalerieMarchande;
+                                    Somme_nbRDVFoire += indicateur.nbRDVFoire;
+                                    Somme_nbContactFoire += indicateur.nbContactFoire;
+                                    Somme_nbRDVMarche += indicateur.nbRDVMarche;
+                                    Somme_nbContactMarche += indicateur.nbContactMarche;
+                                }
+                            });
+                        });
+
+                        // Calcul des sommes de tous les utilisateurs
+                        contenu+= '<tfoot><tr>';
+                        if(vendeursInfo.length != 1)
+                            contenu+= '<td rowspan="2" colspan="3" class="case">Total des ' + vendeursInfo.length + ' vendeurs</td>';
+                        else
+                            contenu+= '<td rowspan="2" colspan="3" class="case">Total</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVBAL50).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactBAL).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVTAP51).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactTAP).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactComplement).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactParrainage).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVPhone55).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactPhone).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVGalerieMarchande).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactGalerieMarchande).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVFoire).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactFoire).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbRDVMarche).format(NotDecimalFormat) + '</td>';
+                        contenu+= '<td class="case">' + numeral(Somme_nbContactMarche).format(NotDecimalFormat) + '</td>';
+                        contenu+= '</tr></tfoot>';
+                        contenu+= '</table>';
+                    }
+                    j$("#tableau2").html(contenu);
+                    flagPage2 = true;
+                    htmlLoading.removeClass("show").addClass("hidden");
+                    j$('.swiper-slide').css( "height", "auto" );
+                } else if (event.type === 'exception') {
+                    htmlLoading.removeClass("show").addClass("hidden");
+                    alert(event.message);
+                } else {
+                    htmlLoading.removeClass("show").addClass("hidden");
+                    alert(event.message);
+                }
+            },
+            {escape: true}
+            );
+        }
+
+        /* Chargement de la page 3 (Vente)                                              */
+        /*------------------------------------------------------------------------------*/
+        function loadPage3(){
+            var dateDebut = j$("[id$=dateDebut]")[0].value;
+            var dateFin = j$("[id$=dateFin]")[0].value;
+            var vendeursList = new Array();
+            var Somme_nbRDVaccompagne = 0;
+            var Somme_nbRDVaccompagnant = 0;
+            var Somme_nbDevisVendu = 0;
+            var Somme_nbCADevisVendu = 0;
+            var Somme_panierMoyenRealiseVente = 0;
+            var contenu='';
+
+            // Init des variables
+            vendeursInfo.forEach(function(vendeur) { vendeursList.push(vendeur.Id) });
+            j$("#tableau3").html(contenu);
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque_Analytique.getHebdomadaireData}', dateDebut, dateFin, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        if(result.length > 0) {
+                            contenu+= '<table class="table-hover triptyque">';
+                            contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="4">Vente</th></tr>';
+                            contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J. Trv.</th>';
+                            contenu+= '<th colspan="2" class="case">Nb RDV</th> <th colspan="2" class="case">Réalisés (K€)</th></tr></thead>';
+
+                            vendeursInfo.forEach(function(vendeur) {
+                                contenu+= '<tr>';
+                                if(vendeur.IsActive == true)
+                                    contenu+= '<td rowspan="2" class="case">' + vendeur.Name + '</td> ';
+                                else
+                                    contenu+= '<td rowspan="2" class="case">' + vendeur.Name + ' (Inactif)</td> ';
+                                contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeur.LastLoginDate))) + '<br/>' + vendeursNbConnexions[vendeur.Id] + '</td>';
+                                result.forEach(function(indicateur) {
+                                    if(indicateur.vendeurId == vendeur.Id){
+                                        contenu+= '<td rowspan="2" class="case">' + indicateur.joursTravaille + '</td>';
+                                        contenu+= '<td class="case">' + indicateur.nbRDVAccompagne + '</td>';
+                                        contenu+= '<td class="case">' + indicateur.nbRDVAccompagnant + '</td>';
+                                        contenu+= '<td class="case">' + numeral(indicateur.nbDevisVendu).format(currencyFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(indicateur.nbCADevisVendu).format(currencyFormat) + '</td> ';
+                                        contenu+= '</tr><tr>';
+                                        contenu+= '<td colspan="2" class="case"></td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(indicateur.panierMoyenRealiseVente).format(currencyFormat) + '</td></tr>';
+
+                                        Somme_nbRDVaccompagne += indicateur.nbRDVAccompagne;
+                                        Somme_nbRDVaccompagnant += indicateur.nbRDVAccompagnant;
+                                        Somme_nbDevisVendu += indicateur.nbDevisVendu;
+                                        Somme_nbCADevisVendu += indicateur.nbCADevisVendu;
+                                    }
+                                });
+                            });
+
+                            // Calcul des sommes de tous les utilisateurs
+                            if(Somme_nbDevisVendu == 0)
+                                Somme_panierMoyenRealiseVente = 0;
+                            else
+                                Somme_panierMoyenRealiseVente = (Somme_nbCADevisVendu / Somme_nbDevisVendu);
+                            contenu+= '<tfoot><tr>';
+                            if(vendeursInfo.length != 1)
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total des ' + vendeursInfo.length + ' vendeurs</td>';
+                            else
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total</td>';
+                            contenu+= '<td class="case">' + Somme_nbRDVaccompagne + '</td>';
+                            contenu+= '<td class="case">' + Somme_nbRDVaccompagnant + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbDevisVendu).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + arrondi0decimal(Somme_nbCADevisVendu) + '</td>';
+                            contenu+= '</tr><tr style="font-weight: bold;"><td colspan="2" class="case"></td>';
+                            contenu+= '<td colspan="2" class="case">' + arrondi0decimal(Somme_panierMoyenRealiseVente) + '</td></tr></tfoot>';
+                            contenu+= '</table>';
+                        }
+                        j$("#tableau3").html(contenu);
+                        flagPage3 = true;
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        j$('.swiper-slide').css( "height", "auto" );
+                    } else if (event.type === 'exception') {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        alert(event.message);
+                    } else {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        function arrondi0decimal(num) {
+            return numeral(Math.round(num)).format(currencyFormat);
+        }
+
+        function formatDate(date) {
+            var stringDateFormated = '';
+            //Miser à jour de la date de dernier appel sortant vente
+            if(!isNaN(date)) {
+                date.setMonth(date.getMonth()+1);
+                // Formatage Date
+                if(date.getDate() < 10) stringDateFormated = '0' + date.getDate(); else stringDateFormated = date.getDate();
+                if(date.getMonth() < 10) stringDateFormated += '/0' + date.getMonth(); else stringDateFormated += '/' + date.getMonth();
+                //stringDateFormated += '/' + date.getFullYear();
+                // Formatage Time
+                //if(date.getHours() < 10) stringDateFormated += ' 0' + date.getHours(); else stringDateFormated += ' ' + date.getHours();
+                //if(date.getMinutes() < 10) stringDateFormated += ':0' + date.getMinutes(); else stringDateFormated += ':' + date.getMinutes();
+                //if(date.getSeconds() < 10) stringDateFormated += ':0' + date.getSeconds(); else stringDateFormated += ':' + date.getSeconds();
+            }
+            return stringDateFormated
+        }
+
+        /* Check if the browser agent in Mobile  */
+        /*----------------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                || ((typeof sforce != 'undefined') && (sforce != null) )
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        /* Affiche message d'information ou d'erreur                                     */
+        /*------------------------------------------------------------------------------*/
+        function displayMessage(message) {
+            var htmlAlertErrorMsg = j$("[id$=alertErrorMsg]");
+            var htmlAlertError = j$("[id$=alertError]");
+            htmlAlertError.removeClass("hidden").addClass("show");
+            htmlAlertErrorMsg.html(message);
+        }
+
+        /* Suppression message d'information ou d'erreur                                     */
+        /*------------------------------------------------------------------------------*/
+        function eraseMessages() {
+            var htmlAlertErrorMsg = j$("[id$=alertErrorMsg]");
+            var htmlAlertError = j$("[id$=alertError]");
+            htmlAlertError.removeClass("show").addClass("hidden");
+            htmlAlertErrorMsg.html('');
+        }
+    </script>
+
+    <c:importvisualstrap theme="default" />
+    <apex:stylesheet value="{!URLFOR($Resource.Swiper, '/Swiper-master/src/idangerous.swiper.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrapDatepicker_js, 'css/datepicker.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Page_CSS)}"/>
+    <style>
+        .swiper-container .swiper-slide{
+            padding-top:10px;
+            padding-bottom:40px;
+        }
+
+        .swiper-container .case {
+            border-style: solid;
+            border-width:1px;
+            border-color: #dddddd;
+            padding:5px;
+            text-align:center;
+        }
+
+        .arrow-left {
+            position: absolute;
+            left: 20px;
+            top: 500px;
+            margin-top: -15px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .arrow-left img {
+            max-width: 100%;
+            height: auto;
+            width: auto\9; /* ie8 */
+        }
+
+        .arrow-right {
+            position: absolute;
+            right: 20px;
+            top: 500px;
+            margin-top: -15px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .arrow-right img {
+            max-width: 100%;
+            height: auto;
+            width: auto\9; /* ie8 */
+        }
+
+        .pagination {
+            position: absolute;
+            left: 0;
+            text-align: center;
+            bottom:5px;
+            width: 100%;
+        }
+
+        .swiper-pagination-switch {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            background: #999;
+            box-shadow: 0px 1px 2px #555 inset;
+            margin: 0 3px;
+            cursor: pointer;
+        }
+
+        .swiper-active-switch {
+            background: #fff;
+        }
+
+        #boutonBlock {
+            margin-left:auto;
+            margin-right:auto;
+            display:block;
+            text-align:center;
+        }
+
+        #boutonExportPdf, #boutonObjVendeurs, #boutonSuivi {
+            display:inline;
+        }
+
+        /* Tableau */
+        .triptyque thead {
+            display: table-header-group;
+            background-color: #a1c8ef;
+        }
+        .triptyque > tbody > tr:nth-child(4n+1) > td, .triptyque > tbody > tr:nth-child(4n+1) > th {
+            background-color: #d4e6f8;
+        }
+        .triptyque > tbody > tr:nth-child(4n+2) > td, .triptyque > tbody > tr:nth-child(4n+2) > th {
+            background-color: #d4e6f8;
+        }
+        .triptyque tfoot {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+    </style>
+
+    <div id="infos" style="float:left; font-size:20px;">Contact et RDV</div>
+    <div style="float:right; font-size:20px;">
+        <span>Page </span>
+        <span id="pageActuelle">1</span>
+        <span> sur 3</span>
+    </div>
+
+    <c:visualstrapblock >
+        <center>
+            <c:pageheader title="Triptyque - Analyse Ponctuelle" icon="tasks" subtitle="{!$User.FirstName} {!$User.LastName}"/>
+        </center>
+
+        <c:panel title="Critères" type="primary">
+            <c:formblock alignment="horizontal">
+                <div class="alert alert-danger hidden" id="alertError" role="alert" style="margin-bottom: 20px;">
+                    <div id="alertErrorMsg" style="color:red;"></div>
+                </div>
+                <apex:form >
+                    <apex:actionFunction name="rerendermagasin" action="{!refreshVendeurs}" rerender="hiddenFields" oncomplete="refreshValues('magasin');">
+                        <apex:param name="firstParam" assignTo="{!codeMagasinActuel}" value="" />
+                    </apex:actionFunction>
+                    <apex:actionFunction name="rerenderVendeurs" action="{!refreshVendeurs}" rerender="hiddenFields"  oncomplete="refreshValues('');"/>
+                    <apex:actionFunction action="{!setDeb}" name="updateStartDate" rerender="hiddenFields" oncomplete="rerenderVendeurs();" >
+                        <apex:param name="firstParam" assignTo="{!dateDebut}" value="" />
+                    </apex:actionFunction>
+                    <apex:actionFunction action="{!setFin}" name="updateEndDate" rerender="hiddenFields" oncomplete="rerenderVendeurs();">
+                        <apex:param name="firstParam" assignTo="{!dateFin}" value="" />
+                    </apex:actionFunction>
+
+                    <c:formgroup >
+                        <input style="height:0px; top:-1000px; position:absolute" type="text" value=""/><br/>
+                        <c:column type="col-md-1" style="padding-top: 10px;">
+                            <apex:outputLabel >Date de Début</apex:outputLabel>
+                        </c:column>
+                        <c:column type="col-md-3" style="padding-top: 10px;">
+                            <div class='input-group date' id='input-datetimepicker-start'>
+                                <input type='text' class="form-control" id="dateDebut" autocomplete="off" value="{!dateDebut}"/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </c:column>
+                        <c:column type="col-md-1" style="padding-top: 10px;">
+                            <apex:outputLabel >Date de Fin</apex:outputLabel>
+                        </c:column>
+                        <c:column type="col-md-3" style="padding-top: 10px;">
+                            <div class='input-group date' id='input-datetimepicker-end'>
+                                <input type='text' class="form-control" id="dateFin" autocomplete="off" value="{!dateFin}"/>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </c:column>
+                        <c:column type="col-md-1" style="padding-top: 10px;">
+                            <apex:outputLabel >Magasin</apex:outputLabel>
+                        </c:column>
+                        <c:column type="col-md-3" style="padding-top: 10px;">
+                            <apex:selectlist styleClass="form-control input-sm" id="magasin" size="1" value="{!codeMagasinActuel}" onChange="refresh = true; refreshHidden(this.value); rerendermagasin(this.value);">
+                                <apex:selectOptions value="{!magasinOptionList}" />
+                            </apex:selectlist>
+                        </c:column>
+                    </c:formgroup>
+
+                    <div id="boutonBlock">
+                        <div id="boutonSuivi">
+                            <apex:commandlink action="{!triptyqueSuiviHebdo}" target="_blank">
+                                <apex:commandButton value="Suivi Hebdomadaire" styleClass="btn btn-primary btn-sm"/>
+                            </apex:commandlink>
+                        </div>
+                        <div id="boutonObjVendeurs">
+                            <apex:commandlink action="{!objVendeurs}" target="_blank">
+                                <apex:commandButton value="Objectifs Vendeurs" styleClass="btn btn-primary btn-sm" rendered="{!CONTAINS($Profile.Name, "Administrateur") || CONTAINS($Profile.Name, "DV") || CONTAINS($Profile.Name, "DR") || CONTAINS($Profile.Name, "RVJ") || CONTAINS($Profile.Name, "RV") }"/>
+                            </apex:commandlink>
+                        </div>
+                        <div id="boutonExportPdf">
+                            <apex:commandlink action="{!exportPDF}" target="_blank">
+                                <apex:commandButton value="Exporter en PDF" styleClass="btn btn-primary btn-sm"/>
+                            </apex:commandlink>
+                        </div>
+                    </div>
+
+                    <apex:outputPanel id="hiddenFields">
+                        <apex:inputHidden id="magHidden" value="{!codeMagasinActuel}" />
+                        <apex:inputHidden id="input-hidden-vendeursList" value="{!vendeursListJSON}" />
+                        <apex:inputHidden id="input-hidden-vendeursNbConnexions" value="{!vendeursListNbConnexionsJSON}" />
+                        <apex:inputHidden value="{!dateDebut}" />
+                        <apex:inputHidden value="{!dateFin}" />
+                    </apex:outputPanel>
+                </apex:form>
+            </c:formblock>
+        </c:panel>
+
+        <c:panel title="Résultats" type="primary">
+            <div id="loading" class="section section-loading show">
+                <span class="loader loader-quart"></span>
+                Chargement en cours... Veuillez patienter
+            </div>
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div id="page1" class="swiper-slide">
+                        <div id="tableau1" class="table-responsive"></div><br/>
+                    </div>
+                    <div id="page2" class="swiper-slide">
+                        <div id="tableau2" class="table-responsive"></div><br/>
+                    </div>
+                    <div id="page3" class="swiper-slide">
+                        <div id="tableau3" class="table-responsive"></div><br/>
+                    </div>
+                </div>
+                <div class="pagination"></div>
+            </div>
+        </c:panel>
+    </c:visualstrapblock>
+</apex:page>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NCC_sans_statut</fullName>
+    <columns>NAME</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>startDate__c</columns>
+    <columns>description__c</columns>
+    <columns>status__c</columns>
+    <columns>RECORDTYPE</columns>
+    <columns>closeDate__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>status__c</field>
+        <operation>equals</operation>
+    </filters>
+    <filters>
+        <field>startDate__c</field>
+        <operation>greaterThan</operation>
+        <value>1/1/2023</value>
+    </filters>
+    <filters>
+        <field>closeDate__c</field>
+        <operation>equals</operation>
+    </filters>
+    <label>NCC sans statut</label>
+    <sharedTo>
+        <group>Admin_Solution</group>
+    </sharedTo>
+</ListView>

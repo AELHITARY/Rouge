@@ -1,0 +1,542 @@
+<template>
+    <lightning-card variant="base" >
+            <!-- HEADER -->
+            <div class="slds-page-header">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:orders" size="medium"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1>
+                                            <span class="slds-page-header__title slds-truncate" title="Clôture comptable">Clôture comptable</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BODY -->
+            <div class="c-container">
+
+                <!-- Spinner -->
+                <div if:true={showLoadingSpinner}>
+                    <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+                </div>
+    
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+    
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+
+                    </lightning-layout-item>
+                </lightning-layout>
+            
+                <lightning-messages></lightning-messages>
+                
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <!-- STEP 1 (SELECTION ACTIFS) -->
+                                                
+                        <template if:true={showStep1Form}>
+                            <h3 class="slds-text-heading_small">
+                                Sélection des élements à clôturer
+                            </h3>
+                            <div class="slds-form" role="list">
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-combobox
+                                                name="recordTypeToClose"
+                                                options={recordTypesToCloseOptions}
+                                                value={recordTypesToCloseSelected}                                               
+                                                onchange={handleRecordTypeToCloseChange}>
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <template if:true={showSpecificRecordTypeOptions}>
+                                <div class="slds-form" role="list">
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <p>
+                                                    Veuillez sélectionner au minimum un type d'élement à clôturer.
+                                                </p>
+                                                <lightning-checkbox-group name="specificRecordTypes"                                                    
+                                                    options={specificRecordTypesOptions}
+                                                    value={specificRecordTypesSelected}                                                 
+                                                    onchange={handleSpecificRecordTypesChange}>
+                                                </lightning-checkbox-group>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection de la date de clôture et des dépôts
+                            </h3>
+                            <div class="slds-form" role="list">
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="date" date-style="short" label="Date de clôture" value={closingDate} 
+                                                                onchange={handleClosingDateChange}></lightning-input>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                                                              
+                            <template if:false={hasAccountsData}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de dépôts éligibles.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={hasAccountsData}>
+                                <p class="slds-m-bottom_medium">
+                                    Veuillez sélectionner au minimum un dépôt.
+                                </p>
+                                <div>
+                                    <lightning-datatable max-row-selection="1"
+                                                        data={accountData}
+                                                        columns={accountColumns}
+                                                        key-field="Id"
+                                                        onrowselection={handleSelectedAccountChange}
+                                                        selected-rows={selectedRecords}>
+                                    </lightning-datatable> 
+                                </div>
+                            </template>
+
+                            <template if:true={showAccountsProvider}>
+                                <template if:false={hasAccountsProviderData}>
+                                    <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                        <div class="slds-box slds-theme_error">
+                                            <div class="slds-media slds-media_center">
+                                                <div class="slds-media__figure">
+                                                    <span class="slds-avatar slds-avatar_small">
+                                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <p>Pas de comptes fournisseurs éligibles.</p>
+                                                </div>
+                                            </div>                            
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={hasAccountsProviderData}>
+                                    <h3 class="slds-text-heading_small">
+                                        Sélection des comptes fournisseurs
+                                    </h3>
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <lightning-combobox
+                                                        name="specifyAccountProvider"
+                                                        options={specifyAccountProviderOptions}
+                                                        value={specifyAccountProviderOptionsSelected}                                               
+                                                        onchange={handleSpecifyAccountProviderChange}>
+                                                    </lightning-combobox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <template if:true={showAccountsProviderTable}>
+                                        <p class="slds-m-bottom_medium">
+                                            Veuillez sélectionner au minimum un compte fournisseur.
+                                        </p>
+                                        <div>
+                                            <lightning-datatable data={accountProviderData}
+                                                                columns={accountColumns}
+                                                                key-field="Id"
+                                                                onrowselection={handleSelectedAccountProviderChange}
+                                                                selected-rows={accountsProviderSelected}>
+                                            </lightning-datatable> 
+                                        </div>
+                                    </template>
+                                </template>
+                            </template>
+                            
+                        </template>
+                        
+                        <!-- STEP 2 (RECAPITULATIF) --> 
+                        <template if:true={showStep2Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Récapitulatif des enregistrements à clôturer
+                            </h3>          
+                            <div class="slds-form" role="list">
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <div class="slds-form-element__control">
+                                                <lightning-formatted-text value="Dépôt sélectionné : "></lightning-formatted-text>
+                                                <lightning-formatted-text value={selectedAccNameList}></lightning-formatted-text>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <div class="slds-form-element__control">
+                                                <lightning-formatted-text value="Date de clôture : "></lightning-formatted-text>
+                                                <lightning-formatted-date-time year="numeric" month="numeric" day="numeric"  value={closingDate}></lightning-formatted-date-time>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <template if:true={showInvoiceRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Factures : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfInvoices}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={totalHTInvoice}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" €)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showCreditMemoRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Avoirs : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfCreditMemos}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={totalHTCreditMemo}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" €)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showAccPieceRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Pièces comptables : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfAccountingPieces}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={totalTTCAccountingPiece}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" €)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showAccEntryRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Ecritures comptables : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfAccountingEntries}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={totalTTCAccountingEntry}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" €)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showOrderItemRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Commandes fournisseurs : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfOrderItems}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={totalHTOrderItem}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" €)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showAssignedResourceRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Factures de service : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfAssignedResources}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={totalHTAssignedResource}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" €)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- STEP 3 (OBJETS CLOTURES) --> 
+                        <template if:true={showStep3Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Résultats des clôtures
+                            </h3>          
+                            <div class="slds-form" role="list">
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <div class="slds-form-element__control">
+                                                <lightning-formatted-text value="Dépôt sélectionné : "></lightning-formatted-text>
+                                                <lightning-formatted-text value={selectedAccNameList}></lightning-formatted-text>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <div class="slds-form-element__control">
+                                                <lightning-formatted-text value="Date de clôture : "></lightning-formatted-text>
+                                                <lightning-formatted-date-time year="numeric" month="numeric" day="numeric"  value={closingDate}></lightning-formatted-date-time>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <template if:true={showInvoiceRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Factures : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfClosedInvoices}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" clôturées ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfFailedInvoices}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" non clôturées)"></lightning-formatted-text>                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showCreditMemoRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Avoirs : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfClosedCreditMemos}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" clôturés ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfFailedCreditMemos}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" non clôturés)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showAccPieceRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Pièces comptables : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfClosedAccountingPieces}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" clôturées ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfFailedAccountingPieces}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" non clôturées)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showAccEntryRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Ecritures comptables : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfClosedAccountingEntries}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" clôturées ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfFailedAccountingEntries}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" non clôturées)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showOrderItemRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Commandes fournisseurs : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfClosedOrderItems}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" clôturées ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfFailedOrderItems}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" non clôturées)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showAssignedResourceRecap}>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value="Factures de service : "></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfClosedAssignedResources}></lightning-formatted-number>
+                                                    <lightning-formatted-text value=" clôturées ("></lightning-formatted-text>
+                                                    <lightning-formatted-number value={numberOfFailedAssignedResources}> </lightning-formatted-number>
+                                                    <lightning-formatted-text value=" non clôturées)"></lightning-formatted-text>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={showErrorList}>
+                                    <h3 class="slds-text-heading_small">
+                                        Détails des erreurs de clôture
+                                    </h3>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <lightning-combobox
+                                                name="errorToShow"
+                                                options={errorTypesToShow}
+                                                value={selectedErrorTypeToShow}                                               
+                                                onchange={handleErrorTypesToShowChange}>
+                                                </lightning-combobox>
+                                                <template if:true={showErrorAll}>
+                                                    <div>
+                                                    <lightning-datatable 
+                                                        key-field="id"
+                                                        data={errorList}
+                                                        columns={errorColumns}>
+                                                    </lightning-datatable>
+                                                    </div>
+                                                </template>
+                                                <template if:true={showErrorInvoice}>
+                                                    <div>
+                                                    <lightning-datatable 
+                                                        key-field="id"
+                                                        data={errorListInvoice}
+                                                        columns={errorColumns}>
+                                                    </lightning-datatable>
+                                                    </div>
+                                                </template>
+                                                <template if:true={showErrorCreditMemo}>
+                                                    <div>
+                                                    <lightning-datatable 
+                                                        key-field="id"
+                                                        data={errorListCreditMemo}
+                                                        columns={errorColumns}>
+                                                    </lightning-datatable>
+                                                    </div>
+                                                </template>
+                                                <template if:true={showErrorAccEntry}>
+                                                    <div>
+                                                    <lightning-datatable 
+                                                        key-field="id"
+                                                        data={errorListAccEntry}
+                                                        columns={errorColumns}>
+                                                    </lightning-datatable>
+                                                    </div>
+                                                </template>
+                                                <template if:true={showErrorAccPiece}>
+                                                    <div>
+                                                    <lightning-datatable 
+                                                        key-field="id"
+                                                        data={errorListAccPiece}
+                                                        columns={errorColumns}>
+                                                    </lightning-datatable>
+                                                    </div>
+                                                </template>
+                                                <template if:true={showErrorAssignedResource}>
+                                                    <div>
+                                                    <lightning-datatable 
+                                                        key-field="id"
+                                                        data={errorListAssignedResource}
+                                                        columns={errorColumns}>
+                                                    </lightning-datatable>
+                                                    </div>
+                                                </template>
+                                                <template if:true={showErrorOrderItem}>
+                                                    <div>
+                                                    <lightning-datatable 
+                                                        key-field="id"
+                                                        data={errorListOrderItem}
+                                                        columns={errorColumns}>
+                                                    </lightning-datatable>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>                            
+                                </template>
+                            </div>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>    
+    
+            <div slot="footer">
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-m-top_xx-small slds-m-bottom_x-small">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <template if:true={showPreviousButton}> 
+                    <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+                </template>
+                <template if:true={showNextButton}> 
+                    <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+                </template>
+                <template if:true={showSubmitButton}> 
+                    <lightning-button variant="brand" label="Clôturer" class="slds-m-around_medium" onclick={closeRecords}></lightning-button>
+                </template>
+            </div>
+        </lightning-card>
+    
+</template>

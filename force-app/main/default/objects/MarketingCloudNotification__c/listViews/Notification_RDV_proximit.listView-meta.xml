@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Notification_RDV_proximit</fullName>
+    <columns>NAME</columns>
+    <columns>type__c</columns>
+    <columns>account__c</columns>
+    <columns>serviceAppointment__c</columns>
+    <columns>mobilePhoneInternational__c</columns>
+    <columns>user__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>type__c</field>
+        <operation>equals</operation>
+        <value>Notification RDV proximité</value>
+    </filters>
+    <label>Notification RDV proximité</label>
+    <language>en_US</language>
+</ListView>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SATCLI</fullName>
+    <availability>online</availability>
+    <description>Affichage dans une nouvelle fenêtre du questionnaire de satisfaction (SATCLI)</description>
+    <displayType>button</displayType>
+    <encodingKey>UTF-8</encodingKey>
+    <hasMenubar>false</hasMenubar>
+    <hasScrollbars>true</hasScrollbars>
+    <hasToolbar>false</hasToolbar>
+    <height>600</height>
+    <isResizable>true</isResizable>
+    <linkType>url</linkType>
+    <masterLabel>SATCLI</masterLabel>
+    <openType>newWindow</openType>
+    <position>none</position>
+    <protected>false</protected>
+    <showsLocation>false</showsLocation>
+    <showsStatus>false</showsStatus>
+    <url>{!URLFOR(&apos;/apex/VF_Site_Questionnaire&apos;, null, [ oId=KContrat__c.Id, qId=&apos;a2U57000001sdHC&apos; ])}</url>
+</WebLink>

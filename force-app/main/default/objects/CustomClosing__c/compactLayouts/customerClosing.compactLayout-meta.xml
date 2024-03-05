@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>customerClosing</fullName>
+    <fields>Name</fields>
+    <fields>year__c</fields>
+    <fields>weekOfYear__c</fields>
+    <fields>month__c</fields>
+    <fields>weekOfMonth__c</fields>
+    <label>Clôture K par K</label>
+</CompactLayout>

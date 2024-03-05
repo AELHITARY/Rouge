@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>signea_circuit_details_acces__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Si la case est cochée, le profil pourra accéder au détail des circuits via un lien présent sur la page de signature électronique d&apos;un devis.</description>
+    <externalId>false</externalId>
+    <label>Signea : Accès au détails de circuit</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

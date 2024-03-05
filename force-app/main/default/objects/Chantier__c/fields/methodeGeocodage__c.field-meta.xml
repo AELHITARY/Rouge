@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>methodeGeocodage__c</fullName>
+    <externalId>false</externalId>
+    <label>Méthode de géocodage</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Automatique</fullName>
+                <default>false</default>
+                <label>Automatique</label>
+            </value>
+            <value>
+                <fullName>Batch</fullName>
+                <default>false</default>
+                <label>Batch</label>
+            </value>
+            <value>
+                <fullName>Manuel</fullName>
+                <default>false</default>
+                <label>Manuel</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

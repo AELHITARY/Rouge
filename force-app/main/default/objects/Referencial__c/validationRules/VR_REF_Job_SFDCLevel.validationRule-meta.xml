@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_Job_SFDCLevel</fullName>
+    <active>true</active>
+    <description>Niveau d&apos;utilisation de Salesforce obligatoire si un des autres niveau est renseigné</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;Job&apos; &amp;&amp; 
+ISPICKVAL(SFDCLevel__c, &apos;&apos;) &amp;&amp; 
+(!ISPICKVAL(FSLLevel__c, &apos;&apos;) ||
+ !ISBLANK(ganttName__c) ||
+ !ISPICKVAL(EALevel__c, &apos;&apos;) ||
+ !ISPICKVAL(MCLevel__c, &apos;&apos;) ||
+ !ISPICKVAL(electronicSignatureLevel__c, &apos;&apos;))</errorConditionFormula>
+    <errorDisplayField>SFDCLevel__c</errorDisplayField>
+    <errorMessage>Niveau d&apos;utilisation de Salesforce obligatoire!</errorMessage>
+</ValidationRule>

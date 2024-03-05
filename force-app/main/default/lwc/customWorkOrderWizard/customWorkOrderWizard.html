@@ -1,0 +1,979 @@
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:work_order" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Assistant de planification de rendez-vous de {workTypeLabel}">Assistant de planification de rendez-vous de {workTypeLabel}</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+        
+        <!-- BODY -->
+        <div class="c-container slds-scrollable" style="height:39vh">
+        
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+
+            <!-- NON DISPONIBLE -->
+            <template if:false={activeWizard}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>Le statut de la commande n'autorise pas la planification de rendez-vous.</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+
+            <!-- ASSISTANT -->
+            <template if:true={activeWizard}>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+
+                    </lightning-layout-item>
+                </lightning-layout>
+            
+                <lightning-messages></lightning-messages>
+                
+                <lightning-layout multiple-rows="true">
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <!-- STEP 1 (ACTION) --> 
+                        <template if:true={showStep1Form}>
+                            <h3 class="slds-text-heading_medium">
+                                Sélection du type du rendez-vous de service
+                            </h3>
+                            <div class="slds-text-align_center">
+                                <p>Veuillez sélectionner le type du rendez-vous de service.</p>
+                            </div>
+                            <div class="slds-align_absolute-center">
+                                <lightning-radio-group name="radioButtonGroup" 
+                                                        onchange={handleActionChange} 
+                                                        options={actionRDVTypeValues}
+                                                        value={selectedActionRDVTypeValue}
+                                                        type="button">
+                                </lightning-radio-group>
+                            </div>
+                        </template>
+
+                        <!-- STEP 2 (PRODUITS) --> 
+                        <template if:true={showStep2Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des produits
+                            </h3>
+
+                            <template if:true={ncpWithoutAsset}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_warning">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:warning" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Des NCP ne sont pas liées à des actifs, merci d'utiliser l'assistant "Reprise NCP" avant de planifier un RDV</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+                                            
+                            <template if:false={productsData}>
+                                <div class="slds-var-m-top_xx-small slds-var-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de produits éligibles pour un rendez-vous de service.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={productsData}>
+                                <div class="slds-form">
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_stacked">
+                                                <p class="slds-var-m-bottom_medium">
+                                                    Veuillez sélectionner les produits qui seront traités par le rendez-vous.
+                                                </p>
+                                            </div>
+                                        </div>        
+                                        <template if:true={showNCPButton}>                                
+                                            <div class="slds-form__item" role="listitem">     
+                                                <div class="slds-form-element slds-form-element_stacked">       
+                                                    <lightning-input type="toggle" 
+                                                                name="display-ncp"
+                                                                label="Voulez vous ajouter des NCP au rendez-vous ?"
+                                                                checked={showNCPStep}
+                                                                message-toggle-active="Oui"
+                                                                message-toggle-inactive="Non"
+                                                                onchange={handleShowNCPStepChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={showAssetFilterButton}>                                
+                                            <div class="slds-form__item" role="listitem">     
+                                                <div class="slds-form-element slds-form-element_stacked">       
+                                                    <lightning-input type="toggle" 
+                                                                name="filter-asset"
+                                                                label={assetFilterButtonLabel}
+                                                                checked={applyAssetFilter}
+                                                                message-toggle-active="Oui"
+                                                                message-toggle-inactive="Non"
+                                                                onchange={handleAssetFilterChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div>
+                                    <lightning-datatable data={productsData}
+                                                        columns={productColumns}
+                                                        key-field="Id"
+                                                        onrowselection={handleSelectedProductsChange}
+                                                        selected-rows={selectedProductRecords}>
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                        </template>
+                        
+                        <!-- STEP 2 BIS (NCP) --> 
+                        <template if:true={showStep2aForm}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des non-conformités produits
+                            </h3>
+
+                            <template if:true={ncpWithoutAsset}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_warning">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:warning" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Des NCP ne sont pas liées à des actifs, merci d'utiliser l'assistant "Reprise NCP" avant de planifier un RDV</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={ncpData}>
+                                <div class="slds-form">
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_stacked">
+                                                <p class="slds-var-m-bottom_medium">
+                                                    Veuillez sélectionner les non-conformités produits qui seront traitées par le rendez-vous.
+                                                </p>
+                                            </div>
+                                        </div>        
+                                        <template if:true={showNCPFilterButton}>                                
+                                            <div class="slds-form__item" role="listitem">     
+                                                <div class="slds-form-element slds-form-element_stacked">       
+                                                    <lightning-input type="toggle" 
+                                                                name="filter-ncp"
+                                                                label={ncpFilterButtonLabel}
+                                                                checked={applyNCPFilter}
+                                                                message-toggle-active="Oui"
+                                                                message-toggle-inactive="Non"
+                                                                onchange={handleNCPFilterChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div>
+                                    <lightning-datatable data={ncpData}
+                                                        columns={ncpColumns}
+                                                        key-field="Id"
+                                                        onrowselection={handleSelectedNCPsChange}
+                                                        selected-rows={selectedNCPRecords}>
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 3 (CONTRAINTES) -->
+                        <template if:true={showStep3Form}>
+                            <h3 class="slds-text-heading_small slds-m-bottom_medium">
+                                Séléction des contraintes
+                            </h3>
+                            <lightning-accordion allow-multiple-sections-open
+                                                active-section-name={activeConstraintsSections}>
+
+                                <lightning-accordion-section name="client" label="Client">                                
+                                    <c-custom-Lookup required
+                                                    label="Contact" 
+                                                    placeholder="Contact du rendez-vous"
+                                                    object-name="Contact"
+                                                    field-name="Name" 
+                                                    field-name-search="Name" 
+                                                    subtitle-field="Name"
+                                                    select-record-id={workOrderContactId} 
+                                                    select-record-name={workOrderContactName}
+                                                    icon-name = "standard:contact" 
+                                                    onselectionchange={handleContactLookupChange} >
+                                    </c-custom-Lookup>
+
+                                    <lightning-checkbox-group name="Jour de visite possible"
+                                                                label="Jour de visite possible"
+                                                                options={daysArray}
+                                                                value={workOrderVisitingDays}
+                                                                onchange={handleVisitingDaysChange}
+                                    ></lightning-checkbox-group>  
+                                    <lightning-input type="time" 
+                                                    name="workOrderVisitingStartHour" 
+                                                    label="Heure de début" 
+                                                    value={workOrderVisitingStartHour} min="08:00:00.000Z" max="16:00:00.000Z"
+                                                    onchange={handleVisitingStartHourChange}>
+                                    </lightning-input>                              
+                                    <lightning-input type="time" 
+                                                    name="workOrderVisitingEndHour" 
+                                                    label="Heure de fin" 
+                                                    value={workOrderVisitingEndHour} min="10:00:00.000Z" max="18:00:00.000Z"
+                                                    onchange={handleVisitingEndHourChange}>
+                                    </lightning-input>                              
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="planification" label="Planification">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <lightning-input required 
+                                                                    type="date" 
+                                                                    name="earliestStartDate" 
+                                                                    label="Au plus tôt le" 
+                                                                    value={workOrderEarliestStartDate}
+                                                                    placeholder="Date de début le plus tôt"
+                                                                    onchange={handleEarliestStartDateChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <lightning-input type="date" 
+                                                                    name="dueDate" 
+                                                                    label="Date d'échéance"
+                                                                    value={workOrderDueDate}                                                
+                                                                    placeholder="Date d'échéance pour effectuer le rendez-vous"
+                                                                    onchange={handleDueDateChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--<c-custom-Lookup required
+                                                        label="Territoire de service" 
+                                                        placeholder="Territoire affecté au rendez-vous"
+                                                        object-name="ServiceTerritory"
+                                                        field-name="Name" 
+                                                        field-name-search="Name" 
+                                                        subtitle-field="Name"
+                                                        select-record-id={serviceTerritoryId} 
+                                                        select-record-name={serviceTerritoryName}
+                                                        icon-name = "standard:contact" 
+                                                        onselectionchange={handleServiceTerritoryLookupChange} >
+                                        </c-custom-Lookup>-->
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <lightning-input required 
+                                                                    type="number" 
+                                                                    name="duration" 
+                                                                    label="Durée du rendez-vous" 
+                                                                    value={workOrderDuration}
+                                                                    placeholder="Durée estimée du rendez-vous"
+                                                                    onchange={handleDurationChange} 
+                                                                    min=1>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <template if:true={durationTypePicklistValues.data}>
+                                                        <lightning-combobox required
+                                                                            name="workOrderDurationType"
+                                                                            label="Type de durée"
+                                                                            value={workOrderDurationType}
+                                                                            placeholder="Type de durée (heures ou minutes)"
+                                                                            options={durationTypePicklistValues.data.values}
+                                                                            onchange={handleDurationTypeChange} >
+                                                        </lightning-combobox>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <label class="slds-form-element__label" for="multiDay">Rendez-vous sur plusieurs jours</label>
+                                                    <lightning-input type="toggle" 
+                                                                    name="multiDay" 
+                                                                    label="Plusieurs jours ?"
+                                                                    checked={workOrderMultiDay}
+                                                                    variant="label-hidden"
+                                                                    message-toggle-active="Oui"
+                                                                    message-toggle-inactive="Non">
+                                                    </lightning-input>
+                                                </div>
+                                            </div>                                      
+                                            <div class="slds-form__item" role="listitem">     
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <label class="slds-form-element__label" for="display-resource">Voulez-vous sélectionner les compétences</label>
+                                                    <lightning-input type="toggle" 
+                                                                name="display-resource"
+                                                                label="Voulez-vous sélectionner les compétences"
+                                                                checked={showSkillStep}
+                                                                variant="label-hidden"
+                                                                message-toggle-active="Oui"
+                                                                message-toggle-inactive="Non"
+                                                                onchange={handleShowSkillStepChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="strategiePlanification" label="Priorité de planification">
+                                    <div class="slds-form">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <template if:true={priorityPicklistValues.data}>
+                                                <lightning-combobox required
+                                                                    name="workOrderPriority"
+                                                                    label="Priorité"
+                                                                    value={workOrderPriority}
+                                                                    placeholder="Priorité du rendez-vous"
+                                                                    options={priorityPicklistValues.data.values}
+                                                                    onchange={handleGenericChange} >
+                                                </lightning-combobox>
+                                            </template> 
+                                        </div>
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <c-custom-Lookup label="Stratégie de planification" 
+                                                            object-name="FSL__Scheduling_Policy__c"
+                                                            field-name="Name" 
+                                                            field-name-search="Name" 
+                                                            subtitle-field="Name"
+                                                            icon-name = "custom:custom64" 
+                                                            select-record-id={workOrderSchedulingPolicyId}
+                                                            select-record-name={workOrderSchedulingPolicyName}
+                                                            onselectionchange={handleSchedulingPolicyLookupChange} >   
+                                            </c-custom-Lookup>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="intervenant" label="Détails sur les intervenants">
+                                    <div class="slds-form">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <lightning-input required 
+                                                                    type="number" 
+                                                                    name="workOrderMinimumCrewSize" 
+                                                                    label="Nombre d'intervenants minimum" 
+                                                                    value={workOrderMinimumCrewSize}
+                                                                    placeholder="Nombre d'intervenants minimum" 
+                                                                    onchange={handleMinimumCrewSizeChange}
+                                                                    min=1>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>                                        
+                                            <div class="slds-form__item" role="listitem">     
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <label class="slds-form-element__label" for="display-resource">Voulez vous séléctionner les intervenants ?</label>
+                                                    <lightning-input type="toggle" 
+                                                                name="display-resource"
+                                                                label="Voulez vous définir les intervenants ?"
+                                                                checked={showResourceStep}
+                                                                variant="label-hidden"
+                                                                message-toggle-active="Oui"
+                                                                message-toggle-inactive="Non"
+                                                                onchange={handleShowResourceStepChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">   
+                                                <div class="slds-form-element slds-form-element_stacked">
+                                                    <lightning-textarea name="workOrderServiceNote" 
+                                                                    label="Note de service" 
+                                                                    value={workOrderServiceNote}
+                                                                    placeholder="Note à destination des intervenants"
+                                                                    onchange={handleGenericChange}
+                                                                    maxlength="32000">
+                                                    </lightning-textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+                        </template>
+
+                        <!-- STEP 4 (COMPETENCES) -->
+                        <template if:true={showStep4Form}>
+                            <h3 class="slds-text-heading_small">
+                                Séléction des compétences
+                            </h3>
+                            <template if:true={hasSkillsData}>
+                                <div class="slds-var-m-bottom_medium">
+                                    <p>Veuillez sélectionner au minimum une compétences requise pour le rendez-vous en définissant le niveau :</p>
+                                    <ul class="slds-list_dotted">
+                                        <li>Pas de valeur ou 0 : Compétence non requise</li>
+                                        <li>1 : Débutant</li>
+                                        <li>2 : Confirmé</li>
+                                        <li>3 : Expert</li>
+                                    </ul>
+                                </div>
+                                <div style="overflow: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Compétence">Compétence</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Niveau requis">Niveau requis</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={skillsData} for:item="skill">
+                                                <tr class="slds-hint-parent" key={skill.id}>
+                                                    <th data-label="Compétence" scope="row">
+                                                        <div class="slds-truncate" title={skill.name}>{skill.name}</div>
+                                                    </th>
+                                                    <td data-label="Niveau requis">
+                                                        <div class="slds-truncate">
+                                                            <lightning-input name="skill-level"
+                                                                            data-skill-id={skill.id}    
+                                                                            data-skill-name={skill.name}
+                                                                            variant="label-hidden"
+                                                                            label="Niveau requis"
+                                                                            type="number" 
+                                                                            value={skill.value}
+                                                                            placeholder="Niveau requis pour la compétence"
+                                                                            min="0" 
+                                                                            max="3">
+                                                            </lightning-input>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 5 (INTERVENANT) -->
+                        <template if:true={showStep5Form}>
+                            <h3 class="slds-text-heading_small">
+                                Séléction des intervenants
+                            </h3>
+                            <template if:true={resourcesData}>
+
+                                <div class="slds-form">
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_stacked">
+                                                <p class="slds-var-m-bottom_medium">
+                                                    Veuillez sélectionner la présence des intervenants.<br/>
+                                                    Par défaut, les intervenants ayant les compétences sont affichés.  
+                                                </p>
+                                            </div>
+                                        </div>                                        
+                                        <div class="slds-form__item" role="listitem">     
+                                            <div class="slds-form-element slds-form-element_stacked">                               
+                                                <lightning-input type="toggle" 
+                                                            name="display-resource"
+                                                            label="Voir tous les intervenants ?"
+                                                            checked={showAllResources}
+                                                            message-toggle-active="Oui"
+                                                            message-toggle-inactive="Non"
+                                                            onchange={handleShowAllResourcesChange}>
+                                                </lightning-input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div >
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Nom">Nom</div>
+                                                </th>
+                                                <!--<th class="" scope="col">
+                                                    <div class="slds-truncate" title="Métier">Métier</div>
+                                                </th>-->
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Présence">Présence</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={resourcesData} for:item="resource">
+                                                <tr class="slds-hint-parent" key={resource.Id}>
+                                                    <th data-label="Nom" scope="row">
+                                                        <div class="slds-truncate" title={resource.Name}>{resource.ServiceResource.Name}</div>
+                                                    </th>
+                                                    <!--<td data-label="Métier">
+                                                        <div class="slds-truncate">{resource.Metier__c}</div>
+                                                    </td>-->
+                                                    <td data-label="Présence">
+                                                        <div class="">
+                                                            <lightning-combobox name="resource-preference"
+                                                                                data-resource-id={resource.ServiceResourceId}    
+                                                                                data-resource-name={resource.ServiceResource.Name}   
+                                                                                label="Présence"
+                                                                                variant="label-hidden"
+                                                                                value=""
+                                                                                options={resourcePreferencePicklistValues} >
+                                                            </lightning-combobox>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 6 (RESUME) -->
+                        <template if:true={showStep6Form}>
+                            <lightning-accordion allow-multiple-sections-open
+                                                active-section-name={activeSummarySections}>
+
+                                <lightning-accordion-section name="clientSummary" label="Client">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Contact</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {workOrderContactName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Jour de visite possible</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {workOrderVisitingDays}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Heure de début des visites</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            <lightning-formatted-time value={workOrderVisitingStartHour}></lightning-formatted-time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Heure de fin des visites</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            <lightning-formatted-time value={workOrderVisitingEndHour}></lightning-formatted-time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="planificationSummary" label="Planification">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Au plus tôt le</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            <lightning-formatted-date-time value={workOrderEarliestStartDate} year="numeric" month="long" day="numeric" weekday="long"></lightning-formatted-date-time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Date d'échéance</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            <lightning-formatted-date-time value={workOrderDueDate} year="numeric" month="long" day="numeric" weekday="long"></lightning-formatted-date-time>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Durée du rendez-vous</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {workOrderDuration} {workOrderDurationType}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Rendez-vous sur plusieurs jours ?</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            <template if:true={workOrderMultiDay}>
+                                                                Oui
+                                                            </template>
+                                                            <template if:false={workOrderMultiDay}>
+                                                                Non
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Priorité</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {workOrderPriority}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Stratégie de planification</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {workOrderSchedulingPolicyName}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="productSummary" label="Produits sélectionnés">
+                                    <lightning-badge slot="actions" label={selectedProductDetails.length}></lightning-badge>
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">                                                            
+                                                            <ul class="slds-has-dividers_bottom-space">
+                                                                <template for:each={selectedProductDetails} for:item="prod">
+                                                                    <li class="slds-item" key={prod.id}>
+                                                                        <article class="slds-tile slds-media">
+                                                                            <div class="slds-media__figure">
+                                                                                <span class="slds-icon_container" title="Produit">
+                                                                                    <lightning-icon slot="media" icon-name="standard:product"></lightning-icon>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div class="slds-media__body">
+                                                                                <article class="slds-tile">
+                                                                                    <h3 class="slds-tile__title slds-truncate" title={prod.name}>
+                                                                                        {prod.name}
+                                                                                    </h3>
+                                                                                    <div class="slds-tile__detail">
+                                                                                        <p class="slds-truncate slds-text-color_weak" title="Produit {prod.productCode}">
+                                                                                            Produit : {prod.productCode}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </article>
+                                                                            </div>
+                                                                        </article>
+                                                                    </li>
+                                                                </template>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <template if:true={hasNCPsSelected}>
+                                    <lightning-accordion-section name="ncpSummary" label="Non-conformité produit sélectionnées">
+                                        <lightning-badge slot="actions" label={selectedNCPDetails.length}></lightning-badge>
+                                        <div class="slds-form" role="list">
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent">
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-form-element__static">                                                            
+                                                                <ul class="slds-has-dividers_bottom-space">
+                                                                    <template for:each={selectedNCPDetails} for:item="ncp">
+                                                                        <li class="slds-item" key={ncp.id}>
+                                                                            <article class="slds-tile slds-media">
+                                                                                <div class="slds-media__figure">
+                                                                                    <span class="slds-icon_container" title="NCP">
+                                                                                        <lightning-icon slot="media" icon-name="standard:case"></lightning-icon>
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div class="slds-media__body">
+                                                                                    <h3 class="slds-tile__title slds-truncate" title={ncp.caseNumber}>
+                                                                                        {ncp.caseNumber}
+                                                                                    </h3>
+                                                                                    <div class="slds-tile__detail">
+                                                                                        <p class="slds-truncate slds-text-color_weak" title="Actif {ncp.asset}">
+                                                                                            Actif : {ncp.asset}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </article>
+                                                                        </li>
+                                                                    </template>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+
+                                <template if:true={hasSkillsSelected}>
+                                    <lightning-accordion-section name="skillSummary" label="Compétences sélectionnées">
+                                        <lightning-badge slot="actions" label={selectedSkillsRecords.length}></lightning-badge>
+                                        <div class="slds-form" role="list">
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-form-element__static">
+                                                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                                                    <thead>
+                                                                        <tr class="slds-line-height_reset">
+                                                                            <th class="" scope="col">
+                                                                                <div class="slds-truncate" title="Compétence">Compétence</div>
+                                                                            </th>
+                                                                            <th class="" scope="col">
+                                                                                <div class="slds-truncate" title="Niveau">Niveau</div>
+                                                                            </th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <template for:each={selectedSkillsRecords} for:item="skill">
+                                                                            <tr class="slds-hint-parent" key={skill.id}>
+                                                                                <th data-label="Nom" scope="row">
+                                                                                    <div class="slds-truncate" title={skill.name}>{skill.name}</div>
+                                                                                </th>
+                                                                                <td data-label="Niveau">
+                                                                                    <div class="slds-truncate" title={skill.value}>{skill.value}</div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </template>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+
+                                <lightning-accordion-section name="intervenantSummary" label="Détails sur les intervenants">
+                                    <lightning-badge slot="actions" label={selectedResourcesRecords.length}></lightning-badge>
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Nombre d'intervenants minimun</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {workOrderMinimumCrewSize}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                        <template if:true={showResourceStep}>
+                                            <div class="slds-form__row">
+                                                <div class="slds-form__item" role="listitem">
+                                                    <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                        <span class="slds-form-element__label">Liste des intervenants sélectionnés</span>                                                        
+                                                        <div class="slds-form-element__control">
+                                                            <div class="slds-form-element__static">
+                                                                <template if:false={hasResourcesSelected}>
+                                                                    Pas d'intervenants séléctionnés
+                                                                </template>
+                                                                <template if:true={hasResourcesSelected}>
+                                                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                                                        <thead>
+                                                                            <tr class="slds-line-height_reset">
+                                                                                <th class="" scope="col">
+                                                                                    <div class="slds-truncate" title="Nom">Nom</div>
+                                                                                </th>
+                                                                                <th class="" scope="col">
+                                                                                    <div class="slds-truncate" title="Présence">Présence</div>
+                                                                                </th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <template for:each={selectedResourcesRecords} for:item="resource">
+                                                                                <tr class="slds-hint-parent" key={resource.id}>
+                                                                                    <th data-label="Nom" scope="row">
+                                                                                        <div class="slds-truncate" title={resource.name}>{resource.name}</div>
+                                                                                    </th>
+                                                                                    <td data-label="Présence">
+                                                                                        <div class="slds-truncate" title={resource.label}>{resource.label}</div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </template>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Note de service</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {workOrderServiceNote}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="complementaryInformation" label="Informations Complémentaires">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                                    <span class="slds-form-element__label">Sous-type d'activité</span>
+                                                    <div class="slds-form-element__control">
+                                                        <div class="slds-form-element__static">
+                                                            {subWorkType}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+        </div>
+
+        <div slot="footer">
+            <template if:true={activeWizard}>
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <template if:true={showPreviousButton}> 
+                    <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+                </template>
+                <template if:true={showNextButton}> 
+                    <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+                </template>
+                <template if:true={showSubmitButton}> 
+                    <lightning-button variant="brand" label="Créer le rendez-vous" class="slds-m-around_medium" onclick={handleCreateWorkOrder}></lightning-button>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tout</fullName>
+    <columns>NAME</columns>
+    <columns>Cle_API__c</columns>
+    <columns>Latitude_initiale__c</columns>
+    <columns>Longitude_initiale__c</columns>
+    <columns>Zoom_initial__c</columns>
+    <columns>Deplacement__c</columns>
+    <columns>Rotation__c</columns>
+    <columns>Street_View__c</columns>
+    <columns>Zoom__c</columns>
+    <columns>Couleur_du_contour_secteur__c</columns>
+    <columns>Couleur_du_fond_secteur__c</columns>
+    <columns>Distance__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Tout</label>
+    <language>fr</language>
+</ListView>

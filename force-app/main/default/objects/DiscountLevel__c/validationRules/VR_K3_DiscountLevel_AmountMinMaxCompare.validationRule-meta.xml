@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_DiscountLevel_AmountMinMaxCompare</fullName>
+    <active>true</active>
+    <description>Le montant maximum doit être supérieur au montant minimum.</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$User.LastName != &quot;Salesforce CPQ&quot; &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+minimumAmount__c &gt; maximumAmount__c</errorConditionFormula>
+    <errorDisplayField>maximumAmount__c</errorDisplayField>
+    <errorMessage>Le montant maximum doit être supérieur au montant minimum.</errorMessage>
+</ValidationRule>

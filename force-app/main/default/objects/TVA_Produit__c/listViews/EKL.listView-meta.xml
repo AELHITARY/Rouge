@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EKL</fullName>
+    <columns>NAME</columns>
+    <columns>Produit__c</columns>
+    <columns>Taux__c</columns>
+    <columns>Datedebut__c</columns>
+    <columns>Datefin__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Produit__c</field>
+        <operation>contains</operation>
+        <value>PG</value>
+    </filters>
+    <label>EKL</label>
+</ListView>

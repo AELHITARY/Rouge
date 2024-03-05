@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MF_FinancingType</fullName>
+    <active>true</active>
+    <description>Type de financement obligatoire</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;FinancingMethod&apos; &amp;&amp;
+ISBLANK(TEXT(financingType__c))</errorConditionFormula>
+    <errorDisplayField>financingType__c</errorDisplayField>
+    <errorMessage>Type de financement obligatoire</errorMessage>
+</ValidationRule>

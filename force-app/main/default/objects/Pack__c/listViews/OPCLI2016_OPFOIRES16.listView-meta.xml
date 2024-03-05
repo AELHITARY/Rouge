@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPCLI2016_OPFOIRES16</fullName>
+    <columns>NAME</columns>
+    <columns>IDRevision__c</columns>
+    <columns>CodePere__c</columns>
+    <columns>CodeFils__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>LAST_UPDATE</field>
+        <operation>equals</operation>
+        <value>1/12/2016 12:00 AM</value>
+    </filters>
+    <label>OPCLI2016_OPFOIRES16_OP0116THER</label>
+    <language>fr</language>
+</ListView>

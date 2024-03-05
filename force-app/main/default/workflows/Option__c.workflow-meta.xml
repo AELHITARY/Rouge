@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldUpdates>
+        <fullName>UR_K2_Option_CodeOptionUnique</fullName>
+        <field>codeOptionUnique__c</field>
+        <formula>ligneDevis__c + Codeoption__c</formula>
+        <name>UR_K2_Option_CodeOptionUnique</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <rules>
+        <fullName>WF_K2_Option_CodeOptionUnique</fullName>
+        <actions>
+            <name>UR_K2_Option_CodeOptionUnique</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <description>Copie le l&apos;ID de la ligne de devis et du code option pour unicité de l&apos;option dans la ligne de devis</description>
+        <formula>NOT(ISNULL(ligneDevis__c)) &amp;&amp; NOT(ISNULL(Codeoption__c))</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+</Workflow>

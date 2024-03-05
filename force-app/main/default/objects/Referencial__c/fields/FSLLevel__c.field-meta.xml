@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FSLLevel__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>Type et niveau d&apos;utilisation de FSL (vide si pas utilisateur de cette solution, gestion = planification + ressource)</inlineHelpText>
+    <label>Niveau FSL</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>SFDCLevel__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Gestion</fullName>
+                <default>false</default>
+                <label>Gestion</label>
+            </value>
+            <value>
+                <fullName>Planification</fullName>
+                <default>false</default>
+                <label>Planification</label>
+            </value>
+            <value>
+                <fullName>Ressource</fullName>
+                <default>false</default>
+                <label>Ressource</label>
+            </value>
+            <value>
+                <fullName>Consultation</fullName>
+                <default>false</default>
+                <label>Consultation</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Administration - Fonctionnel</controllingFieldValue>
+            <controllingFieldValue>Administration - Système</controllingFieldValue>
+            <controllingFieldValue>Données - Consultation</controllingFieldValue>
+            <controllingFieldValue>Données - Gestion</controllingFieldValue>
+            <valueName>Gestion</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Données - Consultation</controllingFieldValue>
+            <controllingFieldValue>Données - Gestion</controllingFieldValue>
+            <valueName>Planification</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Données - Consultation</controllingFieldValue>
+            <controllingFieldValue>Données - Gestion</controllingFieldValue>
+            <valueName>Ressource</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Données - Consultation</controllingFieldValue>
+            <controllingFieldValue>Données - Gestion</controllingFieldValue>
+            <controllingFieldValue>Référentiels</controllingFieldValue>
+            <controllingFieldValue>Référentiels + Données</controllingFieldValue>
+            <controllingFieldValue>RH</controllingFieldValue>
+            <valueName>Consultation</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

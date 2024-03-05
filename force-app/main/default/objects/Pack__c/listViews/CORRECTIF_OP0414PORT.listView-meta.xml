@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CORRECTIF_OP0414PORT</fullName>
+    <columns>IDRevision__c</columns>
+    <columns>NAME</columns>
+    <columns>CodePere__c</columns>
+    <columns>CodeFils__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>LAST_UPDATE</field>
+        <operation>equals</operation>
+        <value>5/5/2014 12:00 AM</value>
+    </filters>
+    <label>CORRECTIF 05/05/2014</label>
+    <language>fr</language>
+</ListView>

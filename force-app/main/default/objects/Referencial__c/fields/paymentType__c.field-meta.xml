@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>paymentType__c</fullName>
+    <description>Utilisé sur le référentiel Mode de règlement, information destinée à la création des écritures comptables</description>
+    <externalId>false</externalId>
+    <label>Type de règlement</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>paymentType</valueSetName>
+    </valueSet>
+</CustomField>

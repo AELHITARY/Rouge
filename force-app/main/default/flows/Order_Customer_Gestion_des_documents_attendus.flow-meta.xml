@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <assignments>
+        <description>Construction de la liste des Ids des documents pour les doublons</description>
+        <name>Add_DocumentId_to_list</name>
+        <label>Add DocumentId to list</label>
+        <locationX>1693</locationX>
+        <locationY>132</locationY>
+        <assignmentItems>
+            <assignToReference>DocumentsId</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>ExpectedDocument.document__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Create_ExpectedAssignedDocument</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Ajoute le ExpectedAssignedDocument à la liste pour la création</description>
+        <name>Add_ExpectedAssignedDocument_to_list</name>
+        <label>Add to ExpectedAssignedDocument list</label>
+        <locationX>1488</locationX>
+        <locationY>321</locationY>
+        <assignmentItems>
+            <assignToReference>ExpectedAssignedDocumentsList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>ExpectedAssignedDocument</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>For_Earch_ExpectedDocument</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Add_ExpectedDocument_Source_to_list</name>
+        <label>Add ExpectedDocument Source to list</label>
+        <locationX>1015</locationX>
+        <locationY>174</locationY>
+        <assignmentItems>
+            <assignToReference>ExpectedDocumentsList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Get_ExpectedDocument</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>For_Earch_ExpectedDocument</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Création des ExpectedAssignedDocument</description>
+        <name>Create_ExpectedAssignedDocument</name>
+        <label>Create ExpectedAssignedDocument</label>
+        <locationX>1693</locationX>
+        <locationY>322</locationY>
+        <assignmentItems>
+            <assignToReference>ExpectedAssignedDocument.customerOrder__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>CustomerOrderId</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>ExpectedAssignedDocument.expectedDocument__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>ExpectedDocument.document__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>ExpectedAssignedDocument.orderNonCompliance__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>ExpectedDocument.orderNonCompliance__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Add_ExpectedAssignedDocument_to_list</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>Vérifie les doublons</description>
+        <name>Check_duplicate</name>
+        <label>Check duplicate</label>
+        <locationX>1481</locationX>
+        <locationY>132</locationY>
+        <defaultConnector>
+            <targetReference>Add_DocumentId_to_list</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Pas de doublon</defaultConnectorLabel>
+        <rules>
+            <name>Doublon</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>DocumentsId</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <elementReference>ExpectedDocument.document__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>For_Earch_ExpectedDocument</targetReference>
+            </connector>
+            <label>Doublon</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Vérifie si des enregistrements sont à créér</description>
+        <name>Check_ExpectedAssignedDocumentsList</name>
+        <label>Check ExpectedAssignedDocumentsList</label>
+        <locationX>1148</locationX>
+        <locationY>399</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Records_to_create</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>ExpectedAssignedDocumentsList</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_records</targetReference>
+            </connector>
+            <label>Records to create</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_if_Expected_Document</name>
+        <label>Check if Expected Document</label>
+        <locationX>841</locationX>
+        <locationY>181</locationY>
+        <defaultConnectorLabel>Résultat par défaut</defaultConnectorLabel>
+        <rules>
+            <name>Has_documents</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_ExpectedDocument</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Add_ExpectedDocument_Source_to_list</targetReference>
+            </connector>
+            <label>Has documents</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>IsDebug</name>
+        <label>Debug ?</label>
+        <locationX>390</locationX>
+        <locationY>176</locationY>
+        <defaultConnector>
+            <targetReference>Get_ExpectedDocument</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Normal</defaultConnectorLabel>
+        <rules>
+            <name>Debug</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>CustomerOrderId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Commande_Client</targetReference>
+            </connector>
+            <label>Debug</label>
+        </rules>
+    </decisions>
+    <description>CustomerOrder - Gestion des documents attendus lors de la création d&apos;une commande client en fonction du mode de financement, des CGV et de la source</description>
+    <interviewLabel>Order (Customer) - Gestion des documents attendus {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Order (Customer) - Gestion des documents attendus</label>
+    <loops>
+        <description>Pour chaque document attendu trouvé, on crée un enregistrement ExpectedAssignedDocument lié au contrat</description>
+        <name>For_Earch_ExpectedDocument</name>
+        <label>For Earch ExpectedDocument</label>
+        <locationX>1152</locationX>
+        <locationY>174</locationY>
+        <assignNextValueToReference>ExpectedDocument</assignNextValueToReference>
+        <collectionReference>ExpectedDocumentsList</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Check_duplicate</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Check_ExpectedAssignedDocumentsList</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Création des enregistrements d&apos;AssignedExpectedDocument</description>
+        <name>Create_records</name>
+        <label>Create records</label>
+        <locationX>933</locationX>
+        <locationY>399</locationY>
+        <inputReference>ExpectedAssignedDocumentsList</inputReference>
+    </recordCreates>
+    <recordLookups>
+        <description>Récupération des informations du contrat</description>
+        <name>Get_Commande_Client</name>
+        <label>Get Commande client</label>
+        <locationX>540</locationX>
+        <locationY>38</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_ExpectedDocument</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CustomerOrderId</elementReference>
+            </value>
+        </filters>
+        <object>Order</object>
+        <outputReference>CustomerOrder</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>financingMethod__c</queriedFields>
+        <queriedFields>termsAndConditions__c</queriedFields>
+        <queriedFields>source__c</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Récupération des documents attendu selon le mode de financement</description>
+        <name>Get_ExpectedDocument</name>
+        <label>Get ExpectedDocument</label>
+        <locationX>711</locationX>
+        <locationY>179</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_if_Expected_Document</targetReference>
+        </connector>
+        <filterLogic>1 OR 2 OR 3</filterLogic>
+        <filters>
+            <field>expectedBy__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CustomerOrder.financingMethod__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>expectedBy__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CustomerOrder.termsAndConditions__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>expectedBy__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CustomerOrder.source__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>ExpectedDocument__c</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>document__c</queriedFields>
+        <queriedFields>orderNonCompliance__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>52</locationX>
+        <locationY>156</locationY>
+        <connector>
+            <targetReference>IsDebug</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Objet contenant les informations du contrat</description>
+        <name>Contract</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Contract</objectType>
+    </variables>
+    <variables>
+        <description>Objet contenant les informations de la commande client</description>
+        <name>CustomerOrder</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Order</objectType>
+    </variables>
+    <variables>
+        <description>Id de la commande client</description>
+        <name>CustomerOrderId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Liste des Ids des documents pour la gestion des doublons</description>
+        <name>DocumentsId</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Enregistrement ExpectedAssignedDocument pour le contrat</description>
+        <name>ExpectedAssignedDocument</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AssignedExpectedDocument__c</objectType>
+    </variables>
+    <variables>
+        <description>Liste des documents attendus du contrat</description>
+        <name>ExpectedAssignedDocumentsList</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>AssignedExpectedDocument__c</objectType>
+    </variables>
+    <variables>
+        <description>Document attendu</description>
+        <name>ExpectedDocument</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ExpectedDocument__c</objectType>
+    </variables>
+    <variables>
+        <description>Liste des documents attendus</description>
+        <name>ExpectedDocumentsList</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ExpectedDocument__c</objectType>
+    </variables>
+</Flow>

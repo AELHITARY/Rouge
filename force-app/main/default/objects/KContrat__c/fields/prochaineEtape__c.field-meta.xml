@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>prochaineEtape__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE(libelleStatutContrat__c,
+  &apos;Contrats ECI du jour&apos;, &apos;Terminé&apos;,
+  &apos;Contrats ECI pose du jour&apos;, &apos;Terminé&apos;,
+  &apos;Contrats en SAV&apos;, &apos;&apos;,
+  &apos;Contrats non commandables&apos;, &apos;Commande usine&apos;,
+  &apos;Contrats non commandes&apos;, &apos;Commande usine&apos;,
+  &apos;Contrats non confirmes&apos;, &apos;Commande usine&apos;,
+  &apos;Contrats non installables&apos;, &apos;Installation&apos;,
+  &apos;Contrats non installes non prepa&apos;, &apos;Installation&apos;,
+  &apos;Contrats non installes non programmes&apos;, &apos;Installation&apos;,
+  &apos;Contrats non installes programme&apos;, &apos;Installation&apos;,
+  &apos;Contrats non livres non prepares&apos;, &apos;Livraison au dépôt&apos;,
+  &apos;Contrats non livres non programmes&apos;, &apos;Livraison au dépôt&apos;,
+  &apos;Contrats non livres programme&apos;, &apos;Livraison au dépôt&apos;,
+  &apos;Contrats non metrables&apos;, &apos;Métrage&apos;,
+  &apos;Contrats non metres non progra.&apos;, &apos;Métrage&apos;,
+  &apos;Contrats non metres programme&apos;, &apos;Commande usine&apos;,
+  &apos;Contrats resilies&apos;, &apos;&apos;,
+  &apos;Contrats soldes&apos;, &apos;&apos;,
+  &apos;Contrats totalement installes&apos;, &apos;&apos;,
+  &apos;ECI Attente Inst Non Prepare&apos;, &apos;Terminé&apos;,
+  &apos;ECI Attente Inst Non Programme&apos;, &apos;Terminé&apos;,
+  &apos;ECI Attente Inst programme&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non Commande&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non Commande Programme&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non Confirme&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non Confirme Programme&apos;, &apos;Terminé&apos;,
+  &apos;ECI non diagnostique non prepare&apos;, &apos;Terminé&apos;,
+  &apos;ECI non diagnostique non prog.&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non diagnostique programme&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non Livre Non Prepare&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non Livre Non Programme&apos;, &apos;Terminé&apos;,
+  &apos;ECI Non Livre programme&apos;, &apos;Terminé&apos;,
+  &apos;Solde&apos;, &apos;&apos;,
+  &apos;Soldé&apos;, &apos;&apos;,
+  &apos;Totalement installe&apos;, &apos;&apos;,
+  &apos;&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Prochaine étape</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

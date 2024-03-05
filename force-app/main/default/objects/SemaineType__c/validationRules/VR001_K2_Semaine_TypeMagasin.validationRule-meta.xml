@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Semaine_TypeMagasin</fullName>
+    <active>true</active>
+    <description>CRM-514 : Le magasin est obligatoire si la semaine est de type Magasin</description>
+    <errorConditionFormula>AND($User.ByPassValidationRule__c = False, ISBLANK(codeMagasin__c), ISPICKVAL(type__c, &apos;Magasin&apos;))</errorConditionFormula>
+    <errorDisplayField>codeMagasin__c</errorDisplayField>
+    <errorMessage>Le magasin est obligatoire !</errorMessage>
+</ValidationRule>

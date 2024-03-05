@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Porte_d_entr_e_PVC_semi_vitr_e_contempor</fullName>
+    <columns>NAME</columns>
+    <columns>valeurCoef1__c</columns>
+    <columns>dateDebut__c</columns>
+    <columns>dateFin__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>famille__c</field>
+        <operation>contains</operation>
+        <value>Porte d&apos;entrée PVC semi-vitrée contemporaine modèle Blanpain</value>
+    </filters>
+    <label>Porte d&apos;entrée PVC semi-vitrée contempor</label>
+    <language>fr</language>
+</ListView>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Mes_chantiers</fullName>
+    <columns>NAME</columns>
+    <columns>numeroChantier__c</columns>
+    <columns>statutVisuel__c</columns>
+    <columns>proprietaire__c</columns>
+    <columns>autreProprietaire__c</columns>
+    <columns>rue__c</columns>
+    <columns>codePostal__c</columns>
+    <columns>ville__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Chantier__c.Chantier</value>
+    </filters>
+    <label>Mes chantiers</label>
+</ListView>

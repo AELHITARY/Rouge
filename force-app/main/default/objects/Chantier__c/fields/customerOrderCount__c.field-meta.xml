@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>customerOrderCount__c</fullName>
+    <description>Nombre de commande client du chantier</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Nombre de commande client du chantier</inlineHelpText>
+    <label>[#] Nombre de commande client</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

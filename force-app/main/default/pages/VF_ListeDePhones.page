@@ -1,0 +1,2240 @@
+<apex:page title="Listes de phones" doctype="html-5.0" controller="Ctrl_ListeDePhones" action="{!insertUserStats}">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/custom-theme/jquery-ui-1.12.1.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'css/cartographie.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/dataTables.bootstrap.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.KparK_Datatable_CSS)}" />
+        <style type="text/css">
+            #pagea {
+                padding: 0px 4px 0px 4px;
+            }
+
+            #legendeBlocker {
+                z-index: -99999999 !important;
+            }
+
+            .custom-popup .leaflet-popup-content {
+                height: 160px;
+            }     
+
+            .typeCompteStyle {
+                width: 100%;
+                float: right;
+                padding: 5px 10px;
+                font-size: 12px;
+                line-height: 1.5;
+                border-radius: 3px; 
+                color: #555555;
+                background-color: #ffffff;
+                border: 1px solid #cccccc;
+                box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+                box-sizing: border-box;
+                transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            }
+
+            .lookupInput input {
+                width: 90%;
+                padding: 5px 10px;
+                font-size: 12px;
+                line-height: 1.5;
+                border-radius: 3px;
+                color: #555555;
+                background-color: #ffffff;
+                border: 1px solid #cccccc;
+                box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+                box-sizing: border-box;
+                transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            }
+
+            input[type=date] {
+                align-items: center;
+                -webkit-float: right;
+                height: 34px;
+                float: right;
+                padding: 0px 10px;
+                font-size: 12px;
+                line-height: 1.5;
+                border-radius: 3px;
+                color: #555555;
+                background-color: #ffffff;
+                border: 1px solid #cccccc;
+                box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+                box-sizing: border-box;
+                transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            }
+
+            input[type="date"]:: -webkit-calendar-picker-indicator {
+                -webkit-padding-start: 1px;
+            }
+
+            #loading {
+                /* position: absolute;
+                top: 25%;
+                left: 0; */
+                width: 100%;
+                margin-top: 10px;
+                line-height: 20px;
+                text-align: center;
+                z-index: 9999;
+            }
+
+            .section {
+                height: 20px;
+                line-height: 20px;
+            }
+
+            /* Loaders */
+            .loader {
+                width: 20px;
+                height: 20px;
+                display: inline-block;
+                vertical-align: middle;
+                position: relative;
+                border-radius: 15px;
+                border: 3px solid rgba(0, 0, 0, 0.4);
+                margin-top: 2px;
+            }
+
+            .loader-quart {
+                border-radius: 20px;
+                border: 4px solid rgba(0, 0, 0, 0.4);
+            }
+
+                .loader-quart:after {
+                    content: '';
+                    position: absolute;
+                    top: -4px;
+                    left: -4px;
+                    bottom: -4px;
+                    right: -4px;
+                    border-radius: 20px;
+                    border: 4px solid transparent;
+                    border-top-color: #000;
+                    -webkit-animation: spin 1s linear infinite;
+                    -moz-animation: spin 1s linear infinite;
+                    animation: spin 1s linear infinite;
+                }
+
+            .loader2 {
+                width: 15px;
+                height: 15px;
+                display: inline-block;
+                vertical-align: middle;
+                position: relative;
+            }
+
+            .loader2-quart {
+                border-radius: 15px;
+                border: 3px solid rgba(0, 0, 0, 0.4);
+            }
+
+                .loader2-quart:after {
+                    content: '';
+                    position: absolute;
+                    top: -3px;
+                    left: -3px;
+                    bottom: -3px;
+                    right: -3px;
+                    border-radius: 15px;
+                    border: 3px solid transparent;
+                    border-top-color: #000;
+                    -webkit-animation: spin 1s linear infinite;
+                    -moz-animation: spin 1s linear infinite;
+                    animation: spin 1s linear infinite;
+                }
+
+            /* Animations */
+            @-webkit-keyframes spin {
+                from {
+                    -webkit-transform: rotate(0deg);
+                }
+
+                to {
+                    -webkit-transform: rotate(360deg);
+                }
+            }
+
+            @-moz-keyframes spin {
+                from {
+                    -moz-transform: rotate(0deg);
+                }
+
+                to {
+                    -moz-transform: rotate(360deg);
+                }
+            }
+
+            @keyframes spin {
+                from {
+                    -webkit-transform: rotate(0deg);
+                    -moz-transform: rotate(0deg);
+                    -ms-transform: rotate(0deg);
+                    -o-transform: rotate(0deg);
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    -webkit-transform: rotate(360deg);
+                    -moz-transform: rotate(360deg);
+                    -ms-transform: rotate(360deg);
+                    -o-transform: rotate(360deg);
+                    transform: rotate(360deg);
+                }
+            }
+
+            .noSidebarCell {
+                padding: 0px;
+            }
+
+            .loader:after {
+                content: '';
+                position: absolute;
+                top: -3px;
+                left: -3px;
+                bottom: -3px;
+                right: -3px;
+                border-radius: 15px;
+                border: 3px solid transparent;
+                border-top-color: #000;
+                -webkit-animation: spin 1s linear infinite;
+                -moz-animation: spin 1s linear infinite;
+                animation: spin 1s linear infinite;
+            }
+
+            #j_id0:account-detail {
+                height: 100%;
+            }
+
+            @media (min-width: 768px) {
+                .visualstrap .form-horizontal .control-label {
+                    text-align: inherit;
+                }
+            }
+
+            .panel-body-parent > .panel-body {
+                border-top-color: inherit !important;
+                margin-bottom: 5px !important;
+            }
+
+            .panel-body-child > .panel-body {
+                border-top-color: inherit !important;
+            }
+
+            .panel-body-child {
+                margin-bottom: 5px !important;
+            }
+
+            /* Collapsable Panels */
+            .panel-heading {
+                cursor: pointer;
+            }
+
+                .panel-heading a:hover, .panel-heading a:enabled, .panel-heading a:active, .panel-heading a:visited {
+                    text-decoration: none;
+                }
+
+                .panel-heading a:after {
+                    font-family: 'Glyphicons Halflings';
+                    content: "\e114";
+                    float: right;
+                }
+
+                .panel-heading a.collapsed:after {
+                    content: "\e080";
+                }
+
+            // Map fix .gm-style img {
+                max-width: none;
+            }
+
+            .gm-style label {
+                width: auto;
+                display: inline;
+            }
+
+            html, body {
+                height: 100%;
+            }
+
+            #map {
+                min-height: 740px;
+            }
+        </style>
+
+        <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui.1.12.1.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet-control-geocoder/Control.Geocoder.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'js/cartographie.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.dqe_js, 'classes/dqe.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.dqe_js, 'jquery.dqe.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/media/js/jquery.dataTables.min.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/dataTables.bootstrap.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/sorting/natural.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.FullCalendar, 'lib/moment.min.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.Cartographie, 'proj4s/proj4js-combined.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.Cartographie, 'proj4s/EPSG27572.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.Cartographie, 'proj4s/EPSG4326.js')}" />
+        <apex:remoteobjects >
+            <apex:remoteobjectmodel name="KContrat__c" jsshorthand="Contrat" fields="Id,compte__c,prochainMetrage__c,prochaineInstallation__c,prochainSAV__c" />
+            <apex:remoteobjectmodel name="Account" fields="Id,email__c,autreTelephone__c,telephoneDomicile__c,telephoneMobile__c,optinTelephoneDomicileKparK__c,optinTelephoneMobileKparK__c,nbPhonings__c,nbAppelsSortants__c,dateDernierAppelSortantKparK__c,AccountNumber" />
+            <apex:remoteobjectmodel name="Product2" fields="Id,Name,ProductCode,IsActive" />
+            <apex:remoteobjectmodel name="ReferentielOptions__c" fields="Id,Name,CodeOption__c" />
+        </apex:remoteobjects>
+
+    </head>
+
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+        var $j = jQuery.noConflict();
+        var datatableOptions;
+        var script;
+        var entityName = '';
+        var entityObject;
+        var remoteActionsToExecute = 0;
+        var remoteActionsExecuted = 0;
+        var initScript = false;
+        var compteSearched = [];
+        var compteGeoSearched = [];
+        var sectorId;
+        // hack for IE9 (no console...)
+        if (!window.console) window.console = {};
+        if (!window.console.log) window.console.log = function () { };
+        if (!window.console.debug) window.console.debug = function () { }; 
+
+        // Messages d'erreur
+        var validationRueCPError = "{!$Label.ldp_erreur_rueCPObligatoire}";
+        var validationRueVilleError = "{!$Label.ldp_erreur_rueVilleObligatoire}";
+        var validationProduitOptionError = "{!$Label.ldp_erreur_codeProduit}";
+
+        //Initialisation à la page
+        $j(document).ready(function() {
+            // Chargement des statistiques
+            loadStatistiques();
+            // Option du datatable
+            datatableOptions = {
+                responsive: true,
+                "bRetrieve": true,
+                "language": {
+                    "url": "{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/l18n/French.json')}"
+                },
+                "columns": [ //définition des noms de propriétés auxquelles réfèrent les colonnes (pour récupérer les données en JSON)
+                    {"data": "Id"},
+                    {"data": "NumCompte"},
+                    {"data": "Name"},
+                    {"data": "TypeCompte"},
+                    {"data": "Address"},
+                    {"data": "PostalCode"},
+                    {"data": "City"},
+                    {"data": "TelDomicile"},
+                    {"data": "TelMobile"},
+                    {"data": "AutreTel"},
+                    {"data": "NbAppelsSortants"},
+                    {"data": "DateDernierAppel"}
+                ],
+                "aaSorting": [[ 1, "asc" ]], //tri par numéro de compte
+                "columnDefs": [
+                    { "type": "natural", "targets": [ 0,1 ] },
+                    { targets: 0, visible: false }
+                ]
+            };
+            // Quand rue est modifié, raz du CP et ville
+            $j("[id$=rue]").on('change', function() {
+                var rue = $j(this)[0];
+                var codePostal = $j("[id$=codePostal]")[0];
+                var ville = $j("[id$=ville]")[0];
+            });
+            // Cache les filtres Magasin, DV et DR
+            if({!(CONTAINS($Profile.Name, "Vendeur") || CONTAINS($Profile.Name, "RVJ") || CONTAINS($Profile.Name, "RV")) && !unlockMagasin})
+                $j("[id$=hiddenBlockFromvendeurs]").addClass("hidden");
+
+
+            var productField = $j("[id$=codeP]");
+            if(productField.val() && productField.val() != '') {
+                getProductInformation(productField.val(), '{!productSample}', 'prd'); // displayProductId
+            }
+            var optionField = $j("[id$=codeO]");
+            if(optionField.val() && optionField.val() != '') {
+                getOptionInformation(optionField.val(), '{!optionSample}', 'opt');
+            }
+            // Active product autocomplete field
+            activeAutoCompleteField('prd');
+            activeAutoCompleteField('opt');
+
+
+            /***************/
+            /* GOOGLE MAPS */
+            /***************/
+            // Initialisation de Google API
+            $j('#critereGeoTab').on('shown.bs.tab', function (e) {
+                console.log('EVENT tab critereGeoTab shown !');
+                if(!initScript) {
+                    loadScript();                    
+                    initializeMap();
+                }
+                else map.fire('resize');
+            });
+
+        });
+
+        /* Récupère les stats de l'utilisateur                                          */
+        /*------------------------------------------------------------------------------*/
+        function loadStatistiques(){
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ListeDePhones.getTodayStats}',
+                function(result, event) {
+                    if (event.status) {
+                        // Récupération des éléments HTML
+                        var nbRecherchesEffectuees = $j("[id$=nbRecherchesEffectuees]")[0];
+                        var nbComptesRetournes = $j("[id$=nbComptesRetournes]")[0];
+                        var nbExportsEffectues = $j("[id$=nbExportsEffectues]")[0];
+                        var nbComptesExportes = $j("[id$=nbComptesExportes]")[0];
+
+                        // Mise à jour des objectifs
+                        // Fix pour Firefox
+                        if(document.all){
+                                nbRecherchesEffectuees.innerText = result.nbRecherchesEffectuees__c;
+                                nbComptesRetournes.innerText = result.nbComptesRetournes__c;
+                                nbExportsEffectues.innerText = result.nbExportsEffectues__c;
+                                nbComptesExportes.innerText = result.nbComptesExportes__c;
+                        } else{
+                                nbRecherchesEffectuees.textContent = result.nbRecherchesEffectuees__c;
+                                nbComptesRetournes.textContent = result.nbComptesRetournes__c;
+                                nbExportsEffectues.textContent = result.nbExportsEffectues__c;
+                                nbComptesExportes.textContent = result.nbComptesExportes__c;
+                        }
+
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction pour la recherche des comptes */
+        /*----------------------------------------*/
+        function searchAcc() {
+
+            // Récupération du li de l'onglet "Via critères de comptes"
+            var critereCompteTab = $j('#critereCompteTab');
+            // Récupération du li de l'onglet "Via critères géographiques"
+            var critereGeoTab = $j('#critereGeoTab');
+
+            // Si l'onglet "Via critère de comptes" est actif alors on effectue une recherche via le formulaire
+            if(critereCompteTab.hasClass('active')) {
+                rechercheComptesViaCriteresComptes();
+
+            // Si l'onglet "Via critères géographiques" est actif alors on effectue une recherche via la map
+            } else if(critereGeoTab.hasClass('active')) {
+                rechercheComptesViaCriteresGeo();
+            }
+        }
+
+        /* Fonction pour la recherche des comptes via les critères de compte */
+        /*-------------------------------------------------------------------*/
+        function rechercheComptesViaCriteresComptes() {
+            var argument = getForm();
+            var rues = [];
+            if($j("[id$=rue]").val() != '' && $j("[id$=rue]").val() != 'undefined') rues.push($j("[id$=rue]").val());
+            if($j("[id$=rue2]").val() != '' && $j("[id$=rue2]").val() != 'undefined') rues.push($j("[id$=rue2]").val());
+            if($j("[id$=rue3]").val() != '' && $j("[id$=rue3]").val() != 'undefined') rues.push($j("[id$=rue3]").val());
+
+            var errorDetected = checkErrors();
+            if(errorDetected == true)
+                return;
+
+            // Chargement
+            loading(true);
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ListeDePhones.recupereCompte}', argument, rues,
+                function(result, event) {
+                    if (event.status) {
+                        // Création liste
+                        createListeResultat(result);
+                        // Chargement des statistiques
+                        loadStatistiques();
+                        // Fin de chargement
+                        loading(false);
+                    } else if (event.type === 'exception') {
+                        // Fin de chargement
+                        loading(false);
+                        alert(event.message);
+                    } else {
+                        // Fin de chargement
+                        loading(false);
+                        alert(event.message);
+                    }
+                },
+            {escape: true}
+            );
+        }
+
+        /* Fonction pour créer le tableau de liste de résultats              */
+        /*-------------------------------------------------------------------*/
+        function createListeResultat(result) {
+            var isExportPdf = $j("[id$=isExportPdf]").val();
+            var isExportExcel = $j("[id$=isExportExcel]").val();
+
+            if(result.length > 0) {
+                compteSearched = [];
+                var contenu= '';
+                var nombre = result.length;
+                var nombreRefus = 0;
+                var k = 0;
+                var n = 0;
+
+                // Affiche erreur si recherche par extension avec rue non géocodé
+                if(result[0].RueGeocode) {
+                    var addressError=result[0].RueGeocode.split('|');
+                    var geoMessage="{!$Label.ldp_erreur_adresseGeocode}";
+                    geoMessage+='<ul>';
+                    for(let j=0; j<addressError.length; j++)
+                        geoMessage+='<li>'+addressError[j]+'</li>';
+                    geoMessage+='</ul>';
+                    $j('#alert-parent').removeClass('hidden').addClass('alert-warning');
+                    $j('#alert-text').html(geoMessage);
+                }
+
+                contenu+= nombre + ' résultats ont été trouvés. Résultats non-affichés : ' + nombreRefus + ' sont en refus de démarchage téléphonique.<br/><br/>';
+
+                //Consctruction du tableau de résultats
+                contenu+= '<table style="width: 100%;" class="table table-striped table-bordered table-hover dataTable table-liste" id="resultTable">';
+                if(result.length > 0){
+                    contenu+= '<thead><tr>';
+                    //contenu+= ' <th style="width:4%;"></th>';
+                    contenu+= ' <th style="width:0;">Id</th>'; //Colonne non affichée permettant d'avoir les Id pour pouvoir les passer au contrôleur
+                    contenu+= ' <th style="width:15%;">N° Compte</th>';
+                    contenu+= ' <th style="width:12%;">Nom du compte</th>';
+                    contenu+= ' <th style="width:6%;">Type</th>';
+                    contenu+= ' <th style="width:13%;">Rue</th>';
+                    contenu+= ' <th style="width:5%;;">CP</th>';
+                    contenu+= ' <th style="width:10%;">Ville</th>';
+                    contenu+= ' <th style="width:9%;">Tél. Domicile</th>';
+                    contenu+= ' <th style="width:9%;">Tél. Portable</th>';
+                    contenu+= ' <th style="width:9%;">Autre Tél.</th>';
+                    if(isMobile()) {
+                        contenu+= '<th title="Nombre appels sortants Vente / nombre appels sortants Call" style="width:7%;">Nb AS</th>';
+                        contenu+= '<th style="width:9%;">Dernier AS</th>';
+                    } else {
+                        contenu+= '<th title="Nombre appels sortants Vente / nombre appels sortants Call" style="width:9%;">Nb appels sortants</th>';
+                        contenu+= '<th style="width:9%;">Dernier appel sortant</th>';
+                    }
+                    contenu+= '</tr></thead>';
+                }
+                var ligneRefus = '<td style="width:9%; font-style: italic;">Refus</td>';
+
+                //Remplissage du tableau
+                for(k=0; k<result.length; k++)
+                {
+                    // Calcul refus
+                    if (result[k].OptinTelDomicile == false && result[k].OptinTelMobile == false) {
+                        nombreRefus++;
+                    } else {
+                        //formattage des champs et ajout du compte à la liste des comptes à afficher
+                        compteSearched.push(result[k]);
+                        var stringDernielAppel = '';
+                        if(result[k].Id == null){result[k].Id = ' ';}
+                        if(result[k].NumCompte == null){result[k].NumCompte = ' ';}
+                        if(result[k].Name == null){result[k].Name = ' ';}
+                        if(result[k].TypeCompte == null){result[k].TypeCompte = ' ';}
+                        if(result[k].Address == null){result[k].Address = ' ';}
+                        if(result[k].PostalCode == null){result[k].PostalCode = ' ';}
+                        if(result[k].City == null){result[k].City = ' ';}
+                        if(result[k].TelDomicile == null){result[k].TelDomicile = ' ';}
+                        if(result[k].TelMobile == null){result[k].TelMobile = ' ';}
+                        if(result[k].AutreTel == null){result[k].AutreTel = ' ';}
+                        if(result[k].NbPhonings == null){result[k].NbPhonings = '0';}
+                        if(result[k].NbAppelsSortants == null){result[k].NbAppelsSortants = '0';}
+                        if(result[k].DateDernierAppel == null){stringDernielAppel = 'N/A'; result[k].DateDernierAppel}
+                        else{
+                            var dateDernierAppel = new Date(result[k].DateDernierAppel);
+                            var moisDateDernierAppel = dateDernierAppel.getMonth();
+                            moisDateDernierAppel += 1;
+                            if(dateDernierAppel.getDate() < 10) stringDernielAppel = '0' + dateDernierAppel.getDate(); else stringDernielAppel = dateDernierAppel.getDate();
+                            if(moisDateDernierAppel < 10) stringDernielAppel += '/0' + moisDateDernierAppel; else stringDernielAppel += '/' + moisDateDernierAppel;
+                            stringDernielAppel += '/' + dateDernierAppel.getFullYear();
+                            result[k].DateDernierAppel = dateDernierAppel;
+                        }
+                        contenu+= '<tr width="100%">';
+                        contenu+= '<td style="width:0;">' + result[k].Id + '</td>';
+                        contenu+= '<td style="width:10%;">' + result[k].NumCompte + '</td>';
+                        contenu+= '<td style="width:12%;"><a href="/' + result[k].Id + '" >' + result[k].Name + '</a></td>';
+                        contenu+= '<td style="width:6%;">' + result[k].TypeCompte + '</td>';
+                        contenu+= '<td style="width:13%;">' + result[k].Address + '</td>';
+                        contenu+= '<td style="width:5%;">' + result[k].PostalCode + '</td>';
+                        contenu+= '<td style="width:10%;">' + result[k].City + '</td>';
+                        if (result[k].OptinTelDomicile == true){
+                            contenu+= '<td style="width:9%;">' + result[k].TelDomicile + '</td>';
+                        } else {
+                            contenu+= ligneRefus;
+                        }
+                        if (result[k].OptinTelMobile == true) {
+                            contenu+= '<td style="width:9%;">' + result[k].TelMobile + '</td>';
+                        } else {
+                            contenu+= ligneRefus;
+                        }
+                        if (result[k].OptinTelDomicile == true) {
+                            contenu+= '<td style="width:9%;">' + result[k].AutreTel + '</td>';
+                        } else {
+                            contenu+= ligneRefus;
+                        }
+                        contenu+= '<td id="nbAppSortant_' + result[k].Id + '" title="Nombre appels sortants Vente / nombre appels sortants Call" style="width:7%;">' + result[k].NbPhonings + ' / ' + result[k].NbAppelsSortants + '</td>';
+                        contenu+= '<td id="dateAppSortant_' + result[k].Id + '" style="width:9%;">' + stringDernielAppel + '</td>';
+                        contenu+= '</tr>';
+                    }
+                }
+                contenu+= '</table><br/>';
+                $j("#affichage").html(contenu);
+                $j("#howmany").html(nombre);
+
+                // Active les boutons exports
+                if(result.length > 0 && result.length !== nombreRefus){
+                    if(isExportPdf == 'false')      $j('#boutonExportPdf').addClass('hidden');
+                    else                            $j('#boutonExportPdf').removeClass('hidden');
+                    if(isExportExcel == 'false')    $j('#boutonExportExcel').addClass('hidden');
+                    else                            $j('#boutonExportExcel').removeClass('hidden');
+                    $j('#liste-create').removeClass('hidden');
+                } else {
+                    $j('#boutonExportPdf').addClass('hidden');
+                    $j('#boutonExportExcel').addClass('hidden');
+                    $j('#liste-create').addClass('hidden');
+                }
+                // Active le tri et désactive pour la première colonne
+                $("[id$=resultTable]").dataTable(datatableOptions);
+            } else {
+                var nombre = '(0)';
+                var contenu= 'Pas de résultats.';
+                $j("#affichage").html(contenu);
+                $j("#howmany").html(nombre);
+                $j('#boutonExportPdf').addClass('hidden');
+                $j('#boutonExportExcel').addClass('hidden');
+                $j('#liste-create').addClass('hidden');
+            }
+        }
+
+        /* Fonction pour mettre à jour les données d'export du contrôleur */
+        /*----------------------------------------------------------------*/
+        function updateDataExport() {
+            var table = $("#resultTable").DataTable();
+            var tableData = table.column(0).data(); //récupère les valeurs triées de la première colonne du tableau (Id)
+            //table.rows().data().toArray() pour avoir toutes les colonnes
+
+            //On transforme les données du tableau au bon format pour pouvoir les passer au contrôleur
+            var accountsForExport = [];
+            for(var i = 0, len = tableData.length; i < len ; i++)
+            {
+                accountsForExport.push(tableData[i]);
+            }
+            var jsonForExport = JSON.stringify(accountsForExport);
+            exportRerender(jsonForExport);
+        }
+
+        /* Gestion de l'activation des boutons Exporter                   */
+        /*----------------------------------------------------------------*/
+        function handleExportPDF() {
+            $j('#boutonExportPdf').on('updateComplete', function (e) { //le bouton attend l'évènement updateComplete
+                $j('#boutonExportPdf').off('updateComplete'); //on arrête d'attendre l'évènement
+                var commandLink = $j("[id$=commandExportPDF]")[0];
+                eventFire(commandLink,'click'); //génération du PDF
+            });
+
+            updateDataExport(); //appelle l'action function exportRerender qui va déclencher l'event updateComplete oncomplete
+        }
+        function handleExportCSV() {
+            $j('#boutonExportExcel').on('updateComplete', function (e) { //le bouton attend l'évènement updateComplete
+                $j('#boutonExportExcel').off('updateComplete'); //on arrête d'attendre l'évènement
+                var commandLink = $j("[id$=commandExportCSV]")[0];
+                eventFire(commandLink,'click'); //génération du CSV
+            });
+
+            updateDataExport(); //appelle l'action function exportRerender qui va déclencher l'event updateComplete oncomplete
+        }
+
+        /*    Gère l'event "complete" de l'actionfunction exportRerender     */
+        /* Notifie les boutons d'export grâce à l'évènement "updateComplete" */
+        /*-------------------------------------------------------------------*/
+        function handleExportRerenderComplete() {
+            $j('#boutonExportPdf').trigger('updateComplete');
+            $j('#boutonExportExcel').trigger('updateComplete');
+        }
+
+        /* Fonction pour le chargement                      */
+        /*--------------------------------------------------*/
+        function loading(isLoading) {
+            if(isLoading) {
+                // Chargement
+                $j("#loading").removeClass('hidden').addClass('show');
+                $j('button').prop('disabled', true);
+                $j('input[type="submit"]').prop('disabled', true);
+            } else {
+                // Fin de chargement
+                $j("#loading").removeClass('show').addClass('hidden');
+                $j('button').prop('disabled', false);
+                $j('input[type="submit"]').prop('disabled', false);
+            }
+        }
+
+        function storeFieldsValues(values) {
+            sessionStorage.setItem('field_DR', values['DR_Filtre__c']);
+            sessionStorage.setItem('field_DV', values['DV_Filtre__c']);
+            sessionStorage.setItem('field_magasin', values['magasin_Filtre__c']);
+            sessionStorage.setItem('field_vendeur', "{!$User.Id}");
+            sessionStorage.setItem("field_LDP", values['Id']);
+        }
+
+        /* Fonction pour la création de la liste de phones  */
+        /*--------------------------------------------------*/
+        function creerListePhones() {
+            var argument = null;
+            var secteurId = sectorId;
+            var nameListe= $j('#nameListe').val();
+            var compteSearchedJSON = JSON.stringify(compteSearched);
+            // Récupération du li de l'onglet "Via critères de comptes"
+            var critereCompteTab = $j('#critereCompteTab');
+            loading(true);
+            // Si l'onglet "Via critère de comptes" est actif alors on récupère le formulaire pour la création
+            if(critereCompteTab.hasClass('active')) {
+                argument = getForm();
+                if($j("[id$=rue]").val() != '' && $j("[id$=rue]").val() != 'undefined') argument['rue'] = $j("[id$=rue]").val();
+                if($j("[id$=rue2]").val() != '' && $j("[id$=rue2]").val() != 'undefined') argument['rue2'] = $j("[id$=rue2]").val();
+                if($j("[id$=rue3]").val() != '' && $j("[id$=rue3]").val() != 'undefined') argument['rue3'] = $j("[id$=rue3]").val();
+                secteurId = null;
+            }
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ListeDePhones.creerListePhones}', argument, compteSearchedJSON, secteurId, nameListe,
+                    function(result, event) {
+                        if (event.status) {
+                            // Redirection vers la page de consultation des listes de phone avec result = idListe créée
+                            storeFieldsValues(result);
+                            redirectToConsultationListe(result.Id);
+                        } else if (event.type === 'exception') {
+                            // Fin de chargement
+                            loading(false);
+                            alert(event.message);
+                        } else {
+                            // Fin de chargement
+                            loading(false);
+                            alert(event.message);
+                        }
+                    },
+                {escape: true}
+            );
+        }
+
+        /* Fonction pour récupérer les informations du formulaire de recherche  */
+        /*----------------------------------------------------------------------*/
+        function getForm() {
+            var magasin             = $j("[id$=magasin]").val();
+            var typeEnregistrement  = $j("[id$=typeEnregistrement]").val();
+            var typeCompte          = $j("[id$=typeCompte]").val();
+            var proprietaire        = $j("[id$=proprietaire]").val();
+            var proprietaireId      = $j("[id$=proprietaire_lkid]").val();
+            var ville               = $j("[id$=ville]").val();
+            var cp                  = $j("[id$=codePostal]").val();
+            var dv                  = $j("[id$=dv]").val();
+            var region              = $j("[id$=region]").val();
+            var dernierAppel        = $j("[id$=dernierAppel]").val();
+            var codeP               = $j("[id$=codeP]").val();
+            var codeP_Id            = $j("[id$=codeProduit_lkid]").val();
+            var codeO               = $j("[id$=codeO]").val();
+            var fichierSource       = $j("[id$=fileName]").val();
+            var extension           = $j("[id$=extension]").val();
+            var rue                 = $j("[id$=rue]").val();
+            var rue2                = $j("[id$=rue2]").val();
+            var rue3                = $j("[id$=rue3]").val();
+
+            var argument = new Object();
+            argument['magasin']=magasin;
+            argument['typeCompte']=typeCompte;
+            argument['proprietaire']=proprietaire;
+            argument['proprietaireId']=proprietaireId;
+            argument['typeEnregistrement']=typeEnregistrement;
+            argument['ville']=ville;
+            argument['cp']=cp;
+            argument['dv']=dv;
+            argument['region']=region;
+            argument['codeP']=codeP;
+            argument['codeP_Id']=codeP_Id;
+            argument['codeO']=codeO;
+            argument['dernierAppel']=dernierAppel;
+            argument['fichierSource']=fichierSource;
+            argument['extension']=extension;
+            argument['rue']=rue;
+            argument['rue2']=rue2;
+            argument['rue3']=rue3;
+            return argument;
+        }
+
+        /* Fonction pour formater la date (format = 'yyyy-mm-dd') */
+        /*--------------------------------------------------------*/
+        function formatDate(date) {
+            var stringDateFormated = '';
+
+            //Mise à jour de la date de dernier appel sortant vente
+            if(!isNaN(date)) {
+                // Formatage Date
+                var moisDate = date.getMonth();
+                moisDate += 1;
+                stringDateFormated = date.getFullYear() + '-';
+                if(moisDate < 10) stringDateFormated += '0' + moisDate + '-'; else stringDateFormated += moisDate + '-';
+                if(date.getDate() < 10) stringDateFormated += '0' + date.getDate(); else stringDateFormated += date.getDate();
+            }
+            return stringDateFormated
+        }
+
+        /* Fonction de vérification champs et génération d'erreurs    */
+        /*------------------------------------------------------------*/
+        function checkErrors(){
+            var argument = getForm();
+            var rues = [];
+            if($j("[id$=rue]").val() != '' && $j("[id$=rue]").val() != 'undefined') rues.push($j("[id$=rue]").val());
+            if($j("[id$=rue2]").val() != '' && $j("[id$=rue2]").val() != 'undefined') rues.push($j("[id$=rue2]").val());
+            if($j("[id$=rue3]").val() != '' && $j("[id$=rue3]").val() != 'undefined') rues.push($j("[id$=rue3]").val());
+
+            var htmlMsgErrorCP = $j("[id$=msgErrorCP]");
+            var htmlMsgErrorVille = $j("[id$=msgErrorVille]");
+            var htmlMsgErrorProduitOption = $j("[id$=msgErrorProduitOption]");
+            var errorDetected = false;
+
+            // Code postal et ville obligatoires si rue saisie (geocodage)
+            if(rues.length != 0 && argument['ville'] == '') {
+                htmlMsgErrorVille.html(validationRueVilleError);
+                errorDetected = true;
+            } else
+                htmlMsgErrorVille.html('');
+
+            // Code postal et/ou la ville obligatoires si autre rue saisie
+            if(rues.length != 0 && argument['cp'] == '') {
+                htmlMsgErrorCP.html(validationRueCPError);
+                errorDetected = true;
+            } else
+                htmlMsgErrorCP.html('');
+
+            // Code produit obligatoire si code Option saisi
+            if($j("[id$=codeP]")[0] !== undefined && $j("[id$=codeO]")[0] !== undefined && argument['codeP'] == '' && argument['codeO'] != '') {
+                htmlMsgErrorProduitOption.html(validationProduitOptionError);
+                $j('[id$=boutonRecherche]').prop('disabled', true);
+                errorDetected = true;
+            } else {
+                htmlMsgErrorProduitOption.html('');
+                $j('[id$=boutonRecherche]').prop('disabled', false);
+            }
+
+            return errorDetected;
+        }
+
+        /* Check if the browser agent in Mobile  */
+        /*----------------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                || ((typeof sforce != 'undefined') && (sforce != null) )
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        /* Fonction d'enroulage/déroulage des panels                */
+        /*----------------------------------------------------------*/
+        function showOrHidePanelCollapse(panelName) {
+            $j("#"+panelName).collapse('toggle');
+            $j("#"+panelName+"Title").toggleClass("collapsed");
+        }
+
+        function toggleRechercherCollapse() {
+            $j("#panel-rechercher").collapse('toggle');
+        }
+
+        function toggleListeCollapse() {
+            $j("#panel-liste").collapse('toggle');
+        }
+
+        function toggleStatistiqueCollapse() {
+            $j("#panel-statistique").collapse('toggle');
+        }
+
+        function toggleCritereCompte() {
+            $j("#panel-rechercher").collapse('toggle');
+        }
+
+        function toggleCritereCodeOption() {
+            $j("#panel-liste").collapse('toggle');
+        }
+
+        function toggleCritereFichierCompteImporte() {
+            $j("#panel-statistique").collapse('toggle');
+        }
+
+        /**************************/
+        /* RECHERCHE GEOGRAPHIQUE */
+        /**************************/
+        // Creation des objets source (LE2) et destination (Lat/Long)
+        var source = new Proj4js.Proj('EPSG:27572');
+        var dest = new Proj4js.Proj('EPSG:4326');
+        var map, searchBox, sectorPolygon;
+        var sectorName, sectorCode='';
+        var latitude_min = 90; 
+        var longitude_max = -180; 
+        var latitude_max  = -90; 
+        var longitude_min = 180;
+        var init = false;
+
+        // Initialisation des types de point
+        dotType = window.dotType || {};
+        dotType.Piste                   = "Piste";
+        dotType.PreContact              = "PreContact";
+        dotType.Contact                 = "Contact";
+        dotType.Prospect                = "Prospect";
+        dotType.Client                  = "Client";
+        dotType.ExClient                = "ExClient";
+        dotType.Prospections            = "Prospections";
+        dotType.R1                      = "R1";
+        dotType.R2                      = "R2";
+        dotType.RPlus                   = "RPlus";
+        dotType.Metrages                = "Metrages";
+        dotType.Installations           = "Installations";
+        dotType.InterventionsSAV        = "InterventionsSAV";
+        dotType.SEARCH                  = "Search"; //Pour la search box
+
+        // Initialisation des types de point
+        dotTypeColor = window.dotTypeColor || {};
+        dotTypeColor.Piste              = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/group-2.png')}";
+        dotTypeColor.PreContact         = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/group-2_1.png')}";
+        dotTypeColor.Contact            = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/group-2_2.png')}";
+        dotTypeColor.Prospect           = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/group-2_3.png')}";
+        dotTypeColor.Client             = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/group-2_4.png')}";
+        dotTypeColor.ExClient           = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/group-2_5.png')}";
+        dotTypeColor.Prospections       = "{!URLFOR($Resource.Cartographie, 'img/prospection.png')}";
+        dotTypeColor.R1                 = "{!URLFOR($Resource.Cartographie, 'img/r1.png')}";
+        dotTypeColor.R2                 = "{!URLFOR($Resource.Cartographie, 'img/r2.png')}";
+        dotTypeColor.RPlus              = "{!URLFOR($Resource.Cartographie, 'img/rplus.png')}";
+        dotTypeColor.Metrages           = "{!URLFOR($Resource.Cartographie, 'img/metrage.png')}";
+        dotTypeColor.Installations      = "{!URLFOR($Resource.Cartographie, 'img/pose.png')}";
+        dotTypeColor.InterventionsSAV   = "{!URLFOR($Resource.Cartographie, 'img/sav.png')}";
+
+        var sectorCoordsArray = []; // Tableau des coordonées Lat/Long après convertions
+        var markersArray = {}; // Tableau des markers
+        var poinVisibleList = {}; // Tableau des points visible sur la carte
+
+        /* Fonction d'initialisation                                                    */
+        /*------------------------------------------------------------------------------*/
+        function loadScript() {
+            console.log('script loading...');
+
+            if(initScript == false){
+                // Suppression de tous les filtres au chargement de la page
+                //sessionStorage.clear();
+
+                // Initialisation des filtres sélectionnés ou non
+                sessionStorage.setItem("Piste","nselected");
+                sessionStorage.setItem("PreContact","nselected");
+                sessionStorage.setItem("Contact","nselected");
+                sessionStorage.setItem("Prospect","selected");
+                sessionStorage.setItem("Client","nselected");
+                sessionStorage.setItem("ExClient","nselected");
+                sessionStorage.setItem("Prospections","nselected");
+                sessionStorage.setItem("R1","nselected");
+                sessionStorage.setItem("R2","nselected");
+                sessionStorage.setItem("RPlus","nselected");
+                sessionStorage.setItem("Metrages","nselected");
+                sessionStorage.setItem("Installations","nselected");
+                sessionStorage.setItem("InterventionsSAV","nselected");
+                initScript = true;
+            }
+            console.log('script loaded !');
+        }
+
+        /* Fonction d'initialisation des variables et de la carte                       */
+        /*------------------------------------------------------------------------------*/
+        function initializeMap() {
+            console.log("initialize map");
+            // Initialise les coordonnées d'affichage
+            var latlng = L.latLng('{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}');
+            // Récupère le premier secteur de la liste
+            sectorName = '{!paramMag}';
+            if(sectorName == '') sectorName = '{!JSENCODE(sectorName)}';
+
+            // Initialise le tableau des markers et des points visible
+            init = true;
+            for(var key in dotType) {
+                markersArray[dotType[key]] = [];
+                poinVisibleList[dotType[key]] = false;
+            }
+
+            // Charge la carte
+            map = initializeLeafletMap('map','{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}', 13);
+            drawSectorAndMarkers();
+
+            // Ajout de la searchbox comme contrôle
+            L.Control.SearchBox = L.Control.extend({
+                onAdd: function(map) {
+                    // Ajout de l'action lors du choix d'un place (avec la souris, pas en utilisant la touche entrée)
+                    var searchBoxDiv = L.DomUtil.get('search-content-id');
+                    // Autocompletion par DQE en mode single (une barre de recherche)
+                    dqe.license_name = "{!licenceDQE}";
+                    options = {
+                        country : 'FRA',
+                        single  : '#search-content-input-id',
+                        zip     : '#search-content-input-id_zip',
+                        city    : '#search-content-input-id_city',
+                        street  : '#search-content-input-id_street',
+                        neighbourhood : 2
+                    };
+                    var dqeForm = $('#id_form').dqe(options); // Activation DQE Adresse
+                    // Ecoute l'evenement de sélection de l'adresse
+                    dqeForm.on('single', function(ui, data) {
+                        $j('#search-content-input-id').val(data.value); // Récupération de l'adresse
+
+                        // 21/07/2021 - JMU - RQM-286 : Update de SINGLE à SINGLEV2 
+                        // Récupération des coordonnées de l'adresse via LATLNG de DQE
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.Ctrl_ListeDePhones.DQELongLat}', data.id, data.num, 'FRA',
+                            function(result, event) {
+                                if (event.status) {
+                                    // Si les points existent, calcul et affichage du secteur, sinon rien
+                                    if (result != null) {
+                                        var latlng = L.latLng(result.Latitude, result.Longitude);
+                                        map.setView(latlng, 13);  // Centrage de la carte
+                                    }
+                                    
+                                } else if (event.type === 'exception') {
+                                    alert(event.message);
+                                } else {
+                                    alert(event.message);
+                                }
+                            },
+                            { buffer: false, escape: true, timeout: 30000 }
+                        );
+                    });
+                    L.DomEvent.disableClickPropagation(searchBoxDiv);
+                    L.DomEvent.on(searchBoxDiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return searchBoxDiv;
+                }
+            });
+            L.control.searchBox = function(opts) {
+                return new L.Control.SearchBox(opts);
+            }
+            L.control.searchBox({ position: 'topleft' }).addTo(map);
+
+             // Ajout du sélecteur de secteur et des points comme contrôle
+            L.Control.SectorSelector = L.Control.extend({
+                onAdd: function(map) {
+                    var sectorSelectorDiv = L.DomUtil.get('legend-content-id');
+                    L.DomEvent.disableClickPropagation(sectorSelectorDiv);
+                    L.DomEvent.on(sectorSelectorDiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return sectorSelectorDiv;
+                }
+            });
+            L.control.sectorSelector = function(opts) {
+                return new L.Control.SectorSelector(opts);
+            }
+            L.control.sectorSelector({ position: 'topleft' }).addTo(map);            
+            
+            // Active la recherche des comptes quand la carte est modifiée (déplacement, zoom)
+            map.on('moveend', function() {
+                // Recherche
+                var compteTypes = getFiltresCompteSelectionnes();
+                var rdvTypes = getFiltresRDVSelectionnes();
+                for(var k = 0; k < compteTypes.length; k++) {
+                    deleteMarkers(map, compteTypes[k]);
+                }
+                getRemoteComptes(compteTypes, rdvTypes);
+            });
+        }
+
+        /* Fonction permettant de changer de secteur (changement)                       */
+        /*------------------------------------------------------------------------------*/
+        function showSector (i) {
+            // Si "Aucun", on supprime le secteur affiché et les markers
+            if (0 === i) {
+                deleteAll(map);
+            } else {
+                sectorName = $j('#sectorSelector').val();
+                deleteAll(map);
+                drawSectorAndMarkers();
+            }
+        }
+
+        /* Fonction permettant de dessiner le secteur sur la carte                      */
+        /*------------------------------------------------------------------------------*/
+        function drawSectorAndMarkers() {
+            sectorName = $j('#sectorSelector').val();
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ListeDePhones.getSectorCoord}',
+                sectorName,
+                function(result, event) {
+                    if (event.status) {
+                        // Init
+                        sectorCode = result.Code;
+                        sectorId = result.Id;
+                        latitude_min = 90; longitude_max = -180; latitude_max  = -90; longitude_min = 180;
+
+                        // Si les points existent, calcul et affichage du secteur, sinon rien
+                        if (result != null && result.WKT != null) {
+                            var optionSector = {
+                                color: '{!googleMapsSettings.Couleur_du_contour_secteur__c}',
+                                opacity: 0.8,
+                                weight: 3,
+                                fillColor: '{!googleMapsSettings.Couleur_du_fond_secteur__c}',
+                                fillOpacity: 0.2
+                            };
+
+                            // Creation du secteur
+                            sectorPolygon = constructSectorPolygon(result.WKT, optionSector);
+                            if(sectorPolygon != null) {
+                                sectorPolygon.addTo(map);                                
+                                // Centre la carte sur le secteur
+                                map.fitBounds(sectorPolygon.getBounds()); 
+                                // Calcul des limites du secteurs
+                                latitude_min = sectorPolygon.getBounds().getSouth();
+                                latitude_max = sectorPolygon.getBounds().getNorth();
+                                longitude_min = sectorPolygon.getBounds().getWest();
+                                longitude_max = sectorPolygon.getBounds().getEast();
+                            }
+
+                            // Initialisation ou affichage des points visible
+                            if(init) {
+                                // Initialise par défaut l'affichage des points ci dessous
+                                changeVisibility(dotType.Prospect, true);
+                                init = false
+                            } else {
+                                for(var key in poinVisibleList) {
+                                    if (poinVisibleList[key] == true) {
+                                        changeVisibility(key, true);
+                                    }
+                                }
+                            }
+                        }
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                { buffer: false, escape: true, timeout: 30000 }
+            );
+        }
+
+        /* Fonction permettant de changer la visibilite des points */
+        /*---------------------------------------------------------*/
+        function changeVisibility(elementId, show) {
+            if (!elementId) {
+                alert('Point non connu');
+                return;
+            }
+
+            show = (typeof show === 'undefined') ? true : (!!show);
+            var sectorIndex = $j('#sectorSelector')[0].selectedIndex;
+            var htmlE = document.getElementById(elementId); // Récupération du bouton
+            var loadingbox = document.getElementById(elementId + '-loader'); // Récupération pour affichage de l'image de chargement
+
+            if (sectorIndex != 0) {
+                if (show) {
+                    // Affichage de l'icone de chargement
+                    $j(loadingbox).addClass('loader');
+                    sessionStorage.setItem(elementId, "selected");
+
+                    // Affichage du bouton en actif
+                    $j(htmlE).addClass('legend-active-dot');
+                    poinVisibleList[elementId] = true;
+                } else {
+                    deleteMarkers(map, elementId);
+                    // Affichage du bouton en inactif
+                    $j(htmlE).removeClass('legend-active-dot');
+                    poinVisibleList[elementId] = false;
+                    sessionStorage.setItem(elementId, "nselected");
+                }
+                // Recherche
+                var compteTypes = getFiltresCompteSelectionnes();
+                var rdvTypes = getFiltresRDVSelectionnes();
+                getRemoteComptes(compteTypes, rdvTypes);
+            }
+        }
+
+        /* Fonction permettant de récupérer tous les comptes des filtres sélectionnés */
+        /*----------------------------------------------------------------------------*/
+        function getRemoteComptes(compteTypes,rdvTypes) {
+            compteGeoSearched = [];
+            // Chargement
+            if(compteTypes.length != 0 || rdvTypes != 0) $j("#legendeBlocker").css("display", "block");
+            // Calcul des limites de la carte
+            latitude_min = map.getBounds().getSouth();
+            latitude_max = map.getBounds().getNorth();
+            longitude_min = map.getBounds().getWest();
+            longitude_max = map.getBounds().getEast();
+
+            if(rdvTypes.length == 0){
+                for(i=0;i<compteTypes.length;i++){
+                    var typeList = [];
+                    typeList.push(compteTypes[i]);
+                    remoteActionsToExecute++;
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.Ctrl_ListeDePhones.getTypeComptes}', sectorCode, typeList, '', latitude_min, latitude_max, longitude_max, longitude_min,
+                        function(result, event) {
+                            if (event.status) {
+                                // Traitement d'affichage des marqueurs par type
+                                for(j=0;j<compteTypes.length;j++){
+                                    if(result[compteTypes[j]] != null){
+                                        var typeToProcess = [];
+                                        typeToProcess.push(compteTypes[j]);
+                                        remoteActionProcess(result, typeToProcess);
+                                    }
+                                    // Suppression de l'icone de chargement
+                                    var loadingbox = document.getElementById(dotType[compteTypes[j]] + '-loader');
+                                    $j(loadingbox).removeClass('loader');
+                                }
+                            } else if (event.type === 'exception') {
+                                alert(event.message);
+                                $j("[id$=loader]").removeClass('loader');
+                                $j("#legendeBlocker").css( {"display": "none"} );
+                            } else {
+                                alert(event.message);
+                                $j("[id$=loader]").removeClass('loader');
+                                $j("#legendeBlocker").css( {"display": "none"} );
+                            }
+                        },
+                        { buffer: false, escape: true, timeout: 30000 }
+                    );
+                }
+            } else {
+                for(x=0;x<rdvTypes.length;x++){
+                    remoteActionsToExecute++;
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.Ctrl_ListeDePhones.getTypeComptes}', sectorCode, compteTypes, rdvTypes[x], latitude_min, latitude_max, longitude_max, longitude_min,
+                        function(result, event) {
+                            if (event.status) {
+                                // Traitement d'affichage des marqueurs par type
+                                for(y=0;y<rdvTypes.length;y++){
+                                    if(result[rdvTypes[y]] != null){
+                                        var typeToProcess = [];
+                                        typeToProcess.push(rdvTypes[y]);
+                                        remoteActionProcess(result, typeToProcess);
+                                    }
+                                    // Suppression de l'icone de chargement
+                                    var loadingbox = document.getElementById(dotType[rdvTypes[y]] + '-loader');
+                                    $j(loadingbox).removeClass('loader');
+                                }
+                            } else if (event.type === 'exception') {
+                                alert(event.message);
+                                $j("[id$=loader]").removeClass('loader');
+                                $j("#legendeBlocker").css( {"display": "none"} );
+                            } else {
+                                alert(event.message);
+                                $j("[id$=loader]").removeClass('loader');
+                                $j("#legendeBlocker").css( {"display": "none"} );
+                            }
+                        },
+                        {escape: true}
+                    );
+                }
+                for(var k = 0; k < compteTypes.length; k++) {
+                    deleteMarkers(map, compteTypes[k]);
+                    var loadingbox = document.getElementById(dotType[compteTypes[k]] + '-loader');
+                    $j(loadingbox).removeClass('loader');
+                }
+            }
+            $j("#legendeBlocker").css( {"display": "none"} );
+        }
+
+        /* Fonction permettant de traiter le résultat des Remote Action */
+        /*--------------------------------------------------------------*/
+        function remoteActionProcess(result, types) {
+            var coords;
+            // Boucle sur les différents types
+            for(var i = 0; i < types.length; ++i) {
+                // Suppression du marker
+                deleteMarkers(map, types[i]);
+
+                // Récupération de la liste des comptes du type courant
+                var comptesType = result[types[i]];
+
+                if(comptesType.length != 0) {
+                    // Bouche sur la liste des comptes de chaque type
+                    for(var y = 0; y < comptesType.length; y++) {
+
+                        var address = checkField(comptesType[y].AddressComplete);
+                        address = $j.trim(address);
+
+                        // Récupère les coordonées
+                        coords = getPointCoords(address, comptesType[y].Latitude, comptesType[y].Longitude, comptesType[y].X, comptesType[y].Y);
+
+                        // Ajout du marker sur la carte
+                        if(coords) {
+                            addMarker(types[i], coords, comptesType[y]);
+                            compteGeoSearched.push(comptesType[y].Id); // Ajout du compte dans la liste des comptes trouvés
+                        } else {
+                            console.log('Erreur position: ' + comptesType[y].Name);
+                        }
+                    }
+                }
+            }
+            remoteActionsExecuted++;
+            if(remoteActionsToExecute == remoteActionsExecuted) $j("#legendeBlocker").css( {"display": "none"} );
+        }
+
+        /* Fonction de recherche des comptes via les critères géographiques */
+        /*------------------------------------------------------------------*/
+        function rechercheComptesViaCriteresGeo() {
+            loading(true);
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ListeDePhones.getAllComptes}', compteGeoSearched,
+                function(result, event) {
+                    if (event.status) {
+                        // Création liste résultat
+                        createListeResultat(result);
+                        // Chargement des statistiques
+                        loadStatistiques();
+                        // Fin de chargement
+                        loading(false);
+                    } else if (event.type === 'exception') {
+                        loading(false);
+                        alert(event.message);
+                    } else {
+                        loading(false);
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de dessiner un marqueur sur la carte                     */
+        /* Présentation des points (Ne pas utiliser pour la SearchBox)                  */
+        /*------------------------------------------------------------------------------*/
+        function addMarker(type, location, object) {
+            // Ajout du marker sur la carte et ajout de la présentation
+            var marker = addMarkerLeaflet(map, type, location, dotTypeColor[type], [32,37], [16,37], [0, -37]);
+            // Ajout de la présentation
+            // Prospections, R1, R2 et R+ - Récupération des comptes et événements
+            if(type == dotType.Prospections
+                    || type == dotType.R1
+                    || type == dotType.R2
+                    || type == dotType.RPlus
+            ) {
+               var dotPresentation = createInfowindow('account&event', null, object, dotTypeColor[type], marker);
+
+            // Poses, Métrages, Interventions SAV - Récupération des comptes et contrats
+            } else if(type == dotType.Metrages
+                    || type == dotType.Installations
+                    || type == dotType.InterventionsSAV
+            ) {
+                // Contrats
+                var contrat = new SObjectModel.Contrat();
+                contrat.retrieve( { where: { compte__c: { eq: object.Id } } }, function(err, records) {
+                    if (err) alert(err);
+                    else {
+                        var dotPresentation = createInfowindow('account&contract', records[0], object, dotTypeColor[type], marker);
+                    }
+                });
+            } else {
+               var dotPresentation = createInfowindow('account', null, object, dotTypeColor[type], marker);
+            }
+            /*L.DomEvent.on(marker, 'click', function (ev) {
+                marker.openPopup();
+                L.DomEvent.stopPropagation(ev);
+            });*/
+            return marker;
+        }
+
+        /* Contruction de l'infowindow                                                  */
+        /*------------------------------------------------------------------------------*/
+        function createInfowindow(objectType, contrat, compte, dotype, marker) {
+            // Champs du compte
+            var compteId = checkField(compte.Id);
+            var compteRue = checkField(compte.Address);
+            var compteCodePostal = checkField(compte.PostalCode);
+            var compteVille = checkField(compte.City);
+            var compteName = checkField(compte.Name);
+            var compteType  = checkField(compte.TypeCompte);
+            var compteEmail = checkField(compte.Email);
+            var compteTeldom = checkField(compte.TelDomicile);
+            var compteTelpor  = checkField(compte.TelMobile);
+            var compteTelautre  = checkField(compte.AutreTel);
+
+            // Traitement champs pour prospections, R1, R2 et R+
+            if(objectType == 'account&event') {
+                var eventRdvType = checkField(compte.RdvType);
+                var eventOwnerName = checkField(compte.OwnerName);
+                var eventActivityDate = checkField(compte.ActivityDate);
+
+            // Traitement champs pour Métrages, poses et SAV
+            } else if(objectType == 'account&contract' && null != contrat) {
+                if(dotype == dotTypeColor.Metrages) var dateProchainMetrage = checkField(contrat.get("prochainMetrage__c"));
+                if(dotype == dotTypeColor.Installations) var dateProchaineInstallation = checkField(contrat.get("prochaineInstallation__c"));
+                if(dotype == dotTypeColor.InterventionsSAV) var dateProchaineIntervention = checkField(contrat.get("prochainSAV__c"));
+            }
+
+            // Construction de la présentation du point
+            var dotPresentation = '<div id="dotPresentation" style="  min-width: 200px;" class="col-md-12">'
+                                +'<div class="col-md-2">'
+                                +'  <image src="'+ dotype +'" />'
+                                +'</div>'
+                                +'<div class="col-md-10">'
+                                +'      <div class="dotPresentatioName">'
+            if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one)) {
+                dotPresentation +='         <a href="javascript:sforce.one.navigateToSObject(\'' + compteId + '\')'+'">'+ compteName +'</a>';
+            } else {
+                dotPresentation +='         <a target="_blank" href="/'+ compteId +'">'+ compteName +'</a>';
+            }
+            dotPresentation     +='     </div>'
+                                +'      <div class="dotPresentatioAddress">'
+                                +           compteRue + '<br />'
+                                +           compteCodePostal + ' ' + compteVille
+                                +'      </div>';
+            dotPresentation +='     <div id="dotPresentatioJoign">'
+                            +'          <div class="line_info">Type : '+ compteType +'</div>'
+                            +'          <div class="line_info">Domicile : '+ compteTeldom +'</div>'
+                            +'          <div class="line_info">Portable : '+ compteTelpor +'</div>'
+                            +'          <div class="line_info">Autre : '+ compteTelautre +'</div>'
+                            +'          <div class="line_info">Email : ' + compteEmail + '</div>'
+                            +'      </div>';
+            if(objectType == 'account&event') {
+                dotPresentation +='     <div class="dotPresentatioAddress">'
+                dotPresentation +='         <div class="line_info">Type : '+ eventRdvType +'</div>'
+                dotPresentation +='         <div class="line_info">Vendeur : '+ eventOwnerName +'</div>'
+                dotPresentation +='         <div class="line_info">Date : '+ eventActivityDate +'</div>'
+                dotPresentation +='     </div>';
+            }
+            if(objectType == 'account&contract') {
+                dotPresentation +='     <div class="dotPresentatioAddress">'
+                if (dateProchainMetrage !== null && dateProchainMetrage !== undefined)
+                    dotPresentation +='         <div class="line_info">Prochain métrage : '+ formatDateFrench(dateProchainMetrage) +'</div>'
+                if (dateProchaineInstallation !== null && dateProchaineInstallation !== undefined)
+                    dotPresentation +='         <div class="line_info">Prochaine Installation : '+ formatDateFrench(dateProchaineInstallation) +'</div>'
+                if (dateProchaineIntervention !== null && dateProchaineIntervention !== undefined)
+                    dotPresentation +='         <div class="line_info">Prochaine Intervention SAV : '+ formatDateFrench(dateProchaineIntervention) +'</div>'
+                dotPresentation +='     </div>';
+            }
+            dotPresentation     +=' </div>'
+                                +'</div>';
+
+            var customOptions = {
+                'maxWidth': '500',
+                'className' : 'custom-popup'
+            };
+            marker.bindPopup(dotPresentation, customOptions);
+        }
+
+        /* Fonction pour formater la date (format = 'dd/mm/yyyy') */
+        /*--------------------------------------------------------*/
+        function formatDateFrench(date) {
+            var stringDateFormated = '';
+
+            //Mise à jour de la date de dernier appel sortant vente
+            if(!isNaN(date)) {
+                // Formatage Date
+                var moisDate = date.getMonth();
+                moisDate += 1;
+                if(date.getDate() < 10) stringDateFormated = '0' + date.getDate() + '/'; else stringDateFormated = date.getDate() + '/';
+                if(moisDate < 10) stringDateFormated += '0' + moisDate + '/'; else stringDateFormated += moisDate + '-';
+                stringDateFormated += date.getFullYear();
+            }
+            return stringDateFormated
+        }
+
+        /* Fonction permettant de changer la visibilite du menu */
+        /*------------------------------------------------------*/
+        function changeMenuVisibility() {
+            var legendMenu = $j('#legend-content-id');
+            var buttonMenu = $j('#search-content-button-id');
+            if(legendMenu.hasClass('show')) {
+                // Si le menu est visible, on cache
+                legendMenu.removeClass('show').addClass('hidden');
+                buttonMenu.removeClass('active');
+            } else {
+                // Si le menu est caché, on affiche
+                legendMenu.addClass('show').removeClass('hidden');
+                buttonMenu.addClass('active');
+            }
+        }
+
+        /* Fonction qui retourne les filtres géo selectionnés */
+        /*----------------------------------------------------*/
+        function getFiltresCompteSelectionnes() {
+            var types = [];
+            if(sessionStorage.getItem("Piste") == "selected") types.push(dotType.Piste);
+            if(sessionStorage.getItem("PreContact") == "selected") types.push(dotType.PreContact);
+            if(sessionStorage.getItem("Contact") == "selected") types.push(dotType.Contact);
+            if(sessionStorage.getItem("Prospect") == "selected") types.push(dotType.Prospect);
+            if(sessionStorage.getItem("Client") == "selected") types.push(dotType.Client);
+            if(sessionStorage.getItem("ExClient") == "selected") types.push(dotType.ExClient);
+            return types;
+        }
+
+        function getFiltresRDVSelectionnes() {
+            var types = [];
+            if(sessionStorage.getItem("Prospections") == "selected") types.push(dotType.Prospections);
+            if(sessionStorage.getItem("R1") == "selected") types.push(dotType.R1);
+            if(sessionStorage.getItem("R2") == "selected") types.push(dotType.R2);
+            if(sessionStorage.getItem("RPlus") == "selected") types.push(dotType.RPlus);
+            if(sessionStorage.getItem("Metrages") == "selected") types.push(dotType.Metrages);
+            if(sessionStorage.getItem("Installations") == "selected") types.push(dotType.Installations);
+            if(sessionStorage.getItem("InterventionsSAV") == "selected") types.push(dotType.InterventionsSAV);
+            return types;
+        }
+
+        /* Get product informations                                                     */
+        /*------------------------------------------------------------------------------*/
+        function getProductInformation(entityName, entityId, fieldId) {
+            // SOQL on product2 object
+            var object = new SObjectModel.Product2();
+            object.retrieve(
+                { where: {
+                    or:
+                        {Name: {eq: entityName.replace(/'/g,"\\'")},
+                        Id: {eq: entityId}
+                    }
+                  }
+                },
+                function(err, records) {
+                    if (err) console.log('Erreur sur la recherche de produit/option');
+                    else {
+                        if(records.length != 0) {
+                            entityObject = records[0];
+                                setEntityInformations(fieldId);
+
+                        }
+                        else {
+                            entityObject = null;
+                        }
+                    }
+                }
+            );
+        }
+
+        /* Get option informations                                                     */
+        /*------------------------------------------------------------------------------*/
+        function getOptionInformation(entityName, entityId, fieldId) {
+            // SOQL on product2 object
+            var object = new SObjectModel.ReferentielOptions__c();
+            object.retrieve(
+                { where: {
+                    or:
+                        {CodeOption__c: {eq: entityName.replace(/'/g,"\\'")},
+                        Id: {eq: entityId}
+                    }
+                  }
+                },
+                function(err, records) {
+                    if (err) console.log('Erreur sur la recherche de produit/option');
+                    else {
+                        if(records.length != 0) {
+                            entityObject = records[0];
+                                setEntityInformations(fieldId);
+
+                        }
+                        else {
+                            entityObject = null;
+                        }
+                    }
+                }
+            );
+        }
+
+        /* Init and active autocomplete field                                           */
+        /*------------------------------------------------------------------------------*/
+        function activeAutoCompleteField(fieldId) {
+            var targetField;
+            if(fieldId == 'prd') 
+                targetField = $("[id$=codeP]");
+            if(fieldId == 'opt') 
+                targetField = $("[id$=codeO]");
+            // Check if instance exist, else init
+            if(typeof targetField.autocomplete('instance') === "undefined") {
+                targetField.autocomplete({
+                    minLength: 2,
+                    focus: function( event, ui ) {
+                        entityObject = ui.item;
+                        if(fieldId.indexOf('prd') != -1) 
+                            targetField.val(unescape(entityObject.get("Name")) );
+                        else if(fieldId.indexOf('opt') != -1) 
+                            targetField.val(unescape(entityObject.get("CodeOption__c")) );
+                        setEntityInformations(fieldId);
+                        return false;
+                    },
+                    select: function( event, ui ) {
+                        entityObject = ui.item;
+                        if(fieldId.indexOf('prd') != -1) 
+                            targetField.val(unescape(entityObject.get("Name")) );
+                        else if(fieldId.indexOf('opt') != -1)
+                            targetField.val(unescape(entityObject.get("CodeOption__c")) );
+                        setEntityInformations(fieldId);
+                        return false;
+                    },
+                    change: function(event, ui) {
+                    },
+                    source: function(request, response) {
+                        queryTerm = request.term;
+                        var object;
+                        if(fieldId.indexOf('prd') != -1) {
+                            object = new SObjectModel.Product2();
+                            // SOQL on product2 object
+                            object.retrieve(
+                                { where: {
+                                    Name: {like: "%"+queryTerm.replace(/'/g,"\\'")+"%"}
+                                    }
+                                },
+                                function(err, records) {
+                                    if (err) console.log('Erreur sur la recherche de produit');
+                                    else response(records);
+                                }
+                            );
+                        }
+                        else if(fieldId.indexOf('opt') != -1){
+                            object = new SObjectModel.ReferentielOptions__c();
+                            // SOQL on product2 object
+                            object.retrieve(
+                                { where: {
+                                    CodeOption__c: {like: "%"+queryTerm.replace(/'/g,"\\'")+"%"}
+                                    }
+                                },
+                                function(err, records) {
+                                    if (err) console.log('Erreur sur la recherche de produit/option');
+                                    else response(records);
+                                }
+                            );
+                        }
+                    },
+                })
+                .data( 'ui-autocomplete' )._renderItem = function( ul, item ) {
+                    var entry;
+                    if(fieldId.indexOf('prd') != -1) 
+                        entry = '<a>' + unescape(item.get("Name")) + '</a>';
+                    else if(fieldId.indexOf('opt') != -1) 
+                        entry = '<a>' + unescape(item.get("CodeOption__c")) + '</a>';
+                    var position = entry.search(new RegExp($.ui.autocomplete.escapeRegex(queryTerm), "i")); // Search
+                    var replaceTerm = entry.substring(position, position+queryTerm.length); //get term for replace
+                    entry = entry.replace(new RegExp($.ui.autocomplete.escapeRegex(queryTerm), "ig"), "<b>"+replaceTerm+"</b>");
+                    return $( '<li></li>' )
+                            .data( 'ui-autocomplete-item', item )
+                            .append( entry )
+                            .appendTo( ul );
+                };
+            }
+        }
+
+        /* Set product fields on the page (Lookup, Family/BU, Symptom)                  */
+        /*------------------------------------------------------------------------------*/
+        function setProductInformations() {
+            if(entityObject) {
+                entityName = unescape(entityObject.get("Name"));
+                // Lookup field
+                $j("[id$=codeProduit_lkid]").val(entityObject.get("Id") );
+                $j("[id$=codeProduit_lkold]").val(entityName);
+            }
+        }
+
+        /* EVENT - ON CHANGE - Treatment when the value change                          */
+        /*------------------------------------------------------------------------------*/
+        function eventOnChangeFieldProduct(field) {
+            if(field.value.trim() != entityName) {
+                if(field.value.trim() == '') {
+                    // Clear all the product fields
+                    $j("[id$=codeProduit_lkid]").val('');
+                    $j("[id$=codeProduit_lkold]").val('');
+                } else {
+                    // Get product
+                    getProductInformation(field.value.trim(), '');
+                }
+            }
+        }
+
+        /* Set product fields on the page (Lookup, Family/BU, Symptom)                  */
+        /*------------------------------------------------------------------------------*/
+        function setEntityInformations(fieldId) {
+            if(entityObject) {
+                entityName = unescape(entityObject.get("Name"));
+                // Lookup field
+                updateHiddenFields(fieldId, entityObject.get("Id"), entityName);
+            }
+        }
+
+        /* EVENT - ON CHANGE - Treatment when the value change                          */
+        /*------------------------------------------------------------------------------*/
+        function eventOnChangeField(field, fieldId) {
+            //if(field.value.trim() != entityName) {
+                if(field.value.trim() == '') {
+                    // Clear all the product fields
+                    updateHiddenFields(fieldId, '', '');
+                } else {
+                    // Get product
+                    if(fieldId.indexOf('prd') != -1) 
+                        getProductInformation(field.value.trim(), '', fieldId);
+                    else if(fieldId.indexOf('opt') != -1) 
+                        getOptionInformation(field.value.trim(), '', fieldId);
+                }
+            //}
+        }
+
+        /* Fonction pour mettre à jour les champs cachés  */
+        /*------------------------------------------------*/
+        function updateHiddenFields(fieldId, valueId, valueName) {
+            if(fieldId == 'prd') 
+                $j("[id$=codeProduit_lkid]").val(valueId);
+                $j("[id$=codeProduit_lkold]").val(valueName);
+            if(fieldId == 'opt') 
+                $j("[id$=codeOption_lkid]").val(valueId);
+                $j("[id$=codeOption_lkold]").val(valueName);
+        }
+
+        /* Fonction pour déclencher un event sur un objet */
+        /*------------------------------------------------*/
+        function eventFire(el, etype) {
+            if (el.fireEvent) {
+                el.fireEvent('on' + etype);
+            }
+            else {
+                var evObj = document.createEvent('Events');
+                evObj.initEvent(etype, true, false);
+                el.dispatchEvent(evObj);
+            }
+        }
+
+    </script>
+    <c:importvisualstrap theme="default" />
+    <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+    <apex:outputpanel styleclass="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero" layout="block" style="height:100%">
+        <center>
+            <c:pageheader title="Listes de Phones" icon="phone-alt" />
+        </center>
+        <div id="pagea">
+            <!-- ERREUR -->
+            <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                <div role="alert" class="col-md-12 col-sm-12 col-xs-12 alert {!IF(message.SeverityStr=='confirm','alert-success',IF(message.SeverityStr=='info',
+                        'alert-info',IF(message.SeverityStr=='warn','alert-warning','alert-danger')))}">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <apex:outputtext value="{!message.Message}" escape="false" />
+                </div>
+            </apex:repeat>
+            <div role="alert" class="col-md-12 col-sm-12 col-xs-12 alert hidden" id="alert-parent">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div id="alert-text"></div>
+            </div>
+
+            <apex:form >
+                <div class="text-center" style="margin-bottom:20px;">
+                    <apex:commandlink action="{!cancel}">
+                        <apex:commandbutton value="Annuler" styleclass="btn btn-primary" />
+                    </apex:commandlink>
+                </div>
+            </apex:form>
+
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <!-- PANEL Rechercher -->
+                <div class="panel panel-primary" id="content-rechercher">
+                    <div class="panel-heading" role="tab" id="panel-rechercherLabel" onclick="showOrHidePanelCollapse('panel-rechercher');">
+                        <h4 class="panel-title">
+                            <!--<a class="collapsed" role="button" onclick="toggleRechercherCollapse();" aria-expanded="false" style="cursor: pointer;">
+                                Rechercher
+                            </a>-->
+                            <a id="panel-rechercherTitle" aria-expanded="false">Rechercher</a>
+                        </h4>
+                    </div>
+                    <div id="panel-rechercher" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-rechercherLabel">
+                        <div class="panel-body">
+                            <ul id="tabsList" class="nav nav-tabs">
+                                <li id="critereCompteTab" role="presentation" class="active"><a href="#criteresCompte" role="tab" data-toggle="tab">Via critères personnalisés</a></li>
+                                <li id="critereGeoTab" role="presentation"><a href="#criteresGeographique" role="tab" data-toggle="tab">Via critères géographiques</a></li>
+                            </ul>
+                            <c:panel styleclass="panel-body-parent">
+                                <div class="tab-content">
+                                    <div id="criteresCompte" class="tab-pane fade in active">
+                                        <div id="error" style="color: #FF0000;"></div>
+
+                                        <div class="panel panel-default panel-body-child">
+                                            <div class="panel-heading" id="critereCompte-title" onclick="showOrHidePanelCollapse('critereCompte');">
+                                                <h3 class="panel-title">
+                                                    <a id="critereCompteTitle">Via des critères de comptes</a>
+                                                </h3>
+                                            </div>
+                                            <div id="critereCompte" class="panel-body panel-collapse collapse in" aria-labelledby="critereCompte-title">
+                                                <c:formblock alignment="horizontal">
+                                                    <apex:form >
+                                                        <apex:actionfunction name="rerendermagasin" rerender="magasin">
+                                                            <apex:param name="firstParam" assignto="{!codeDV}" value="" />
+                                                        </apex:actionfunction>
+                                                        <apex:actionfunction name="rerendermagasinDV"
+                                                                             rerender="magasin" />
+                                                        <apex:actionfunction name="rerenderdv" rerender="dv"
+                                                                             oncomplete="rerendermagasinDV(this.value);">
+                                                            <apex:param name="firstParam" assignto="{!codeRegion}"
+                                                                        value="" />
+                                                        </apex:actionfunction>
+                                                        <apex:actionfunction name="redirectToConsultationListe"
+                                                                             action="{!redirectToConsultationListe}"
+                                                                             rerender="hiddenFields">
+                                                            <apex:param id="idListe" name="idListe" value="" />
+                                                        </apex:actionfunction>
+                                                        <c:formgroup >
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.typeEnregistrement}">
+                                                                    Type d'enregistrement
+                                                                </apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:selectlist styleclass="form-control input-sm" required="true" size="1" id="typeEnregistrement"
+                                                                                 value="{!selectedRecordType}">
+                                                                    <apex:selectoptions value="{!optionsRecordType}" />
+                                                                </apex:selectlist>
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.typeCompte}">
+                                                                    Type du compte
+                                                                </apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputfield id="typeCompte"
+                                                                                 styleclass="typeCompteStyle" value="{!unFoyer.Type}"
+                                                                                 onclick="style.boxShadow='0px 0px 8px #81BFFF';"
+                                                                                 onblur="style.boxShadow='0px 0.5px 1px #CECECE inset';"
+                                                                                 required="false" />
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.proprietaire}">
+                                                                    Propriétaire
+                                                                </apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputfield id="proprietaire" required="false"
+                                                                                 value="{!unFoyer.OwnerId}" html-placeholder="Propriétaire" />
+                                                            </div>
+                                                        </c:formgroup>
+                                                        <c:formgroup >
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.rue}">Rue</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputtext styleclass="form-control input-sm" id="rue"
+                                                                                value="{!unFoyer.rue__c}" html-placeholder="Rue" onchange="checkErrors();" />
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.rue2}">Autre rue (1)</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputtext styleclass="form-control input-sm"
+                                                                                id="rue2" value="{!rue2}" html-placeholder="Rue" onchange="checkErrors();" />
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.rue3}">Autre rue (2)</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputtext styleclass="form-control input-sm"
+                                                                                id="rue3" value="{!rue3}" html-placeholder="Rue" onchange="checkErrors();" />
+                                                            </div>
+                                                        </c:formgroup>
+                                                        <c:formgroup style="margin-bottom:2px !important;">
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.codePostal}">Code postal</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputtext styleclass="form-control input-sm"
+                                                                                id="codePostal" value="{!unFoyer.PersonMailingPostalCode}"
+                                                                                html-placeholder="Code postal" onchange="checkErrors();" />
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.ville}">Ville</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputtext styleclass="form-control input-sm" id="ville" value="{!unFoyer.PersonMailingCity}"
+                                                                                html-placeholder="Ville" onchange="checkErrors();" />
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.extension}">Extension (km)</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:inputtext id="extension" html-placeholder="Extension (km)" value="{!perimetre}" styleclass="form-control input-sm" />
+                                                            </div>
+                                                        </c:formgroup>
+                                                        <c:formgroup >
+                                                            <div class="col-md-4">
+                                                                <div id="msgErrorCP" style="color:red;"></div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div id="msgErrorVille" style="color:red;"></div>
+                                                            </div>
+                                                        </c:formgroup>
+                                                        <c:formgroup id="hiddenBlockFromvendeurs">
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.region}">DR</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:selectlist disabled="{!CONTAINS($Profile.Name, "
+                                                                                 vendeur") || contains($profile.name, "DV" ) || ((actualUser.codeDR__c != "null" && actualUser.codeDR__c != "undefined") && contains($profile.name, "DR" )) || contains($profile.name, "RVJ" ) || contains($profile.name, "RV" )}" styleclass="form-control input-sm"
+                                                                                 id="region" size="1" value="{!codeRegion}"
+                                                                                 onchange="rerenderdv(this.value);">
+                                                                    <apex:selectoptions value="{!optionsRegion}" />
+                                                                </apex:selectlist>
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.dv}">DV</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:selectlist disabled="{!CONTAINS($Profile.Name, "
+                                                                                 vendeur") || contains($profile.name, "DV" ) || contains($profile.name, "RVJ" ) || contains($profile.name, "RV" )}" styleclass="form-control input-sm"
+                                                                                 id="dv" size="1" value="{!codeDV}"
+                                                                                 onchange="rerendermagasin(this.value);">
+                                                                    <apex:selectoptions value="{!optionsDV}" />
+                                                                </apex:selectlist>
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.magasin}">Magasin</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:selectlist disabled="{!(CONTAINS($Profile.Name, "
+                                                                                 vendeur") || contains($profile.name, "RVJ" ) || contains($profile.name, "RV" )) && !unlockmagasin}" styleclass="form-control input-sm"
+                                                                                 id="magasin" size="1" value="{!codeMag}">
+                                                                    <apex:selectoptions value="{!optionsMag}" />
+                                                                </apex:selectlist>
+                                                            </div>
+                                                        </c:formgroup>
+                                                        <c:formgroup >
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.dernierAppel}">Date de dernier appel</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:selectlist styleclass="form-control input-sm" size="1" id="dernierAppel" value="{!codeDernierAppel}">
+                                                                    <apex:selectoptions value="{!optionsDernierAppel}" />
+                                                                </apex:selectlist>
+                                                            </div>
+                                                        </c:formgroup>
+                                                    </apex:form>
+                                                </c:formblock>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default panel-body-child">
+                                            <div class="panel-heading" id="critereCodeOption-title" onclick="showOrHidePanelCollapse('critereCodeOption');">
+                                                <h3 class="panel-title">
+                                                    <!--<a data-toggle="collapse" href="#critereCodeOption" aria-expanded="false" aria-controls="critereCodeOption">-->
+                                                    <a id="critereCodeOptionTitle" class="collapsed">Via des codes produits et options</a>
+                                                </h3>
+                                            </div>
+                                            <div id="critereCodeOption" class="panel-body panel-collapse collapse" aria-labelledby="critereCodeOption-title">
+                                                <c:formblock alignment="horizontal">
+                                                    <apex:form >
+                                                        <c:formgroup >
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.codeP}">Code Produit</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <apex:input value="{!productCode}" id="codeP" styleclass="form-control input-sm" html-placeholder="Code Produit" type="search" onchange="checkErrors(); eventOnChangeFieldProduct(this, 'prd');" />
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <apex:outputlabel styleclass="control-label" for="{!$Component.codeO}">Code Option</apex:outputlabel>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <!--<apex:inputfield id="codeO" value="{!codeO.Option__c}" required="false" html-placeholder="Code Option" type="search" onchange="checkErrors()" />-->
+                                                                <apex:input value="{!optionCode}" id="codeO" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="checkErrors(); eventOnChangeFieldProduct(this, 'opt');" />
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div id="msgErrorProduitOption" style="color:red;"></div>
+                                                            </div>
+                                                        </c:formgroup>
+                                                    </apex:form>
+                                                </c:formblock>
+                                            </div>
+                                        </div>
+                                        <apex:outputpanel layout="none" rendered="{!isInPeriode && filesName.size != 1}">
+                                            <div class="panel panel-default panel-body-child">
+                                                <div class="panel-heading" id="critereFichierCompteImporte-title" onclick="showOrHidePanelCollapse('critereFichierCompteImporte');">
+                                                    <h3 class="panel-title">
+                                                        <a id="critereFichierCompteImporteTitle" class="collapsed">Via des fichiers de comptes importés</a>
+                                                    </h3>
+                                                </div>
+                                                <div id="critereFichierCompteImporte" class="panel-body panel-collapse collapse" aria-labelledby="critereFichierCompteImporte-title">
+                                                    <c:formblock alignment="horizontal">
+                                                        <apex:form >
+                                                            <apex:actionfunction name="changeImportDate"
+                                                                                 action="{!refreshImportDate}" rerender="hiddenFields">
+                                                                <apex:param name="firstParam"
+                                                                            assignto="{!fileNameSelected}" value="" />
+                                                            </apex:actionfunction>
+                                                            <c:formgroup >
+                                                                <div class="col-md-1">
+                                                                    <apex:outputlabel styleclass="control-label" for="{!$Component.fileName}">Nom du fichier source</apex:outputlabel>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <apex:selectlist styleclass="form-control input-sm"
+                                                                                     id="fileName" size="1" value="{!fileNameSelected}"
+                                                                                     onchange="changeImportDate(this.value);">
+                                                                        <apex:selectoptions value="{!filesName}" />
+                                                                    </apex:selectlist>
+                                                                </div>
+                                                                <div class="col-md-1 hidden">
+                                                                    <apex:outputlabel >Date d'importation</apex:outputlabel>
+                                                                </div>
+                                                                <div class="col-md-3 hidden">
+                                                                    <input id="codeProduit_lkid" value="{!displayProductId}" />
+                                                                    <input id="codeProduit_lkold" value="{!displayProductName}" />
+                                                                    <input id="codeOption_lkid" value="{!displayOptionId}" />
+                                                                    <input id="codeOption_lkold" value="{!displayOptionName}" />
+                                                                    <apex:outputpanel id="dateImportPanel">
+                                                                        <input type="date" id="dateImport" value="{!dateImport}" />
+                                                                    </apex:outputpanel>
+                                                                </div>
+                                                            </c:formgroup>
+                                                        </apex:form>
+                                                    </c:formblock>
+                                                </div>
+                                            </div>
+                                        </apex:outputpanel>
+                                    </div>
+                                    <div id="criteresGeographique" class="tab-pane fade">
+                                        <!-- Search Bar -->
+                                        <div id="search-content-id" class="search-content" role="search" tabindex="-1">
+                                            <div class="row">
+                                                <div class="input-group" id="id_form">
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-primary active" onclick="changeMenuVisibility();" id="search-content-button-id">Menu</button>
+                                                    </span>
+                                                        <input id="search-content-input-id" type="text" class="form-control" placeholder="Saisissez une adresse" />
+                                                        <input id="search-content-input-id_zip" type="hidden" class="form-control" />
+                                                        <input id="search-content-input-id_city" type="hidden" class="form-control" />
+                                                        <input id="search-content-input-id_street" type="hidden" class="form-control" />
+                                                        <input id="search-content-input-id_number" type="hidden" class="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Legende et filtres -->
+                                        <div id="legend-content-id" class="legend-content show" style="z-index: 10;">
+                                            <div id="legendeBlocker" style="position: absolute;top:0;left:0;width: 100%;height:100%;z-index:20;opacity:0.4;filter: alpha(opacity = 50)"></div>
+
+                                            <!-- ComboBox Secteur -->
+                                            <div id="legend-content-sector-id">
+                                                <div class="legend-content-sector">
+                                                    <div>
+                                                        <select id="sectorSelector" onchange="showSector(this.selectedIndex)" class="form-control input-sm">
+                                                            <option>{!$Label.Aucun}</option>
+                                                            <apex:repeat value="{!sectorNamesList}" var="i">
+                                                                <apex:outputtext rendered="{! i == sectorName }" escape="false"><option selected="selected">{!HtmlEncode(i)}</option></apex:outputtext>
+                                                                <apex:outputtext rendered="{! i != sectorName }" escape="false"><option>{!HtmlEncode(i)}</option></apex:outputtext>
+                                                            </apex:repeat>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <ul class="nav nav-tabs" role="tablist" id="tabElement">
+                                                <li class="active"><a href="#comptes" role="tab" data-toggle="tab">Comptes</a></li>
+                                                <li id="chantiersTab"><a href="#rdv" role="tab" data-toggle="tab">RDV</a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <!-- Onglet Service -->
+                                                <div class="tab-pane active" id="comptes">
+                                                    <div class="list-group legend-list-group">
+                                                        <a href="" class="list-group-item legend-list-group-item" id="Piste" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/listeDePhones/group-2.png')}" styleclass="legend-icons" />
+                                                            Piste
+                                                            <div id="Piste-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="PreContact" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/listeDePhones/group-2_1.png')}" styleclass="legend-icons" />
+                                                            Pré-contact
+                                                            <div id="PreContact-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="Contact" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/listeDePhones/group-2_2.png')}" styleclass="legend-icons" />
+                                                            Contact
+                                                            <div id="Contact-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="Prospect" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/listeDePhones/group-2_3.png')}" styleclass="legend-icons" />
+                                                            Prospect
+                                                            <div id="Prospect-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="Client" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/listeDePhones/group-2_4.png')}" styleclass="legend-icons" />
+                                                            Client
+                                                            <div id="Client-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="ExClient" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/listeDePhones/group-2_5.png')}" styleclass="legend-icons" />
+                                                            Ex-client
+                                                            <div id="ExClient-loader" class="pull-right"></div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <!-- Onglet Commercial -->
+                                                <div class="tab-pane" id="rdv">
+                                                    <div class="list-group legend-list-group">
+                                                        <a href="" class="list-group-item legend-list-group-item" id="Prospections" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/prospection.png')}" styleclass="legend-icons" />
+                                                            <apex:outputtext value=" Prospections (<= J+{!futurEventDays})" />
+                                                            <div id="Prospections-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="R1" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/r1.png')}" styleclass="legend-icons" />
+                                                            <apex:outputtext value=" R1 (<= J+{!futurEventDays})" />
+                                                            <div id="R1-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="R2" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/r2.png')}" styleclass="legend-icons" />
+                                                            <apex:outputtext value=" R2 (<= J+{!futurEventDays})" />
+                                                            <div id="R2-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="RPlus" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/rplus.png')}" styleclass="legend-icons" />
+                                                            <apex:outputtext value=" R+ (<= J+{!futurEventDays})" />
+                                                            <div id="RPlus-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="Metrages" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/metrage.png')}" styleclass="legend-icons" />
+                                                            <apex:outputtext value=" Métrages (<= J+{!futurEventDays})" />
+                                                            <div id="Metrages-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="Installations" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/pose.png')}" styleclass="legend-icons" />
+                                                            <apex:outputtext value=" Poses (<= J+{!futurEventDays})" />
+                                                            <div id="Installations-loader" class="pull-right"></div>
+                                                        </a>
+                                                        <a href="" class="list-group-item legend-list-group-item" id="InterventionsSAV" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                                                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/sav.png')}" styleclass="legend-icons" />
+                                                            <apex:outputtext value=" Interventions SAV (<= J+{!futurEventDays})" />
+                                                            <div id="InterventionsSAV-loader" class="pull-right"></div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="map"></div>
+                                    </div>
+                                </div>
+                            </c:panel>
+                            <apex:form >
+                                <apex:actionfunction name="exportRerender" rerender="hiddenFields" oncomplete="handleExportRerenderComplete();">
+                                    <apex:param name="data" assignto="{!dataExport}" value="" />
+                                </apex:actionfunction>
+                                <div class="text-center">
+                                    <button id="boutonRecherche" class="btn btn-primary" onclick="searchAcc(); return false;">
+                                        Rechercher les comptes
+                                    </button>
+                                    <div id="loading" class="section hidden">
+                                        <span class="loader loader-quart"></span> Recherche en cours...
+                                        Veuillez patienter
+                                    </div>
+                                </div>
+                                <apex:outputpanel id="hiddenFields">
+                                    <apex:inputhidden id="idRequeteInput" value="{!dataExport}" />
+                                    <apex:inputhidden value="{!isExportPdf}" id="isExportPdf" />
+                                    <apex:inputhidden value="{!isExportExcel}" id="isExportExcel" />
+                                    <apex:inputhidden id="dateImportToUpdate" value="{!dateImportToUpdate}" />
+                                </apex:outputpanel>
+                            </apex:form>
+                        </div>
+                    </div>
+                </div><!-- /.PANEL Recherche -->
+                <!-- PANEL Liste des résultats -->
+                <center>
+                    <c:pageheader title="Résultats" icon="folder-open" />
+                </center>
+                <div class="panel panel-primary" id="content-resultat">
+                    <div class="panel-heading" role="tab" id="panel-listeLabel" onclick="showOrHidePanelCollapse('panel-liste');">
+                        <h4 class="panel-title">
+                            <!--<a class="collapsed" style="cursor: pointer;" onclick="toggleListeCollapse();">Liste des résultats</a>-->
+                            <a id="panel-listeTitle">Liste des résultats</a>
+                        </h4>
+                    </div>
+                    <div id="panel-liste" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-listeLabel">
+                        <div class="panel-body">
+                            <div id="affichage"></div>
+                            <div class="text-center" style="margin-top: 15px;">
+                                <apex:form styleclass="form-inline">
+                                    <div id="liste-create" style="display: inline-block;" class="hidden">
+                                        <div class="form-group">
+                                            <label for="nameListe">Nom de la liste</label>
+                                            <input type="text" class="form-control input-sm" id="nameListe" placeholder="Nom de la liste" />
+                                        </div>
+                                        <div class="form-group">
+                                            <button id="boutonRecherche" class="btn btn-primary" onclick="$j(this).button('loading'); creerListePhones(); return false;" data-loading-text="Veuillez patienter...">
+                                                Enregistrer
+                                            </button>
+                                        </div>
+                                    </div>
+                                </apex:form>
+                            </div>
+                            <apex:form styleclass="form-inline" rendered="{!CONTAINS($Profile.Name, "Administrateur") || contains($Profile.Name, "DV" ) || contains($Profile.Name, "DR" ) || contains($Profile.Name, "RVJ" ) || contains($Profile.Name, "RV" ) || contains($Profile.Name, "Vendeur" )}">
+                                <div class="text-center" style="margin-top: 15px;">
+                                    <div class="form-group">
+                                        <button type="button" id="boutonExportPdf" class="btn btn-primary hidden" onclick="handleExportPDF();">
+                                            Exporter en PDF
+                                        </button>
+                                        <div class="hidden">
+                                            <apex:commandlink id="commandExportPDF" action="{!exportPDF}" target="_blank">
+                                                <apex:commandbutton value="Exporter en PDF" styleclass="btn btn-primary" />
+                                            </apex:commandlink>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button type="button" id="boutonExportExcel" class="btn btn-primary hidden" onclick="handleExportCSV();">
+                                            Exporter pour EXCEL
+                                        </button>
+                                        <div class="hidden">
+                                            <apex:commandlink id="commandExportCSV" action="{!exportCSV}" target="_blank">
+                                                <apex:commandbutton value="Exporter en EXCEL" styleclass="btn btn-primary" />
+                                            </apex:commandlink>
+                                        </div>
+                                    </div>
+                                </div>
+                            </apex:form>
+                        </div>
+                    </div>
+                </div><!-- /.PANEL Liste des résultats -->
+                <!-- PANEL Statistiques -->
+                <center>
+                    <c:pageheader title="Statistiques" icon="stats" />
+                </center>
+                <div class="panel panel-primary">
+                    <div class="panel-heading" role="tab" id="panel-statistiqueLabel" onclick="showOrHidePanelCollapse('panel-statistique')">
+                        <h4 class="panel-title">
+                            <!--<a class="collapsed" style="cursor: pointer;" onclick="toggleStatistiqueCollapse();">Statistiques</a>-->
+                            <a id="panel-statistiqueTitle">Statistiques</a>
+                        </h4>
+                    </div>
+                    <div id="panel-statistique" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-statistiqueLabel">
+                        <div class="panel-body">
+                            <div class="col-md-3">
+                                <c:well style="text-align:center;">
+                                    <c:glyph icon="search" style="font-size:40px" /> &nbsp;<span style="font-size: 54px" id="nbRecherchesEffectuees">0</span>
+                                    <p class="text-muted">recherches effectuées aujourd'hui</p>
+                                </c:well>
+                            </div>
+                            <div class="col-md-3">
+                                <c:well style="text-align:center;">
+                                    <c:glyph icon="user" style="font-size:40px" /> &nbsp;<span style="font-size: 54px" id="nbComptesRetournes">0</span>
+                                    <p class="text-muted">comptes recherchés aujourd'hui</p>
+                                </c:well>
+                            </div>
+                            <div class="col-md-3">
+                                <c:well style="text-align:center;">
+                                    <c:glyph icon="floppy-save" style="font-size:40px" /> &nbsp;<span style="font-size: 54px" id="nbExportsEffectues">0</span>
+                                    <p class="text-muted">exports effectués aujourd'hui</p>
+                                </c:well>
+                            </div>
+                            <div class="col-md-3">
+                                <c:well style="text-align:center;">
+                                    <c:glyph icon="floppy-saved" style="font-size:40px" /> &nbsp; <span style="font-size: 54px" id="nbComptesExportes">0</span>
+                                    <p class="text-muted">comptes exportés aujourd'hui</p>
+                                </c:well>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.PANEL Statistiques -->
+            </div>
+        </div>
+    </apex:outputpanel>
+</apex:page>

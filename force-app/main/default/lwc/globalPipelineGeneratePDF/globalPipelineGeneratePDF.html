@@ -1,0 +1,132 @@
+<template>
+    <div>
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="doctype:pdf" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Génération pipeline">Génération pipeline</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container">
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+
+            <lightning-layout multiple-rows="true">
+                <lightning-layout-item flexibility="auto" padding="around-small">
+                    <div class="slds-form" role="list">
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                    <c-custom-Lookup label="Dépôt" 
+                                                    object-name="Account"
+                                                    object-type-record-name="Entity"
+                                                    field-name="Name" 
+                                                    field-name-search="Name" 
+                                                    required
+                                                    custom-filter="isActive__c=true AND entityType__r.KparKReference__c='DEP' AND migratedToK3__c=true"
+                                                    subtitle-field="KparKReference__c"
+                                                    icon-name = "standard:account" 
+                                                    onselectionchange={handleServiceEntityLookupChange} >   
+                                    </c-custom-Lookup>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                    <lightning-input type="date" date-style="short" label="Date" value={generationDate} 
+                                                        max={todaysDate} onchange={handleGenerateDateChange} required></lightning-input>
+                                </div>
+                            </div>
+                        </div>     
+                        <!-- <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                    <lightning-combobox
+                                        name="orderStatusGroup"
+                                        label="Groupe de statuts"
+                                        value={orderGroupStatusSelected}
+                                        placeholder="Sélectionnez le groupe de statut ou tous les statuts"
+                                        options={orderGroupStatus}
+                                        onchange={handleOrderGroupStatusChange} >
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                    <lightning-radio-group 
+                                        label="Format du document"
+                                        options={docFormatList}
+                                        value={docFormat}
+                                        onchange={handleDocFormatChange}
+                                        type="button">
+                                    </lightning-radio-group>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                    <lightning-dual-listbox name="orderStatus"
+                                        label="Sélection des statuts"
+                                        source-label="Disponible"
+                                        selected-label="Sélectionnée"
+                                        field-level-help="Sélectionnez le ou les status à afficher dans le Pipeline"
+                                        options={orderStatus}
+                                        onchange={handleOrderStatusChange}
+                                        value={orderStatusSelected} 
+                                        disable-reordering
+                                        min="1"
+                                        message-when-range-underflow="Sélectionnez au minimun 1 statut">
+                                    </lightning-dual-listbox>
+                                </div>
+                            </div>
+                        </div>                         
+                    </div>                          
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+        
+        <div slot="footer" class="slds-card__footer">
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-m-vertical_xx-small">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            <!-- BUTTONS -->   
+            <lightning-button variant="brand" label="Générer le document" title="Générer le document" onclick={handleSave}></lightning-button>
+        </div>
+    </div> 
+</template>

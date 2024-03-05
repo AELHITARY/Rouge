@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DiscountLevel</fullName>
+    <fields>discount__c</fields>
+    <fields>Name</fields>
+    <fields>minimumAmount__c</fields>
+    <fields>maximumAmount__c</fields>
+    <fields>discountAmount__c</fields>
+    <fields>discountPercent__c</fields>
+    <label>Palier de promotion</label>
+</CompactLayout>

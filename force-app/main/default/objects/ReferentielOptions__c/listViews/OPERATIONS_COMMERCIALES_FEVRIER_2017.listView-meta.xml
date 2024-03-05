@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPERATIONS_COMMERCIALES_FEVRIER_2017</fullName>
+    <columns>NAME</columns>
+    <columns>Debutvalidite__c</columns>
+    <columns>FinValidite__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>startsWith</operation>
+        <value>OP0217</value>
+    </filters>
+    <label>OPERATIONS COMMERCIALES FEVRIER 2017</label>
+    <language>fr</language>
+</ListView>

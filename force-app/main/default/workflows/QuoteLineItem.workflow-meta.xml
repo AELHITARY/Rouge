@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldUpdates>
+        <fullName>MaJRemiseVendeur</fullName>
+        <description>MàJ du champ Remise Vendeur (%) si la Remise vendeur (€) est renseignée</description>
+        <field>RemisevendeurPourcentage__c</field>
+        <formula>IF( RemisevendeurPourcentage__c &lt;&gt;0 , RemisevendeurPourcentage__c , (Remisevendeureuro__c *1)/ PrixTTCtarif__c )</formula>
+        <name>FRA_QuoteLineItem_MàJ_RemiseVendeur%</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MaJRemiseVendeurDevise</fullName>
+        <description>MàJ du champ Remise Vendeur (€) si la Remise vendeur (%) est renseignée</description>
+        <field>Remisevendeureuro__c</field>
+        <formula>IF( Remisevendeureuro__c &lt;&gt;0 , Remisevendeureuro__c , RemisevendeurPourcentage__c * PrixTTCtarif__c )</formula>
+        <name>FRA_QuoteLineItem_MàJ_RemiseVendeur€</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_QLI_LegacyReference</fullName>
+        <field>legacyReference__c</field>
+        <formula>Quote.numeroDevis__c + &apos;-0&apos; + NumLigneText__c</formula>
+        <name>UR001_K2_QLI_LegacyReference</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_QLI_promotionDevise</fullName>
+        <description>ROUND(( Remise_Enseigne__c / (1 + ( TVApourcentage__c / 100))),2)</description>
+        <field>PromotionDevise__c</field>
+        <formula>ROUND(( Remise_Enseigne__c / (1 + TVApourcentage__c)),2)</formula>
+        <name>UR001_K2_QLI_promotionDevise</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <rules>
+        <fullName>FRA_QuoteLineItem_CalculRemiseVendeur</fullName>
+        <actions>
+            <name>MaJRemiseVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>MaJRemiseVendeurDevise</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <description>Si le vendeur renseigne la Remise en (%) alors la remise (€) sera renseignée et vice versa</description>
+        <formula>1=1</formula>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_QuoteLineItem_InsertOrUpdate</fullName>
+        <actions>
+            <name>UR001_K2_QLI_LegacyReference</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_QLI_promotionDevise</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+</Workflow>

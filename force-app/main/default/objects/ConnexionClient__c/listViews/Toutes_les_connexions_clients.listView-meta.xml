@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Toutes_les_connexions_clients</fullName>
+    <columns>NAME</columns>
+    <columns>identifiant__c</columns>
+    <columns>eventDateTime__c</columns>
+    <columns>eventType__c</columns>
+    <columns>etat__c</columns>
+    <columns>details__c</columns>
+    <columns>mdpHashEncrypted__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Toutes les connexions clients</label>
+    <language>fr</language>
+</ListView>

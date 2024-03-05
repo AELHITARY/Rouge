@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ESCIncentive</fullName>
+    <fields>Name</fields>
+    <fields>KparKReference__c</fields>
+    <fields>startDate__c</fields>
+    <fields>endDate__c</fields>
+    <fields>customerAmount__c</fields>
+    <label>Incentive CEE</label>
+</CompactLayout>

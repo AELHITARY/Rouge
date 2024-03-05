@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_RefundTypeReason</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+( RecordType.DeveloperName = &apos;CheckRequest&apos; || RecordType.DeveloperName = &apos;Refund&apos; ) &amp;&amp;
+isLegacy__c == false &amp;&amp;
+NOT(ISBLANK(refundReason__c)) &amp;&amp;
+RecordType.DeveloperName != TEXT(refundReason__r.refundType__c)</errorConditionFormula>
+    <errorDisplayField>refundReason__c</errorDisplayField>
+    <errorMessage>Motif de remboursement incorrect!</errorMessage>
+</ValidationRule>

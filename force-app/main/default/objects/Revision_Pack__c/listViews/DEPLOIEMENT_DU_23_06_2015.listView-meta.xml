@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DEPLOIEMENT_DU_23_06_2015</fullName>
+    <columns>CodeProduit__c</columns>
+    <columns>Datedapplication__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>6/23/2015 12:00 AM</value>
+    </filters>
+    <label>DEPLOIEMENT DU 23-06-2015</label>
+    <language>fr</language>
+</ListView>

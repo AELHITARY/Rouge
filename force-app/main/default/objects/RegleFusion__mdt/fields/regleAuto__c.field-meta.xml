@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>regleAuto__c</fullName>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Règle de fusion automatique</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Standard</fullName>
+                <default>false</default>
+                <label>Standard</label>
+            </value>
+            <value>
+                <fullName>Minimum</fullName>
+                <default>true</default>
+                <label>Minimum</label>
+            </value>
+            <value>
+                <fullName>Maximum</fullName>
+                <default>false</default>
+                <label>Maximum</label>
+            </value>
+            <value>
+                <fullName>Somme</fullName>
+                <default>false</default>
+                <label>Somme</label>
+            </value>
+            <value>
+                <fullName>Et</fullName>
+                <default>false</default>
+                <label>Et</label>
+            </value>
+            <value>
+                <fullName>Ou</fullName>
+                <default>false</default>
+                <label>Ou</label>
+            </value>
+            <value>
+                <fullName>Premier créé</fullName>
+                <default>false</default>
+                <label>Premier créé</label>
+            </value>
+            <value>
+                <fullName>Dernier créé</fullName>
+                <default>false</default>
+                <label>Dernier créé</label>
+            </value>
+            <value>
+                <fullName>Premier modifié</fullName>
+                <default>false</default>
+                <label>Premier modifié</label>
+            </value>
+            <value>
+                <fullName>Dernier modifié</fullName>
+                <default>false</default>
+                <label>Dernier modifié</label>
+            </value>
+            <value>
+                <fullName>Vide</fullName>
+                <default>false</default>
+                <label>Vide</label>
+            </value>
+            <value>
+                <fullName>Dépendance</fullName>
+                <default>false</default>
+                <label>Dépendance</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

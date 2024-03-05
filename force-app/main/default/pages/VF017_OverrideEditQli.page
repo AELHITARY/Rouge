@@ -1,0 +1,2 @@
+<apex:page sidebar="false" showHeader="false" standardController="QuoteLineItem" extensions="Ctrl017_OverrideEditQli" action="{!redirectToEditAll}">
+</apex:page>

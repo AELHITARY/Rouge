@@ -1,0 +1,188 @@
+<apex:page controller="Ctrl_Site_LiveChat" applybodytag="false" applyhtmltag="false" showheader="false" sidebar="false" doctype="html-5.0" standardstylesheets="false" cache="false"   >
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Formulaire de contact pour discussion en ligne</title>
+        <apex:includescript value=" {!urlfor($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js' )}" />
+        <apex:includescript value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/js/bootstrap.min.js')}" />
+        <!-- CSS Bootstrap -->
+        <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}" />
+        <script type="text/javascript">
+            $ = jQuery.noConflict();
+            $(document).ready(function () {
+                var width = 520;//$('body').width();
+                var height = $('body').height();
+                /*
+                var scrollWidth = $('body').width() - width;
+                var scrollHeight = $('body').height() - height;
+                $('body').css('margin-right', scrollWidth + 'px');
+                $('body').css('margin-bottom', scrollHeight + 'px');
+                */
+                window.resizeTo(width,height+90);
+            });
+
+            function checkForm(){
+                clearErrors();
+                var required = true;
+                var valid = true;
+                if($('[id$="expertPreChatName"]').val() == "" ){
+                    $('[id$="expertPreChatName"]').addClass('errorInput');
+                    required = false;
+                }
+                if($('[id$="expertPreChatFirstName"]').val() == "" ){
+                    $('[id$="expertPreChatFirstName"]').addClass('errorInput');
+                    required = false;
+                }
+                if($('[id$="expertPreChatEmail"]').val() == "" ){
+                    $('[id$="expertPreChatEmail"]').addClass('errorInput');
+                    required = false;
+                }
+                if( required && !validateEmail($('[id$="expertPreChatEmail"]').val()) ){
+                    $('[id$="expertPreChatEmail"]').addClass('errorInput');
+                    valid = false;
+                }
+
+                if (!required){
+                    $('#errorMessage').text('{!$Label.liveagent_msg_preChatRequiredField}');
+
+                }
+                else if(!valid){
+                    $('#errorMessage').text('{!$Label.liveagent_msg_preChatFormatError}');
+
+                }
+                return (valid && required);
+            }
+
+            function submitForm(){
+                // Submit
+                $('#prechatForm').submit();
+            }
+
+            function validateEmail(emailA) {
+                var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+                var address =emailA;
+                if(reg.test(address) == false) {
+                   return false;
+                }
+                return true;
+            }
+
+            function preChatRequest(){
+                $('#errorMessage').text('');
+                if(checkForm()){
+                    waitCursor();
+                    disableInputs();
+                    //$(".popin-chat").bind('click', false);
+                    $("#clickChat").bind('click', false);
+                    clickChatCtrl();
+                }
+
+            }
+
+            function clearErrors(){
+                $('[id$="expertPreChatFirstName"]').removeClass('errorInput');
+                $('[id$="expertPreChatName"]').removeClass('errorInput');
+                $('[id$="expertPreChatEmail"]').removeClass('errorInput');
+            }
+
+            function waitCursor   () { $ ('body').addClass ('wait');    };
+            function normalCursor () { $ ('body').removeClass ('wait'); };
+
+            function disableInputs(){
+                $('[id$="expertPreChatFirstName"]').attr('disabled','disabled');
+                $('[id$="expertPreChatName"]').attr('disabled','disabled');
+                $('[id$="expertPreChatEmail"]').attr('disabled','disabled');
+            }
+        </script>
+    </head>
+    <body>
+        <div class="content">
+            <div class="container">
+                <div class="header-title">
+                    <!-- HEADER -->
+                    <div class="container-fluid">
+                        <div style="float: left;">
+                            <img src="{!URLFOR($Resource.Site_Espace_Client, 'img/logo_kpark.png')}" alt="Logo K par K" class="img-responsive header-logo" />
+                        </div>
+                        <div style="text-align: right;">
+                            <span>Discussion en ligne</span>
+                        </div>
+                    </div>
+                </div>
+                <apex:form id="prechatFormInput" style="margin-top: 20px;">
+                    <apex:actionFunction name="clickChatCtrl" rerender="prechatFormPanel" action="{!clickChat}" id="prechat_submit" oncomplete="submitForm();"/>
+                    <div class=" col-md-7 col-sm-6 col-xs-12">
+                        <div class="panel panel-custom">
+                            <div class="panel-body">
+                                <form>
+                                    <div class="form-group">
+                                        <label class="control-label" for="{!$Component.clientName}">Nom <span class="required-field">*</span></label>
+                                        <apex:inputtext label="Nom" id="expertPreChatName" styleclass="form-control" value="{!clientName}" maxlength="80" html-pattern="^[A-Za-zÜ-ü\s]{1,80}$" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" for="{!$Component.clientFirstName}">Prénom <span class="required-field">*</span></label>
+                                        <apex:inputtext label="Prénom" id="expertPreChatFirstName" styleclass="form-control" value="{!clientFirstName}" maxlength="40" html-pattern="^[A-Za-zÜ-ü\s]{1,40}$" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label" for="{!$Component.email}">E-mail <span class="required-field">*</span></label>
+                                        <apex:input label="E-mail" id="expertPreChatEmail" styleclass="form-control" value="{!email}" type="email" />
+                                    </div>
+                                    <!--<div class="form-group">
+                                        <label class="control-label" for="{!$Component.Topic}">Type de demande <span class="required-field">*</span></label>
+                                    </div>-->
+                                    <div class="row">
+                                        <p class="errorMessage" id="errorMessage"></p>
+                                    </div>
+                                    <div class="row text-center">
+                                        <div align="center">
+                                            <a id="clickChat" class="btn-lg btn-custom btn-custom-red" href="#" onclick="preChatRequest(); return false;">Envoyer</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </apex:form>
+            </div>
+        </div>
+        <apex:outputPanel id="prechatFormPanel">
+            <form method='post' id='prechatForm' action="{!endpoint}">
+                <input type="hidden" name='liveagent.prechat:Firstname' value="{!clientFirstName}" />
+                <input type="hidden" name='liveagent.prechat.name' value="{!clientName}" />
+                <input type="hidden" name='liveagent.prechat:Name' value="{!clientName}" />
+                <input type="hidden" name='liveagent.prechat:Email' value="{!email}" />
+                <input type="hidden" name='liveagent.prechat:RecordId' value="{!accountId}" />
+                <input type="hidden" name="liveagent.prechat.findorcreate.map:Account" value="Id,RecordId" />
+                <input type="hidden" name="liveagent.prechat.findorcreate.map.doFind:Account" value= "Id,true" />
+                <input type="hidden" name="liveagent.prechat.findorcreate.map.isExactMatch:Account" value= "Id,true" />
+                <input type="hidden" name="liveagent.prechat.findorcreate.saveToTranscript:Account" value="AccountId" />
+            </form>
+        </apex:outputPanel>
+
+        <style type="text/css">
+            body {
+                overflow: hidden;
+                padding-right: 20px;
+                padding-left: 20px;
+            }
+
+            .errorMessage{
+                color:red;
+                clear: both;
+                display:block;
+                text-align: center;
+                height:12px;
+            }
+
+            .errorInput {
+                border: 1px solid #FF5656 !important;
+                box-shadow: 0 0 2px #FF0000;
+            }
+
+            .wait{
+                cursor: wait;
+            }
+
+        </style>
+    </body>
+</apex:page>

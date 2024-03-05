@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>materiauxIsolationCombles__c</fullName>
+    <externalId>false</externalId>
+    <label>Matériaux isolation des combles</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Laine de roche</fullName>
+                <default>false</default>
+                <label>Laine de roche</label>
+            </value>
+            <value>
+                <fullName>Laine de verre</fullName>
+                <default>false</default>
+                <label>Laine de verre</label>
+            </value>
+            <value>
+                <fullName>Ouate de cellulose</fullName>
+                <default>false</default>
+                <label>Ouate de cellulose</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

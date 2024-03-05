@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AccountingEntry</fullName>
+    <fields>Name</fields>
+    <fields>RecordTypeId</fields>
+    <fields>entryDate__c</fields>
+    <fields>amount__c</fields>
+    <fields>entityBankAccount__c</fields>
+    <label>Ecriture comptable</label>
+</CompactLayout>

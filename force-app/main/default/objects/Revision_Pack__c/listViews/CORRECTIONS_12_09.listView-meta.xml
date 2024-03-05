@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CORRECTIONS_12_09</fullName>
+    <columns>NAME</columns>
+    <columns>CodeProduit__c</columns>
+    <columns>Datedapplication__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>9/12/2014 12:00 AM</value>
+    </filters>
+    <label>CORRECTIONS 12/09</label>
+    <language>fr</language>
+</ListView>

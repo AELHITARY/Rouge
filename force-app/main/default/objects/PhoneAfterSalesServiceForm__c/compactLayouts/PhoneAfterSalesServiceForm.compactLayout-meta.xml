@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PhoneAfterSalesServiceForm</fullName>
+    <fields>type__c</fields>
+    <fields>result__c</fields>
+    <fields>case__c</fields>
+    <fields>legacyReference__c</fields>
+    <label>Fiche SAV téléphonique</label>
+</CompactLayout>

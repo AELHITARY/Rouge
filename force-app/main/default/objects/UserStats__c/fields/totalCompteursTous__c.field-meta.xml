@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>totalCompteursTous__c</fullName>
+    <externalId>false</externalId>
+    <formula>compteurAffectationProximite__c +
+ compteurAffectationProximitePlanning__c +
+ compteurAtteinteObjectifs__c +
+ compteurCalendrierKparK__c +
+ compteurCalendrierMobile__c +
+ compteurCalendrierDashboard__c +
+ compteurCartographie__c +
+ compteurFeuilleRoute__c +
+ compteurListePhones__c +
+ compteurObjectifVendeur__c +
+ compteurPhototheque__c +
+ compteurProspection__c +
+ compteurRechercheParProduits__c +
+ compteurRecherchesChantiers__c +
+ compteurRecherchesComptes__c +
+ compteurRecherchesContrats__c +
+ compteurRecherchesDevis__c +
+ compteurRecherchesProjets__c +
+ compteurStreetView__c +
+ compteurTriptyque__c +
+ compteurTriptyqueAnalysePonctuelle__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Total (Tous compteurs)</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

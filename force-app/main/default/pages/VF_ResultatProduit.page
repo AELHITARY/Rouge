@@ -1,0 +1,591 @@
+<apex:page title="Recherche par produits" id="ResultatProduit" sidebar="false" showHeader="true" controller="Ctrl_RechercheProduit" docType="html-5.0" contenttype="text/html;charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/custom-theme/jquery-ui-1.12.1.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'css/cartographie.css')}" />
+    <style>
+        .custom-popup .leaflet-popup-content {
+            height: 115px;
+        }
+
+        #newSearch {
+            cursor: pointer;
+            direction: ltr;
+            overflow: hidden;
+            text-align: center;
+            position: relative;
+            color: rgb(0, 0, 0);
+            font-family: Roboto, Arial, sans-serif;
+            -webkit-user-select: none;
+            font-size: 11px;
+            padding: 8px;
+            border-bottom-left-radius: 2px;
+            border-top-left-radius: 2px;
+            -webkit-background-clip: padding-box;
+            box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px;
+            min-width: 22px;
+            font-weight: 500;
+            background-color: rgb(255, 255, 255);
+            background-clip: padding-box;
+            margin-top: 10px;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            margin-top: -10px;
+            line-height: 20px;
+            text-align: center;
+            z-index: 9999;
+        }
+
+        .section {
+            height: 500px;
+            line-height: 500px; }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            border-radius: 20px;
+            border: 4px solid rgba(0, 0, 0, 0.4); }
+
+        .loader:after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            bottom: -4px;
+            right: -4px;
+            border-radius: 20px;
+            border: 4px solid transparent;
+            border-top-color: #000;
+            -webkit-animation: spin 1s linear infinite;
+            -moz-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite; }
+
+        /* Animations */
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg); } }
+        @-moz-keyframes spin {
+            from {
+                -moz-transform: rotate(0deg); }
+
+            to {
+                -moz-transform: rotate(360deg); } }
+        @keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg); } }
+    </style>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui.1.12.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet-control-geocoder/Control.Geocoder.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'js/cartographie.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'js/autocompletion_places.js')}" />
+
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+
+        // Initialisation des types de point
+        dotType = window.dotType || {};
+        dotType.EXACTE    = "Exacte";
+        dotType.PRODUIT   = "Produit";
+        dotType.OPTION    = "Option";
+        dotType.ADRESSE   = "Adresse";
+        dotType.VENDEURS  = "Vendeurs";
+
+        // Initialisation des types de point
+        dotTypeColor = window.dotTypeColor || {};
+        dotTypeColor.EXACTE   = "{!URLFOR($Resource.Cartographie, 'img/search_exacte.png')}";
+        dotTypeColor.PRODUIT  = "{!URLFOR($Resource.Cartographie, 'img/search_produit.png')}";
+        dotTypeColor.OPTION   = "{!URLFOR($Resource.Cartographie, 'img/search_option.png')}";
+        dotTypeColor.ADRESSE  = "{!URLFOR($Resource.Cartographie, 'img/search_adresse.png')}";
+        dotTypeColor.VENDEURS = "{!URLFOR($Resource.Cartographie, 'img/vendeur.png')}";
+
+        // Initialisation des messages d'erreur
+        labels = window.labels || {};
+        labels.NOT_FOUND                   = "{!JSENCODE($Label.NOT_FOUND)}";
+        labels.GEOCODING_ERROR             = "{!JSENCODE($Label.GEOCODING_ERROR)}";
+        labels.UNABLE_GET_POSITION         = "{!JSENCODE($Label.UNABLE_GET_POSITION)}";
+
+        var circle;
+        var map, latitude, longitude, perimetre;
+        var markersArray = {}; // Tableau des markers
+
+        j$ = jQuery.noConflict();
+        j$(document).ready(function(){
+            initializeMap();
+        });
+
+        /* Fonction d'initialisation des variables et de la carte                       */
+        /*------------------------------------------------------------------------------*/
+        function initializeMap() {
+            // Verification si application mobile
+            if(isMobile()) {
+                // Si mobile, affiche carte en plein écran
+                j$("html").css("height", "100%");
+                j$("body").css("height", "100%");
+                j$("#map").css({"height":"100%", "min-height":"100%", "width":"100%", "padding":"0"});
+                j$("#divMapMenu").css({"height":"100%", "min-height":"100%", "width":"100%", "padding":"0"});
+            }
+
+            // Initialise le tableau des markers et des points visible
+            init = true;
+            for(var key in dotType) {
+                markersArray[dotType[key]] = [];
+            }
+            
+            // Charge la carte
+            map = initializeLeafletMap('map','48.8540681', '2.4772684', 13);
+
+            // Ajout du menu
+            L.Control.MapMenu = L.Control.extend({
+                onAdd: function(map) {
+                    var mapMenuDiv = L.DomUtil.get('divMapMenu');
+                    L.DomEvent.disableClickPropagation(mapMenuDiv);
+                    L.DomEvent.on(mapMenuDiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return mapMenuDiv;
+                }
+            });
+            L.control.mapMenu = function(opts) {
+                return new L.Control.MapMenu(opts);
+            }
+            L.control.mapMenu({ position: 'topleft' }).addTo(map);
+
+            // Ajout du bouton nouvelle recherche comme controle
+            L.Control.NewSearch = L.Control.extend({
+                onAdd: function(map) {
+                    var newSearchdiv = L.DomUtil.get('newSearch');
+                    // Ajout de la fonction de recherche
+                    L.DomEvent.on(newSearchdiv, 'click', function() {
+                        newSearchJavascript();
+                    });
+                    L.DomEvent.disableClickPropagation(newSearchdiv);
+                    L.DomEvent.on(newSearchdiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return newSearchdiv;
+                }
+            });
+            L.control.newSearch = function(opts) {
+                return new L.Control.NewSearch(opts);
+            }
+            L.control.newSearch({ position: 'topright' }).addTo(map);
+
+            // Affichage
+            getRemoteVendeurs();
+            viewResult();
+        }
+
+        /* Fonction permettant de récupérer les vendeurs et les afficher                */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteVendeurs() {
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_RechercheProduit.getVendeursList}',
+                function(result, event) {
+                    if (event.status) {
+                        // Boucle sur les vendeurs
+                        for(var i = 0; i < result.length; ++i) {
+                            var address = checkField(result[i].rue__c) + ' ' + checkField(result[i].codePostal__c) + ' ' + checkField(result[i].ville__c);
+                            address = j$.trim(address);
+
+                            // Récupère les coordonées
+                            var coords = getPointCoords(address, result[i].localisationLatitude__c, result[i].localisationLongitude__c, null, null);
+
+                            // Ajout du marker sur la carte
+                            if(coords) {
+                                addMarker(dotType.VENDEURS, dotTypeColor.VENDEURS, coords, result[i], address);
+                            } else {
+                                alert(labels.UNABLE_GET_POSITION + result[i].Name);
+                            }
+                        }
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les chantiers et les afficher */
+        /*----------------------------------------------------------------*/
+        function viewResult(chantiers) {
+            var coords;
+
+            // stockage des produits et options
+            var produitsMap = new Object;
+            if('{!prd1}'!='') produitsMap['{!prd1}'] = ['{!opt11}','{!opt12}','{!opt13}','1'];
+            if('{!prd2}'!='') produitsMap['{!prd2}'] = ['{!opt21}','{!opt22}','{!opt23}','2'];
+            if('{!prd3}'!='') produitsMap['{!prd3}'] = ['{!opt31}','{!opt32}','{!opt33}','3'];
+
+            // Chargement
+            j$('#loading').removeClass('hidden').addClass('show');
+
+            // récupération des valeurs entrées
+            latitude = "{!adresse_latitude}";
+            longitude = "{!adresse_longitude}";
+            perimetre = "{!perimetre}";
+
+            console.log("latitude, longitude : "+latitude+" , "+longitude);
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_RechercheProduit.searchChantiersProducts}', produitsMap, latitude, longitude, perimetre,
+                function(result, event) {
+                    if (event.status) {
+                        // Boucle sur les chantiers
+                        if(result != null && result.length > 0) {
+                            var trList= '';
+
+                            // Affichage marker de l'adresse de référence
+                            addMarkerAdresse(dotType.ADRESSE, dotTypeColor.ADRESSE, latitude, longitude);
+                            for(var i = 0; i < result.length; ++i) {
+                                var address = checkField(result[i].chantier.adresseGeolocalisation__c);
+                                address = j$.trim(address);
+
+                                // Récupère les coordonées
+                                coords = getPointCoords(address, result[i].chantier.Localisation__Latitude__s, result[i].chantier.Localisation__Longitude__s, result[i].chantier.x__c, result[i].chantier.y__c)
+                                var corres;
+
+                                // Ajout du marker sur la carte
+                                if(coords) {
+                                    if(result[i].Correspondance.indexOf('Exacte')!=-1){
+                                        addMarker(dotType.EXACTE, dotTypeColor.EXACTE, coords, result[i], address);
+                                        corres = dotTypeColor.EXACTE;
+                                    } else {
+                                        if(result[i].Correspondance.indexOf('Option')!=-1){
+                                            addMarker(dotType.OPTION, dotTypeColor.OPTION, coords, result[i], address);
+                                            corres = dotTypeColor.OPTION;
+                                        } else {
+                                            if(result[i].Correspondance.indexOf('Produit')!=-1){
+                                                addMarker(dotType.PRODUIT, dotTypeColor.PRODUIT, coords, result[i], address);
+                                                corres = dotTypeColor.PRODUIT;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    alert(labels.UNABLE_GET_POSITION + result[i].Name);
+                                }
+
+                                var objectCorrespondanceName = result[i].Correspondance;
+                                if (objectCorrespondanceName.indexOf("Exacte") != -1) objectCorrespondanceName = "Exacte";
+                                else{
+                                    if (objectCorrespondanceName.indexOf("Option") != -1) objectCorrespondanceName = "Option";
+                                    else{
+                                        if (objectCorrespondanceName.indexOf("Produit") != -1) objectCorrespondanceName = "Produit";
+                                    }
+                                }
+
+                                // Construction de la présentation de la liste
+                                trList +='<tr>'
+                                            +'<td>'
+                                            +'  <image src="'+ corres +'" class="legend-icons"/>'
+                                            +'</td>'
+                                            +'<td>';
+                                if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+                                    trList +=   '<a target="_blank" href="javascript:sforce.one.navigateToSObject(\'' + result[i].chantier.Id + '\')'+'">'+ result[i].chantier.Name +'</a>';
+                                else
+                                    trList +='  <a target="_blank" href="/'+ result[i].chantier.Id +'">'+ result[i].chantier.Name +'</a>';
+                                trList +=   '</td>'
+                                        +'</tr>'
+                                        +'<tr>'
+                                        +'<td></td><td>'
+                                        +  result[i].chantier.rue__c + ' '
+                                        +  result[i].chantier.codePostal__c + ' ' + result[i].chantier.ville__c
+                                        +'</td>'
+                                        +'</tr>'
+                                        +'<tr>'
+                                            +'<td></td><td>'
+                                            +  objectCorrespondanceName
+                                            +'</td>'
+                                        +'</tr>'
+                                        +'<tr>'
+                                        +'<td></td><td>'
+                                if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+                                    trList +=   '<a target="_blank" href="javascript:sforce.one.navigateToSObject(\'' + result[i].compte.Id + '\')'+'">'+ result[i].compte.AccountNumber +'</a>';
+                                else
+                                    trList +='  <a target="_blank" href="/'+ result[i].compte.Id +'">' + result[i].compte.AccountNumber+'</a>';
+                                trList +=   '</td>'
+                                        +'</tr>';
+                                if (result[i].projet != null)  {
+                                    trList += '<tr>'
+                                            +'<td></td><td>'
+                                    if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+                                        trList +=   '<a target="_blank" href="javascript:sforce.one.navigateToSObject(\'' + result[i].projet.Id + '\')'+'">'+ result[i].projet.numeroProjet__c +'</a>';
+                                    else
+                                        trList +='  <a target="_blank" href="/'+ result[i].projet.Id +'">' + result[i].projet.numeroProjet__c+'</a>';
+                                    trList +=   '</td>'
+                                }
+                                trList += '</tr>';
+                            }
+
+                            // Ajout du circle et menu
+                            addMenuAndCircle(trList);
+
+                            j$('#loading').removeClass('show').addClass('hidden');
+                        } else {
+                            newSearchJavascriptWithError();
+                            j$('#loading').removeClass('show').addClass('hidden');
+                        }
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                        newSearchJavascript();
+                    } else {
+                        alert(event.message);
+                        newSearchJavascript();
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant d'afficher le contenu de la liste des chantiers          */
+        /* Dessine le cercle                                                            */
+        /*------------------------------------------------------------------------------*/
+        function addMenuAndCircle(contentHtml) {
+            j$("#tabList").html(contentHtml);
+
+            // Configuration cercle
+            var radius = perimetre*1;
+            var latlng = L.latLng(latitude, longitude);
+            var circleOpt = {
+                radius: radius,
+                fillColor: '#eaeaea',
+                fillOpacity: 0.2,
+                color: '#FF0000',
+                opacity: 0.8,
+                weight: 2,
+                interactive: false
+            };
+            // Ajout du cercle
+            circle = L.circle(latlng, circleOpt).addTo(map);           
+            // Centre la carte sur le secteur
+            //map.fitBounds(circle.getBounds()); 
+            map.setView(new L.LatLng(latitude, longitude),15);
+
+            j$("#divMapMenu").css('visibility','visible');
+            j$("#divMapMenu").css('opacity', '0.75');
+            j$('#productSearch-menu').removeClass('hidden').addClass('show');
+            j$("#productSearch-menu").css('overflow', 'auto');
+        }
+
+        /* Fonction permettant de dessiner un marqueur sur la carte (hors Google Place) */
+        /* Présentation des points                                                      */
+        /*------------------------------------------------------------------------------*/
+        function addMarker(dot, dotype, location, object, address) {
+
+            // InfoWindow
+            if(dot == dotType.VENDEURS) {
+                var dotPresentation = createInfowindow('user', object);
+                // Chantier
+            } else {
+                var dotPresentation = createInfowindow('chantier', object);
+                var objectCorrespondance = checkField(object.Correspondance);
+                var objectCorrespondanceName = objectCorrespondance;
+                if (objectCorrespondanceName.indexOf("Exacte") != -1) objectCorrespondanceName = "Exacte";
+                if (objectCorrespondanceName.indexOf("Produit") != -1) objectCorrespondanceName = "Produit";
+                if (objectCorrespondanceName.indexOf("Option") != -1) objectCorrespondanceName = "Option";
+            }
+
+            // Ajout du marker sur la carte et ajout de la présentation
+            var marker = addMarkerLeaflet(map, dot, location, dotype, [32,37], [16,37], [0, -37]);
+            var customOptions = {
+                'maxWidth': '500',
+                'className' : 'custom-popup'
+            };
+            marker.bindPopup(dotPresentation, customOptions);
+            L.DomEvent.on(marker, 'click', function (ev) {
+                marker.openPopup();
+                L.DomEvent.stopPropagation(ev);
+            });
+            // Construction du marker avec un label
+            if(objectCorrespondanceName != 'Exacte' && dot != dotType.VENDEURS){
+                var label = objectCorrespondance.slice(-1);
+                marker.bindTooltip(label, { permanent: true, opacity: 0.7, direction: 'bottom', className: 'labels'});
+            }
+            return marker;
+        }
+
+        /* Contruction de l'infowindow                                                  */
+        /*------------------------------------------------------------------------------*/
+        function createInfowindow(type, object) {
+            // Traitement champs pour chantier
+            if(type == 'chantier') {
+                // Récupération des informations
+                var objectId = object.chantier.Id;
+                var objectName = checkField(object.Name);
+                var objectRue = checkField(object.chantier.rue__c);
+                var objectCodePostal = checkField(object.chantier.codePostal__c);
+                var objectVille = checkField(object.chantier.ville__c);
+                var objectCorrespondance = checkField(object.Correspondance);
+                var objectCompteId = checkField(object.compte.Id);
+                var objectCompteNum = checkField(object.compte.AccountNumber);
+                if (object.projet != null) {
+                    var objectProjetId = checkField(object.projet.Id);
+                    var objectProjetNum = checkField(object.projet.numeroProjet__c);
+                }
+                var objectCorrespondanceName = objectCorrespondance;
+                if (objectCorrespondanceName.indexOf("Exacte") != -1) objectCorrespondanceName = "Exacte";
+                if (objectCorrespondanceName.indexOf("Produit") != -1) objectCorrespondanceName = "Produit";
+                if (objectCorrespondanceName.indexOf("Option") != -1) objectCorrespondanceName = "Option";
+            // Traitement champs pour vendeur
+            } else if (type == 'user') {
+                var objectId = object.Id;
+                var objectRue = checkField(object.rue__c);
+                var objectCodePostal = checkField(object.codePostal__c);
+                var objectVille = checkField(object.ville__c);
+                var objectName = checkField(object.Name);
+            }
+
+            // Construction de la présentation du point
+            var dotPresentation = '<div id="dotPresentation">'
+                                    +'<div class="dotPresentationDetail">'
+                                    +'      <div class="dotPresentatioName">'
+            if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+                dotPresentation +=   '<a target="_blank" href="javascript:sforce.one.navigateToSObject(\'' + objectId + '\')'+'">'+ objectName +'</a>';
+            else
+                dotPresentation +='  <a target="_blank" href="/'+ objectId +'">' + objectName +'</a>';
+            dotPresentation     +='      </div>'
+                                +'      <div class="dotPresentatioAddress">'
+                                +           objectRue + '<br />'
+                                +           objectCodePostal + ' ' + objectVille
+                                +'      </div>';
+            if(type == 'chantier') {
+                                +'      <div class="dotPresentatioAddress">'
+                                +           objectCorrespondanceName
+                                +'      </div>'
+                                +'      <div id="dotPresentatioJoign">'
+                if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+                    dotPresentation +='     <div class="line_info">Compte : <a target="_blank" href="javascript:sforce.one.navigateToSObject(\'' + objectCompteId + '\')'+'">'+ objectCompteNum +'</a>';
+                else
+                    dotPresentation +='     <div class="line_info">Compte : <a target="_blank" href="/'+ objectCompteId +'">'+ objectCompteNum +'</a></div>';
+                if (object.projet != null) {
+                    if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+                        dotPresentation +=' <div class="line_info">Projet : <a target="_blank" href="javascript:sforce.one.navigateToSObject(\'' + objectProjetId + '\')'+'">'+ objectProjetNum +'</a>';
+                    else
+                        dotPresentation +=' <div class="line_info">Projet : <a target="_blank" href="/'+ objectProjetId +'">'+ objectProjetNum +'</a></div>';
+                }
+                dotPresentation +=  '      </div>';
+            }
+            dotPresentation +=  ' </div>'
+                            +'</div>';
+
+            return dotPresentation;
+        }
+
+        /* Fonction permettant de dessiner un marqueur sur la carte (Adresse de référence) */
+        /*---------------------------------------------------------------------------------*/
+        function addMarkerAdresse(dot, dotype, latitude, longitude) {
+            // Construction du marker
+            var location = L.latLng(latitude, longitude);
+            var marker = addMarkerLeaflet(map, dot, location, dotype, [32,37], [16,37], [0, -37]);
+            return marker;
+        }
+
+
+        /* Fonction supprimant les markers et le cercle  */
+        /*-----------------------------------------------*/
+        function clearMap(){
+            // Supprimer cercle
+            if (circle && circle != null){
+                map.removeLayer(circle);
+            }
+            // Supprimer markers
+            deleteAll(map);
+        }
+
+        /* Check if the browser agent in Mobile                     */
+        /*----------------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                || ((typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    </script>
+
+    <div id="loading" class="section">
+        <span class="loader"></span>
+        Recherche en cours... Veuillez patienter
+    </div>
+
+    <div>
+        <apex:form >
+            <apex:actionFunction action="{!newSearch}" name="newSearchJavascript" />
+            <apex:actionFunction action="{!newSearchWithError}" name="newSearchJavascriptWithError" />
+        </apex:form>
+    </div>
+
+    <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+    <apex:outputPanel styleClass="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero" layout="block" style="height:100%">
+
+        <!-- Marker et Legende -->
+        <div id ="divMapMenu" class="legend-content show" style="z-index: 10;">
+            <div id="productSearch-menu" style="max-height:450px;" class="hidden">
+                <div id="productSearch-dotmenu" style="font-size:11px;">
+                    <table id="tabList" class="dotmenu-content" >
+                    </table>
+                </div>
+                <div id="productSearch-dotmenu" style="font-size:11px; padding-top: 10px;">
+                    <table id="legend" style="width: 100%" class="dotmenu-content">
+                        <tr><td style="font-weight: bold;">Légende :</td></tr>
+                        <tr>
+                            <td><apex:image url="{!URLFOR($Resource.Cartographie, 'img/search_exacte.png')}" styleClass="legend-icons"/></td>
+                            <td>Correspondance Exacte</td>
+                        </tr><tr>
+                            <td><apex:image url="{!URLFOR($Resource.Cartographie, 'img/search_produit.png')}" styleClass="legend-icons"/></td>
+                            <td>Correspondance Produit</td>
+                        </tr><tr>
+                            <td><apex:image url="{!URLFOR($Resource.Cartographie, 'img/search_option.png')}" styleClass="legend-icons"/></td>
+                            <td>Correspondance Option</td>
+                        </tr><tr>
+                            <td><apex:image url="{!URLFOR($Resource.Cartographie, 'img/vendeur.png')}" styleClass="legend-icons"/></td>
+                            <td>Vendeurs</td>
+                        </tr><tr>
+                            <td><apex:image url="{!URLFOR($Resource.Cartographie, 'img/search_adresse.png')}" styleClass="legend-icons"/></td>
+                            <td>Adresse de recherche</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton nouvelle recherche -->
+        <div id="newSearch" draggable="false" title="Nouvelle recherche">
+            Nouvelle recherche
+        </div>
+
+        <div id="map"></div>
+    </apex:outputPanel>
+</apex:page>

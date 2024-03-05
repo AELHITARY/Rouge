@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MF_AdvancePaymentLower100</fullName>
+    <active>true</active>
+    <description>Le total des acomptes ne doit pas dépasser 100%</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;FinancingMethod&apos; &amp;&amp;
+NOT(ISNULL(advancePayment1__c)) &amp;&amp;
+(advancePayment1__c + NULLVALUE(advancePayment2__c, 0)) &gt; 1.0</errorConditionFormula>
+    <errorMessage>Le total des acomptes ne doit pas dépasser 100%!</errorMessage>
+</ValidationRule>

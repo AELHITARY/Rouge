@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>typeReponse__c</fullName>
+    <description>Type de réponse nécessaire pour répondre à la question.
+Mettre la valeur &quot;Étiquette&quot; si c&apos;est juste pour avoir un texte.</description>
+    <externalId>false</externalId>
+    <label>Type de réponse</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Titre</fullName>
+                <default>false</default>
+                <label>Titre</label>
+            </value>
+            <value>
+                <fullName>Etiquette</fullName>
+                <default>false</default>
+                <label>Etiquette</label>
+            </value>
+            <value>
+                <fullName>Texte</fullName>
+                <default>false</default>
+                <label>Texte</label>
+            </value>
+            <value>
+                <fullName>Case à cocher</fullName>
+                <default>false</default>
+                <label>Case à cocher</label>
+            </value>
+            <value>
+                <fullName>Numéro</fullName>
+                <default>false</default>
+                <label>Numéro</label>
+            </value>
+            <value>
+                <fullName>Radio</fullName>
+                <default>false</default>
+                <label>Radio</label>
+            </value>
+            <value>
+                <fullName>Matrice</fullName>
+                <default>false</default>
+                <label>Matrice</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

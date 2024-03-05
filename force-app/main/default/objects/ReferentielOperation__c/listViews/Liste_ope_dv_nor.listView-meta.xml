@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Liste_ope_dv_nor</fullName>
+    <booleanFilter>1 OR 2</booleanFilter>
+    <columns>Ville__c</columns>
+    <columns>Datedebut__c</columns>
+    <columns>Datefin__c</columns>
+    <columns>NAME</columns>
+    <columns>Code__c</columns>
+    <columns>SurfaceduStand__c</columns>
+    <columns>Magasins_DR_Nord__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>OWNER.LAST_NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Code2__c</field>
+        <operation>startsWith</operation>
+        <value>NOR</value>
+    </filters>
+    <filters>
+        <field>Code__c</field>
+        <operation>startsWith</operation>
+        <value>NOR</value>
+    </filters>
+    <label>Normandie - opérations</label>
+    <language>fr</language>
+    <sharedTo>
+        <role>ContrleurdExploitation</role>
+        <role>ContrleurdeGestion</role>
+        <role>DV0010</role>
+        <role>DirecteurAdminetFinancier</role>
+        <role>DirecteurExcutif</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FOIRES_2016</fullName>
+    <columns>NAME</columns>
+    <columns>Datedebut__c</columns>
+    <columns>Datefin__c</columns>
+    <columns>SurfaceduStand__c</columns>
+    <columns>Code__c</columns>
+    <columns>Ville__c</columns>
+    <columns>magasins__c</columns>
+    <columns>Coutemplacement__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>SurfaceduStand__c</field>
+        <operation>equals</operation>
+        <value>G3 : 9m²,HC : Hors-catégorie,G1 : 36m²,G2 : 18m²</value>
+    </filters>
+    <filters>
+        <field>Datefin__c</field>
+        <operation>greaterThan</operation>
+        <value>1/1/2016</value>
+    </filters>
+    <filters>
+        <field>Datedebut__c</field>
+        <operation>lessThan</operation>
+        <value>1/1/2017</value>
+    </filters>
+    <label>FOIRES 2016</label>
+    <language>fr</language>
+    <sharedTo>
+        <role>Supportutilisateur</role>
+    </sharedTo>
+</ListView>

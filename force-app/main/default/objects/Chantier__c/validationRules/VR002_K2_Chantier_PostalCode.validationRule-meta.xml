@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR002_K2_Chantier_PostalCode</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c == FALSE 
+&amp;&amp; (UPPER(pays__c) == &apos;F&apos; || UPPER(pays__c) == &apos;FR&apos; || UPPER(pays__c) == &apos;FRA&apos; || UPPER(pays__c) == &apos;FRANCE&apos;)
+&amp;&amp; (ISNUMBER(codePostal__c) == FALSE || VALUE(codePostal__c) &lt; 1000 || VALUE(codePostal__c) &gt; 99999)</errorConditionFormula>
+    <errorDisplayField>codePostal__c</errorDisplayField>
+    <errorMessage>Code postal invalide! (Le code postal doit être sur 5 positions et ne contenir que des chiffres)</errorMessage>
+</ValidationRule>

@@ -1,0 +1,72 @@
+<apex:page tabStyle="Absences_r_currentes__tab" controller="CTRL_FSL_AbsRec_Result"  showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0">
+    <html>
+        <head>
+            <title>Récapitulatif</title>
+            <apex:stylesheet value="{!URLFOR($Resource.CSS_Form, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        </head>
+        
+        <body>
+            <div class="slds">
+                <apex:form id="fdrForm">
+                    <div class="slds-card">
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 0px; ">
+                            <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                    <h1 class="slds-text-heading--small slds-truncate" style="font-weight: bold; font-size : 1.5em; margin-bottom: 1%;">Absences récurrentes</h1><br/>
+                            </div>
+                        </div>
+                        
+                        <div id="rdvSection" >
+                            
+                            <apex:pageBlock id="pb0">
+                                
+                                
+                                <div  style="font-size: 1.1em; margin-bottom: 1%; margin-top:1%;">
+                                    <apex:outputText >
+                                        Vous avez crée <span style="font-weight: bold;" > {!nbCreated}</span> absence(s) sur les {!nbExpected} attendues.
+                                    </apex:outputText>
+                                </div>  
+                                
+                                <apex:pageBlockTable value="{!lAbsenceResourceCreated}" var="item" id="pbt" style="font-size : 1.1em;">
+                                    
+                                    <apex:column >
+                                        <apex:facet name="header">
+                                            Ressource
+                                        </apex:facet>
+                                        <apex:outputText value="{!item.Resource.Name}" style="margin-left: 15px; font-size: 0.9em;"></apex:outputText>
+                                    </apex:column>
+                                    
+                                    <apex:column >
+                                        <apex:facet name="header">
+                                            Type d'absence
+                                        </apex:facet>
+                                        <apex:outputText value="{!item.Type}" style="margin-left: 15px; font-size: 0.9em;"></apex:outputText>
+                                    </apex:column>
+                                    
+                                    <apex:column >
+                                        <apex:facet name="header">
+                                            Début 
+                                        </apex:facet>
+                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy  HH'h'mm}" style="margin-left: 15px; white-space:pre;">
+                                            <apex:param value="{!item.Start+(2/24)}" /> 
+                                        </apex:outputText>
+                                    </apex:column>
+                                    
+                                    <apex:column >
+                                        <apex:facet name="header">
+                                            Fin 
+                                        </apex:facet>
+                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}" style="margin-left: 15px; white-space:pre;">
+                                            <apex:param value="{!item.End+(2/24)}" /> 
+                                        </apex:outputText>
+                                    </apex:column>
+                                    
+                                </apex:pageBlockTable>
+                            </apex:pageBlock>  
+                        </div>
+                    </div>
+                </apex:form>  
+            </div>
+        </body>
+    </html>
+</apex:page>

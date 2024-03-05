@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>amountDifference__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISNULL(amount__c) || ISNULL(oldAmount__c), null, amount__c - oldAmount__c)</formula>
+    <label>[#] Delta OLD versus NEW montant</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

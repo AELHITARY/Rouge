@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Operation</fullName>
+    <fields>Name</fields>
+    <fields>Ville__c</fields>
+    <fields>Datedebut__c</fields>
+    <fields>Datefin__c</fields>
+    <label>Opération</label>
+</CompactLayout>

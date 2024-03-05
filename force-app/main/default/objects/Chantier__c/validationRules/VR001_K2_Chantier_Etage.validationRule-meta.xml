@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_Etage</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c == FALSE &amp;&amp; !ISNULL( etage__c ) &amp;&amp; etage__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>etage__c</errorDisplayField>
+    <errorMessage>Etage du chantier invalide! (L&apos;étage doit être supérieur ou égal à 0)</errorMessage>
+</ValidationRule>

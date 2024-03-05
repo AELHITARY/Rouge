@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MinPayableAmount</fullName>
+    <active>true</active>
+    <description>Le Montant min. payable doit être supérieur à 0 si renseigné</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+minPayableAmount__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>minPayableAmount__c</errorDisplayField>
+    <errorMessage>Montant min. payable doit être supérieur ou égal à 0!</errorMessage>
+</ValidationRule>

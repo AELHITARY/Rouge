@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_ONC_ExpirationDate</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+NOT(ISNULL(expirationDate__c)) &amp;&amp;
+expirationDate__c &lt; startDate__c</errorConditionFormula>
+    <errorDisplayField>expirationDate__c</errorDisplayField>
+    <errorMessage>Date d&apos;expiration invalide (doit être postérieure à la date d&apos;ouverture)!</errorMessage>
+</ValidationRule>

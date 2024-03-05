@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>nbRDV__c</fullName>
+    <description>Nombre de comptes sur lesquels un RDV a été positionné</description>
+    <externalId>false</externalId>
+    <label>Nombre de RDV</label>
+    <summaryFilterItems>
+        <field>PhoningVendeur__c.RDV__c</field>
+        <operation>notEqual</operation>
+        <value>null</value>
+    </summaryFilterItems>
+    <summaryForeignKey>PhoningVendeur__c.liste__c</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Semaine_DateFin</fullName>
+    <active>true</active>
+    <description>CRM-514 : La date de fin est obligatoire si la semaine est de type Vendeur</description>
+    <errorConditionFormula>AND($User.ByPassValidationRule__c = False, ISBLANK(dateFin__c), ISPICKVAL(type__c, &apos;Vendeur&apos;))</errorConditionFormula>
+    <errorDisplayField>dateFin__c</errorDisplayField>
+    <errorMessage>La date de fin est obligatoire !</errorMessage>
+</ValidationRule>

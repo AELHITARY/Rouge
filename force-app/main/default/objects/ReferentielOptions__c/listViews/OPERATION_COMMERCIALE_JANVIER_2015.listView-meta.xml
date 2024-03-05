@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPERATION_COMMERCIALE_JANVIER_2015</fullName>
+    <columns>NAME</columns>
+    <columns>LibelleOption__c</columns>
+    <columns>CodeOption__c</columns>
+    <columns>Debutvalidite__c</columns>
+    <columns>FinValidite__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>equals</operation>
+        <value>OP0115PORT,OP0115TK10,OP0115TK20,OP0115TK55</value>
+    </filters>
+    <label>OPERATION COMMERCIALE JANVIER 2015</label>
+    <language>fr</language>
+</ListView>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ExternalCollaborator</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>Collaborator</compactLayoutAssignment>
+    <description>Collaborateur externe de la société K par K (prestataire)</description>
+    <label>Collaborateur externe</label>
+    <picklistValues>
+        <picklist>stageName__c</picklist>
+        <values>
+            <fullName>Désactivé</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En cours</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Provisionné</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

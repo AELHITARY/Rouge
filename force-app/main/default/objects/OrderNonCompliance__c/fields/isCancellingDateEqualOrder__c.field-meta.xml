@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>isCancellingDateEqualOrder__c</fullName>
+    <externalId>false</externalId>
+    <formula>if(cancellationDate__c == customerOrder__r.cancellingDate__c, true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Date d&apos;annulation égal à la commande</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

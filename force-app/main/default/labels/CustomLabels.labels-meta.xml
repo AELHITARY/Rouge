@@ -1,0 +1,3318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>AdresseNonSelectionneeGeoloc</fullName>
+        <categories>Account,Chantier</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>AdresseNonSelectionneeGeoloc</shortDescription>
+        <value>Veuillez sélectionnez une adresse à copier.</value>
+    </labels>
+    <labels>
+        <fullName>AdresseNonTrouveeGeoloc</fullName>
+        <categories>Account,Chantier</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>AdresseNonTrouveeGeoloc</shortDescription>
+        <value>Adresse non géolocalisée. Veuillez contacter votre administrateur.</value>
+    </labels>
+    <labels>
+        <fullName>AdresseNonValideGeoloc</fullName>
+        <categories>Account, Chantier, Recherche par produit</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>AdresseNonValideGeoloc</shortDescription>
+        <value>Veuillez renseigner une adresse valide.</value>
+    </labels>
+    <labels>
+        <fullName>AmendmentAvailable</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Type ID when Amendment Available on Order</shortDescription>
+        <value>0126E000000p9cEQAQ</value>
+    </labels>
+    <labels>
+        <fullName>AmendmentUnavailable</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Type ID when Amendment Unavailable on Order</shortDescription>
+        <value>0126E000000pZzfQAE</value>
+    </labels>
+    <labels>
+        <fullName>Aucun</fullName>
+        <categories>Cartographie</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Aucun</shortDescription>
+        <value>--Aucun--</value>
+    </labels>
+    <labels>
+        <fullName>AucunEnregTrouve</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>AucunEnregTrouve</shortDescription>
+        <value>Aucun enregistrement à afficher.</value>
+    </labels>
+    <labels>
+        <fullName>CodePostal_obligatoire</fullName>
+        <categories>Site_Parrainage</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>CodePostal_obligatoire</shortDescription>
+        <value>Merci de renseigner le code postal dans l&apos;adresse complète.</value>
+    </labels>
+    <labels>
+        <fullName>DevisVenduEnregistreNonClonable</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Devis vendu enregistre non clonable</shortDescription>
+        <value>Un devis au statut vendu enregistré ne peut être cloné</value>
+    </labels>
+    <labels>
+        <fullName>EmailDisableInactiveUsersBatch</fullName>
+        <categories>TECH</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>EmailDisableInactiveUsersBatch</shortDescription>
+        <value>mohamed.ait-boutargante@kpark.fr;informatique@kpark.fr</value>
+    </labels>
+    <labels>
+        <fullName>Erreur_utilisateur</fullName>
+        <categories>Reaffectation user</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur utilisateur</shortDescription>
+        <value>L&apos;utilisateur n&apos;existe pas !</value>
+    </labels>
+    <labels>
+        <fullName>FSL_FDR_Label_PermissionSet</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FSL_FDR_Label_PermissionSet</shortDescription>
+        <value>FSL Admin License; FSL Admin Permissions;</value>
+    </labels>
+    <labels>
+        <fullName>FSL_FDR_idFullTerritory</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FSL_FDR_idFullTerritory</shortDescription>
+        <value>00eD0000001iahA</value>
+    </labels>
+    <labels>
+        <fullName>FSL_Type_AR_Delete</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FSL_Type_AR_Delete</shortDescription>
+        <value>Secondaire;Visite;</value>
+    </labels>
+    <labels>
+        <fullName>FSL_Type_Absence_Delete</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>FSL_Type_Absence_Delete</shortDescription>
+        <value>Renfort;Visite de pose;</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Add_Row</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Add_Row</shortDescription>
+        <value>Ajouter une ligne</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Advanced</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Advanced</shortDescription>
+        <value>Ajouter une logique de filtrage...</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Advanced_Conditions</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Advanced_Conditions</shortDescription>
+        <value>Logique de filtrage</value>
+    </labels>
+    <labels>
+        <fullName>Filter_And</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_And</shortDescription>
+        <value>Et</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Clear</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Clear</shortDescription>
+        <value>Effacer le filtre</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Clear_Advanced</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Clear_Advanced</shortDescription>
+        <value>Supprimer la logique de filtrage</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Field_label</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Field_label</shortDescription>
+        <value>Champ</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Operator_label</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Operator_label</shortDescription>
+        <value>Opérateur</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Remove_Row</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Remove_Row</shortDescription>
+        <value>Supprimer une ligne</value>
+    </labels>
+    <labels>
+        <fullName>Filter_Value_label</fullName>
+        <categories>Filter</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filter_Value_label</shortDescription>
+        <value>Valeur</value>
+    </labels>
+    <labels>
+        <fullName>GEOCODING_ERROR</fullName>
+        <categories>Cartographie</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>GEOCODING_ERROR</shortDescription>
+        <value>Erreur lors du geocodage</value>
+    </labels>
+    <labels>
+        <fullName>MERCI_DE_CHOISIR_UN_SECTEUR</fullName>
+        <categories>Cartographie</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>MERCI_DE_CHOISIR_UN_SECTEUR</shortDescription>
+        <value>Merci de choisir un secteur</value>
+    </labels>
+    <labels>
+        <fullName>NOT_FOUND</fullName>
+        <categories>Cartographie</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>not found</shortDescription>
+        <value>not found</value>
+    </labels>
+    <labels>
+        <fullName>NRV10ManagerAssignmentValidationFailManager</fullName>
+        <categories>Messages, Errors</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Manager assignment validation fail manager</shortDescription>
+        <value>Il existe déjà une affectation de responsable pour ces dates. Vérifiez que les autres affectations ont bien une date de fin ou adaptez vos dates.</value>
+    </labels>
+    <labels>
+        <fullName>NRV10ManagerAssignmentValidationFailRole</fullName>
+        <categories>Messages, Errors</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Manager assignment validation fail role</shortDescription>
+        <value>Il existe déjà une affectation de responsable sur cette équipe pour ces dates, vérifiez que les autres affectations ont une date de fin ou modifiez vos dates.</value>
+    </labels>
+    <labels>
+        <fullName>NRV10RemunerationGridValidationFailDates</fullName>
+        <categories>Messages, Errors</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>NRV10RemunerationGridValidationFailDates</shortDescription>
+        <value>La date d&apos;ouverture ne peut être postérieure à la plus petite date d&apos;application des révisions de grille associées. De même, la date de fermeture ne peut être antérieure à la plus lointaine date des révisions de grille associées.</value>
+    </labels>
+    <labels>
+        <fullName>OverrideNewAccount</fullName>
+        <categories>OverrideNewAccount</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>OverrideNewAccount</shortDescription>
+        <value>La création d&apos;un foyer, prospect ou client, ne peut se faire depuis cet onglet : seulement au travers de la conversion d&apos;un Lead.</value>
+    </labels>
+    <labels>
+        <fullName>PhoneInvalid</fullName>
+        <categories>Account,Chantier</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Numéro de téléphone incorrect</shortDescription>
+        <value>Numéro de téléphone incorrect</value>
+    </labels>
+    <labels>
+        <fullName>PhoneValid</fullName>
+        <categories>Account,Chantier</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Numéro de téléphone valide</shortDescription>
+        <value>Numéro de téléphone valide</value>
+    </labels>
+    <labels>
+        <fullName>RTFRASousCampagne</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>RTFRA- Sous Campagne</shortDescription>
+        <value>012D0000000iLWS</value>
+    </labels>
+    <labels>
+        <fullName>RTRole</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>RTRole</shortDescription>
+        <value>00ED0000001PAmx</value>
+    </labels>
+    <labels>
+        <fullName>RT_FRA_ActiviteCommerciale</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>RT_FRA_ActiviteCommerciale</shortDescription>
+        <value>012D0000000iLWd</value>
+    </labels>
+    <labels>
+        <fullName>RecId</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>RecId</shortDescription>
+        <value>012D0000000iLWd</value>
+    </labels>
+    <labels>
+        <fullName>SOQLDisableInactiveUsersBatch</fullName>
+        <categories>TECH</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>SOQLDisableInactiveUsersBatch</shortDescription>
+        <value>SELECT ID 
+FROM User 
+WHERE IsActive = true 
+AND LastLoginDate &lt; LAST_N_DAYS:30 
+AND Profile.Name != &apos;Administrateur système&apos; 
+AND Profile.Name != &apos;K/K - FSL ressource externe&apos; 
+AND Profile.Name != &apos;K/K - Utilisateur externe&apos; 
+AND Profile.Name != &apos;K/K - Interface&apos; 
+AND Profile.Name != &apos;&apos;</value>
+    </labels>
+    <labels>
+        <fullName>ScoreMin_Geo_Auto</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ScoreMin_Geo_Auto</shortDescription>
+        <value>17</value>
+    </labels>
+    <labels>
+        <fullName>TestSOQLDisableInactiveUsersBatch</fullName>
+        <categories>TECH</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>TestSOQLDisableInactiveUsersBatch</shortDescription>
+        <value>Select id, Name,IsActive,LastLoginDate,Profile.Name from user where IsActive = true limit 5</value>
+    </labels>
+    <labels>
+        <fullName>UNABLE_GET_POSITION</fullName>
+        <categories>Cartographie</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>UNABLE_GET_POSITION</shortDescription>
+        <value>Impossible de déterminer la position de :</value>
+    </labels>
+    <labels>
+        <fullName>VR_Message_AccountChantierNotDefined</fullName>
+        <categories>VR Message</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>VR_Message_AccountChantierNotDefined</shortDescription>
+        <value>Le propriétaire fiscal du chantier n&apos;est pas défini.</value>
+    </labels>
+    <labels>
+        <fullName>VR_Message_AddressChantierNotDefined</fullName>
+        <categories>VR Message</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>VR_Message_AddressChantierNotDefined</shortDescription>
+        <value>L&apos;adresse du chantier n&apos;est pas rempli.</value>
+    </labels>
+    <labels>
+        <fullName>VR_Message_ContactChantierNotDefined</fullName>
+        <categories>VR Message</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>VR_Message_ContactChantierNotDefined</shortDescription>
+        <value>Le contact du compte n&apos;est pas défini.</value>
+    </labels>
+    <labels>
+        <fullName>VR_Message_TerritoryChantierNotDefined</fullName>
+        <categories>VR Message</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>VR_Message_TerritoryChantierNotDefined</shortDescription>
+        <value>Le territoire du chantier n&apos;est pas rempli.</value>
+    </labels>
+    <labels>
+        <fullName>Ville_obligatoire</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Ville_obligatoire</shortDescription>
+        <value>Merci de renseigner la ville dans l&apos;adresse complète.</value>
+    </labels>
+    <labels>
+        <fullName>accEntries_msg_SingleEntity</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Les entité de saisie des pieces associé ne correspondent pas</shortDescription>
+        <value>L&apos;entité de saisie de l&apos;écriture comptable doit être égale à l&apos;entité de saisie de toutes les pièces comptables associées!</value>
+    </labels>
+    <labels>
+        <fullName>accEntries_msg_cantDelete</fullName>
+        <categories>Écriture comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accEntries_msg_cantDelete</shortDescription>
+        <value>Les écritures comptables ne peuvent pas être supprimées afin de respecter les exigences légales de conservation.</value>
+    </labels>
+    <labels>
+        <fullName>accEntries_msg_parentReceiptCompositeError</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accEntries_msg_parentReceiptCompositeError</shortDescription>
+        <value>Seule une pièce de type encaissement peut avoir un parent de type encaissement composite!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_accountParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_accountParent</shortDescription>
+        <value>Le compte doit être identique à celui de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_accountRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_accountRequired</shortDescription>
+        <value>Le compte est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_accountingDateBoudaries</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_accountingDateBoudaries</shortDescription>
+        <value>La date comptable doit être comprise entre la date de la pièce et aujourd&apos;hui.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_accountingDateParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_accountingDateParent</shortDescription>
+        <value>La date comptable doit être identique à celle de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_cancePieceAmount</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_cancePieceAmount</shortDescription>
+        <value>Le montant de l&apos;annulation ajouté au montant déjà annulé de la pièce annulée ne doit pas dépassé le montant initial de la pièce annulée!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_cannotBeParentAndChild</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_cannotBeParentAndChild</shortDescription>
+        <value>Une pièce comptable ne peut pas être parent et enfant en même temps.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_cantCreate</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_cantCreate</shortDescription>
+        <value>Des pièces comptables ne peuvent pas être créées si la pièce comptable parente est verrouillée afin de respecter les exigences légales de conservation.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_cantDelete</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_cantDelete</shortDescription>
+        <value>Les pièces comptables (et celles en découlant) ne peuvent pas être supprimées afin de respecter les exigences légales de conservation.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_dueDateParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_dueDateParent</shortDescription>
+        <value>La date d&apos;échéance doit être identique à celle de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_dueDatePast</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_dueDateFuture</shortDescription>
+        <value>La date d&apos;échéance doit être supérieure ou égale à la date de la pièce.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_dueDateRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_dueDateRequired</shortDescription>
+        <value>La date d&apos;échéance est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_entityBankAccountActive</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_entityBankAccountActive</shortDescription>
+        <value>Le compte bancaire référencé doit être actif à la date de la pièce.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_entityBankAccountCancelledPiece</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_entityBankAccountCancelledPiece</shortDescription>
+        <value>Le compte bancaire doit être identique entre la pièce comptable et la pièce annulée !</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_entityBankAccountParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_entityBankAccountParent</shortDescription>
+        <value>Le compte bancaire doit être identique à celui de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_entityBankAccountRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_entityBankAccountRequired</shortDescription>
+        <value>Le compte bancaire est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_externalBankParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_externalBankParent</shortDescription>
+        <value>La banque externe doit être identique à celui de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_externalBankRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_externalBankRequired</shortDescription>
+        <value>La banque externe (compte) est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_externalReferenceParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_externalReferenceParent</shortDescription>
+        <value>La Référence externe (Compte) doit être identique à celui de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_externalReferenceRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_externalReferenceRequired</shortDescription>
+        <value>La référence externe (compte) est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_inputEntityActive</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_inputEntityActive</shortDescription>
+        <value>L&apos;entité référencée doit être active à la date de la pièce (vérifier les versions)</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_inputEntityForbiddenForTheseRT</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_inputEntityForbiddenForTheseRT</shortDescription>
+        <value>L&apos;entité de saisie est interdite pour ce type d&apos;enregistrement.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_inputEntityParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_inputEntityParent</shortDescription>
+        <value>L&apos;entité de saisie doit être identique à celle de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_inputEntityRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_inputEntityRequired</shortDescription>
+        <value>L&apos;entité de saisie est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_inputEntityRequiredForTheseRT</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_inputEntityRequiredForTheseRT</shortDescription>
+        <value>L&apos;entité de saisie est obligatoire pour ce type d&apos;enregistrement!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_invoiceRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_invoiceRequired</shortDescription>
+        <value>La facture est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_noBankAccountVisibilityForTHisEntity</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>pas de visibilité de compte bancaire par l&apos;entité</shortDescription>
+        <value>Le compte bancaire sélectionné n&apos;est pas visible par l&apos;entité à la date de la pièce et/ou à la date comptable</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_noDelete</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_noDelete</shortDescription>
+        <value>Suppression interdite si le statut est égal à Comptabilisé ou Annulé!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_orderEntityActive</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_orderEntityActive</shortDescription>
+        <value>La commande doit être active à la date de la pièce!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_orderEntityParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_orderEntityParent</shortDescription>
+        <value>La commande doit être identique à celle de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_orderEntityRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_orderEntityRequired</shortDescription>
+        <value>La commande est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_overpaymentChildAmountNotAllowed</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_overpaymentChildAmountNotAllowed</shortDescription>
+        <value>Trop perçu interdit!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_parentForbiddenForTheseRT</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_parentForbiddenForTheseRT</shortDescription>
+        <value>Impossible sélectionner une pièce parente pour ce type d&apos;enregistrement.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_parentNeedChild</fullName>
+        <categories>Pièce comptable</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_parentNeedChild</shortDescription>
+        <value>Lorsque la date comptable est renseignée, la pièce comptable parente doit avoir au moins une pièce comptable enfant.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_paymentMethodActive</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_paymentMethodActive</shortDescription>
+        <value>Le mode de règlement référencé doit être actif à la date de la pièce.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_paymentMethodParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_paymentMethodParent</shortDescription>
+        <value>Le mode de règlement doit être identique à celui de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_paymentMethodRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_paymentMethodRequired</shortDescription>
+        <value>Le mode de règlement est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_pieceDateParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_pieceDateParent</shortDescription>
+        <value>La date de la pièce doit être identique à celle de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_pieceDatePast</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_pieceDatePast</shortDescription>
+        <value>La date de la pièce doit être inférieure ou égale à aujourd&apos;hui!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_pieceDateRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_pieceDateRequired</shortDescription>
+        <value>La date de la pièce est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_receiptInvoiceNoChild</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_receiptInvoiceNoChild</shortDescription>
+        <value>Une pièce de type encaissement avec une facture ne peut avoir de sous-lignes!</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_refundReasonActive</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_refundReasonActive</shortDescription>
+        <value>Le motif de remboursement référencé doit être actif à la date de la pièce.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_refundReasonParent</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_refundReasonParent</shortDescription>
+        <value>La motif de remboursement doit être identique à celui de la pièce parente.</value>
+    </labels>
+    <labels>
+        <fullName>accPieces_msg_refundReasonRequired</fullName>
+        <categories>Pièce comptable</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>accPieces_msg_refundReasonRequired</shortDescription>
+        <value>Le motif de remboursement est obligatoire!</value>
+    </labels>
+    <labels>
+        <fullName>acc_error_CustomerPasswordClientOnly</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_error_CustomerPasswordClientOnly</shortDescription>
+        <value>Vous pouvez seulement réinitialiser le mot de passe d&apos;un compte de type &quot;Client&quot; ou &quot;Ex-client&quot;.</value>
+    </labels>
+    <labels>
+        <fullName>acc_error_nameCaractereMin</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_error_nameCaractereMin</shortDescription>
+        <value>Nom du compte professionnel invalide (au moins une lettre est requise)</value>
+    </labels>
+    <labels>
+        <fullName>acc_error_nomCaractereInterdit</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_error_nomCaractereInterdit</shortDescription>
+        <value>Nom du compte personnel invalide (chiffre ou caractère spécial interdit)</value>
+    </labels>
+    <labels>
+        <fullName>acc_error_nomCaractereMin</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_error_nomCaractereMin</shortDescription>
+        <value>Nom du compte personnel invalide (au moins une lettre est requise)</value>
+    </labels>
+    <labels>
+        <fullName>acc_error_parrainTypeClient</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_error_parrainTypeClient</shortDescription>
+        <value>Le parrain doit être de type client.</value>
+    </labels>
+    <labels>
+        <fullName>acc_error_prenomCaractereInterdit</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_error_prenomCaractereInterdit</shortDescription>
+        <value>Prénom du compte personnel invalide (chiffre ou caractère spécial interdit)</value>
+    </labels>
+    <labels>
+        <fullName>acc_error_prenomCaractereMin</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_error_prenomCaractereMin</shortDescription>
+        <value>Prénom du compte personnel invalide (au moins une lettre est requise).</value>
+    </labels>
+    <labels>
+        <fullName>acc_msg_ConfirmResetCustomerPassword</fullName>
+        <categories>Compte</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>acc_msg_ConfirmResetCustomerPassword</shortDescription>
+        <value>La demande a été envoyée avec succès. Un e-mail avec le nouveau mot de passe sera envoyé au client lorsque le traitement sera terminé.</value>
+    </labels>
+    <labels>
+        <fullName>asset_msg_cantDeleteAsset</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>asset_msg_cantDeleteAsset</shortDescription>
+        <value>Impossible de supprimer un actif si l&apos;actif parent est verrouillé</value>
+    </labels>
+    <labels>
+        <fullName>asset_msg_cantDeleteAssetWithRessource</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>impossible de supprimer un asset avec une ressource associé</shortDescription>
+        <value>Vous ne pouvez pas supprimer un actif qui as une ressource associée ou qui est issue d&apos;une commande client.</value>
+    </labels>
+    <labels>
+        <fullName>asset_msg_cantDeleteCase</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>asset_msg_cantDeleteCase</shortDescription>
+        <value>Impossible de supprimer une requête si l&apos;actif est verrouillé</value>
+    </labels>
+    <labels>
+        <fullName>asset_msg_cantDeleteEntitlement</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>asset_msg_cantDeleteEntitlement</shortDescription>
+        <value>Impossible de supprimer une garantie si l&apos;actif est verrouillé</value>
+    </labels>
+    <labels>
+        <fullName>asset_msg_cantDeleteProviderOrderItem</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>asset_msg_cantDeleteProviderOrderItem</shortDescription>
+        <value>Impossible de modifier ou de créer un produit commandé fournisseur si l&apos;actif est verrouillé</value>
+    </labels>
+    <labels>
+        <fullName>asset_msg_cantDeleteWOLI</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>asset_msg_cantDeleteWOLI</shortDescription>
+        <value>Impossible de supprimer une ligne de RDV si l&apos;actif est verrouillé</value>
+    </labels>
+    <labels>
+        <fullName>body1DisableInactiveUsersBatch</fullName>
+        <categories>TECH</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>body1DisableInactiveUsersBatch</shortDescription>
+        <value>Le processus batch de suspension d&apos;activités des utilisateurs inactifs est terminé.</value>
+    </labels>
+    <labels>
+        <fullName>body2DisableInactiveUsersBatch</fullName>
+        <categories>TECH</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>body2DisableInactiveUsersBatch</shortDescription>
+        <value>Mises à jour réussies (</value>
+    </labels>
+    <labels>
+        <fullName>body3DisableInactiveUsersBatch</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>body3DisableInactiveUsersBatch</shortDescription>
+        <value>Aucun utilisateur inactif trouvé.</value>
+    </labels>
+    <labels>
+        <fullName>cartographie_msg_SearchPlaceholder</fullName>
+        <categories>Cartographie</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>cartographie_msg_SearchPlaceholder</shortDescription>
+        <value>Recherchez une adresse postale</value>
+    </labels>
+    <labels>
+        <fullName>case_msg_ChantierRequired</fullName>
+        <categories>Requête</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Chantier obligatoire</shortDescription>
+        <value>Vous devez définir un chantier!</value>
+    </labels>
+    <labels>
+        <fullName>case_msg_DeleteAdminOnly</fullName>
+        <categories>Requête</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Suppression Admin</shortDescription>
+        <value>Vous n&apos;avez pas les droits nécessaires pour pouvoir supprimer la requête.</value>
+    </labels>
+    <labels>
+        <fullName>case_msg_PremiereReponseRequired</fullName>
+        <categories>Requête</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Première réponse obligatoire</shortDescription>
+        <value>Il n&apos;est pas possible de mettre une requête &quot;A cloturer&quot; si il n&apos;existe pas de première réponse du client.</value>
+    </labels>
+    <labels>
+        <fullName>case_msg_SectorisationAccountEmpty</fullName>
+        <categories>Requête</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>case_msg_SectorisationAccountEmpty</shortDescription>
+        <value>La sectorisation du compte de cette requête n&apos;est pas remplie.</value>
+    </labels>
+    <labels>
+        <fullName>case_msg_SectorisationChantierEmpty</fullName>
+        <categories>Requête</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>case_msg_SectorisationChantierEmpty</shortDescription>
+        <value>La sectorisation du chantier de cette requête n&apos;est pas remplie.</value>
+    </labels>
+    <labels>
+        <fullName>case_msg_commentairePublicPresionnelle</fullName>
+        <categories>Requête</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Message - Texte du commentaire publique</shortDescription>
+        <value>Bonjour {0} {1} {2},
+
+Nous vous informons que la résolution de votre demande de type &quot;{3}&quot; est fixée au {4}.
+
+Cordialement,
+
+{5} du service clients K par K.</value>
+    </labels>
+    <labels>
+        <fullName>confirmationRDV_msg_dejaConfirme</fullName>
+        <categories>Rendez-vous</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>confirmationRDV_msg_dejaConfirme</shortDescription>
+        <value>Ce rendez-vous a déjà été confirmé.</value>
+    </labels>
+    <labels>
+        <fullName>confirmationRDV_msg_merci</fullName>
+        <categories>Rendez-vous</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>confirmationRDV_msg_merci</shortDescription>
+        <value>Le rendez-vous a été confirmé. Merci pour votre validation.</value>
+    </labels>
+    <labels>
+        <fullName>creditMemo_msg_commercialCreditMemoInvLineReq</fullName>
+        <categories>Avoir</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>creditMemo_msg_commercialCreditMemoInvLineReq</shortDescription>
+        <value>Sur un avoir commercial au statut autre que brouillon, présence obligatoire d&apos;au moins une ligne d&apos;avoir référençant une facture</value>
+    </labels>
+    <labels>
+        <fullName>creditmemo_msg_cantDelete</fullName>
+        <categories>Error Delete</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>creditmemo_msg_cantDelete</shortDescription>
+        <value>L&apos;avoir et les lignes ne peuvent pas être supprimés afin de respecter les exigences légales de conservation.</value>
+    </labels>
+    <labels>
+        <fullName>devisAvecSignatureElectroniqueEnCoursNonClonable</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Devis non clonable car signature électronique en cours</shortDescription>
+        <value>Un devis avec une signature électronique en cours ne peut pas être cloné</value>
+    </labels>
+    <labels>
+        <fullName>dqe_msg_errorsWSDQEAddress</fullName>
+        <categories>DQE</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur WebService DQE</shortDescription>
+        <value>&lt;strong&gt;ERREUR :&lt;/strong&gt; Le service DQE Adresse a rencontré une erreur. Veuillez contacter le support informatique.</value>
+    </labels>
+    <labels>
+        <fullName>erreur_adresse_obligatoire</fullName>
+        <categories>Site_Parrainage</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur_adresse_obligatoire</shortDescription>
+        <value>Veuillez renseigner votre adresse complète.</value>
+    </labels>
+    <labels>
+        <fullName>erreur_civilite_non_remplis</fullName>
+        <categories>Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur civilite non remplis</shortDescription>
+        <value>La civilité, le nom et le prénom doivent être remplis !</value>
+    </labels>
+    <labels>
+        <fullName>erreur_compte_deja_existant</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur compte déja existant</shortDescription>
+        <value>Le filleul est déja client KparK !</value>
+    </labels>
+    <labels>
+        <fullName>erreur_compte_inexistant</fullName>
+        <categories>Site_Parrainage</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur compte inexistant</shortDescription>
+        <value>Le compte n&apos;existe pas</value>
+    </labels>
+    <labels>
+        <fullName>erreur_compte_present</fullName>
+        <categories>Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur compte present</shortDescription>
+        <value>Votre inscription a déjà été enregistrée</value>
+    </labels>
+    <labels>
+        <fullName>erreur_contrat_obligatoire</fullName>
+        <categories>Site_Parrainage</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur_contrat_obligatoire</shortDescription>
+        <value>Veuillez entrer un numéro de contrat.</value>
+    </labels>
+    <labels>
+        <fullName>erreur_email_ou_telephone_vide</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Parrainage : Email ou telephone vide</shortDescription>
+        <value>Merci de saisir au moins un moyen de joignabilité (email ou téléphone) !</value>
+    </labels>
+    <labels>
+        <fullName>erreur_inscription_non_present</fullName>
+        <categories>Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur inscription non present</shortDescription>
+        <value>Votre inscription n&apos;est pas enregistrée, veuillez retourner à l&apos;étape 1</value>
+    </labels>
+    <labels>
+        <fullName>erreur_nom_invalide</fullName>
+        <categories>Site_Parrainage, Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur nom invalide</shortDescription>
+        <value>Nom invalide (chiffre ou caractère spécial interdit)</value>
+    </labels>
+    <labels>
+        <fullName>erreur_nom_obligatoire</fullName>
+        <categories>Site_Parrainage</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur_nom_obligatoire</shortDescription>
+        <value>Merci de renseigner le champ nom.</value>
+    </labels>
+    <labels>
+        <fullName>erreur_prenom_invalide</fullName>
+        <categories>Site_Parrainage, Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur prenom invalide</shortDescription>
+        <value>Prénom invalide (chiffre ou caractère spécial interdit)</value>
+    </labels>
+    <labels>
+        <fullName>erreur_prenom_obligatoire</fullName>
+        <categories>Site_Parrainage</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur_prenom_obligatoire</shortDescription>
+        <value>Merci de renseigner le champ prénom.</value>
+    </labels>
+    <labels>
+        <fullName>erreur_reaffectationUser</fullName>
+        <categories>erreur</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Utilisateur inactif ou rôle non autorisé</shortDescription>
+        <value>L&apos;utilisateur sélectionné n&apos;est pas actif ou n&apos;appartient pas au même rôle ou à un sous-rôle</value>
+    </labels>
+    <labels>
+        <fullName>error_champs_non_renseignes</fullName>
+        <categories>Site_Parrainage</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>erreur champs non renseignés</shortDescription>
+        <value>Les champs obligatoires ne sont pas remplis</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CallInternalError</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CallInternalError</shortDescription>
+        <value>Une erreur est survenue, veuillez contacter le</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CallSuccessful</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CallSuccessful</shortDescription>
+        <value>Votre demande a été prise en compte. Nous vous rappelons le plus rapidement possible</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CallUnavailable</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CallUnavailable</shortDescription>
+        <value>Le service est indisponible, veuillez contacter le</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseChantierRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseChantierRequired</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Vous devez sélectionner un chantier pour votre demande.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseCreateSuccessful</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseCreateSuccessful</shortDescription>
+        <value>Votre demande a bien été prise en compte et sera traitée dans les meilleurs délais.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseDescriptionRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseDescriptionRequired</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Vous devez saisir une description pour votre demande.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseErrorReadFile</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseErrorReadFile</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Impossible de lire la pièce jointe. Veuillez réessayer.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseErrorSizeFile</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseErrorSizeFile</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; La taille du fichier dépasse la limite de 4Mo. Merci de réessayer avec un fichier différent.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseRDVTypeRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseRDVTypeRequired</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Vous devez saisir un type de rendez-vous.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseTypeUnknown</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseTypeUnknown</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Une erreur est survenue, le type de demande que vous avez sélectionné ne semble plus être pris en compte par le système.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CaseWrongAttachmentType</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CaseWrongAttachmentType</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Nous acceptons seulement les images comme pièces jointe (JPEG, JPG, PNG, GIF, BMP) pour les demandes.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_ChangePasswordRequired</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Champs MDP requis</shortDescription>
+        <value>Vous devez saisir tous les champs requis pour modifier le mot de passe.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_ChangerMDPSuccessful</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_ChangerMDPSuccessful</shortDescription>
+        <value>Votre mot de passe a bien été modifié. Vous pourrez l&apos;utiliser dès votre prochaine connexion.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CommentRequiredForCaseOpening</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CommentRequiredForCaseOpening</shortDescription>
+        <value>Veuillez laisser un commentaire afin de nous dire pourquoi vous rouvrez votre demande.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_CreateFilleulSuccessful</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_CreateFilleulSuccessful</shortDescription>
+        <value>Votre demande de parrainage a bien été prise en compte.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_ErreurReglesMotDePasse</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Mot de passe incorrect</shortDescription>
+        <value>Le nouveau mot de passe doit contenir au moins {0} majuscule{1}, {2} minuscule{3} et {4} chiffre{5}.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_FilleulTypeDotationRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Filleul - Email obligatoire pour ce type de dotation</shortDescription>
+        <value>Vous devez spécifier une adresse e-mail pour ce type de dotation.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_InvalidPassword</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_InvalidPassword</shortDescription>
+        <value>Le mot de passe saisi ne correspond pas à votre mot de passe actuel.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_Loading</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Chargement</shortDescription>
+        <value>VEUILLEZ PATIENTER...</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_MultiAccounts</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Info - Plusieurs comptes trouvés avec email</shortDescription>
+        <value>Plusieurs comptes utilisent cette adresse, veuillez utiliser votre numéro de compte.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_NewMDPDoesNotMatch</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_NewMDPDoesNotMatch</shortDescription>
+        <value>Le nouveau mot de passe et la confirmation du nouveau mot de passe ne sont pas identiques.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_NoAccounts</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Pas de compte avec email ou Numéro</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Aucun compte n&apos;est associé à cette adresse e-mail ou numéro de compte.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_NoAttachment</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_NoAttachment</shortDescription>
+        <value>&lt;b&gt;Erreur :&lt;/b&gt; Merci de choisir un fichier à joindre à la demande.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_NoCaseComment</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_NoCaseComment</shortDescription>
+        <value>&lt;b&gt;Erreur :&lt;/b&gt; Impossible d&apos;envoyer un commentaire vide.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_OldIdenticalPassword</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - New mdp identique de l&apos;ancien</shortDescription>
+        <value>Vous devez choisir un nouveau mot de passe différent de l&apos;ancien.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_PasswordSizeError</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Taille du mot de passe</shortDescription>
+        <value>Le nouveau mot de passe doit comporter entre {0} et {1} caractères.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_msg_UpdateAccountSuccessful</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_msg_UpdateAccountSuccessful</shortDescription>
+        <value>Votre demande de modification a bien été prise en compte et sera traitée dans les meilleurs délais après vérification du service client.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_CaseAdministrativeType</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_CaseAdministrativeType</shortDescription>
+        <value>Type de demande administrative</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_CaseInformationType</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_CaseInformationType</shortDescription>
+        <value>Type de demande d&apos;information</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_CaseMotif</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_CaseMotif</shortDescription>
+        <value>Motif de la demande</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_CaseRDVType</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_CaseRDVType</shortDescription>
+        <value>Type de rendez-vous</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_CasetNoAttachments</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_CasetNoAttachments</shortDescription>
+        <value>Il n&apos;y a pas de pièce jointe pour cette demande.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_CasetNoComments</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_CasetNoComments</shortDescription>
+        <value>Il n&apos;y a pas de commentaire pour cette demande.</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_ProjectNoCurrent</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_ProjectNoCurrent</shortDescription>
+        <value>Vous n&apos;avez pas de projets en cours</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_ProjectNoFinish</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_ProjectNoFinish</shortDescription>
+        <value>Vous n&apos;avez pas de projets terminés</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_ProjectNoTotal</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_ProjectNoTotal</shortDescription>
+        <value>Vous n&apos;avez pas de projets</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_ReglesMotDePasse</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Mot de passe - Règles de saisie</shortDescription>
+        <value>Votre mot de passe doit comprendre entre {0} et {1} caractères. Il doit être composé d’au moins {2} lettre{3} majuscule, {4} lettre{5} minuscule, {6} chiffre{7} (0-9).</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_statusCommentLabel_closing</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_statusCommentLabel_closing</shortDescription>
+        <value>Pour quelles raisons voulez-vous clôturer cette demande ? (facultatif)</value>
+    </labels>
+    <labels>
+        <fullName>espaceclient_text_statusCommentLabel_opening</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>espaceclient_text_statusCommentLabel_opening</shortDescription>
+        <value>Pour quelle raison souhaitez vous rouvrir cette demande ?&lt;br/&gt;
+Vous devez nous faire un commentaire sur la réouverture de la demande.</value>
+    </labels>
+    <labels>
+        <fullName>event_error_dateDebutMin</fullName>
+        <categories>Event</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>event_error_dateDebutMin</shortDescription>
+        <value>La date de début ne peut pas être inférieure à 7 jours</value>
+    </labels>
+    <labels>
+        <fullName>event_error_demandeurPrincipal</fullName>
+        <categories>Event</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>event_error_demandeurPrincipal</shortDescription>
+        <value>Création impossible d&amp;#39;un nouveau rendez-vous. 
+Le rendez-vous doit obligatoirement concerné le demandeur principal du projet.</value>
+    </labels>
+    <labels>
+        <fullName>event_error_droitSuppression</fullName>
+        <categories>Event</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>event_error_droitSuppression</shortDescription>
+        <value>Vous n&amp;#39;&apos;avez pas les droits de suppression d&amp;#39;un événement.</value>
+    </labels>
+    <labels>
+        <fullName>event_error_projetAssocie</fullName>
+        <categories>Event</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>event_error_projetAssocie</shortDescription>
+        <value>Création impossible d&amp;#39;un nouveau rendez-vous. 
+Le rendez-vous doit être obligatoirement associé à un projet.</value>
+    </labels>
+    <labels>
+        <fullName>financialCharge_msg_cantDelete</fullName>
+        <categories>Error Delete</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>financialCharge_msg_cantDelete</shortDescription>
+        <value>Impossible de supprimer une charge financière verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>fsl_CouleurRdvTransmis</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv transmis</shortDescription>
+        <value>#FFB6C1</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurAbsenceDisponible</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur absence / Disponible</shortDescription>
+        <value>#65737e</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurAbsenceNonDisponible</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur absence / Non disponible</shortDescription>
+        <value>#a7adba</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurAbsenceRenfort</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur absence / Renfort</shortDescription>
+        <value>#a99c8e</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvAnnule</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv annulé</shortDescription>
+        <value>#ff0000</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvConfirme</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv confirmé</shortDescription>
+        <value>#529CFE</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvConfirmeClient</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv confirmé client</shortDescription>
+        <value>#F68FA2</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvDebriefe</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>fsl_couleurRdvDebriefe</shortDescription>
+        <value>#009900</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvDebriefeReserves</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv debriefe avec reserves</shortDescription>
+        <value>#F88E55</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvDebriefeRetourGC</fullName>
+        <categories>FSL</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Couleur Rdv Debriefe RetourGC</shortDescription>
+        <value>#40FF00</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvEnCours</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv en cours</shortDescription>
+        <value>#3333ff</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvPlanifie</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv planifié</shortDescription>
+        <value>#F0C300</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvRetourGCAvecReserves</fullName>
+        <categories>FSL</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Couleur Rdv RetourGC avec Réserves</shortDescription>
+        <value>#40FF00</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvRetourGCSansReserves</fullName>
+        <categories>FSL</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Couleur Rdv RetourGC sans Réserves</shortDescription>
+        <value>#FF0080</value>
+    </labels>
+    <labels>
+        <fullName>fsl_couleurRdvTermine</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Couleur rdv terminé</shortDescription>
+        <value>#993399</value>
+    </labels>
+    <labels>
+        <fullName>fsl_dureeMinimum15min</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur duréée RDV trop courte</shortDescription>
+        <value>La durée minimum d&apos;un rendez-vous est de 15 minutes.</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesAssignedResourceServiceAppointment</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre ressource attribuée et rdv</shortDescription>
+        <value>La période de validité de l&apos;utilisateur (ressource attribuée) doit couvrir celle du rendez-vous auquel il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesOperatingHoursServiceTerritory</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre horaire et territoire</shortDescription>
+        <value>La période de validité de l&apos;horaire doit couvrir celle de tous les territoires auxquels il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesOperatingHoursServiceTerritoryMember</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre horaire et membres de territoire</shortDescription>
+        <value>La période de validité de l&apos;horaire doit couvrir celle de tous les membres de territoire auxquels il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesOperatingHoursWorkOrder</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre horaire et demane rdv</shortDescription>
+        <value>La période de validité de l&apos;horaire doit couvrir celle de tous les demandes de rendez-vous !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesResourcePreferenceWorkOrder</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence des dates entre ressource préférée et demande rdv</shortDescription>
+        <value>La période de validité de l&apos;utilisateur (ressource préférée) doit couvrir celle de la demande de rendez-vous à laquelle il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesServiceAppointmentServiceTerritory</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre territoire et rdv</shortDescription>
+        <value>La période de validité du territoire doit couvrir celle de tous les rendez-vous auquels il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesServiceAppointmentWorkOrder</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre demande rdv et rdv</shortDescription>
+        <value>La période de validité de la demande de rendez-vous doit couvrir celle de tous les rendez-vous auxquels elle est rattachée !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesServiceTerritoryServiceTerritoryMember</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre territoire et ses membres</shortDescription>
+        <value>La période de validité du territoire doit couvrir celle de tous ses membres !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesUserResourceAbsence</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence des dates entre user et absence</shortDescription>
+        <value>La période de validité de l&apos;utilisateur doit couvrir celle de toutes les indisponibilités de ressource auxquelles il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesUserServiceResourceCapacity</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence des dates entre utilisateur et capacité</shortDescription>
+        <value>La période de validité de l&apos;utilisateur doit couvrir celle de toutes les capacités de ressource auxquelles il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesUserServiceResourceSkill</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence des dates entre utilisateur et compétence</shortDescription>
+        <value>La période de validité de l&apos;utilisateur doit couvrir celle de tous les compétences de ressource auxquelles il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesUserServiceTerritoryMember</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence des dates entre utilisateur et membres de territoire</shortDescription>
+        <value>La période de validité de l&apos;utilisateur doit couvrir celle de tous les membres de territoire auxquels il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDatesWorkOrderServiceTerritory</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur cohérence dates entre demande rdv et territoire</shortDescription>
+        <value>La période de validité du territoire doit couvrir celle de toutes les demandes de rendez-vous auxquelles il est rattaché !</value>
+    </labels>
+    <labels>
+        <fullName>fsl_errorDesactivationResourceAttribuee</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur sur la désactivation de ressource qui est attribuée au rendez-vous</shortDescription>
+        <value>Impossible de désactiver une ressource attribuée à un rendez-vous planifié dans le futur.</value>
+    </labels>
+    <labels>
+        <fullName>fsl_ganttIcone</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>fsl_ganttIcone</shortDescription>
+        <value>https://kpark--c.eu26.content.force.com/servlet/servlet.FileDownload?file=0152p000006KDrk</value>
+    </labels>
+    <labels>
+        <fullName>fsl_heureDateAuPlusTardParDefaut</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Heure par défaut de la date Au plus tard</shortDescription>
+        <value>21:59:00</value>
+    </labels>
+    <labels>
+        <fullName>fsl_limiteRdvPlusieursJours</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Limite des rdv multi jours</shortDescription>
+        <value>480</value>
+    </labels>
+    <labels>
+        <fullName>fsl_nbMinuteSynchroPE</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Nombre de minutes de synchronisation</shortDescription>
+        <value>1</value>
+    </labels>
+    <labels>
+        <fullName>fsl_nomHoraireStandard</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>fsl_nomHoraireStandard</shortDescription>
+        <value>K/K Semaine type standard</value>
+    </labels>
+    <labels>
+        <fullName>fsl_nomHoraireVide</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>fsl_nomHoraireVide</shortDescription>
+        <value>K/K Semaine type vide</value>
+    </labels>
+    <labels>
+        <fullName>fsl_nomRecordTypeDS</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>fsl_nomRecordTypeDS</shortDescription>
+        <value>fsl_ServiceTerritoryDS</value>
+    </labels>
+    <labels>
+        <fullName>fsl_nomRecordTypeDepot</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>fsl_nomRecordTypeDepot</shortDescription>
+        <value>fsl_ServiceTerritoryDepot</value>
+    </labels>
+    <labels>
+        <fullName>fsl_nomRecordTypeRenfort</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>fsl_nomRecordTypeRenfort</shortDescription>
+        <value>Non_Availability</value>
+    </labels>
+    <labels>
+        <fullName>fsl_prioriteEngagementDepasse</fullName>
+        <categories>FSL</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>fsl_prioriteEngagementDepasse</shortDescription>
+        <value>CRITIQUE</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteConfirmeEnPeril</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Confirme/EnPeril</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWypAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteConfirmeStandard</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Confirme/Standard</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyqAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteConfirmeUrgence</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Confirme/Urgence</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyrAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteDebriefeEnPeril</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Debriefe/EnPeril</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWysAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteDebriefeStandard</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Debriefe/Standard</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWytAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteDebriefeUrgence</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Debriefe/Urgence</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyuAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioritePlanifieEnPeril</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Planifie/EnPeril</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz3AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioritePlanifieStandard</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Planifie/Standard</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz4AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioritePlanifieUrgence</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : Planifie/Urgence</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz5AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOAnnuleCritique</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : AnnuleCritique/Urgence</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWylAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOAnnuleElevee</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : AnnuleElevee/EnPeril</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWymAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOAnnuleFaible</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : AnnuleFaible/Standard</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWynAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOAnnuleMoyenne</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : AnnuleMoyenne</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyoAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWODemandeCritique</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : DemandeCritique/Urgence</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyvAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWODemandeElevee</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : DemandeElevee/EnPeril</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWywAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWODemandeFaible</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : DemandeFaible/Standard</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyxAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWODemandeMoyenne</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : DemandeMoyenne</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyyAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOEncoursCritique</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : EncoursCritique/Urgence</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWyzAAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOEncoursElevee</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : EncoursElevee/EnPeril</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz0AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOEncoursFaible</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : EncoursFaible/Standard</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz1AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOEncoursMoyenne</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : EncoursMoyenne</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz2AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOTermineCritique</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : TermineCritique/Urgence</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz7AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOTermineElevee</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : TermineElevee/EnPeril</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz8AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOTermineFaible</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : TermineFaible/Standard</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz9AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutPrioriteWOTermineMoyenne</fullName>
+        <categories>FSL</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>StatutPriorite : TermineMoyenne</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=01557000005ZWz6AAG</value>
+    </labels>
+    <labels>
+        <fullName>fsl_statutTermine</fullName>
+        <categories>FSL</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>StatutTerminé</shortDescription>
+        <value>/servlet/servlet.FileDownload?file=0155E000000J85W</value>
+    </labels>
+    <labels>
+        <fullName>fsl_urgenceEngagementDepasse</fullName>
+        <categories>FSL</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>fsl_urgenceEngagementDepasse</shortDescription>
+        <value>true</value>
+    </labels>
+    <labels>
+        <fullName>import_erreur_ObjectsChanged</fullName>
+        <categories>Import</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - objets à créer modifiés pendant le traitement</shortDescription>
+        <value>Mise à jour de la fiche contact impossible car des modifications sont intervenues depuis le dernier enregistrement sur les objet(s) suivant(s) :</value>
+    </labels>
+    <labels>
+        <fullName>import_erreur_horssecteur_classeexception</fullName>
+        <categories>Import</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>import_erreur_horssecteur_classeexception</shortDescription>
+        <value>L&apos;adresse indiquée n’est pas couverte par KparK</value>
+    </labels>
+    <labels>
+        <fullName>import_erreur_horssecteur_message</fullName>
+        <categories>Import</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>import_erreur_horssecteur_message</shortDescription>
+        <value>Nous sommes désolés, mais le code postal que vous avez saisi n’est pas couvert par K par K</value>
+    </labels>
+    <labels>
+        <fullName>import_erreur_horssecteur_messageexception</fullName>
+        <categories>Import</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>import_erreur_horssecteur_messageexception</shortDescription>
+        <value>Erreur de validation : l&apos;adresse n&apos;a pu être sectorisée</value>
+    </labels>
+    <labels>
+        <fullName>invoice_msg_cantDelete</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>invoice_msg_cantDelete</shortDescription>
+        <value>La facture et les lignes ne peuvent pas être supprimées afin de respecter les exigences légales de conservation.</value>
+    </labels>
+    <labels>
+        <fullName>invoice_msg_cantDeleteInvoiceLine</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>invoice_msg_cantDeleteInvoiceLine</shortDescription>
+        <value>Impossible de supprimer une ligne de facture si la commande est vérouillée!</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_adresseGeocode</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_adresseGeocode</shortDescription>
+        <value>Les adresses suivantes n&apos;ont pas pu être pas géocodées et ne sont pas pris en compte lors de la recherche :</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_codeProduit</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_codeProduit</shortDescription>
+        <value>Veuillez saisir un code produit.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_dateFutur</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_dateFutur</shortDescription>
+        <value>La date/heure de rendez doit être positionnée dans le futur !</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_datePositive</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_datePositive</shortDescription>
+        <value>La date de fin renseignée doit être supérieure à la date de début.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_dateRDVValide</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_dateRDVValide</shortDescription>
+        <value>Veuillez renseigner une date de RDV valide.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_debutLeftBorder</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_debutLeftBorder</shortDescription>
+        <value>La date de début renseignée doit être supérieure au 1er Janvier 2017.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_dureeNegative</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_dureeNegative</shortDescription>
+        <value>La durée du RDV ne peut pas être négative.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_exportCSVVide</fullName>
+        <categories>Liste De Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_exportCSVVide</shortDescription>
+        <value>Il n&amp;#39;y pas de données à exporter en EXCEL</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_exportPDFVide</fullName>
+        <categories>Liste De Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_exportPDFVide</shortDescription>
+        <value>Il n&amp;#39;y pas de données à exporter en PDF</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_finLeftBorder</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_finLeftBorder</shortDescription>
+        <value>La date de fin renseignée doit être supérieure au 1er Janvier 2017.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_heureRDVValide</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_heureRDVValide</shortDescription>
+        <value>Veuillez renseigner une heure de début et de fin de RDV valides.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_leftBorder</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_leftBorder</shortDescription>
+        <value>La date de début renseignée doit être supérieure au 1er Janvier 2017.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_regionObligatoire</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_regionObligatoire</shortDescription>
+        <value>La région est obligatoire.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_rightBorder</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_rightBorder</shortDescription>
+        <value>Cette date doit être inférieure ou égale à la date du jour.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_rueCPObligatoire</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_rueCPObligatoire</shortDescription>
+        <value>Le code postal est obligatoire si une rue est renseignée.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_rueVilleObligatoire</fullName>
+        <categories>Liste de Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_rueVilleObligatoire</shortDescription>
+        <value>La ville est obligatoire si une rue est renseignée.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_sectoDV</fullName>
+        <categories>Liste De Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_sectoDV</shortDescription>
+        <value>Sectorisation de votre compte invalide ! (DV) Merci de contacter votre support.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_sectoMagasin</fullName>
+        <categories>Liste De Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_sectoMagasin</shortDescription>
+        <value>Sectorisation de votre compte invalide ! (Magasin) Merci de contacter votre support.</value>
+    </labels>
+    <labels>
+        <fullName>ldp_erreur_sectoRegion</fullName>
+        <categories>Liste De Phones</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>ldp_erreur_sectoRegion</shortDescription>
+        <value>Sectorisation de votre compte invalide ! (Région) Merci de contacter votre support</value>
+    </labels>
+    <labels>
+        <fullName>liveagent_msg_postCloseWindow</fullName>
+        <categories>Live Agent</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>liveagent_msg_postCloseWindow</shortDescription>
+        <value>Fermer la fenêtre</value>
+    </labels>
+    <labels>
+        <fullName>liveagent_msg_postMessage</fullName>
+        <categories>Live Agent</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>liveagent_msg_postMessage</shortDescription>
+        <value>Merci pour vos questions, en espérant avoir répondu à celles-ci.</value>
+    </labels>
+    <labels>
+        <fullName>liveagent_msg_preChatFormatError</fullName>
+        <categories>Live Agent</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>liveagent_msg_preChatFormatError</shortDescription>
+        <value>Merci de remplir correctement les champs marqués</value>
+    </labels>
+    <labels>
+        <fullName>liveagent_msg_preChatRequiredField</fullName>
+        <categories>Live Agent</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>liveagent_msg_preChatRequiredField</shortDescription>
+        <value>Merci de remplir les champs demandés</value>
+    </labels>
+    <labels>
+        <fullName>merge_msg_errorsDuplicateDetected</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Doublon détecté</shortDescription>
+        <value>&lt;strong&gt;ERREUR :&lt;/strong&gt; Cet enregistrement ne peut pas être enregistré car un ou plusieurs doublons ont été détectés !</value>
+    </labels>
+    <labels>
+        <fullName>merge_msg_errorsFieldRequired</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur champs manquant</shortDescription>
+        <value>Les champs en rouge sont mal renseignés. Veuillez les corriger.</value>
+    </labels>
+    <labels>
+        <fullName>merge_msg_errorsInMerge</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur lors de la fusion</shortDescription>
+        <value>&lt;strong&gt;ERREUR :&lt;/strong&gt; La fusion a échouée.&lt;br/&gt;</value>
+    </labels>
+    <labels>
+        <fullName>merge_msg_errorsWebserviceDQE</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur WebService DQE</shortDescription>
+        <value>&lt;strong&gt;ERREUR :&lt;/strong&gt; Le service de détection de doublon a rencontré une erreur. Veuillez contacter le support.</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_accountToKeep</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Compte à conserver</shortDescription>
+        <value>Compte à conserver</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_chantierToKeep</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Chantier à conserver</shortDescription>
+        <value>Chantier à conserver</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_confirmQuickMerge</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Confirmation fusion rapide</shortDescription>
+        <value>Confirmez vous la fusion des données entre ces deux enregistrements ?</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_forceSave</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Forcer la sauvegarde</shortDescription>
+        <value>Forcer la sauvegarde</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_helpText</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Texte d&apos;aide</shortDescription>
+        <value>Vous pouvez sélectionner l&apos;enregistrement à converser après la fusion en cliquant sur le bouton correspondant. Si vous créez un nouveau enregistrement, l&apos;enregistrement existant sera automatiquement conservé.</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_merge</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Fusion</shortDescription>
+        <value>Fusion</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_mergeAccountSubTitle</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Titre fusion pour compte</shortDescription>
+        <value>Fusion de comptes</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_mergeChantierSubTitle</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Titre fusion pour chantier</shortDescription>
+        <value>Fusion de chantiers</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_mergeSubTitle</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Titre du panneau</shortDescription>
+        <value>Liste des champs à fusionner</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_nbDuplicatesFound</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Nombre de doublons</shortDescription>
+        <value>Doublons détectés :</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_processMerge</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Fusion en cours</shortDescription>
+        <value>Fusion en cours...</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_quickMerge</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Fusion rapide</shortDescription>
+        <value>Fusion rapide</value>
+    </labels>
+    <labels>
+        <fullName>merge_text_selectAllValues</fullName>
+        <categories>Fusion</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Sélection de toutes les valeurs</shortDescription>
+        <value>Sélectionner toutes les valeurs</value>
+    </labels>
+    <labels>
+        <fullName>msg_AccountDoesntExist</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur - Compte inexistant</shortDescription>
+        <value>Le compte sélectionné n&apos;existe pas.</value>
+    </labels>
+    <labels>
+        <fullName>msg_Chargement</fullName>
+        <categories>Account</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Chargement</shortDescription>
+        <value>Chargement en cours... Veuillez patienter</value>
+    </labels>
+    <labels>
+        <fullName>msg_ConfirmModificationAccount</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_ConfirmModificationAccount</shortDescription>
+        <value>Vos modifications ont bien été prises en compte.</value>
+    </labels>
+    <labels>
+        <fullName>msg_ConfirmResetCustomerPassword</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_ConfirmResetCustomerPassword</shortDescription>
+        <value>La demande a été envoyée avec succès. Un e-mail avec le nouveau mot de passe sera envoyé au client lorsque le traitement sera terminé.</value>
+    </labels>
+    <labels>
+        <fullName>msg_EmailRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_EmailRequired</shortDescription>
+        <value>Veuillez saisir une adresse e-mail.</value>
+    </labels>
+    <labels>
+        <fullName>msg_EmailRequiredForEmail</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_EmailRequiredForEmail</shortDescription>
+        <value>Veuillez saisir une adresse e-mail afin de recevoir votre mot de passe.</value>
+    </labels>
+    <labels>
+        <fullName>msg_InternalError</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_InternalError</shortDescription>
+        <value>Une erreur interne est survenue, veuillez contacter le service client.</value>
+    </labels>
+    <labels>
+        <fullName>msg_LoginRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_LoginRequired</shortDescription>
+        <value>Veuillez saisir votre adresse email ou votre numéro de compte.</value>
+    </labels>
+    <labels>
+        <fullName>msg_LoginRequiredForEmail</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_LoginRequiredForEmail</shortDescription>
+        <value>Veuillez saisir l&apos;adresse e-mail ou le numéro de votre compte afin de recevoir votre mot de passe.</value>
+    </labels>
+    <labels>
+        <fullName>msg_NameRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_NameRequired</shortDescription>
+        <value>Veuillez saisir le code postal.</value>
+    </labels>
+    <labels>
+        <fullName>msg_NameRequiredForEmail</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_NameRequiredForEmail</shortDescription>
+        <value>Veuillez saisir votre code postal afin de recevoir votre mot de passe.</value>
+    </labels>
+    <labels>
+        <fullName>msg_NoPasswordSet</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Première connexion</shortDescription>
+        <value>Aucun mot de passe n&amp;#39;est défini. Merci de suivre le lien prévu pour la première connexion afin de vous en générer un.</value>
+    </labels>
+    <labels>
+        <fullName>msg_NotConfirmModificationAccount</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_NotConfirmModificationAccount</shortDescription>
+        <value>Les modifications n&apos;ont pas pu être enregistrées. Un e-mail a été envoyé au service client afin de résoudre le problème. Merci de votre compréhension.</value>
+    </labels>
+    <labels>
+        <fullName>msg_NumberAccountRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_NumberAccountRequired</shortDescription>
+        <value>Veuillez saisir un numéro de compte.</value>
+    </labels>
+    <labels>
+        <fullName>msg_NumberAccountRequiredForEmail</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_NumberAccountRequiredForEmail</shortDescription>
+        <value>Veuillez saisir un numéro de compte afin de recevoir votre mot de passe.</value>
+    </labels>
+    <labels>
+        <fullName>msg_PasswordRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_PasswordRequired</shortDescription>
+        <value>Veuillez saisir un mot de passe.</value>
+    </labels>
+    <labels>
+        <fullName>msg_QuestionResetCustomerPassword</fullName>
+        <categories>Espace client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_QuestionResetCustomerPassword</shortDescription>
+        <value>Êtes-vous sur de vouloir réinitialiser le mot de passe du client ?</value>
+    </labels>
+    <labels>
+        <fullName>msg_WrongLoginPassword</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_WrongLoginPassword</shortDescription>
+        <value>L&apos;identifiant ou le mot de passe sont erronés. Veuillez réessayer.</value>
+    </labels>
+    <labels>
+        <fullName>msg_accessNotAllowed</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_accessNotAllowed</shortDescription>
+        <value>Vous n’êtes pas autorisé à voir cette page, merci de vous authentifier.</value>
+    </labels>
+    <labels>
+        <fullName>msg_demandeMotDePasseSansEmail</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_demandeMotDePasseSansEmail</shortDescription>
+        <value>Votre e-mail n’est pas valable. Nous ne pouvons pas vous envoyer votre mot de passe par e-mail.
+Veuillez contacter le service client afin de recevoir votre mot de passe par courrier.</value>
+    </labels>
+    <labels>
+        <fullName>msg_lostPasswordEmailError</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_lostPasswordEmailError</shortDescription>
+        <value>Votre e-mail n’est pas valable. Nous ne pouvons pas vous envoyer votre mot de passe par e-mail. 
+Veuillez contacter le service client afin de recevoir votre mot de passe par courrier.</value>
+    </labels>
+    <labels>
+        <fullName>msg_lostPasswordGenerated</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_lostPasswordGenerated</shortDescription>
+        <value>Un e-mail vous sera envoyé dans les plus bref délais avec votre nouveau mot de passe.</value>
+    </labels>
+    <labels>
+        <fullName>msg_notAllowedAccess</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>msg_notAllowedAccess</shortDescription>
+        <value>Vous n’êtes pas autorisé à voir cette page, merci de vous authentifier.</value>
+    </labels>
+    <labels>
+        <fullName>objectif_ajout_vendeur_inactif</fullName>
+        <categories>Objectifs Vendeurs</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>objectif_ajout_vendeur_inactif</shortDescription>
+        <value>Etes-vous sur de vouloir ajouter un vendeur inactif dans la liste ? (Si oui, cliquez sur Ajouter)</value>
+    </labels>
+    <labels>
+        <fullName>objectif_ca_mois_minimum</fullName>
+        <categories>Objectifs Vendeurs</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>objectif_ca_mois_minimum</shortDescription>
+        <value>La totalité des objectifs CA (K€) vendu de ce mois est inférieur à</value>
+    </labels>
+    <labels>
+        <fullName>objectif_erreur_global</fullName>
+        <categories>Objectifs Vendeurs</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>objectif_erreur_global</shortDescription>
+        <value>Une erreur interne est survenue, merci de contacter le support</value>
+    </labels>
+    <labels>
+        <fullName>objectif_erreur_valeurs</fullName>
+        <categories>Objectifs Vendeurs</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>objectif_erreur_valeurs</shortDescription>
+        <value>Vous devez saisir une valeur entière positive</value>
+    </labels>
+    <labels>
+        <fullName>objectif_save_success</fullName>
+        <categories>Objectifs Vendeurs</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>objectif_save_success</shortDescription>
+        <value>La sauvegarde s&apos;est effectuée avec succès</value>
+    </labels>
+    <labels>
+        <fullName>option_erreur_choix_opcli</fullName>
+        <categories>Configurateur options</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>option_erreur_choix_opcli</shortDescription>
+        <value>Vous ne pouvez pas choisir une option d’opération cliente si une remise de parrainage ou une option Market est présente</value>
+    </labels>
+    <labels>
+        <fullName>option_erreur_choix_parrainage</fullName>
+        <categories>Configurateur options</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>option_erreur_choix_parrainage</shortDescription>
+        <value>Vous ne pouvez pas choisir une remise de parrainage si une option de parrainage, d’opération cliente ou Market est présente</value>
+    </labels>
+    <labels>
+        <fullName>option_erreur_no_ligne_devis</fullName>
+        <categories>Configurateur options</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>option_erreur_no_ligne_devis</shortDescription>
+        <value>La ligne de devis n&apos;existe pas</value>
+    </labels>
+    <labels>
+        <fullName>option_erreur_no_revision_pack</fullName>
+        <categories>Configurateur options</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>option_erreur_no_revision_pack</shortDescription>
+        <value>Nous n&apos;avons pas trouvé de Revision Pack pour ce produit.</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_allAssetShouldBeInstalled</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>les actif de 1er niveaux doivent avoir une date d&apos;installation</shortDescription>
+        <value>Date d&apos;achèvement invalide (Au moins un actif sans date d&apos;installation ou avec une date d&apos;installation postérieure à la date d&apos;achèvement)!</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cannotValidateOrder</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>La commande ne peut pas être validée administrativement</shortDescription>
+        <value>Impossible de valider administrativement la commande. Le retour de métrage n&apos;est pas saisi et une impossibilité est en cours.</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantCreateIOrModifyOrderDiffNCPResponsability</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur lors de la Créa/modif de la responsabilité</shortDescription>
+        <value>La responsabilité de la commande fournisseur doit être identique à celle de la NCP associée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantCreateOrderNCPIfNoResponsability</fullName>
+        <categories>Commande</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Erreur lors de la création depuis une NCP sans responsabilité</shortDescription>
+        <value>Vous ne pouvez pas créer une commande fournisseur associée à une NCP, si cette NCP ne dispose pas de responsabilité.</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteAsset</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteAsset</shortDescription>
+        <value>Impossible de supprimer un actif si la commande est verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteCreditMemo</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteCreditMemo</shortDescription>
+        <value>Impossible de supprimer un avoir si la commande est verrouillée!</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteCreditMemoLine</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteCreditMemoLine</shortDescription>
+        <value>Impossible de supprimer une ligne d&apos;avoir si la commande est verrouillée!</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteEntitlement</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteEntitlement</shortDescription>
+        <value>Impossible de supprimer une garantie si la commande est verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteInvoice</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteInvoice</shortDescription>
+        <value>Impossible de supprimer facture si la commande est verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteInvoiceLine</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteInvoiceLine</shortDescription>
+        <value>Impossible de supprimer une ligne de facture si la commande est verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteOrderItem</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteOrderItem</shortDescription>
+        <value>Impossible de supprimer une ligne de commande si la commande est verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteServiceAppointment</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteServiceAppointment</shortDescription>
+        <value>Impossible de supprimer un rendez-vous de service si la commande est verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_cantDeleteWorkOrder</fullName>
+        <categories>Error Delete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_cantDeleteWorkOrder</shortDescription>
+        <value>Impossible de supprimer une demande de rendez-vous si la commande est verrouillée</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_impossibleToCreateCustomerOrder</fullName>
+        <categories>Commande</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_impossibleToCreateCustomerOrder</shortDescription>
+        <value>Numéro d&apos;accord de financement non renseigné!</value>
+    </labels>
+    <labels>
+        <fullName>order_msg_orderValidatedByAmendment</fullName>
+        <categories>Commande</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>order_msg_orderValidatedByAmendment</shortDescription>
+        <value>Approbation suite validation commande avenant</value>
+    </labels>
+    <labels>
+        <fullName>questionnaire_erreur_contratErrone</fullName>
+        <categories>Site Questionnaire</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>questionnaire_erreur_contratErrone</shortDescription>
+        <value>Le contrat associé à ce questionnaire n&apos;est pas valide ou n&apos;est plus disponible.</value>
+    </labels>
+    <labels>
+        <fullName>questionnaire_erreur_numeroErrone</fullName>
+        <categories>Site Questionnaire</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>questionnaire_erreur_numeroErrone</shortDescription>
+        <value>La saisie doit être un nombre entier compris entre 0 et 10.</value>
+    </labels>
+    <labels>
+        <fullName>questionnaire_erreur_questionObligatoire</fullName>
+        <categories>Site Questionnaire</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>questionnaire_erreur_questionObligatoire</shortDescription>
+        <value>Cette question est obligatoire. Veuillez donner une réponse.</value>
+    </labels>
+    <labels>
+        <fullName>questionnaire_erreur_questionnaireErrone</fullName>
+        <categories>Site Questionnaire</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>questionnaire_erreur_questionnaireErrone</shortDescription>
+        <value>Le questionnaire n&apos;est pas spécifié ou non valide.</value>
+    </labels>
+    <labels>
+        <fullName>questionnaire_erreur_questionsManquantes</fullName>
+        <categories>Site Questionnaire</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>questionnaire_erreur_questionsManquantes</shortDescription>
+        <value>Certaines questions obligatoires ont été mal renseignées ou n\&apos;ont pas été remplies.</value>
+    </labels>
+    <labels>
+        <fullName>questionnaire_msg_clientSatisfait</fullName>
+        <categories>Site Questionnaire</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>questionnaire_msg_clientSatisfait</shortDescription>
+        <value>Merci d’avoir répondu à notre enquête de satisfaction.
+&lt;/br&gt;
+Nous vous remercions d’avoir fait confiance à l’équipe KparK.
+&lt;/br&gt;
+Pour remercier le travail de nos collaborateurs, n’hésitez pas à laisser un avis sur notre page Facebook.
+&lt;/br&gt;
+{0}
+&lt;/br&gt;
+Bien à vous, l’équipe KparK.</value>
+    </labels>
+    <labels>
+        <fullName>questionnaire_msg_merci</fullName>
+        <categories>Site Questionnaire</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>questionnaire_msg_merci</shortDescription>
+        <value>Merci de nous avoir donné votre avis sur notre prestation.</value>
+    </labels>
+    <labels>
+        <fullName>quote_error_cantDeleteQuoteLine</fullName>
+        <categories>Devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>quote_error_cantDeleteQuoteLine</shortDescription>
+        <value>Vous ne pouvez pas supprimer la ligne de devis si elle est liée à devis avenant, une commande fournisseur ou si le devis est approuvé!</value>
+    </labels>
+    <labels>
+        <fullName>quote_error_dateAcceptationInvalide</fullName>
+        <categories>Opportunite</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>quote_error_dateAcceptationInvalide</shortDescription>
+        <value>Date d&amp;#39;acceptation client invalide (Il reste des lignes de produit à configurer)</value>
+    </labels>
+    <labels>
+        <fullName>quote_error_dateTransmissionInvalide</fullName>
+        <categories>Opportunite</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>quote_error_dateTransmissionInvalide</shortDescription>
+        <value>Date de transmission client invalide (Il reste des lignes de produit à configurer).</value>
+    </labels>
+    <labels>
+        <fullName>quote_error_emailDateExpiration</fullName>
+        <categories>Opportunite</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>quote_error_emailDateExpiration</shortDescription>
+        <value>Il n&apos;est pas possible d’effectuer cet envoi car la date d’expiration du devis est dépassée</value>
+    </labels>
+    <labels>
+        <fullName>quote_error_emaildevisTMC</fullName>
+        <categories>Opportunite</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>quote_error_emaildevisTMC</shortDescription>
+        <value>Vous ne pouvez pas envoyer d&apos;email pour un devis TMC (Toute Modification Comprise).</value>
+    </labels>
+    <labels>
+        <fullName>quote_error_modeFinancementInvalide</fullName>
+        <categories>Opportunite</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>quote_error_modeFinancementInvalide</shortDescription>
+        <value>Mode de financement invalide (Vous n&amp;#39;êtes pas autorisés à utiliser ce mode de financement.</value>
+    </labels>
+    <labels>
+        <fullName>quote_error_toConfigure</fullName>
+        <categories>Opportunite</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>quote_error_toConfigure</shortDescription>
+        <value>Votre devis est au statut &apos;A configurer&apos;, il ne peut pas être envoyé.</value>
+    </labels>
+    <labels>
+        <fullName>reaffectationReussie</fullName>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Reaffectation ok</shortDescription>
+        <value>La réaffectation s&apos;est déroulée correctement</value>
+    </labels>
+    <labels>
+        <fullName>search_products_meme_produit</fullName>
+        <categories>Recherche par produit</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>search_products_meme_produit</shortDescription>
+        <value>Vous ne pouvez pas sélectionner deux ou trois produits identiques.</value>
+    </labels>
+    <labels>
+        <fullName>search_products_option_sans_produit</fullName>
+        <categories>Recherche par produit</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>search_products_option_sans_produit</shortDescription>
+        <value>Vous ne pouvez pas spécifier une option sans sélectionner un produit.</value>
+    </labels>
+    <labels>
+        <fullName>search_products_pas_de_produit</fullName>
+        <categories>Recherche par produit</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>search_products_pas_de_produit</shortDescription>
+        <value>Merci de sélectionner un produit afin de faire une recherche.</value>
+    </labels>
+    <labels>
+        <fullName>search_products_pas_resultats</fullName>
+        <categories>Recherche par produit</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>search_products_pas_resultats</shortDescription>
+        <value>Aucun chantier ne correspond aux critères. Veuillez élargir votre recherche.</value>
+    </labels>
+    <labels>
+        <fullName>signea_msg_ConfirmChantierNotPrimary</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Confirmation chantier non principal</shortDescription>
+        <value>Le chantier n&apos;est pas une résidence principale, confirmez-vous le lancement de la signature électronique ?</value>
+    </labels>
+    <labels>
+        <fullName>signea_msg_ConfirmCircuitLaunchAuto</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>signea_msg_ConfirmCircuitLaunchAuto</shortDescription>
+        <value>Êtes-vous certain de vouloir sélectionner le mode automatique? Dans ce cas, le circuit de signature du contrat sera lancé automatiquement à la signature du DIPC.</value>
+    </labels>
+    <labels>
+        <fullName>signea_msg_ConfirmMessageLancement</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Confirmation de lancement de la signature électronique</shortDescription>
+        <value>Confirmez-vous le lancement de la signature électronique sur ce devis ?\nAttention! Il sera impossible de revenir en arrière une fois le processus enclenché.</value>
+    </labels>
+    <labels>
+        <fullName>signea_msg_ConfirmMessageLancementIsolation</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Confirmation de lancement d&apos;une signature de contrat isolation</shortDescription>
+        <value>Le devis associé possède un contrat de type isolation. Néanmoins, les informations CEE ne sont pas toutes remplies sur ce devis.\nConfirmez-vous le lancement de la signature électronique sur ce devis ?\nAttention! Il sera impossible de revenir en arrière une fois le processus enclenché.</value>
+    </labels>
+    <labels>
+        <fullName>signea_msg_ErrorChampCircuitNull</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Champ des circuits null sur le devis</shortDescription>
+        <value>Une erreur inconnue est survenue lors de la création du circuit {0}. Veuillez contacter votre administrateur. 
+Détails des circuits concernés : DIPC : {1}, Contrat : {2}.</value>
+    </labels>
+    <labels>
+        <fullName>signea_msg_ErrorCheckContext</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Conditions non remplies avant signature</shortDescription>
+        <value>Création d&apos;un circuit de signature électronique impossible !</value>
+    </labels>
+    <labels>
+        <fullName>signea_msg_ErrorCreationCircuit</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Erreur à la création du circuit</shortDescription>
+        <value>Création du circuit ({0}) Code : {1} !</value>
+    </labels>
+    <labels>
+        <fullName>signea_text_ManuscriteDistance</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Signature manuscrite à distance</shortDescription>
+        <value>Manuscrite (A distance)</value>
+    </labels>
+    <labels>
+        <fullName>signea_text_ManuscriteF2F</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Signature manuscrite en face à face</shortDescription>
+        <value>Manuscrite (En face à face)</value>
+    </labels>
+    <labels>
+        <fullName>signea_text_SMSDistance</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Signature par SMS à distance</shortDescription>
+        <value>Par SMS (A distance)</value>
+    </labels>
+    <labels>
+        <fullName>signea_text_SMSF2F</fullName>
+        <categories>Signature électronique</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Signea - Signature par SMS en face à face</shortDescription>
+        <value>Par SMS (En face à face)</value>
+    </labels>
+    <labels>
+        <fullName>site_adresse_non_valide</fullName>
+        <categories>Site_Parrainage, Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_adresse_non_valide</shortDescription>
+        <value>Adresse non reconnue. Merci de saisir une adresse valide !</value>
+    </labels>
+    <labels>
+        <fullName>site_delai_vide</fullName>
+        <categories>Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_delai_vide</shortDescription>
+        <value>Merci de répondre à la question concernant le délai de votre projet !</value>
+    </labels>
+    <labels>
+        <fullName>site_email_erreur</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_email_erreur</shortDescription>
+        <value>Le format de votre adresse email est invalide !</value>
+    </labels>
+    <labels>
+        <fullName>site_email_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_email_vide</shortDescription>
+        <value>Merci de saisir votre email</value>
+    </labels>
+    <labels>
+        <fullName>site_materiau_fenetre_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_materiau_fenetre_vide</shortDescription>
+        <value>Merci de choisir le type de matériau de vos fenêtres !</value>
+    </labels>
+    <labels>
+        <fullName>site_materiau_portail_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_materiau_portail_vide</shortDescription>
+        <value>Merci de choisir le type de matériau de votre portail !</value>
+    </labels>
+    <labels>
+        <fullName>site_materiau_volet_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_materiau_volet_vide</shortDescription>
+        <value>Merci de choisir le type de matériau de vos volets !</value>
+    </labels>
+    <labels>
+        <fullName>site_msg_AddressNotValid</fullName>
+        <categories>Espace Client, Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_msg_AddressNotValid</shortDescription>
+        <value>Adresse non reconnue. Merci de saisir une adresse valide.</value>
+    </labels>
+    <labels>
+        <fullName>site_msg_CodePostalRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_msg_CodePostalRequired</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Le champ code postal est obligatoire. Merci de renseigner une valeur.</value>
+    </labels>
+    <labels>
+        <fullName>site_msg_EmailNotValid</fullName>
+        <categories>Espace Client, Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_msg_EmailNotValid</shortDescription>
+        <value>Le format de votre adresse e-mail est invalide.</value>
+    </labels>
+    <labels>
+        <fullName>site_msg_EtageNotValid</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>Etage non valide</shortDescription>
+        <value>Étage non valide, merci de saisir votre étage en chiffres.</value>
+    </labels>
+    <labels>
+        <fullName>site_msg_FaxNotValid</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_msg_FaxNotValid</shortDescription>
+        <value>Le numéro de télécopie doit commencer pas un 0 et contenir 10 chiffres.</value>
+    </labels>
+    <labels>
+        <fullName>site_msg_TelNotValid</fullName>
+        <categories>Espace Client, Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_msg_TelNotValid</shortDescription>
+        <value>Le numéro de téléphone doit commencer pas un 0 et contenir 10 chiffres.</value>
+    </labels>
+    <labels>
+        <fullName>site_msg_VilleRequired</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_msg_VilleRequired</shortDescription>
+        <value>&lt;strong&gt;Erreur :&lt;/strong&gt; Le champ ville est obligatoire. Merci de renseigner une valeur.</value>
+    </labels>
+    <labels>
+        <fullName>site_projet_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_projet_vide</shortDescription>
+        <value>Merci de choisir au moins une réponse concernant votre projet !</value>
+    </labels>
+    <labels>
+        <fullName>site_quantite_fenetre_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_quantite_fenetre_vide</shortDescription>
+        <value>Merci de choisir la quantité de fenêtres !</value>
+    </labels>
+    <labels>
+        <fullName>site_quantite_garage_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_quantite_garage_vide</shortDescription>
+        <value>Merci de choisir la quantité de portes de garage !</value>
+    </labels>
+    <labels>
+        <fullName>site_quantite_portail_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_quantite_portail_vide</shortDescription>
+        <value>Merci de choisir la quantité de portails et clôtures !</value>
+    </labels>
+    <labels>
+        <fullName>site_quantite_porte_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_quantite_porte_vide</shortDescription>
+        <value>Merci de choisir la quantité de portes</value>
+    </labels>
+    <labels>
+        <fullName>site_quantite_store_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_quantite_store_vide</shortDescription>
+        <value>Merci de choisir la quantité de stores !</value>
+    </labels>
+    <labels>
+        <fullName>site_quantite_volet_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_quantite_volet_vide</shortDescription>
+        <value>Merci de choisir la quantité de volets !</value>
+    </labels>
+    <labels>
+        <fullName>site_reglement_vide</fullName>
+        <categories>Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_reglement_vide</shortDescription>
+        <value>Merci d’accepter le règlement !</value>
+    </labels>
+    <labels>
+        <fullName>site_telephone_erreur</fullName>
+        <categories>Espace Client</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_telephone_erreur</shortDescription>
+        <value>Votre téléphone doit contenir 10 chiffres !</value>
+    </labels>
+    <labels>
+        <fullName>site_telephone_vide</fullName>
+        <categories>Site_QTS</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_telephone_vide</shortDescription>
+        <value>Merci de saisir votre téléphone</value>
+    </labels>
+    <labels>
+        <fullName>site_type_fenetre_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_type_fenetre_vide</shortDescription>
+        <value>Merci de choisir le type de fenêtres !</value>
+    </labels>
+    <labels>
+        <fullName>site_type_garage_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_type_garage_vide</shortDescription>
+        <value>Merci de choisir le type de portes de garage !</value>
+    </labels>
+    <labels>
+        <fullName>site_type_habitation_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_type_habitation_vide</shortDescription>
+        <value>Merci de répondre à la question si vous habitez un pavillon ou un appartement !</value>
+    </labels>
+    <labels>
+        <fullName>site_type_personne_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_type_personne_vide</shortDescription>
+        <value>Merci de répondre à la question si vous êtes  propriétaire ou locataire !</value>
+    </labels>
+    <labels>
+        <fullName>site_type_porte_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_type_porte_vide</shortDescription>
+        <value>Merci de choisir le type de portes !</value>
+    </labels>
+    <labels>
+        <fullName>site_type_store_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_type_store_vide</shortDescription>
+        <value>Merci de choisir le type de stores !</value>
+    </labels>
+    <labels>
+        <fullName>site_type_volet_vide</fullName>
+        <categories>Demande devis</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>site_type_volet_vide</shortDescription>
+        <value>Merci de choisir le type de volets !</value>
+    </labels>
+    <labels>
+        <fullName>subjectDisableInactiveUsersBatch</fullName>
+        <categories>TECH</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>subjectDisableInactiveUsersBatch</shortDescription>
+        <value>Statut de l&apos;exécution du Batch : Suspension des utilisateurs inactifs</value>
+    </labels>
+    <labels>
+        <fullName>system_id_pricebookentry_standard</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.id.pricebookentry.standard</shortDescription>
+        <value>01sD0000000GV94IAG</value>
+    </labels>
+    <labels>
+        <fullName>system_id_referencial_cancelAuto</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.id.referencial.cancelAuto</shortDescription>
+        <value>a6Y680000004C9K</value>
+    </labels>
+    <labels>
+        <fullName>system_id_serviceappointment_RTFSL</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system_id_serviceappointment_RTFSL</shortDescription>
+        <value>01257000000kiZoAAI</value>
+    </labels>
+    <labels>
+        <fullName>system_id_user_kpark</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.id.user.kpark</shortDescription>
+        <value>00568000000p7ep</value>
+    </labels>
+    <labels>
+        <fullName>system_id_user_questionnaire</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.id.user.questionnaire</shortDescription>
+        <value>00557000007sQ3E</value>
+    </labels>
+    <labels>
+        <fullName>system_id_workorder_RTFSL</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.id.workorder.RTFSL</shortDescription>
+        <value>01257000000kiZjAAI</value>
+    </labels>
+    <labels>
+        <fullName>system_reference_forfaitDep_productCode</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.reference.forfaitDep.productCode</shortDescription>
+        <value>FDDSAV</value>
+    </labels>
+    <labels>
+        <fullName>system_reference_mainOeuvre_productCode</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.reference.mainOeuvre.productCode</shortDescription>
+        <value>MOSAV</value>
+    </labels>
+    <labels>
+        <fullName>system_reference_referencial_cancelExpiration</fullName>
+        <categories>Système</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>system.reference.referencial.cancelExpiration</shortDescription>
+        <value>R-0015</value>
+    </labels>
+    <labels>
+        <fullName>user_error_desactivationImpossible</fullName>
+        <categories>User</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>user_error_desactivationImpossible</shortDescription>
+        <value>Désactivation de l&apos;utilisateur impossible car il existe des RDV commerciaux ou des RDV de services dans le futur.</value>
+    </labels>
+    <labels>
+        <fullName>workOrder_msg_cantChangeChantier</fullName>
+        <categories>Work Order</categories>
+        <language>fr</language>
+        <protected>false</protected>
+        <shortDescription>workOrder_msg_cantChangeChantier</shortDescription>
+        <value>Impossible de modifier le chantier de la demande de rendez-vous si celui-ci est différent du chantier des actifs des éléments de la demande.</value>
+    </labels>
+</CustomLabels>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPFOIRES</fullName>
+    <columns>NAME</columns>
+    <columns>CodeOption__c</columns>
+    <columns>Debutvalidite__c</columns>
+    <columns>FinValidite__c</columns>
+    <columns>Actif__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>contains</operation>
+        <value>OPFOIRES</value>
+    </filters>
+    <label>OPFOIRES</label>
+    <language>fr</language>
+</ListView>

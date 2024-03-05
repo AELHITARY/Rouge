@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MAJ_OptionMai2019</fullName>
+    <columns>NAME</columns>
+    <columns>LibelleOption__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>startsWith</operation>
+        <value>OP0519</value>
+    </filters>
+    <label>MAJ Option - Mai 2019</label>
+    <language>fr</language>
+</ListView>

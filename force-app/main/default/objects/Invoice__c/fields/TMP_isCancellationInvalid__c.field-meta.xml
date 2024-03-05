@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TMP_isCancellationInvalid__c</fullName>
+    <externalId>false</externalId>
+    <formula>AND(amount__c &gt; 0,
+(ISNULL(cancellationDate__c) &amp;&amp; (cancelledAmount__c &gt;= amount__c))
+||
+(!ISNULL(cancellationDate__c) &amp;&amp; (cancelledAmount__c &lt; amount__c))
+||
+((!ISNULL(cancellationDate__c) || (cancelledAmount__c &gt;= amount__c)) &amp;&amp; !ISPICKVAL(status__c, &apos;Annulée&apos;))
+)</formula>
+    <label>[#] Annulation invalide?</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

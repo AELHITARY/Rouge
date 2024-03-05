@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_Sectorisation</fullName>
+    <active>true</active>
+    <description>Sectorisation obligatoire afin de garantir une adresse en France.
+Exception :
+- les administrateurs
+- le marketing
+- interfaces d&apos;import/export 
+- les géocodages batch car l&apos;iris et la secto ne sont pas connus immédiatment</description>
+    <errorConditionFormula>AND(
+   $User.ByPassValidationRule__c == FALSE,
+   $Profile.Name != &apos;Administrateur système&apos;,
+   
+   OR(
+     /* Nouveau chantier */ 
+     AND(ISNEW(),
+         NOT(ISPICKVAL(methodeGeocodage__c, &apos;BATCH&apos;)),
+         NOT(ISPICKVAL(methodeGeocodage__c, &apos;&apos;)),
+         OR(UPPER(libelleMagasinActuel__c) = &apos;HORS ZONE&apos;,
+            UPPER(libelleMagasinActuel__c) = &apos;ZONE BLANCHE&apos;)
+         ),
+   
+     /* Chantier modifié */
+     AND(NOT(ISNEW()),
+         (NOW() - CreatedDate) &gt; 0.00030, /* 30 secondes autorisées pour modifications */
+         OR(ISNULL(sectorisation__c),  /* Sectorisation absente --&gt; Erreur quelque soit le cas: chantier créé dabs Kube ou chantier lié à la reprise de données */
+            ISBLANK(sectorisation__c),
+            AND(OR(ISCHANGED(rue__c), /* Changement d&apos;adresse */
+                   ISCHANGED(codePostal__c),
+                   ISCHANGED(ville__c),
+                   ISCHANGED(pays__c)),
+                OR(UPPER(libelleMagasinActuel__c) = &apos;HORS ZONE&apos;,
+                   UPPER(libelleMagasinActuel__c) = &apos;ZONE BLANCHE&apos;)
+            )
+         )
+     )   
+   )
+)</errorConditionFormula>
+    <errorMessage>Enregistrement impossible d&apos;un chantier non sectorisé, en hors zone ou en zone blanche!</errorMessage>
+</ValidationRule>

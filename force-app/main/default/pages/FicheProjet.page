@@ -1,0 +1,655 @@
+<apex:page StandardController="Opportunity" extensions="CTRL_FicheProjet" showHeader="false" renderas="PDF" applyhtmltag="false">
+    <head>
+        <style type="text/css" media="all">
+                @page{ margin:0.25in; }
+
+
+
+                body { font-family: arial,sans-serif; font-size:6pt;}
+                .all-width{width:100%; border-collapse: collapse;}
+                .clearer { clear: both;}
+                table.all-width td {
+                    padding:2pt;
+
+                }
+
+                .container {
+                            margin:0px;
+                            width: 566pt;
+                            }
+                .logo
+                            {
+                            width:70px;
+                            }
+                .header
+                            {
+                            width:566pt;
+                            margin: 0 auto;
+                            border-bottom: #737373 1px solid;
+                            }
+                .header h1
+                            {
+                            text-align:center;
+                            margin: 0 0 20px 0
+                            }
+                .space
+                            {
+                            height:15px;
+                            width:10pt;
+                            }
+                .header_table, .interest_table
+                            {
+                            width:100%;
+                            padding-bottom:10px;
+                            margin-bottom:10px;
+                            }
+                div .intro
+                            {
+                            width:566pt;
+                            padding-bottom:0px;
+                            }
+                .label_firstCol
+                            {
+                            display: inline-block;
+                            width: 60px;
+                            }
+                .label_secondCol
+                            {
+                            display: inline-block;
+                            width: 80px;
+                            }
+                .label_thirdCol
+                            {
+                            display: inline-block;
+                            width: 80px;
+                            }
+                .general-infos
+                            {
+                            width:565pt;
+                            height:310pt;
+                            border: #737373 1px solid;
+                            }
+                .block-left,
+                .block-right
+                            {
+                            width:282pt;
+                            height:250pt;
+
+                            }
+                .right-border
+                            {
+                            border-right: #737373 1px solid;
+                            }
+                .top-border
+                            {
+                            border-top: #737373 1px solid;
+                            }
+                .bottom-border
+                            {
+                            border-bottom: #737373 1px solid;
+                            }
+                .general-interest
+                            {
+                            width:565pt;
+                            /*height:170pt;*/
+                            border: #737373 1px solid;
+                            margin-bottom: 10pt
+                            }
+                 table.interest_table
+                        {
+
+                        }
+                table.interest_table td {
+
+                    }
+                table.interest_table th {
+                    border-bottom:1px #000 solid;
+                    padding: 0 2pt;
+                     /*border-collapse:collapse;*/
+                }
+                div.task {
+                    width:100%;
+                    height:125px;
+                    display:block;
+                    position:relative;
+                    border: #737373 1px solid;
+                    margin-bottom: 10pt
+                }
+                div.event {
+                    width:100%;
+                    height:125px;
+                    display:block;
+                    position:relative;
+                    border: #737373 1px solid;
+                }
+                .data .block-left,
+                .data .block-right {
+                    height: 150px
+
+                }
+                 div.data
+                            {
+                            width:100%;
+                            height:150px;
+                            display:block;
+                            position:relative;
+                            border: #737373 1px solid;
+                            }
+                 /*.data .precision {
+                    border-top: 1px #777 solid
+                 }  */
+                .block-left
+                            {
+                            float:left;
+                            }
+                .block-right
+                            {
+                            float:right;
+                            }
+                .block-right div,
+                .block-left div
+                            {
+                            width:100%
+                            }
+                div h2
+                    {
+                        text-align:center;
+                    }
+                ul li{ list-style-type: none; margin: 0; display: block; position:relative;padding-top:3px; padding-bottom:3px;}
+                /* `XHTML, HTML4, HTML5 Reset
+----------------------------------------------------------------------------------------------------*/
+
+b,
+strong {
+/*
+  Makes browsers agree.
+  IE + Opera = font-weight: bold.
+  Gecko + WebKit = font-weight: bolder.
+*/
+  font-weight: bold;
+}
+
+img {
+  color: transparent;
+  font-size: 0;
+  vertical-align: middle;
+/*
+  For IE.
+  http://css-tricks.com/ie-fix-bicubic-scaling-for-images
+*/
+  -ms-interpolation-mode: bicubic;
+}
+
+li {
+/*
+  For IE6 + IE7.
+*/
+  display: list-item;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+th,
+td,
+caption {
+  font-weight: normal;
+  vertical-align: top;
+  text-align: left;
+}
+
+q {
+  quotes: none;
+}
+
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+
+sub,
+sup,
+small {
+  font-size: 75%;
+}
+
+sub,
+sup {
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+svg {
+/*
+  For IE9.
+*/
+  overflow: hidden;
+}
+
+/*--------------------------------------------------------------*/
+/*-------------------       LABEL        -----------------------*/
+/*--------------------------------------------------------------*/
+.qualification ul { float: left;display: block;position: relative;width:95pt;padding:0 0 0 5pt;}
+
+.general-infos ul li,
+.data ul li { clear: both;}
+.general-infos span,
+.data span { display: block;float: left;position: relative;height: 16px;}
+.general-infos span.label,
+.data span.label { border: 0 none}
+
+.general-infos span.output_civilite,
+.general-infos span.output_civilite1,
+.data span.output_civilite2 { width: 15pt}
+.general-infos span.output_firstName,
+.general-infos span.output_firstName1,
+.data span.output_prenom2 { width:60pt }
+.general-infos span.output_lastName,
+.general-infos span.output_lastName1,
+.data span.output_nom2 { width:50pt }
+
+.general-infos span.output_ZIP,
+.general-infos span.output_ZIP1,
+.data span.output_codePostal2 { width:50pt }
+.general-infos span.output_ville,
+.general-infos span.output_ville1,
+.data span.output_ville2 { width:60pt }
+
+.general-infos span.output_interphone,
+.general-infos span.output_interphone1 { width:15pt }
+.general-infos span.output_etage,
+.general-infos span.output_etage1 { width:8pt }
+
+.general-infos span.output_telFixe,
+.general-infos span.output_telFixe1,
+.data span.output_telFixe2,
+.data span.output_numeroFoyer2 { width: 60pt; }
+
+.general-infos li.li_adresse {  height:30px;
+                                line-height:30px;
+                             }
+.general-infos li.li_adresse span{ display:inline-block;
+                                     line-height:1.2;}
+
+
+.general-infos span.output_telPortable,
+.general-infos span.output_telPortable1 { width: 110pt}
+.label_projet{font-weight:bold; font-size:9px;}
+        </style>
+    </head>
+    <body>
+        <!-- Start Div Container-->
+        <div class="container">
+            <!-- Start Div Header-->
+            <div class="header">
+                <img src="{!URLFOR($Resource.KubeLogo, 'kube.gif')}" class="logo"/>
+                <h1>FICHE PROJET</h1>
+            </div>
+            <!-- End Div Header-->
+
+            <!-- Start Div Intro-->
+            <div class="intro">
+                <table class="header_table">
+                    <tr>
+                        <td><span class="label_firstCol">Origine Projet :</span><span class="output_origine">{!myIntroduction.Origine}</span></td>
+                        <td><span class="label_secondCol">Date de Creation :</span><span class="output_dateCreation">{!myIntroduction.DateCreation}</span></td>
+                        <td><span class="label_thirdCol">Heure de Creation :</span><span class="output_heureCreation">{!myIntroduction.HeureCreation}</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="label_firstCol">Statut :</span><span class="output_status">{!myIntroduction.Statut}</span></td>
+                        <td><span class="label_secondCol">Vendeur :</span><span class="output_vendor">{!myIntroduction.Vendeur}</span></td>
+                        <td><span class="label_thirdCol">Magasin (C) :</span><span class="output_store">{!myIntroduction.Magasin}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" align="left"><span class="label_projet">N&deg; Projet :</span><span class="output_status">{!myIntroduction.NumeroProjet}</span></td>
+                    </tr>
+                </table>
+            </div>
+            <!-- End Div Intro-->
+
+            <!-- Start Div Space-->
+            <div class="space">
+            </div>
+            <!-- End Div Space-->
+
+            <!-- Start Div General-Infos-->
+            <div class="general-infos">
+                <!-- Start Div Block-Left-->
+                <div class="block-left right-border">
+                    <!-- Start Div Signataire-->
+                    <div class="signataire">
+                        <h2>COORDONNEES SIGNATAIRE</h2>
+                        <ul>
+                            <li class="li_numCompte"><span class="label">N° du compte :</span><span class="output_numCompte">{!mySignataire.NumCompte}</span></li>
+                            <li>
+                                <span class="label">Civilite :</span><span class="output_civilite">{!mySignataire.Civilite}</span>
+                                <span class="label">Prenom :</span><span class="output_firstName">{!mySignataire.Prenom}</span>
+                                <span class="label">Nom :</span><span class="output_lastName">{!mySignataire.Nom}</span>
+                            </li>
+                            <li class="li_adresse"><span class="label">Rue :</span><span class="output_adresse">{!mySignataire.Rue}</span></li>
+                            <li>
+                                <span class="label">Code Postal :</span><span class="output_ZIP">{!mySignataire.CodePostal}</span>
+                                <span class="label">Ville :</span><span class="output_ville">{!mySignataire.Ville}</span>
+                                <span class="label">Pays :</span><span class="output_pays">{!mySignataire.Pays}</span>
+                            </li>
+                            <li>
+                                <span class="label">Interphone :</span><span class="output_interphone">{!mySignataire.Interphone}</span>
+                                <span class="label">Etage :</span><span class="output_etage">{!FLOOR(mySignataire.Etage)}</span>
+                            </li>
+                            <li>
+                                <span class="label">Tel fixe :</span><span class="output_telFixe">{!mySignataire.PhoneNumber}</span>
+                                <span class="label">Tel portable :</span><span class="output_telPortable">{!mySignataire.MobilePhoneNumber}</span>
+                            </li>
+                            <li><span class="label">E-mail :</span><span class="output_email">{!mySignataire.MailAddr}</span></li>
+                            <li><span class="label">Rôle :</span><span class="output_role">{!mySignataire.role}</span></li>
+                        </ul>
+                    </div>
+                    <!-- End Div Signataire-->
+                    <!-- Start Div Signataire autre-->
+                    <div class="signataire1 top-border right-border">
+                        <h2>COORDONNEES SIGNATAIRE (AUTRE)</h2>
+                        <ul>
+                            <li class="li_numCompte"><span class="label">N° du compte :</span><span class="output_numCompte">{!myAutreSignataire.NumCompte}</span></li>
+                            <li>
+                                <span class="label">Civilite :</span><span class="output_civilite">{!myAutreSignataire.Civilite}</span>
+                                <span class="label">Prenom :</span><span class="output_firstName">{!myAutreSignataire.Prenom}</span>
+                                <span class="label">Nom :</span><span class="output_lastName">{!myAutreSignataire.Nom}</span>
+                            </li>
+                            <li class="li_adresse"><span class="label">Rue :</span><span class="output_adresse">{!myAutreSignataire.Rue}</span></li>
+                            <li>
+                                <span class="label">Code Postal :</span><span class="output_ZIP">{!myAutreSignataire.CodePostal}</span>
+                                <span class="label">Ville :</span><span class="output_ville">{!myAutreSignataire.Ville}</span>
+                                <span class="label">Pays :</span><span class="output_pays">{!myAutreSignataire.Pays}</span>
+                            </li>
+                            <li>
+                                <span class="label">Code acces :</span><span class="output_codeAcces">{!myAutreSignataire.CodeAcces}</span>
+                                <span class="label">Interphone :</span><span class="output_interphone">{!myAutreSignataire.Interphone}</span>
+                                <span class="label">Etage :</span><span class="output_etage">{!FLOOR(myAutreSignataire.Etage)}</span>
+                            </li>
+                            <li>
+                                <span class="label">Tel fixe :</span><span class="output_telFixe">{!myAutreSignataire.PhoneNumber}</span>
+                                <span class="label">Tel portable :</span><span class="output_telPortable">{!myAutreSignataire.MobilePhoneNumber}</span>
+                            </li>
+                            <li><span class="label">E-mail :</span><span class="output_email">{!myAutreSignataire.MailAddr}</span></li>
+                            <li><span class="label">Rôle :</span><span class="output_role">{!myAutreSignataire.role}</span></li>
+                        </ul>
+                    </div>
+                    <!-- End Div Signataire autre-->
+                </div>
+                <!-- End Div Block-Left-->
+
+                <!-- Start Div Block-Right-->
+                <div class="block-right">
+                    <!-- Start Div Chantier-->
+                    <div class="chantier" style="width:100%;">
+                        <h2>COORDONNEES CHANTIER</h2>
+                        <ul>
+                            <li class="li_numCompte"><span class="label">N° du chantier :</span><span class="output_numCompte">{!myChantier.NumChantier}</span></li>
+                            <li><span class="label">Rue :</span><span class="output_adresse1">{!myChantier.Rue}</span></li>
+                            <li>
+                                <span class="label">Code Postal :</span><span class="output_ZIP1">{!myChantier.CodePostal}</span>
+                                <span class="label">Ville :</span><span class="output_ville1">{!myChantier.Ville}</span>
+                                <span class="label">Pays :</span><span class="output_pays1">{!myChantier.Pays}</span>
+                            </li>
+                            <li>
+                                <span class="label">Etage :</span><span class="output_etage1">{!FLOOR(myChantier.Etage)}</span>
+                            </li>
+                            <li>
+                                <span class="label">Description :</span><span class="output_etage1">{!myChantier.Description}</span>
+                                <br/>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- End Div Chantier-->
+
+                    <!-- Start Div Qualification-->
+                    <div class="qualification top-border" style="width:100%">
+                        <h2>PRE-QUALIFICATION</h2>
+                            <ul>
+                                <li>
+                                    <span class="label_residence">Residence :</span>
+                                    <span class="output_residence">{!myQualification.Residence}</span>
+                                </li>
+                                 <li>
+                                    <span class="label_typeHabitation">Type habitation :</span>
+                                    <span class="output_typeHabitation">{!myQualification.TypeHabitation}</span>
+                                </li>
+                                <li>
+                                     <span class="label_dateConstruction">Date construction :</span>
+                                     <span class="output_dateConstruction">{!myQualification.DateConstruction}</span>
+                                </li>
+                                <li>
+                                    <span class="label_modeChauffe">Mode chauffe :</span>
+                                    <span class="output_modeChauffe">{!myQualification.ModeChauffe}</span>
+                                </li>
+                            </ul>
+                            <ul>
+                                  <li>
+                                      <span class="label_urbanisme">Urbanisme :</span>
+                                      <span class="output_urbanisme">{!myQualification.Urbanisme}</span>
+                                  </li>
+                            </ul>
+                            <div>
+                                <span class="label" style="padding-left:45px;">Description :</span>
+                                <span><apex:outputField value="{!myOpportunity.Description}"/></span>
+                            </div>
+                            <div class="clearer"> </div>
+                    </div>
+                    <!-- End Div Qualification-->
+
+                </div>
+                <!-- End Div Block-Right-->
+            </div>
+            <!-- End Div General-Infos-->
+
+            <!-- Start Div Space-->
+            <div class="space">
+            </div>
+            <!-- End Div Space-->
+
+            <!-- Start Div General-Interest-->
+            <div class="general-interest" style="clear:both;">
+                <h2>INTERET PRINCIPAL</h2>
+                <table class="interest_table" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td class="right-border">
+                            <table class="all-width">
+                                <thead>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Qte</th>
+                                        <th>Materiau</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="label_fenetre">Fenetre</span></td>
+                                        <td><span class="output_qteFenetre">{!FLOOR(myInteretPrincipal.NumFenetre)}</span></td>
+                                        <td><span class="output_matFenetre">{!myInteretPrincipal.MatFenetre}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_porteFenetre">Porte fenetre</span></td>
+                                        <td><span class="output_qtePorteFenetre">{!FLOOR(myInteretPrincipal.NumPorteFenetre)}</span></td>
+                                        <td><span class="output_matPorteFenetre">{!myInteretPrincipal.MatPorteFenetre}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_coulissant">Coulissant</span></td>
+                                        <td><span class="output_qteCoulissant">{!FLOOR(myInteretPrincipal.NumCoulissant)}</span></td>
+                                        <td><span class="output_matCoulissant">{!myInteretPrincipal.MatCoulissant}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_voletRoulant">Volet roulant</span></td>
+                                        <td><span class="output_qteVoletRoulant">{!FLOOR(myInteretPrincipal.NumVoletRoulant)}</span></td>
+                                        <td><span class="output_matVoletRoulant">{!myInteretPrincipal.MatVoletRoulant}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_portail">Portail</span></td>
+                                        <td><span class="output_qtePortail">{!FLOOR(myInteretPrincipal.NumPortail)}</span></td>
+                                        <td><span class="output_matPortail">{!myInteretPrincipal.MatPortail}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="right-border">
+                            <table class="all-width">
+                                <thead>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Qte</th>
+                                        <th>Materiau</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="label_voletBattant">Volet battant</span></td>
+                                        <td><span class="output_qteVoletBattant">{!FLOOR(myInteretPrincipal.NumVoletBattant)}</span></td>
+                                        <td><span class="output_matVoletBattant">{!myInteretPrincipal.MatVoletBattant}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_persienne">Persienne</span></td>
+                                        <td><span class="output_qtePersienne">{!FLOOR(myInteretPrincipal.NumPersiennes)}</span></td>
+                                        <td><span class="output_matPersienne">{!myInteretPrincipal.MatPersiennes}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_moustiquaire">Moustiquaire</span></td>
+                                        <td><span class="output_qteMoustiquaire">{!FLOOR(myInteretPrincipal.NumMoustiquaire)}</span></td>
+                                        <td><span class="output_matMoustiquaire">{!myInteretPrincipal.MatMoustiquaire}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_storeBanne">Store banne</span></td>
+                                        <td><span class="output_qteStoreBanne">{!FLOOR(myInteretPrincipal.NumStoreBanne)}</span></td>
+                                        <td><span class="output_matStoreBanne">{!myInteretPrincipal.MatStoreBanne}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_porteInterieur">Porte d'interieur</span></td>
+                                        <td><span class="output_qtePorteInterieur">{!FLOOR(myInteretPrincipal.NumPorteInterieur)}</span></td>
+                                        <td><span class="output_matPorteInterieur">{!myInteretPrincipal.MatPorteInterieur}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>
+                            <table class="all-width">
+                                <thead>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Qte</th>
+                                        <th>Materiau</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="label_porteGarage">Porte de garage</span></td>
+                                        <td><span class="output_qtePorteGarage">{!FLOOR(myInteretPrincipal.NumPorteGarage)}</span></td>
+                                        <td><span class="output_matPorteGarage">{!myInteretPrincipal.MatPorteGarage}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_porteEntree">Porte d'entree</span></td>
+                                        <td><span class="output_qtePorteEntree">{!FLOOR(myInteretPrincipal.NumPorteEntree)}</span></td>
+                                        <td><span class="output_matPorteEntree">{!myInteretPrincipal.MatPorteEntree}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_porteBlindee">Porte blindee</span></td>
+                                        <td><span class="output_qtePorteBlindee">{!FLOOR(myInteretPrincipal.NumPorteBlindee)}</span></td>
+                                        <td><span class="output_matPorteBlindee">{!myInteretPrincipal.MatPorteBlindee}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="label_porteService">Porte de service</span></td>
+                                        <td><span class="output_qtePorteService">{!FLOOR(myInteretPrincipal.NumPorteService)}</span></td>
+                                        <td><span class="output_matPorteService">{!myInteretPrincipal.MatPorteService}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>&nbsp;</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- End Div General-Interest-->
+
+            <!-- Start Div GeneralInterestSpace-->
+            <div class="generalInterestSpace">
+            </div>
+            <!-- End Div GeneralInterestSpace-->
+
+            <div class="task">
+                <h2>TACHES</h2>
+                <table style="width:100%">
+                    <thead>
+                        <tr>
+                            <td><span class="label_objet">Objet</span></td>
+                            <td><span class="label_attribue">Attribué à</span></td>
+                            <td><span class="label_echeance">Echéance</span></td>
+                            <td><span class="label_statut">Statut</span></td>
+                            <td><span class="label_priorite">Priorité</span></td>
+                            <td><span class="label_rappel">Rappel</span></td>
+                            <td><span class="label_desc" style="display: block;white-space: pre;">Description</span></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <apex:repeat value="{!myTachelist}" var="taches">
+                            <tr>
+                                <td><span class="output_objet">{!taches.Objet}</span></td>
+                                <td><span class="label_attribue">{!taches.Attribue}</span></td>
+                                <td style="width:46px"><span class="label_echeance">{!taches.Echeance}</span></td>
+                                <td style="width:25px"><span class="label_statut">{!taches.Statut}</span></td>
+                                <td><span class="label_priorite">{!taches.Priorite}</span></td>
+                                <td style="width:65px"><span class="label_rappel">{!taches.Rappel}</span></td>
+                                <td><span class="label_desc" style="display: block;white-space: pre;">{!taches.Description}</span></td>
+                            </tr>
+                        </apex:repeat>
+                    </tbody>
+                </table>
+            </div>
+            <!-- End Div Task-->
+            <div class="event">
+                <h2>HISTORIQUE DES RDV</h2>
+                <table style="width:100%">
+                    <thead>
+                        <tr>
+                            <td><span class="label_dateRdv">Date du RDV</span></td>
+                            <td><span class="label_type">Type</span></td>
+                            <td><span class="label_statutRdv">Statut</span></td>
+                            <td><span class="label_emplacement">Emplacement</span></td>
+                            <td><span class="label_couple">Couple</span></td>
+                            <td><span class="label_desc" style="display: block;white-space: pre;">Description</span></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <apex:repeat value="{!myRdvlist}" var="RDV">
+                            <tr>
+                                <td style="width:65px"><span class="output_dateRdv">{!RDV.Date}</span></td>
+                                <td><span class="output_type">{!RDV.Type}</span></td>
+                                <td><span class="output_statutRdv">{!RDV.StatutRDV}</span></td>
+                                <td><span class="output_emplacement">{!RDV.Location}</span></td>
+                                <td><span class="output_couple">{!RDV.Couple}</span></td>
+                                <td><span class="label_desc" style="display: block;white-space: pre;">{!RDV.Description}</span></td>
+                            </tr>
+                        </apex:repeat>
+                    </tbody>
+                </table>
+                <!-- Start Div Precision-->
+                <div class="precision">
+                    <span class="label_precisions">Description du dernier RDV :</span><span class="output_precisions">{!Precisions}</span>
+                </div>
+                <!-- End Div Precision-->
+            </div>
+            <!-- End Div Event-->
+        </div>
+        <!-- End Div Container -->
+    </body>
+</apex:page>

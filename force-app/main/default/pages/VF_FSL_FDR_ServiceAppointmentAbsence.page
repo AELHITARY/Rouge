@@ -1,0 +1,390 @@
+<apex:page title="Feuille de route" showHeader="false" sidebar="false" standardStylesheets="false" controller="CTRL_FSL_FDR_ServiceAppointmentAbsence" cache="false" docType="html-5.0">
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <html>
+        <head>
+            <title>Feuille de route</title>
+            
+            <script type = "text/javascript">
+                j$ = jQuery.noConflict();
+
+                /*Vérification des RDV à l'ouverture de la page*/
+                function checkSA()
+                {
+                    var l = document.getElementById("longueur");
+                    var lrdv = document.getElementById("lrdv");
+                    var noSA = document.getElementById("noSA");
+                    
+                    var debut = document.getElementById("debut");
+                    var fin = document.getElementById("fin");
+                    var doubleDate = document.getElementById("doubleDate");
+                    
+                    /*Mise en page de la feuille de route*/
+                    if(debut && fin && debut.innerText === fin.innerText) {
+                        doubleDate.style.display="none";
+                    }
+                }
+                
+                /*Impression*/
+                function savePage()
+                {	
+                    /*
+                    var s = document.getElementById("bSave");
+                    s.style.display="none";
+                    window.print();
+                    */
+                    
+                    var w = window.open();
+                    var html = j$("[id$=block]").html();
+                    var style = j$('style').html()
+                    
+                    j$(w.document.body).html(html);
+                    j$(w.document.head).append('<style type="text/css">'+style+'</style>');
+                    w.print();
+                }
+                   
+            </script>
+        
+            <style type="text/css" media="all">
+                @page 
+                {
+                    size:portrait;
+                    font-family: 'Segoe UI', 'Verdana', sans-serif;
+                    margin-left: 3%;
+                    margin-top: 1%;
+                    margin-right: 3%;
+                    margin-bottom: 1%;
+                    @bottom-right 
+                    {
+                    	content: "Page " counter(page) " / " counter(pages);
+                    }
+                    @top-right 
+                    {
+                    	content: element(header_right);
+                    }
+                    @top-center 
+                    {
+                    	content: element(header_center);
+                    }
+                    @top-left 
+                    {
+                        content: element(header_left);
+                    }
+                }
+                
+                html
+                {
+                	font-family: 'Segoe UI';
+                }
+                
+                .logo 
+                {
+                	display:block;
+                	margin-left:auto;
+                }
+                
+                img 
+                {
+                	float: right;
+                }
+                
+                .title1
+                {
+                	font-size : 20px;
+	                font-weight: bold;
+                }
+                
+                p
+                {
+                    font-size : 0.6em;
+                }
+                
+                table
+                {
+                    border: 1px solid black;
+                    border-collapse: collapse;
+                    table-layout: fixed;
+                    width: 100%;  
+                    margin-bottom : 10px;
+                	font-size : 0.6em;
+                }
+                
+                thead 
+                {
+                    font-weight: bold;
+                    color: #FFFFFF;
+                    margin-bottom: 3px;
+                }
+                
+                td
+                {
+                	vertical-align: top;
+                }
+                
+                .td1
+                {
+                	width:18%;
+                	padding-left: 5px;
+                }
+                .td2
+                {
+                	width:32%;
+                }
+                
+                .info
+                {
+                	font-weight : bold;
+                }
+                .ficheRes 
+                {
+                    page-break-before: always;
+                }
+                
+                .button{
+                    display: inline-block;
+                    font-size: 20px;
+                    tex-align:center;
+                    color:#FFFFFF;
+                    background-color:#0070D2;
+                    border-radius: 13px;
+                    text-decoration : none; 
+                    font-family: 'Segoe UI', 'Verdana', sans-serif;
+                    outline: none;
+                    padding: 10px 20px;
+                	margin-right: 5px;
+                }
+                .button:hover
+                {
+                	background-color:#005FB2;
+                }
+        </style>
+        
+        </head>
+        
+            
+        <div id="bSave" style="display: block; text-align:center;">
+            <apex:form >
+                <apex:outputPanel layout="none">
+                    <input type ="button" value="Précédent" onclick="history.go(-1)" class="button"/>
+                </apex:outputPanel>
+                <apex:commandLink id="save"  value="Imprimer / Enregistrer" onclick="savePage();" styleClass="button" />
+                
+                <!--<apex:commandButton action="{!exportToPDF}" value="Export to PDF" id="ExportPDF" styleClass="button"/>-->
+            </apex:form>
+            
+            <apex:pageBlock id="pbRDV" rendered="{!error == 'AucunRDV'}" >
+                <p>
+                    Il n'y a aucun rendez-vous à afficher.
+                </p>
+            </apex:pageBlock> 
+        </div>   
+        
+        <apex:pageBlock id="block">
+            <body onload="checkSA()">
+            	<apex:repeat value="{!ListServiceResource}" var="key" id="repeat1">
+                	<apex:repeat value="{!mapSrDate[key]}" var="date" id="repeat2">
+                        <div class="ficheRes">
+                            <h4 class="title1">
+                                <img class="logo" src="{!LEFT($CurrentPage.URL,FIND('/',$CurrentPage.URL,9))}/servlet/servlet.FileDownload?file={!LogoKparKId}" width="150" height="60" align="middle"/>
+                                Feuille de route de {!key.Name} <br/>
+                                Du <apex:outputText value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!date}" /></apex:outputText> 
+                            </h4>
+                            
+                            <apex:variable var="count" value="{!0}"/> 
+                            <apex:repeat value="{!mapDateSac[date]}" var="sac" id="repeat3">
+                                <apex:pageBlock rendered="{!sac.assignedResource == key.Id}">
+                                    <apex:pageBlock id="pbRDV" rendered="{!sac.idType == 'SA'}" >
+                                        <apex:variable var="count" value="{!count + 1}"/>
+                                    </apex:pageBlock>
+                                    <apex:pageBlock id="pbABS" rendered="{!sac.idType == 'ABS'}" >
+                                        <apex:variable var="count" value="{!count + 1}"/>
+                                    </apex:pageBlock>
+                                </apex:pageBlock>
+                            </apex:repeat>
+                            
+                            <div id="lrdv" style="display: block;">
+                                <h5 class="title2">
+                                    Détails des rendez-vous : {!count} rendez-vous et indisponibilités.
+                                </h5>
+                                
+                                <apex:repeat value="{!mapDateSac[date]}" var="sac" id="repeat4">
+                                    <apex:pageBlock rendered="{!sac.assignedResource == key.Id}">
+                                        <apex:pageBlock id="pbRDV" rendered="{!sac.idType == 'SA'}" >
+                                            <!-- LISTE DES RDV -->
+                                            <table>
+                                                <thead style="background-color: #C5003D;">
+                                                    <td class="td1">Rendez-vous : </td>
+                                                    <td class="td2">{!sac.saId} </td>
+                                                    <td class="td1">Code :</td>
+                                                    <td class="td2">{!sac.codeGC}</td>
+                                                </thead>
+                                                
+                                                <tr>
+                                                    <td rowspan="2" class="td1">Client : </td>
+                                                    <td rowspan="2" class="td2 info">{!sac.subject}</td>
+                                                    <td class="td1"></td>
+                                                    <td class="td2"></td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Type : </td>
+                                                    <td class="td2">{!sac.typeSa}</td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Adresse :</td>
+                                                    <td class="td2 info">{!sac.adress}</td>
+                                                    <td class="td1">Durée : </td>
+                                                    <td class="td2">{!sac.duration}</td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Code postal : </td>
+                                                    <td colspan="3" class="td2 info">{!sac.postalCode}</td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Ville : </td>
+                                                    <td class="td2 info">{!sac.city}</td>
+                                                    <td class="td1">Début d'arrivée : </td>
+                                                    <td class="td2">
+                                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                            <apex:param value="{!sac.debutArrivee+(2/24)}" /> 
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Contact : </td>
+                                                    <td class="td2">{!sac.homePhone} / {!sac.mobilePhone}</td>
+                                                    <td class="td1">Début du rendez-vous :</td>                       
+                                                    <td class="td2">
+                                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                            <apex:param value="{!sac.schedStart+(2/24)}" /> 
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Statut : </td>
+                                                    <td colspan="3" class="td2">{!sac.status}</td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1"></td>
+                                                    <td class="td2"></td>
+                                                    <td class="td1">Fin d'arrivée :</td>                          
+                                                    <td class="td2">
+                                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                            <apex:param value="{!sac.finArrivee+(2/24)}" /> 
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Chiffre d'affaire : </td>
+                                                    <td class="td2">{!sac.chiffreAffaire} €</td>
+                                                    <td class="td1">Fin du rendez-vous : </td>                           
+                                                    <td class="td2">
+                                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                            <apex:param value="{!sac.schedEnd+(2/24)}" /> 
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr> 
+                                                
+                                                <tr>
+                                                    <td colspan="4" style="background-color: #ffffff; opacity: 0;" class="dateJour" >
+                                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy}" >
+                                                            <apex:param value="{!sac.schedStart+(2/24)}" /> 
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Description : </td>
+                                                    <td colspan="3" class="td2">{!sac.description}</td>
+                                                </tr> 
+                                                
+                                                <tr>
+                                                    <td class="td1">Note de service : </td>
+                                                    <td colspan="3" class="td2">{!sac.serviceNote}</td>
+                                                </tr> 
+                                                
+                                            </table>
+                                        </apex:pageBlock>
+                                        
+                                        <apex:pageBlock id="pbABS" rendered="{!sac.idType == 'ABS'}" >
+                                            <!-- LISTE DES RDV -->
+                                            <table>
+                                                <thead  style="background-color: #0060B4;">
+                                                    <td class="td1">Absence : </td>
+                                                    <td class="td2">{!sac.saId} </td>
+                                                    <td class="td1">Intitulé :</td>
+                                                    <td class="td2">{!sac.codeGC}</td>
+                                                </thead>
+                                                
+                                                <tr>
+                                                    <td class="td1">Adresse :</td>
+                                                    <td class="td2 info">{!sac.adress}</td>
+                                                    <td class="td1">Type : </td>
+                                                    <td class="td2">{!sac.typeSa}</td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Code postal : </td>
+                                                    <td colspan="3" class="td2 info">{!sac.postalCode}</td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1">Ville : </td>
+                                                    <td class="td2 info">{!sac.city}</td>
+                                                    <td class="td1">Début du rendez-vous :</td>                       
+                                                    <td class="td2">
+                                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                            <apex:param value="{!sac.schedStart+(2/24)}" /> 
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td class="td1"></td>
+                                                    <td class="td2"></td>
+                                                    <td class="td1">Fin du rendez-vous : </td>                           
+                                                    <td class="td2">
+                                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                            <apex:param value="{!sac.schedEnd+(2/24)}" /> 
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr> 
+                                                
+                                                <tr>
+                                                    <td class="td1"></td>
+                                                    <td class="td2"></td>
+                                                    <td class="td1">Durée : </td>
+                                                    <td class="td2">{!sac.duration}</td>
+                                                </tr>
+                                                
+                                                
+                                                <tr>
+                                                    <td class="td1">Description : </td>
+                                                    <td colspan="3" class="td2">{!sac.description}</td>
+                                                </tr>
+                                            </table>
+                                        </apex:pageBlock>
+                                    </apex:pageBlock>
+                                </apex:repeat>                                  
+                            </div>
+                            
+                            <div style="font-size:0.5em;">
+                                <apex:outputText value="Créée par {1} {2} le {0, date, dd/MM/yyyy 'à' HH:mm:ss}">
+                                    <apex:param value="{!NOW()+(2/24)}" />
+                                    <apex:param value="{!$User.FirstName}"/>
+                                    <apex:param value="{!$User.LastName}"/>
+                                </apex:outputText>
+                            </div>
+                        </div>
+                    </apex:repeat>
+                </apex:repeat>
+            </body>
+        </apex:pageBlock>
+    </html>
+</apex:page>

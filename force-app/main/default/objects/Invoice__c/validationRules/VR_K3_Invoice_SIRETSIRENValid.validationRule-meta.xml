@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_Invoice_SIRETSIRENValid</fullName>
+    <active>true</active>
+    <description>SIRET et SIREN ne peuvent pas être négatif</description>
+    <errorConditionFormula>$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+$User.ByPassValidationRule__c == false &amp;&amp;
+(
+sellerSIRET__c &lt; 0 ||
+headOfficeSIRET__c &lt; 0 ||
+headOfficeSIREN__c &lt; 0
+) &amp;&amp;
+isLegacy__c == false</errorConditionFormula>
+    <errorMessage>Les numéros SIRET et SIREN ne peuvent pas être négatif!</errorMessage>
+</ValidationRule>

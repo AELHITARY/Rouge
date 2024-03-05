@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Import_QtePorteInterieur</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+$User.ByPassValidationRule__c = false,
+quantitePorteInterieur__c &lt; 0)</errorConditionFormula>
+    <errorDisplayField>quantitePorteInterieur__c</errorDisplayField>
+    <errorMessage>Quantité invalide (doit être supérieure ou égale à 0)!</errorMessage>
+</ValidationRule>

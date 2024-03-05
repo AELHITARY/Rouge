@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FinancingMethod_Active</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <columns>financingType__c</columns>
+    <columns>fundingAgency__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.FinancingMethod</value>
+    </filters>
+    <filters>
+        <field>active__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Mode de financement (Actif)</label>
+    <language>fr</language>
+</ListView>

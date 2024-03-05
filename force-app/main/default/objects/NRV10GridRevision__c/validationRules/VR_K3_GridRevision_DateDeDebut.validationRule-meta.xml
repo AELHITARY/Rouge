@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_GridRevision_DateDeDebut</fullName>
+    <active>true</active>
+    <description>Vérifie que la date de début est renseignée et postérieure ou égale à la date de&apos;ouverture de la grille de rémunération.</description>
+    <errorConditionFormula>AND(!$User.ByPassValidationRule__c, ISBLANK(startDate__c))</errorConditionFormula>
+    <errorDisplayField>startDate__c</errorDisplayField>
+    <errorMessage>La date d&apos;application doit être renseignée.</errorMessage>
+</ValidationRule>

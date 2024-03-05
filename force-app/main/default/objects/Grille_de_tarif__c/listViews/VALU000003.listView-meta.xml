@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VALU000003</fullName>
+    <columns>NAME</columns>
+    <columns>CodeGrilleTarif__c</columns>
+    <columns>Datedapplication__c</columns>
+    <columns>Date_fin_validite__c</columns>
+    <columns>Dimension__c</columns>
+    <columns>Prix1vantail__c</columns>
+    <columns>Prix2vantaux__c</columns>
+    <columns>Prix3vantaux__c</columns>
+    <columns>Prix4vantaux__c</columns>
+    <columns>Prix5vantaux__c</columns>
+    <columns>Prix6vantaux__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>LAST_UPDATE</field>
+        <operation>equals</operation>
+        <value>2/26/2015 12:00 AM</value>
+    </filters>
+    <filters>
+        <field>Date_fin_validite__c</field>
+        <operation>notEqual</operation>
+        <value>2/23/2015</value>
+    </filters>
+    <label>Grilles 24/02/2015</label>
+    <language>fr</language>
+</ListView>

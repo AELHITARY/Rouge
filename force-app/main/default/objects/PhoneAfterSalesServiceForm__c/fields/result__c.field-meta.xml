@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>result__c</fullName>
+    <externalId>false</externalId>
+    <label>Résultat</label>
+    <required>true</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>type__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Appel destiné à un autre service.</fullName>
+                <default>false</default>
+                <label>Appel destiné à un autre service.</label>
+            </value>
+            <value>
+                <fullName>Autres</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Autres</label>
+            </value>
+            <value>
+                <fullName>Bras</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Bras</label>
+            </value>
+            <value>
+                <fullName>Crémone</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Crémone</label>
+            </value>
+            <value>
+                <fullName>Demande d’information</fullName>
+                <default>false</default>
+                <label>Demande d’information</label>
+            </value>
+            <value>
+                <fullName>Fenêtre drapeau</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Fenêtre drapeau</label>
+            </value>
+            <value>
+                <fullName>Fixation</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Fixation</label>
+            </value>
+            <value>
+                <fullName>Infiltration</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Infiltration</label>
+            </value>
+            <value>
+                <fullName>Joints</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Joints</label>
+            </value>
+            <value>
+                <fullName>Modification de rendez-vous</fullName>
+                <default>false</default>
+                <label>Modification de rendez-vous</label>
+            </value>
+            <value>
+                <fullName>Moteur de volet HS</fullName>
+                <default>false</default>
+                <label>Moteur de volet HS</label>
+            </value>
+            <value>
+                <fullName>Moteur HS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Moteur HS</label>
+            </value>
+            <value>
+                <fullName>Pièce cassée</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pièce cassée</label>
+            </value>
+            <value>
+                <fullName>Piles</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Piles</label>
+            </value>
+            <value>
+                <fullName>Problème de joints</fullName>
+                <default>false</default>
+                <label>Problème de joints</label>
+            </value>
+            <value>
+                <fullName>Problème de piles</fullName>
+                <default>false</default>
+                <label>Problème de piles</label>
+            </value>
+            <value>
+                <fullName>Problème d’infiltration</fullName>
+                <default>false</default>
+                <label>Problème d’infiltration</label>
+            </value>
+            <value>
+                <fullName>Problème télécommande</fullName>
+                <default>false</default>
+                <label>Problème télécommande</label>
+            </value>
+            <value>
+                <fullName>Programmation</fullName>
+                <default>false</default>
+                <label>Programmation</label>
+            </value>
+            <value>
+                <fullName>Question sur l’entretien</fullName>
+                <default>false</default>
+                <label>Question sur l’entretien</label>
+            </value>
+            <value>
+                <fullName>Réglage</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Réglage</label>
+            </value>
+            <value>
+                <fullName>Serrure</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Serrure</label>
+            </value>
+            <value>
+                <fullName>Serrure HS</fullName>
+                <default>false</default>
+                <label>Serrure HS</label>
+            </value>
+            <value>
+                <fullName>Télécommande</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Télécommande</label>
+            </value>
+            <value>
+                <fullName>Vitrage cassé</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Vitrage cassé</label>
+            </value>
+            <value>
+                <fullName>Volet solaire HS</fullName>
+                <default>false</default>
+                <label>Volet solaire HS</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Résolu</controllingFieldValue>
+            <valueName>Problème de piles</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Résolu</controllingFieldValue>
+            <valueName>Problème télécommande</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Résolu</controllingFieldValue>
+            <valueName>Programmation</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Résolu</controllingFieldValue>
+            <valueName>Question sur l’entretien</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Non résolu</controllingFieldValue>
+            <valueName>Moteur de volet HS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Non résolu</controllingFieldValue>
+            <valueName>Problème de joints</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Non résolu</controllingFieldValue>
+            <valueName>Problème d’infiltration</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Non résolu</controllingFieldValue>
+            <valueName>Serrure HS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Non résolu</controllingFieldValue>
+            <valueName>Volet solaire HS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Autre</controllingFieldValue>
+            <valueName>Appel destiné à un autre service.</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Autre</controllingFieldValue>
+            <valueName>Demande d’information</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Autre</controllingFieldValue>
+            <valueName>Modification de rendez-vous</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

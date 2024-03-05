@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_RefundAmount</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+(RecordType.DeveloperName = &apos;Refund&apos; ||
+RecordType.DeveloperName = &apos;CheckRequest&apos;) &amp;&amp;
+isLegacy__c == false &amp;&amp;
+isPositiveCheckRequest__c == false &amp;&amp;
+amount__c &gt;= 0</errorConditionFormula>
+    <errorDisplayField>amount__c</errorDisplayField>
+    <errorMessage>Montant invalide (doit être strictement inférieur à 0)!</errorMessage>
+</ValidationRule>

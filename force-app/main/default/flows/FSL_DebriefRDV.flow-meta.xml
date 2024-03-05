@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <choices>
+        <name>Aucun</name>
+        <choiceText>Aucun</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>AUCUN</stringValue>
+        </value>
+    </choices>
+    <description>debriefing des rendez-vous</description>
+    <dynamicChoiceSets>
+        <name>fsl_documentsFournis</name>
+        <dataType>Multipicklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_documentsFournis__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_IncidentsProduits</name>
+        <dataType>Multipicklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_incidentsProduits__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_IncidentsTravaux</name>
+        <dataType>Multipicklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_incidentsTravaux__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_modeReglement</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_modeReglement__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_ProduitsConcernes</name>
+        <dataType>Multipicklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_produitsConcernes__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_ReservesChantier</name>
+        <dataType>Multipicklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_reservesChantier__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_ReservesProduits</name>
+        <dataType>Multipicklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_reservesProduits__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_ReservesTravaux</name>
+        <dataType>Multipicklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_reservesTravaux__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_ResponsabilitesChantier</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_responsabiliteChantier__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_ResponsabilitesProduits</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_responsabiliteProduits__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>fsl_ResponsabilitesTravaux</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>fsl_responsabiliteTravaux__c</picklistField>
+        <picklistObject>ServiceAppointment</picklistObject>
+    </dynamicChoiceSets>
+    <formulas>
+        <description>Durée exprimée en Minutes</description>
+        <name>DureeProchaineInterventionenMinutes</name>
+        <dataType>Number</dataType>
+        <expression>{!DureeProchainRdv} * 60</expression>
+        <scale>0</scale>
+    </formulas>
+    <interviewLabel>FSL_DebriefRDV {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>FSL_DebriefRDV</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>FieldServiceMobile</processType>
+    <recordUpdates>
+        <name>UpdateServiceAppointment</name>
+        <label>UpdateServiceAppointment</label>
+        <locationX>404</locationX>
+        <locationY>467</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>fsl_autorisationFinancement__c</field>
+            <value>
+                <elementReference>BonPaiement</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_coutsProchainRDV__c</field>
+            <value>
+                <elementReference>CoutsProchainRdv</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_dateDebriefing__c</field>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_documentsFournis__c</field>
+            <value>
+                <elementReference>DocumentsFournis</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_dureeProchainRDV__c</field>
+            <value>
+                <elementReference>DureeProchaineInterventionenMinutes</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_incidentsProduits__c</field>
+            <value>
+                <elementReference>IncidentsProduits</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_incidentsTravaux__c</field>
+            <value>
+                <elementReference>IncidentsTravaux</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_modeReglement__c</field>
+            <value>
+                <elementReference>ModeReglement</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_montantRecu__c</field>
+            <value>
+                <elementReference>MontantRecu</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_nbIntervenantProchainRDV__c</field>
+            <value>
+                <elementReference>NbIntervenants</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_preparationMagasinier__c</field>
+            <value>
+                <elementReference>PreparationMagasinier</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_produitsConcernes__c</field>
+            <value>
+                <elementReference>ProduitsConcernes</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_recommandationsChantier__c</field>
+            <value>
+                <elementReference>RecommandationsChantier</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_reservesChantier__c</field>
+            <value>
+                <elementReference>ReservesChantier</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_reservesProduits__c</field>
+            <value>
+                <elementReference>ReservesProduits</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_reservesTravaux__c</field>
+            <value>
+                <elementReference>ReservesTravaux</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_responsabiliteChantier__c</field>
+            <value>
+                <elementReference>ResponsabilitesChantier</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_responsabiliteProduits__c</field>
+            <value>
+                <elementReference>ResponsabilitesProduits</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_responsabiliteTravaux__c</field>
+            <value>
+                <elementReference>ResponsabilitesTravaux</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_retoursReservesClient__c</field>
+            <value>
+                <elementReference>RetoursClient</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_retoursReservesKparK__c</field>
+            <value>
+                <elementReference>RetoursKparK</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>fsl_signatureClient__c</field>
+            <value>
+                <elementReference>SignatureClient</elementReference>
+            </value>
+        </inputAssignments>
+        <object>ServiceAppointment</object>
+    </recordUpdates>
+    <screens>
+        <name>DonneesAdministratives</name>
+        <label>Données administratives</label>
+        <locationX>404</locationX>
+        <locationY>61</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <connector>
+            <targetReference>ReservesResponsabilites</targetReference>
+        </connector>
+        <fields>
+            <name>MontantRecu</name>
+            <dataType>Currency</dataType>
+            <fieldText>Montant reçu (à saisir si le montant &gt; 0)</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+            <scale>3</scale>
+        </fields>
+        <fields>
+            <name>ModeReglement</name>
+            <choiceReferences>fsl_modeReglement</choiceReferences>
+            <choiceReferences>Aucun</choiceReferences>
+            <dataType>String</dataType>
+            <defaultSelectedChoiceReference>Aucun</defaultSelectedChoiceReference>
+            <fieldText>Mode de réglement (obligatoire si le montant est saisi)</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>BonPaiement</name>
+            <dataType>Boolean</dataType>
+            <fieldText>Bon pour paiement</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>SignatureClient</name>
+            <dataType>Boolean</dataType>
+            <fieldText>Signature client</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>ProchaineIntervention</name>
+        <label>Prochaine intervention</label>
+        <locationX>400</locationX>
+        <locationY>358</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <connector>
+            <targetReference>UpdateServiceAppointment</targetReference>
+        </connector>
+        <fields>
+            <name>DureeProchainRdv</name>
+            <dataType>Number</dataType>
+            <fieldText>Durée prochaine intervention (en H)</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+            <scale>0</scale>
+        </fields>
+        <fields>
+            <name>NbIntervenants</name>
+            <dataType>Number</dataType>
+            <fieldText>Nombre d&apos;intervenants</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+            <scale>0</scale>
+        </fields>
+        <fields>
+            <name>CoutsProchainRdv</name>
+            <dataType>Number</dataType>
+            <fieldText>Coûts prochain rendez-vous</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+            <scale>0</scale>
+        </fields>
+        <pausedText>Le rendez-vous est débriefé avec succès!</pausedText>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>ReservesResponsabilites</name>
+        <label>Réserves / Responsabilités</label>
+        <locationX>401</locationX>
+        <locationY>168</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <connector>
+            <targetReference>Retours</targetReference>
+        </connector>
+        <fields>
+            <name>ReservesChantier</name>
+            <choiceReferences>fsl_ReservesChantier</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Réserves Chantier (ECI, SVI)</fieldText>
+            <fieldType>MultiSelectPicklist</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>ResponsabilitesChantier</name>
+            <choiceReferences>fsl_ResponsabilitesChantier</choiceReferences>
+            <choiceReferences>Aucun</choiceReferences>
+            <dataType>String</dataType>
+            <defaultSelectedChoiceReference>Aucun</defaultSelectedChoiceReference>
+            <fieldText>Responsabilités Chantier</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>IncidentsProduits</name>
+            <choiceReferences>fsl_IncidentsProduits</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Incidents Produits (DIAG)</fieldText>
+            <fieldType>MultiSelectPicklist</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>ReservesProduits</name>
+            <choiceReferences>fsl_ReservesProduits</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Réserves Produits (ECI, SVI)</fieldText>
+            <fieldType>MultiSelectPicklist</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>ResponsabilitesProduits</name>
+            <choiceReferences>fsl_ResponsabilitesProduits</choiceReferences>
+            <choiceReferences>Aucun</choiceReferences>
+            <dataType>String</dataType>
+            <defaultSelectedChoiceReference>Aucun</defaultSelectedChoiceReference>
+            <fieldText>Responsabilités Produits</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>IncidentsTravaux</name>
+            <choiceReferences>fsl_IncidentsTravaux</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Incidents Travaux (DIAG)</fieldText>
+            <fieldType>MultiSelectPicklist</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>ReservesTravaux</name>
+            <choiceReferences>fsl_ReservesTravaux</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Réserves Travaux (ECI, SVI)</fieldText>
+            <fieldType>MultiSelectPicklist</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>ResponsabilitesTravaux</name>
+            <choiceReferences>fsl_ResponsabilitesTravaux</choiceReferences>
+            <choiceReferences>Aucun</choiceReferences>
+            <dataType>String</dataType>
+            <defaultSelectedChoiceReference>Aucun</defaultSelectedChoiceReference>
+            <fieldText>Responsabilités Travaux</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <isRequired>true</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Retours</name>
+        <label>Retours</label>
+        <locationX>400</locationX>
+        <locationY>265</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <connector>
+            <targetReference>ProchaineIntervention</targetReference>
+        </connector>
+        <fields>
+            <name>RetoursClient</name>
+            <fieldText>Retours Client</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>RetoursKparK</name>
+            <fieldText>Retours KparK</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>RecommandationsChantier</name>
+            <fieldText>Recommandations Chantier</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>DocumentsFournis</name>
+            <choiceReferences>fsl_documentsFournis</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Documents fournis</fieldText>
+            <fieldType>MultiSelectPicklist</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>ProduitsConcernes</name>
+            <choiceReferences>fsl_ProduitsConcernes</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Produits concernés</fieldText>
+            <fieldType>MultiSelectPicklist</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>PreparationMagasinier</name>
+            <fieldText>Préparation Magasinier</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <startElementReference>DonneesAdministratives</startElementReference>
+    <status>Active</status>
+    <variables>
+        <name>fileIDs</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>fileNames</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>Id</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

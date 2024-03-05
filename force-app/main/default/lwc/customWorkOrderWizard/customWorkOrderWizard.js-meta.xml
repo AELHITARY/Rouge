@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="CustomWorkOrderWizard">
+    <apiVersion>57.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Assistant RDV Service</masterLabel>
+    <description>Assistant personnalisé pour planifier les RDV de service (Controle, installation, SAV, etc...)</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>Order</object>
+                <object>Chantier__c</object>
+                <object>AfterSalesService__c</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

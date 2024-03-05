@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>sponsorshipDiscount__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Permet d&apos;identifier une promotion de type Parrainage pour le processus de sélection des promotions</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Cocher si la promotion est spécifique à une promotion parrainage.
+Indique qu&apos;elle sera appliquée une seule fois sur un devis.</inlineHelpText>
+    <label>Parrainage</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

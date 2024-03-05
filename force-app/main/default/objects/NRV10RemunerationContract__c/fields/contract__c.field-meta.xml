@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>contract__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Contrat collaborateur</label>
+    <referenceTo>CollaboratorContract__c</referenceTo>
+    <relationshipLabel>Contrats de rémunération (Contrat collaborateur)</relationshipLabel>
+    <relationshipName>Contrats_de_r_mun_ration</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

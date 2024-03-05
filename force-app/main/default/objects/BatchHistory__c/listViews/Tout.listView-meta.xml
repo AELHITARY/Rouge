@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tout</fullName>
+    <columns>NAME</columns>
+    <columns>nomDuBatch__c</columns>
+    <columns>dateLancementStart__c</columns>
+    <columns>dateFinStart__c</columns>
+    <columns>dateLancementExecute__c</columns>
+    <columns>dateFinExecute__c</columns>
+    <columns>statut__c</columns>
+    <columns>nombreATraiter__c</columns>
+    <columns>nombreTraite__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Tout</label>
+    <language>fr</language>
+</ListView>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GDPR_dernierEssai__c</fullName>
+    <description>Date/Heure de dernier essai de la suppression (avec échec de cet enregistrement)</description>
+    <externalId>false</externalId>
+    <label>Date dernier essai (GDPR)</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

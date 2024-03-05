@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_Iris</fullName>
+    <active>true</active>
+    <description>Sectorisation obligatoire afin de garantir une adresse en France.
+Exception :
+- les administrateurs
+- le marketing
+- interfaces d&apos;import/export 
+- les géocodages batch car l&apos;iris et la secto ne sont pas connus immédiatment</description>
+    <errorConditionFormula>AND(
+   $User.ByPassValidationRule__c == FALSE,
+   !ISPICKVAL(methodeGeocodage__c, &apos;BATCH&apos;),
+   $Profile.Name != &apos;Administrateur système&apos;,
+   $Profile.Name != &apos;K/K - Marketing&apos;,
+   $Profile.Name != &apos;K/K - Import Lead&apos;,
+   $Profile.Name != &apos;K/K - Interface&apos;,
+   $Profile.Name != &apos;K/K - Affiliation&apos;,
+   ISNULL(sectorisation__c)
+)</errorConditionFormula>
+    <errorDisplayField>iris__c</errorDisplayField>
+    <errorMessage>Sectorisation du chantier obligatoire ou non trouvée !</errorMessage>
+</ValidationRule>

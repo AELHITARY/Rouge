@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>methodePrixParent__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+NOT(ISBLANK( productOption__c)),
+TEXT(productOption__r.SBQQ__ConfiguredSKU__r.MethodePrixOption__c), 
+&quot;&quot;
+)</formula>
+    <label>Méthode prix parent</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <decisions>
+        <name>Check_Quote_Type</name>
+        <label>Check Quote Type</label>
+        <locationX>314</locationX>
+        <locationY>323</locationY>
+        <defaultConnectorLabel>Other</defaultConnectorLabel>
+        <rules>
+            <name>Quote_Not_Signea</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>CheckQuoteNotSignea</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>NotSigneaCloneOpp</targetReference>
+            </connector>
+            <label>Quote Not Signea</label>
+        </rules>
+        <rules>
+            <name>Quote_Signea</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>CheckQuoteSignea</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>SigneaSoldQuote</targetReference>
+            </connector>
+            <label>Quote Signea</label>
+        </rules>
+    </decisions>
+    <description>Devis CPQ - Flow permettant d&apos;exécuter les processus de création de la commande client lors de la vente d&apos;un devis CPQ avenant</description>
+    <formulas>
+        <name>CheckQuoteNotSignea</name>
+        <dataType>Boolean</dataType>
+        <expression>ISCHANGED( {!$Record.dateAcceptationClient__c} ) &amp;&amp; 
+NOT(ISBLANK( {!$Record.dateAcceptationClient__c} )) &amp;&amp;
+NOT(ISPICKVAL( PRIORVALUE( {!$Record.SBQQ__Status__c} ), &quot;Vendu&quot; )) &amp;&amp;
+{!$Record.SBQQ__Primary__c} == false &amp;&amp; 
+ISBLANK( {!$Record.circuitSignatureContrat__c} )</expression>
+    </formulas>
+    <formulas>
+        <name>CheckQuoteSignea</name>
+        <dataType>Boolean</dataType>
+        <expression>ISCHANGED( {!$Record.amendmentOpportunityCreated__c} ) &amp;&amp;
+{!$Record.amendmentOpportunityCreated__c} &amp;&amp;
+NOT(ISBLANK( {!$Record.circuitSignatureContrat__c} ))</expression>
+    </formulas>
+    <interviewLabel>Devis CPQ - After Trigger - {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Devis CPQ - After Trigger - Vente devis avenant</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>188</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Quote_Type</targetReference>
+        </connector>
+        <object>SBQQ__Quote__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <name>NotSigneaCloneOpp</name>
+        <label>Clonage projet</label>
+        <locationX>50</locationX>
+        <locationY>431</locationY>
+        <connector>
+            <targetReference>NotSigneaQuoteSold</targetReference>
+        </connector>
+        <flowName>Devis_CPQ_Avenant_Vendu_Clonage_projet</flowName>
+        <inputAssignments>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <name>NotSigneaQuoteSold</name>
+        <label>MAJ Statut &amp; Suppr projet</label>
+        <locationX>50</locationX>
+        <locationY>539</locationY>
+        <flowName>Devis_CPQ_Avenant_Vendu_MAJ_Statut</flowName>
+        <inputAssignments>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <name>SigneaSoldQuote</name>
+        <label>MAJ Statut &amp; Suppr projet</label>
+        <locationX>314</locationX>
+        <locationY>431</locationY>
+        <flowName>Devis_CPQ_Avenant_Vendu_MAJ_Statut</flowName>
+        <inputAssignments>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+</Flow>

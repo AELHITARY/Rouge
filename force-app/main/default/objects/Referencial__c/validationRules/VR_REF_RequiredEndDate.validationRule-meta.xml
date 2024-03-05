@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_RequiredEndDate</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;PublicHoliday&apos; &amp;&amp;
+(ISNULL(endDate__c) || endDate__c = null)</errorConditionFormula>
+    <errorDisplayField>endDate__c</errorDisplayField>
+    <errorMessage>Date de fin de validité obligatoire!</errorMessage>
+</ValidationRule>

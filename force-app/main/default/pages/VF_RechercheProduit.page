@@ -1,0 +1,946 @@
+<apex:page title="Recherche par produits" id="RechercheProduit" sidebar="false" showHeader="true" controller="Ctrl_RechercheProduit" docType="html-5.0" action="{!insertUserStats}">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/custom-theme/jquery-ui-1.12.1.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'css/cartographie.css')}" />
+
+    <apex:includeScript value="https://maps.googleapis.com/maps/api/js?key={!googleMapsSettings.Cle_API__c}&libraries=places" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui.1.12.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet-control-geocoder/Control.Geocoder.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'js/cartographie.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.Cartographie, 'js/autocompletion_places.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'classes/dqe.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'jquery.dqe.js')}" />
+    <apex:remoteobjects >
+        <apex:remoteobjectmodel name="Product2" fields="Id,Name,ProductCode,IsActive" />
+        <apex:remoteobjectmodel name="ReferentielOptions__c" fields="Id,Name,CodeOption__c" />
+    </apex:remoteobjects>
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+
+        var componentForm; 
+        var formFields;
+        var entityName = '';
+        var entityObject;
+        var autocompletionType = '{!autocompletionType}';
+
+        j$ = jQuery.noConflict();
+        j$(document).ready(function(){
+            // Evite le rechargement de la page lors de l'appuie sur Entree sur le champ de recherche
+            j$('.search_place').keypress(function(e) {
+                if (e.which == 13) {
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+
+            // DQE Software - Address
+            if(autocompletionType == 'dqe'){
+                dqe.license_name = "{!licenceDQE}";
+                options = {
+                    //country : 'FRA',
+                    country : '[id$=id_country]',
+                    zip     : '[id$=id_zip]',
+                    city    : '[id$=id_city]',
+                    street  : '[id$=id_street]',
+                    geoloc  : "callback_geoloc"
+                };
+                var dqeForm = $('#id_form').dqe(options);
+
+                if(j$('[id$=id_street]').val() != '') {
+                    dqeForm.on('city', function(ui, data) {
+                        dqeForm.trigger('geoloc');
+                    });
+                }
+            }
+            // Autocompletion Google
+            // Nom et type de valeur a récupérer dans l'adresse lors du retour de Google Place
+            else if(autocompletionType == 'google'){
+                // ID des champs definis dans le formulaire pour l'adresse
+                formFields = ['adresse_rue', 'locality', 'administrative_area_level_1', 'country', 'postal_code'];
+
+                // Nom et type de valeur a recuperer dans l'adresse lors du retour de Google Place
+                componentForm = {
+                    sublocality: 'long_name',
+                    street_number: 'short_name',
+                    route: 'long_name',
+                    locality: 'long_name',
+                    administrative_area_level_1: 'long_name',
+                    country: 'long_name',
+                    postal_code: 'short_name'
+                };
+                // Initialise le champ de recherche d'adresse (auto-completion)
+                initializeAutoCompletion('autocomplete', formFields);
+                activeAutoCompletionWithLocalisation(componentForm, formFields, 'adresse_latitude', 'adresse_longitude');
+            }
+
+            // Recherche info du compte si champ non vide
+            if(j$('[id$=prospect_lkid]')[0] != null) 
+                getInfoCompte();
+
+            // Bouton de recherche
+            j$('[id$=recherche]').on("click",function(e) {
+                if(!validationField()) {
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+
+            // Active le bouton et affiche le popup de demande de géolocalisation (seulement mobile)
+            if(navigator.geolocation) {
+                browserSupportFlag = true;
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    // Le navigateur peut géolocaliser la position, popup
+                    if(isMobile() && j$("[id$=adresse_rue]").val() == '')
+                        j$("[id$=modal-geolocalisation]").modal('show');
+                }, function(error) {
+                    // L'utilisateur n'a pas donne la permision, on désactive le bouton
+                    if(error.code) {
+                        if(error.PERMISSION_DENIED) {
+                            // Cache le bouton de géolocalisation
+                            browserSupportFlag = false;
+                            j$("#container-geoloc").removeClass("input-group");
+                            j$("#container-buttons-geoloc").addClass("hidden");
+                        }
+                    }
+                });
+            } else {
+                // Cache le bouton de géolocalisation
+                browserSupportFlag = false;
+                j$("#container-geoloc").removeClass("input-group");
+                j$("#container-buttons-geoloc").addClass("hidden");
+            }
+
+            var productField = j$("[id$=produit1]");
+            if(productField.val() && productField.val() != '') {
+                getProductInformation(productField.val(), '{!productSample}', 'prd1');
+            }
+            var productField2 = j$("[id$=produit2]");
+            if(productField2.val() && productField2.val() != '') {
+                getProductInformation(productField2.val(), '{!productSample2}', 'prd2');
+            }
+            var productField3 = j$("[id$=produit3]");
+            if(productField3.val() && productField3.val() != '') {
+                getProductInformation(productField3.val(), '{!productSample3}', 'prd3');
+            }
+            var optionField11 = j$("[id$=option11]");
+            if(optionField11.val() && optionField11.val() != '') {
+                getOptionInformation(optionField11.val(), '{!optionSample11}', 'opt11');
+            }
+            var optionField12 = j$("[id$=option12]");
+            if(optionField12.val() && optionField12.val() != '') {
+                getOptionInformation(optionField12.val(), '{!optionSample12}', 'opt12');
+            }
+            var optionField13 = j$("[id$=option13]");
+            if(optionField13.val() && optionField13.val() != '') {
+                getOptionInformation(optionField13.val(), '{!optionSample13}', 'opt13');
+            }
+            var optionField21 = j$("[id$=option21]");
+            if(optionField21.val() && optionField21.val() != '') {
+                getOptionInformation(optionField21.val(), '{!optionSample21}', 'opt21');
+            }
+            var optionField22 = j$("[id$=option22]");
+            if(optionField22.val() && optionField22.val() != '') {
+                getOptionInformation(optionField22.val(), '{!optionSample22}', 'opt22');
+            }
+            var optionField23 = j$("[id$=option23]");
+            if(optionField23.val() && optionField23.val() != '') {
+                getOptionInformation(optionField23.val(), '{!optionSample23}', 'opt23');
+            }
+            var optionField31 = j$("[id$=option31]");
+            if(optionField31.val() && optionField31.val() != '') {
+                getOptionInformation(optionField31.val(), '{!optionSample31}', 'opt31');
+            }
+            var optionField32 = j$("[id$=option32]");
+            if(optionField32.val() && optionField32.val() != '') {
+                getOptionInformation(optionField32.val(), '{!optionSample32}', 'opt32');
+            }
+            var optionField33 = j$("[id$=option33]");
+            if(optionField33.val() && optionField33.val() != '') {
+                getOptionInformation(optionField33.val(), '{!optionSample33}', 'opt33');
+            }
+            // Active product autocomplete field
+            activeAutoCompleteField('prd1');
+            activeAutoCompleteField('prd2');
+            activeAutoCompleteField('prd3');
+            activeAutoCompleteField('opt11');
+            activeAutoCompleteField('opt12');
+            activeAutoCompleteField('opt13');
+            activeAutoCompleteField('opt21');
+            activeAutoCompleteField('opt22');
+            activeAutoCompleteField('opt23');
+            activeAutoCompleteField('opt31');
+            activeAutoCompleteField('opt32');
+            activeAutoCompleteField('opt33');
+        });
+
+        /* Fonction de récupération de la position et affichage sur la carte  */
+        /*--------------------------------------------------------------------*/
+        function callback_geoloc(data) {
+            // Modification champs cachés
+            j$('[id$=adresse_latitude]').val(data.Latitude);
+            j$('[id$=adresse_longitude]').val(data.Longitude);
+        }
+
+
+        /* Fonction qui alimente les champs adresses à partir d'un prospect */
+        /*------------------------------------------------------------------*/
+        function getInfoCompte(){
+            var prospect;
+
+            // récupération des valeurs entrées
+            if(j$("[id$=prospect_lkid]")[0] != null)
+                prospect = j$("[id$=prospect_lkid]").val();
+            else{
+                alert ("Prospect client non valide.");
+                return;
+            }
+            j$("[id$=autocomplete]").val("");
+
+            if(prospect != "") {
+                // Call APEX function
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_RechercheProduit.recupereCompte}', prospect,
+                    function(result, event) {
+                        if (event.status) {
+                            if(result.length > 0) {
+                                console.log('result[0] : '+result[0]);
+                                console.log('Latitude : '+result[0].Localisation__Latitude__s);
+                                console.log('Longitude : '+result[0].Localisation__Longitude__s);
+                                // Récupération du compte
+                                if(autocompletionType == 'dqe'){
+                                    if(result[0].pays__c != "") 
+                                        j$("[id$=id_country]").val(PAYS_VALEUR_MAP[result[0].pays__c.toUpperCase()]);
+                                    j$("[id$=id_street]").val(result[0].rue__c);
+                                    j$("[id$=id_city]").val(result[0].ville__c);
+                                    j$("[id$=id_zip]").val(result[0].codePostal__c);
+                                    // active les champs
+                                    j$('[id$=id_street]').prop('disabled', false);
+                                    j$('[id$=id_city]').prop('disabled', false);
+                                    j$('[id$=id_zip]').prop('disabled', false);
+                                }
+                                else if(autocompletionType == 'google'){
+                                    j$("[id$=adresse_rue]").val(result[0].rue__c);
+                                    j$("[id$=locality]").val(result[0].ville__c);
+                                    j$("[id$=postal_code]").val(result[0].codePostal__c);
+                                    j$("[id$=autocomplete]").val(result[0].rue__c + ', ' + result[0].codePostal__c + ' ' + result[0].ville__c );
+                                    // active les champs
+                                    j$('[id$=adresse_rue]').prop('disabled', false);
+                                    j$('[id$=locality]').prop('disabled', false);
+                                    j$('[id$=postal_code]').prop('disabled', false);
+                                }
+
+                                j$("[id$=adresse_latitude]").val(result[0].Localisation__Latitude__s);
+                                j$("[id$=adresse_longitude]").val(result[0].Localisation__Longitude__s);
+                            }
+                        } else if (event.type === 'exception') {
+                            alert(event.message);
+                        } else {
+                            alert(event.message);
+                        }
+                    },
+                    {escape: true}
+                );
+            } else {
+                if(autocompletionType == 'dqe'){
+                    // active les champs
+                    j$('[id$=id_street]').prop('disabled', false);
+                    j$('[id$=id_city]').prop('disabled', false);
+                    j$('[id$=id_zip]').prop('disabled', false);
+                    // Récupération du compte
+                    j$('[id$=id_street]').val("");
+                    j$('[id$=id_city]').val("");
+                    j$('[id$=id_zip]').val("");
+                    // désactive les champs
+                    j$('[id$=id_street]').prop('disabled', true);
+                    j$('[id$=id_city]').prop('disabled', true);
+                    j$('[id$=id_zip]').prop('disabled', true);
+                }
+                else if(autocompletionType == 'google'){
+                    // active les champs
+                    j$('[id$=adresse_rue]').prop('disabled', false);
+                    j$('[id$=locality]').prop('disabled', false);
+                    j$('[id$=postal_code]').prop('disabled', false);
+                    // Récupération du compte
+                    j$('[id$=adresse_rue]').val("");
+                    j$('[id$=locality]').val("");
+                    j$('[id$=postal_code]').val("");
+                    j$('[id$=adresse_latitude]').val("");
+                    j$('[id$=adresse_longitude]').val("");
+                    // désactive les champs
+                    j$('[id$=adresse_rue]').prop('disabled', true);
+                    j$('[id$=locality]').prop('disabled', true);
+                    j$('[id$=postal_code]').prop('disabled', true);
+                }
+                j$('[id$=adresse_latitude]').val("");
+                j$('[id$=adresse_longitude]').val("");
+            }
+        }
+
+        /* Fonction validation des champs du formulaire  */
+        /*-----------------------------------------------*/
+        function validationField(){
+            var adresse_rue, postal_code, locality;
+            if(autocompletionType == 'dqe'){
+                var country = j$('[id$=id_country]').val();
+                adresse_rue = j$('[id$=id_street]').val();
+                postal_code = j$('[id$=id_zip]').val();
+                locality = j$('[id$=id_city]').val();
+                j$('[id$=id_country]').val(country);
+                j$('[id$=id_street]').val(adresse_rue);
+                j$('[id$=rue]').val(adresse_rue);
+                j$('[id$=id_zip]').val(postal_code);
+                j$('[id$=id_city]').val(locality);
+            }
+            else if(autocompletionType == 'google'){
+                adresse_rue = j$('[id$=adresse_rue]').val();
+                postal_code = j$('[id$=postal_code]').val();
+                locality = j$('[id$=locality]').val();
+                j$('[id$=adresse_rue]').val(adresse_rue);
+                j$('[id$=rue]').val(adresse_rue);
+                j$('[id$=codePostal]').val(postal_code);
+                j$('[id$=ville]').val(locality);
+            }
+
+            console.log('adresse_rue : '+adresse_rue);
+            console.log('postal_code : '+postal_code);
+            console.log('locality : '+locality);
+
+            var produit1 = j$('[id$=prdId1]').val();
+            var produit2 = j$('[id$=prdId2]').val();
+            var produit3 = j$('[id$=prdId3]').val();
+            var perimetre = j$('[id$=perimetre]').val();
+            j$('[id$=peri]').val(perimetre);
+            j$('[id$=prd1]').val(produit1);
+            j$('[id$=prd2]').val(produit2);
+            j$('[id$=prd3]').val(produit3);
+
+            j$('[id$=opt11]').val(j$('[id$=optId11]').val());
+            j$('[id$=opt12]').val(j$('[id$=optId12]').val());
+            j$('[id$=opt13]').val(j$('[id$=optId13]').val());
+            j$('[id$=opt21]').val(j$('[id$=optId21]').val());
+            j$('[id$=opt22]').val(j$('[id$=optId22]').val());
+            j$('[id$=opt23]').val(j$('[id$=optId23]').val());
+            j$('[id$=opt31]').val(j$('[id$=optId31]').val());
+            j$('[id$=opt32]').val(j$('[id$=optId32]').val());
+            j$('[id$=opt33]').val(j$('[id$=optId33]').val());
+
+            if(j$('[id$=prospect]').val() != "") {
+                var prospectId = j$('[id$=prospect_lkid]').val();
+                j$('[id$=client]').val(prospectId);
+            }
+
+            return true;
+        }
+
+        /* Fonction de récupération de la localisation de l'utilisateur  */
+        /*---------------------------------------------------------------*/
+        function getPosition() {
+            // Active la géolocation si le navigateur le permet
+            if(browserSupportFlag) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latlng = L.latLng(parseFloat(position.coords.latitude), parseFloat(position.coords.longitude));
+
+                    // GOOGLE
+                    if('{!autocompletionType}' == "google") {
+                        // Géocodage de l'adresse pour maj des champs
+                        var geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({'location': latlng}, function(results, status) {
+                            if (status == google.maps.GeocoderStatus.OK) {
+                              if (results[0]) {
+                                j$("[id$=autocomplete]").val(results[0].formatted_address);
+                                fillInAddressWithLocalisation('{!autocompletionType}', results[0], componentForm, formFields, 'adresse_latitude', 'adresse_longitude');
+                              }
+                            } else {
+                              alert("{!JSENCODE($Label.GEOCODING_ERROR)} : " + status);
+                            }
+                        });
+                    // DQE
+                    } else if('{!autocompletionType}' == "dqe") {
+                        // Géocodage de l'adresse pour maj des champs
+                        codeAdress(latlng.lat+" "+latlng.lng, function(result) {
+                            if(result && result.length != 0) {
+                                var address = result[0];
+                                // Nom et type de valeur a récupérer dans l'adresse lors du retour du geocodeur
+                                componentForm = {
+                                    house_number: 'house_number',
+                                    road: 'id_street',
+                                    city: 'id_city',
+                                    village: 'id_city',
+                                    town: 'id_city',
+                                    country: 'id_country',
+                                    postal_code: 'id_zip',
+                                    postcode: 'id_zip'
+                                };
+                                // ID des champs définis dans le formulaire pour l'adresse
+                                formFields = ['id_street', 'id_city', 'id_country', 'id_zip'];
+                                // Mise à jour des champs adresse
+                                fillInAddressWithLocalisation('{!autocompletionType}',address, componentForm, formFields, 'adresse_latitude', 'adresse_longitude');
+                                // Trigger DQE
+                                //j$("[id$=id_city]").trigger('change');
+                            } else {
+                                alert(labels.UNABLE_GET_POSITION);
+                            }
+                        });
+                    }
+                }, function(error) {
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            alert("Vous n'avez pas autorisé l'accès à votre position");
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            alert("Votre position n'a pas pu être déterminée");
+                            break;
+                        case error.TIMEOUT:
+                            alert("Le service de géolocalisation n'a pas répondu à temps");
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            alert("Erreur de géolocalisation inconnue");
+                            break;
+                    }
+                });
+            }
+        }
+
+        /* Get product informations                                                     */
+        /*------------------------------------------------------------------------------*/
+        function getProductInformation(entityName, entityId, fieldId) {
+            // SOQL on product2 object
+            var object = new SObjectModel.Product2();
+            object.retrieve(
+                { where: {
+                    or:
+                        {Name: {eq: entityName.replace(/'/g,"\\'")},
+                        Id: {eq: entityId}
+                    }
+                  }
+                },
+                function(err, records) {
+                    if (err) console.log('Erreur sur la recherche de produit/option');
+                    else {
+                        if(records.length != 0) {
+                            entityObject = records[0];
+                                setEntityInformations(fieldId);
+                        }
+                        else {
+                            entityObject = null;
+                        }
+                    }
+                }
+            );
+        }
+        
+        /* Get option informations                                                     */
+        /*------------------------------------------------------------------------------*/
+        function getOptionInformation(entityName, entityId, fieldId) {
+            // SOQL on option__c object
+            var object = new SObjectModel.ReferentielOptions__c();
+            object.retrieve(
+                { where: {
+                    or:
+                        {CodeOption__c: {eq: entityName.replace(/'/g,"\\'")},
+                        Id: {eq: entityId}
+                    }
+                  }
+                },
+                function(err, records) {
+                    if (err) console.log('Erreur sur la recherche de produit/option');
+                    else {
+                        if(records.length != 0) {
+                            entityObject = records[0];
+                                setEntityInformations(fieldId);
+                        }
+                        else {
+                            entityObject = null;
+                        }
+                    }
+                }
+            );
+        }
+        /* Init and active autocomplete field                                           */
+        /*------------------------------------------------------------------------------*/
+        function activeAutoCompleteField(fieldId) {
+            var targetField;
+            if(fieldId == 'prd1') 
+                targetField = $("[id$=produit1]");
+            if(fieldId == 'prd2') 
+                targetField = $("[id$=produit2]");
+            if(fieldId == 'prd3') 
+                targetField = $("[id$=produit3]");
+            if(fieldId == 'opt11') 
+                targetField = $("[id$=option11]");
+            if(fieldId == 'opt12') 
+                targetField = $("[id$=option12]");
+            if(fieldId == 'opt13') 
+                targetField = $("[id$=option13]");
+            if(fieldId == 'opt21') 
+                targetField = $("[id$=option21]");
+            if(fieldId == 'opt22') 
+                targetField = $("[id$=option22]");
+            if(fieldId == 'opt23') 
+                targetField = $("[id$=option23]");
+            if(fieldId == 'opt31') 
+                targetField = $("[id$=option31]");
+            if(fieldId == 'opt32') 
+                targetField = $("[id$=option32]");
+            if(fieldId == 'opt33') 
+                targetField = $("[id$=option33]");
+            // Check if instance exist, else init
+            if(typeof targetField.autocomplete('instance') === "undefined") {
+                targetField.autocomplete({
+                    minLength: 2,
+                    focus: function( event, ui ) {
+                        entityObject = ui.item;
+                        if(fieldId.indexOf('prd') != -1) 
+                            targetField.val(unescape(entityObject.get("Name")) );
+                        else if(fieldId.indexOf('opt') != -1) 
+                            targetField.val(unescape(entityObject.get("CodeOption__c")) );
+                        setEntityInformations(fieldId);
+                        return false;
+                    },
+                    select: function( event, ui ) {
+                        entityObject = ui.item;
+                        if(fieldId.indexOf('prd') != -1) 
+                            targetField.val(unescape(entityObject.get("Name")) );
+                        else if(fieldId.indexOf('opt') != -1)
+                            targetField.val(unescape(entityObject.get("CodeOption__c")) );
+                        setEntityInformations(fieldId);
+                        return false;
+                    },
+                    change: function(event, ui) {
+                    },
+                    source: function(request, response) {
+                        queryTerm = request.term;
+                        var object;
+                        if(fieldId.indexOf('prd') != -1) {
+                            object = new SObjectModel.Product2();
+                            // SOQL on product2 object
+                            object.retrieve(
+                                { where: {
+                                    Name: {like: "%"+queryTerm.replace(/'/g,"\\'")+"%"}
+                                    }
+                                },
+                                function(err, records) {
+                                    if (err) console.log('Erreur sur la recherche de produit');
+                                    else response(records);
+                                }
+                            );
+                        }
+                        else if(fieldId.indexOf('opt') != -1){
+                            object = new SObjectModel.ReferentielOptions__c();
+                            // SOQL on product2 object
+                            object.retrieve(
+                                { where: {
+                                    CodeOption__c: {like: "%"+queryTerm.replace(/'/g,"\\'")+"%"}
+                                    }
+                                },
+                                function(err, records) {
+                                    if (err) console.log('Erreur sur la recherche de produit/option');
+                                    else response(records);
+                                }
+                            );
+                        }
+                    },
+                })
+                .data( 'ui-autocomplete' )._renderItem = function( ul, item ) {
+                    var entry;
+                    if(fieldId.indexOf('prd') != -1) 
+                        entry = '<a>' + unescape(item.get("Name")) + '</a>';
+                    else if(fieldId.indexOf('opt') != -1) 
+                        entry = '<a>' + unescape(item.get("CodeOption__c")) + '</a>';
+                    var position = entry.search(new RegExp($.ui.autocomplete.escapeRegex(queryTerm), "i")); // Search
+                    var replaceTerm = entry.substring(position, position+queryTerm.length); //get term for replace
+                    entry = entry.replace(new RegExp($.ui.autocomplete.escapeRegex(queryTerm), "ig"), "<b>"+replaceTerm+"</b>");
+                    return $( '<li></li>' )
+                            .data( 'ui-autocomplete-item', item )
+                            .append( entry )
+                            .appendTo( ul );
+                };
+            }
+        }
+
+        /* Set product fields on the page (Lookup, Family/BU, Symptom)                  */
+        /*------------------------------------------------------------------------------*/
+        function setEntityInformations(fieldId) {
+            if(entityObject) {
+                entityName = unescape(entityObject.get("Name"));
+                // Lookup field
+                updateHiddenFields(fieldId, entityObject.get("Id"));
+            }
+        }
+
+        /* EVENT - ON CHANGE - Treatment when the value change                          */
+        /*------------------------------------------------------------------------------*/
+        function eventOnChangeField(field, fieldId) {
+            //if(field.value.trim() != entityName) {
+                if(field.value.trim() == '') {
+                    // Clear all the product fields
+                    updateHiddenFields(fieldId, '');
+                } else {
+                    // Get product
+                    if(fieldId.indexOf('prd') != -1) 
+                        getProductInformation(field.value.trim(), '', fieldId);
+                    else if(fieldId.indexOf('opt') != -1) 
+                        getOptionInformation(field.value.trim(), '', fieldId);
+                }
+            //}
+        }
+
+        /* Fonction pour mettre à jour les champs cachés  */
+        /*------------------------------------------------*/
+        function updateHiddenFields(fieldId, valueId) {
+            if(fieldId == 'prd1') 
+                j$("[id$=prdId1]").val(valueId);
+            if(fieldId == 'prd2') 
+                j$("[id$=prdId2]").val(valueId);
+            if(fieldId == 'prd3') 
+                j$("[id$=prdId3]").val(valueId);
+            if(fieldId == 'opt11') 
+                j$("[id$=optId11]").val(valueId);
+            if(fieldId == 'opt12') 
+                j$("[id$=optId12]").val(valueId);
+            if(fieldId == 'opt13') 
+                j$("[id$=optId13]").val(valueId);
+            if(fieldId == 'opt21') 
+                j$("[id$=optId21]").val(valueId);
+            if(fieldId == 'opt22') 
+                j$("[id$=optId22]").val(valueId);
+            if(fieldId == 'opt23') 
+                j$("[id$=optId23]").val(valueId);
+            if(fieldId == 'opt31') 
+                j$("[id$=optId31]").val(valueId);
+            if(fieldId == 'opt32') 
+                j$("[id$=optId32]").val(valueId);
+            if(fieldId == 'opt33') 
+                j$("[id$=optId33]").val(valueId);
+        }
+
+        /* Fonction pour déclencher un event sur un objet */
+        /*------------------------------------------------*/
+        function eventFire(el, etype) {
+            if (el.fireEvent) {
+                el.fireEvent('on' + etype);
+            }
+            else {
+                var evObj = document.createEvent('Events');
+                evObj.initEvent(etype, true, false);
+                el.dispatchEvent(evObj);
+            }
+        }
+
+        /* Check if the browser agent in Mobile                                         */
+        /*------------------------------------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                    || navigator.userAgent.match(/webOS/i)
+                    || navigator.userAgent.match(/iPhone/i)
+                    || navigator.userAgent.match(/iPad/i)
+                // || navigator.userAgent.match(/iPod/i)
+                    || navigator.userAgent.match(/BlackBerry/i)
+                    || navigator.userAgent.match(/Windows Phone/i)
+                    || ((typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one) )
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    </script>
+    <style>
+        .lookupInput input{
+            width:90%;
+            padding:5px 10px;
+            font-size:12px;
+            line-height:1.5;
+            border-radius:3px;
+            color: #555555;
+            background-color: #ffffff;
+            border:1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing:border-box;
+            transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+    </style>
+
+    <c:importvisualstrap theme="default" />
+    <c:visualstrapblock >
+        <center>
+            <c:pageheader title="Recherche par produits" icon="search" subtitle="{!$User.FirstName} {!$User.LastName}"/>
+        </center>
+        <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+            <div role="alert" class="col-md-12 col-sm-12 col-xs-12 alert {!IF(message.SeverityStr=='confirm','alert-success',IF(message.SeverityStr=='info',
+                        'alert-info',IF(message.SeverityStr=='warn','alert-warning','alert-danger')))}">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <apex:outputtext value="{!message.Message}" escape="false" />
+            </div>
+        </apex:repeat>
+        <div class="col-md-12 col-sm-12 col-xs-12 col-lg-12">
+            <c:panel title="Critères de recherche" type="primary">
+                <apex:form id="AdresseLocation">
+                <apex:actionFunction name="refreshAdresse" reRender="country,codePostal,rue,ville" />
+                    <div id="id_form">
+                        <c:panel title="Adresse">
+                            <c:formblock alignment="horizontal">
+                                <div class="form-group">
+                                    <!-- DQE -->
+                                    <apex:outputpanel rendered="{!autocompletionType == 'dqe'}" layout="none">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="autocomplete" style="text-align: left">Pays</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <apex:selectlist label="Pays" size="1" styleclass="form-control input-sm" id="id_country" value="{!country}" multiselect="false">
+                                                <apex:selectoptions value="{!paysList}" />
+                                            </apex:selectlist>
+                                        </div>
+                                    </apex:outputpanel>
+                                    <!-- GOOGLE -->
+                                    <apex:outputPanel rendered="{!autocompletionType == 'google'}" layout="none">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="autocomplete" style="text-align: left">Adresse complète</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div id="container-geoloc" class="input-group">
+                                                <apex:input label="Adresse complète" id="autocomplete" type="text" styleClass="form-control input-sm search_place" html-autocomplete="false"/>
+                                                <span id="container-buttons-geoloc" class="input-group-btn">
+                                                <button class="btn btn-default btn-sm" type="button" onClick="getPosition();"><span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span></button>
+                                              </span>
+                                          </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                    <div class="col-md-1">
+                                        <label class="control-label">Prospect / client</label>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <apex:inputField label="Prospect / client" value="{!unChantier.proprietaire__c}" id="prospect" onchange="getInfoCompte();"/>
+                                    </div>
+                                </div>
+                            </c:formblock>
+                            <c:formblock alignment="horizontal">
+                                <div class="form-group">
+                                    <!-- DQE -->
+                                    <apex:outputpanel rendered="{!autocompletionType == 'dqe'}" layout="none">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="id_zip">Code postal</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <apex:input label="Code postal" id="id_zip" value="{!cp}" styleClass="form-control input-sm"  onChange="refreshAdresse()" />
+                                        </div>
+                                    </apex:outputpanel>
+                                    <!-- GOOGLE -->
+                                    <apex:outputpanel rendered="{!autocompletionType == 'google'}" layout="none">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="adresse_rue">Rue</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <apex:input label="Rue" id="adresse_rue" value="{!rue}" styleClass="form-control input-sm"/>
+                                        </div>
+                                    </apex:outputpanel>
+                                    <div class="col-md-1">
+                                        <label class="control-label" for="perimetre">Périmètre (mètre)</label>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <apex:inputText id="perimetre" label="Périmètre (mètre)" value="{!perimetre}" styleClass="form-control input-sm"/>
+                                    </div>
+                                </div>
+                            </c:formblock>
+                            <c:formblock alignment="horizontal">
+                                <div class="form-group">
+                                    <!-- DQE -->
+                                    <apex:outputpanel rendered="{!autocompletionType == 'dqe'}" layout="none">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="id_city">Ville</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <apex:input label="Code postal" id="id_city" value="{!ville}" styleClass="form-control input-sm" onChange="refreshAdresse()"/>
+                                        </div>
+                                    </apex:outputpanel>
+                                    <!-- GOOGLE -->
+                                    <apex:outputpanel rendered="{!autocompletionType == 'google'}" layout="none">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="postal_code">Code postal</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <apex:input label="Code postal" id="postal_code" value="{!cp}" styleClass="form-control input-sm" />
+                                        </div>
+                                    </apex:outputpanel>
+                                    <!-- DQE -->
+                                    <apex:outputpanel rendered="{!autocompletionType == 'dqe'}" layout="none">
+                                        <div class="col-md-6">
+                                            <button class="btn btn-default btn-sm" type="button" onClick="getPosition();">
+                                                <span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span>
+                                                 Me localiser
+                                            </button>
+                                        </div>
+                                    </apex:outputpanel>
+                                    <!-- GOOGLE -->
+                                    <apex:outputpanel rendered="{!autocompletionType == 'google'}" layout="none">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="locality">Ville</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <apex:input label="Code postal" id="locality" value="{!ville}" styleClass="form-control input-sm" />
+                                        </div>
+                                    </apex:outputpanel>
+                                </div>
+                            </c:formblock>
+                            <!-- DQE -->
+                            <apex:outputpanel rendered="{!autocompletionType == 'dqe'}" layout="none">
+                                <c:formblock alignment="horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-1">
+                                            <label class="control-label" for="id_street">Rue</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <apex:input label="Code postal" id="id_street" value="{!rue}" styleClass="form-control input-sm"  onChange="refreshAdresse()"/>
+                                        </div>
+                                        <div class="col-md-1">
+                                        </div>
+                                        <div class="col-md-5">
+                                        </div>
+                                    </div>
+                                </c:formblock>
+                            </apex:outputpanel>
+                        </c:panel>
+                    </div>
+                </apex:form>
+                <apex:form id="Produits">
+                    <c:panel title="Produits">
+                        <c:formblock alignment="horizontal">
+                            <div class="form-group">
+                                <div class="col-md-1">
+                                    <label class="control-label" for="Produit1">Produit 1</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!productCode1}" id="produit1" styleclass="form-control input-sm" html-placeholder="Code Produit" type="search" onchange="eventOnChangeField(this, 'prd1');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option11">Option 1</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode11}" id="option11" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt11');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option12">Option 2</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode12}" id="option12" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt12');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option13">Option 3</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode13}" id="option13" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt13');" />
+                                </div>
+                            </div>
+                        </c:formblock>
+                        <c:formblock alignment="horizontal">
+                            <div class="form-group">
+                                <div class="col-md-1">
+                                    <label class="control-label" for="Produit2">Produit 2</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!productCode2}" id="produit2" styleclass="form-control input-sm" html-placeholder="Code Produit" type="search" onchange="eventOnChangeField(this, 'prd2');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option21">Option 1</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode21}" id="option21" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt21');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option22">Option 2</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode22}" id="option22" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt22');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option23">Option 3</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode23}" id="option23" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt23');" />
+                                </div>
+                            </div>
+                        </c:formblock>
+                        <c:formblock alignment="horizontal">
+                            <div class="form-group">
+                                <div class="col-md-1">
+                                    <label class="control-label" for="Produit3">Produit 3</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!productCode3}" id="produit3" styleclass="form-control input-sm" html-placeholder="Code Produit" type="search" onchange="eventOnChangeField(this, 'prd3');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option31">Option 1</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode31}" id="option31" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt31');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option32">Option 3</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode32}" id="option32" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt32');" />
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="control-label" for="option33">Option 3</label>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:input value="{!optionCode33}" id="option33" styleclass="form-control input-sm" html-placeholder="Code Option" type="search" onchange="eventOnChangeField(this, 'opt33');" />
+                                </div>
+                            </div>
+                        </c:formblock>
+                    </c:panel>
+                    <div class="text-center">
+                        <apex:commandButton value="Rechercher" styleClass="btn btn-primary" id="recherche" action="{!resultatProduit}"/>
+                    </div>
+    
+                    <apex:inputHidden id="administrative_area_level_1" value="{!departement}"/>
+                    <apex:inputHidden id="country" value="{!pays}"/>
+                    <apex:inputHidden value="{!adresse_latitude}" id="adresse_latitude"/>
+                    <apex:inputHidden value="{!adresse_longitude}" id="adresse_longitude"/>
+                    <apex:inputHidden value="{!unChantier.proprietaire__c}" id="client"/>
+                    <apex:inputHidden value="{!perimetre}" id="peri"/>
+                    <apex:inputHidden value="{!rue}" id="rue"/>
+                    <apex:inputHidden value="{!cp}" id="codePostal"/>
+                    <apex:inputHidden value="{!ville}" id="ville"/>
+                    <apex:inputHidden value="{!prd1}" id="prd1"/>
+                    <apex:inputHidden value="{!prd2}" id="prd2"/>
+                    <apex:inputHidden value="{!prd3}" id="prd3"/>
+                    <apex:inputHidden value="{!opt11}" id="opt11"/>
+                    <apex:inputHidden value="{!opt12}" id="opt12"/>
+                    <apex:inputHidden value="{!opt13}" id="opt13"/>
+                    <apex:inputHidden value="{!opt21}" id="opt21"/>
+                    <apex:inputHidden value="{!opt22}" id="opt22"/>
+                    <apex:inputHidden value="{!opt23}" id="opt23"/>
+                    <apex:inputHidden value="{!opt31}" id="opt31"/>
+                    <apex:inputHidden value="{!opt32}" id="opt32"/>
+                    <apex:inputHidden value="{!opt33}" id="opt33"/>
+                    <apex:inputHidden value="{!displayProductId1}" id="prdId1"/>
+                    <apex:inputHidden value="{!displayProductId2}" id="prdId2"/>
+                    <apex:inputHidden value="{!displayProductId3}" id="prdId3"/>
+                    <apex:inputHidden value="{!displayOptionId11}" id="optId11"/>
+                    <apex:inputHidden value="{!displayOptionId12}" id="optId12"/>
+                    <apex:inputHidden value="{!displayOptionId13}" id="optId13"/>
+                    <apex:inputHidden value="{!displayOptionId21}" id="optId21"/>
+                    <apex:inputHidden value="{!displayOptionId22}" id="optId22"/>
+                    <apex:inputHidden value="{!displayOptionId23}" id="optId23"/>
+                    <apex:inputHidden value="{!displayOptionId31}" id="optId31"/>
+                    <apex:inputHidden value="{!displayOptionId32}" id="optId32"/>
+                    <apex:inputHidden value="{!displayOptionId33}" id="optId33"/>
+                </apex:form>
+            </c:panel>
+        </div>
+
+        <!-- POPUP MODAL-->
+        <c:modal title="Géolocalisation" id="modal-geolocalisation">
+            <p>Souhaitez vous effectuer une géolocalisation de votre position ?</p>
+            <apex:outputPanel layout="block" styleClass="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Non</button>
+                <button type="button" class="btn btn-success" onclick="getPosition(); return false;" data-dismiss="modal">Oui</button>
+            </apex:outputPanel>
+        </c:modal>
+    </c:visualstrapblock>
+</apex:page>

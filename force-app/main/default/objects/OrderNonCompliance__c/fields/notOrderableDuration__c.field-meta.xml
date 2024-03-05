@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>notOrderableDuration__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(closeDate__c &gt; customerOrder__r.controlDateForm__c &amp;&amp; closeDate__c &lt;= customerOrder__r.transmissionDate__c,duration__c,0)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>[#] Durée non-commandable</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

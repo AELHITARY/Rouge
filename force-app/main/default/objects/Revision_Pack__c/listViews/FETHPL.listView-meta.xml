@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FETHPL</fullName>
+    <columns>NAME</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeProduit__c</field>
+        <operation>equals</operation>
+        <value>FETHPL</value>
+    </filters>
+    <label>FETHPL</label>
+    <language>fr</language>
+    <sharedTo>
+        <role>ContrleurdExploitation</role>
+        <role>ContrleurdeGestion</role>
+        <role>Marketing</role>
+        <role>Supportutilisateur</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Coefficients_de_d_cote_DECOTE_2016</fullName>
+    <columns>gridRevision__c</columns>
+    <columns>NAME</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <columns>ratingDifference__c</columns>
+    <columns>discountCoefficient__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>NRV10RemunerationRate__c.discountCommission</value>
+    </filters>
+    <filters>
+        <field>gridRevision__c</field>
+        <operation>startsWith</operation>
+        <value>DECOTE-DEC_2016</value>
+    </filters>
+    <label>Coéfficients de décote DEC_2016</label>
+</ListView>

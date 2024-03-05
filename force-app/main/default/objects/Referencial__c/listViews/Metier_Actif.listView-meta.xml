@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Metier_Actif</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <columns>jobHierarchy__c</columns>
+    <columns>SFDCLevel__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.Job</value>
+    </filters>
+    <filters>
+        <field>active__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Métier (Actif)</label>
+    <language>fr</language>
+</ListView>

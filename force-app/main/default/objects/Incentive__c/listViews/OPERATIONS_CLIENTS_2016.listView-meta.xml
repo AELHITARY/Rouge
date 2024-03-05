@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPERATIONS_CLIENTS_2016</fullName>
+    <columns>NAME</columns>
+    <columns>DebutValidite__c</columns>
+    <columns>FinValidite__c</columns>
+    <columns>LibelleOperation__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeIncentive__c</field>
+        <operation>startsWith</operation>
+        <value>2016OPCL</value>
+    </filters>
+    <label>OPERATIONS CLIENTS 2016</label>
+    <language>fr</language>
+</ListView>

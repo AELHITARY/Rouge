@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>codeGarantie__c</fullName>
+    <externalId>false</externalId>
+    <label>Code Garantie</label>
+    <referenceTo>Garantie__c</referenceTo>
+    <relationshipLabel>Durées des garanties options</relationshipLabel>
+    <relationshipName>DureeGarantiesOptions</relationshipName>
+    <relationshipOrder>1</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

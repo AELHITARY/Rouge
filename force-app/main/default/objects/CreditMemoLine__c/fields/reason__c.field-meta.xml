@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>reason__c</fullName>
+    <externalId>false</externalId>
+    <label>Motif d&apos;avoir</label>
+    <required>true</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Annulation facture</fullName>
+                <default>false</default>
+                <label>Annulation facture</label>
+            </value>
+            <value>
+                <fullName>Avoir commercial</fullName>
+                <default>false</default>
+                <label>Avoir commercial</label>
+            </value>
+            <value>
+                <fullName>Avoir technique</fullName>
+                <default>false</default>
+                <label>Avoir technique</label>
+            </value>
+            <value>
+                <fullName>Défaut KparK</fullName>
+                <default>false</default>
+                <label>Défaut KparK</label>
+            </value>
+            <value>
+                <fullName>Défaut usine</fullName>
+                <default>false</default>
+                <label>Défaut usine</label>
+            </value>
+            <value>
+                <fullName>Erreur Métrage</fullName>
+                <default>false</default>
+                <label>Erreur Métrage</label>
+            </value>
+            <value>
+                <fullName>Modification contrat</fullName>
+                <default>false</default>
+                <label>Modification contrat</label>
+            </value>
+            <value>
+                <fullName>Motif Administratif</fullName>
+                <default>false</default>
+                <label>Motif Administratif</label>
+            </value>
+            <value>
+                <fullName>Prestation non-conforme</fullName>
+                <default>false</default>
+                <label>Prestation non-conforme</label>
+            </value>
+            <value>
+                <fullName>Protocole avec avoir</fullName>
+                <default>false</default>
+                <label>Protocole avec avoir</label>
+            </value>
+            <value>
+                <fullName>Retard livraison</fullName>
+                <default>false</default>
+                <label>Retard livraison</label>
+            </value>
+            <value>
+                <fullName>Retard installation KparK</fullName>
+                <default>false</default>
+                <label>Retard installation KparK</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

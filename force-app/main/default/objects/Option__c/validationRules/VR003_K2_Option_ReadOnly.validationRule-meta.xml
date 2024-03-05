@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR003_K2_Option_ReadOnly</fullName>
+    <active>true</active>
+    <description>Devis en lecture seule dès que le statut a atteint une phase finale (Vendu en attente d&apos;enregistrement, Vendu enregistré, Vendu incontournable, Résilié)</description>
+    <errorConditionFormula>AND(
+$User.ByPassValidationRule__c = False,
+$Profile.Name != &apos;Administrateur système&apos;,
+$UserRole.Name != &apos;Support utilisateur&apos;,
+OR(
+ISPICKVAL(ligneDevis__r.Quote.Status, &apos;Vendu en attente d\&apos;enregistrement&apos;),
+ISPICKVAL(ligneDevis__r.Quote.Status, &apos;Vendu enregistré&apos;),
+ISPICKVAL(ligneDevis__r.Quote.Status, &apos;Vendu incontournable&apos;),
+ISPICKVAL(ligneDevis__r.Quote.Status, &apos;Résilié&apos;))
+)</errorConditionFormula>
+    <errorMessage>Modification des options des lignes du devis impossible car devis en lecture seule (Etat final du devis atteint)!</errorMessage>
+</ValidationRule>

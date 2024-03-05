@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_Unmutable</fullName>
+    <active>true</active>
+    <description>Pièce comptable non modifiable!
+Remplace et annule les 2 VR:VR_K3_AccountingPiece_CannotEdit et VR_K3_AccountingPiece_CantUpdate</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+
+/* Pièce déjà comptabilisée ou annulée */
+(ISPICKVAL(status__c, &quot;Comptabilisé&quot;) || ISPICKVAL(status__c, &quot;Annulé&quot;)) &amp;&amp;
+(ISPICKVAL(PRIORVALUE(status__c), &quot;Comptabilisé&quot;) || ISPICKVAL(PRIORVALUE(status__c), &quot;Annulé&quot;)) &amp;&amp; 
+
+/* Détection des valeurs modifiées */
+OR(ISCHANGED(RecordTypeId),
+   ISCHANGED(inputEntity__c),
+   ISCHANGED(orderEntity__c),
+   ISCHANGED(account__c),
+   ISCHANGED(order__c),
+   ISCHANGED(invoice__c),
+   ISCHANGED(creditMemo__c),
+   ISCHANGED(cancelledPiece__c),
+   ISCHANGED(refundReason__c),
+   ISCHANGED(entityBankAccount__c),
+   ISCHANGED(pieceDate__c),
+   ISCHANGED(dueDate__c),
+   ISCHANGED(accountingDate__c),
+   ISCHANGED(amount__c),
+   ISCHANGED(paymentMethod__c),
+   ISCHANGED(externalBank__c),
+   ISCHANGED(externalReference__c),
+   ISCHANGED(parent__c)
+)</errorConditionFormula>
+    <errorMessage>Pièce comptable non modifiable!</errorMessage>
+</ValidationRule>

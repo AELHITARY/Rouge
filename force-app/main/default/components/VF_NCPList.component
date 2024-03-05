@@ -1,0 +1,47 @@
+<apex:component controller="Ctrl_caseTemplt" access="global">
+    <apex:attribute name="caseFId" type="Id" description="Id of the Case" assignTo="{!caseId}"/>
+    <!--<apex:attribute name="showTable" type="Boolean" description="Show table if value"/>-->
+    <div style="display:none;">{!ncps}</div>
+    <apex:outputPanel rendered="{!showTable}">
+        <apex:repeat value="{!cases}" var="o">
+            Éléments de refacturation (en date du <apex:outputText value=" {0,date,dd/MM/yyyy}" >
+                                                    <apex:param value="{!o.demandedDate__c}" />
+                                                </apex:outputText>) :<br/><br/>
+        </apex:repeat>
+        <table border = "1" cellspacing = "0">
+            <tr style="background-color:#C0C0C0">        
+                <td style="width:105px">Type</td>
+                <td style="width:28px">Qte</td>  
+                <td style="width:60px">Unité</td>    
+                <td style="width:100px">Mnt demandé</td> 
+                <td>Description</td>      
+            </tr>
+            <apex:repeat value="{!ncps}" var="o">
+                <tr> 
+                    <td><b>{!o.type__c}</b></td>
+                    <td style="text-align: right"><b>{!o.quantity__c}</b></td> 
+                    <td style="text-align: right"><b>{!o.unit__c}</b></td> 
+                    <td style="text-align: right"><b>
+                        <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                            <apex:param value="{!o.demandedAmount__c}" />
+                        </apex:outputText>
+                    </b></td>   
+                    <td><b><apex:outputText escape="false" value="{!o.description__c}" /></b></td>  
+                </tr>
+            </apex:repeat>
+            <apex:repeat value="{!cases}" var="o">
+                <tr>
+                    <td style="text-align: right">{!o.providerReInvoiceItemCount__c}</td>
+                    <td></td> 
+                    <td></td> 
+                    <td style="text-align: right">                    
+                        <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                            <apex:param value="{!o.demandedAmount__c}" />
+                        </apex:outputText>
+                    </td>   
+                    <td></td> 
+                </tr>
+            </apex:repeat>
+        </table><br/><br/>
+    </apex:outputPanel>
+</apex:component>

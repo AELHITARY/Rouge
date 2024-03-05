@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>signea_circuit_acces__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Permet de donner l&apos;accès à un profil pour qu&apos;il puisse lancer un circuit via la page Signea</description>
+    <externalId>false</externalId>
+    <label>Signea : Accès à la création de circuit</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

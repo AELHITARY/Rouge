@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>nbArgumentations__c</fullName>
+    <description>Nombre de comptes argumentés, c’est-à-dire pour lesquels il y a eu une argumentation</description>
+    <externalId>false</externalId>
+    <label>Nombre d’argumentations</label>
+    <summaryFilterItems>
+        <field>PhoningVendeur__c.argumentationEffectuee__c</field>
+        <operation>equals</operation>
+        <value>TRUE</value>
+    </summaryFilterItems>
+    <summaryForeignKey>PhoningVendeur__c.liste__c</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Prix1vantail__c</fullName>
+    <description>Prix pour 1 vantail
+GC_grprixdim.gri_px1vt</description>
+    <externalId>false</externalId>
+    <label>Prix 1 vantail</label>
+    <precision>9</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

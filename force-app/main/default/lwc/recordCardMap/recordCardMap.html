@@ -1,0 +1,56 @@
+<template>
+    <lightning-card variant="narrow" title="Carte" icon-name="standard:address">      
+        <!-- BUTTONS -->
+        <div slot="actions">       
+            <template if:true={showForceLocalisationButton}>        
+                <lightning-button-icon icon-name="utility:world" 
+                        variant="border-filled" 
+                        alternative-text="Recalculer la localisation" 
+                        onclick={handleForceLocalisationClick}>
+                </lightning-button-icon>
+            </template>
+            <lightning-button-icon icon-name="utility:refresh" 
+                    class="slds-m-left_xx-small"
+                    variant="border-filled" 
+                    alternative-text="Actualiser la carte" 
+                    onclick={handleRefreshClick}>
+            </lightning-button-icon>
+        </div>
+
+        <!-- BODY -->
+        <div class="container">
+        
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+            
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+                
+            <!-- MAP -->
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto">
+                    <div class="slds-p-left_x-small slds-p-right_x-small">
+                        <c-leaflet-map oninitialized={showLocalisations} map-height={mapHeight}></c-leaflet-map>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+    </lightning-card>
+</template>

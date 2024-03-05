@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>CGI-FSL : Platform Event publié par salesforce pour envoyer les notifications sur Work Order</description>
+    <eventType>StandardVolume</eventType>
+    <label>NotificationWO</label>
+    <pluralLabel>NotificationsWO</pluralLabel>
+    <publishBehavior>PublishImmediately</publishBehavior>
+</CustomObject>

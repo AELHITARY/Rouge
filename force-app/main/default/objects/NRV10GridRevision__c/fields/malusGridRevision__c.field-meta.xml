@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>malusGridRevision__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Grille de révision dédiée au malus.</description>
+    <externalId>false</externalId>
+    <label>Révision du malus de vente</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>NRV10GridRevision__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>malus</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>NRV10GridRevision__c</referenceTo>
+    <relationshipLabel>Révisions de grilles (Révision du bonus de vente)</relationshipLabel>
+    <relationshipName>Revisions_de_grilles</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SHER</fullName>
+    <columns>IDRevision__c</columns>
+    <columns>NAME</columns>
+    <columns>CodeFils__c</columns>
+    <columns>CodePere__c</columns>
+    <columns>FilsAutoselectionnable__c</columns>
+    <columns>FilsSubstituable__c</columns>
+    <columns>Mode_de_Selection__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>LAST_UPDATE</field>
+        <operation>equals</operation>
+        <value>TODAY</value>
+    </filters>
+    <label>Packs récemment modifiés</label>
+    <language>fr</language>
+</ListView>

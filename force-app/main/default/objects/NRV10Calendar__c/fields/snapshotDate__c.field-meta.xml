@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>snapshotDate__c</fullName>
+    <description>Date de cliché provenant de la migration de données -&gt; r10calen.cal_cal_deb
+En fin de période des tests et validation de migration des données, à voir si ce champs est conservé.</description>
+    <externalId>false</externalId>
+    <label>Date de cliché</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

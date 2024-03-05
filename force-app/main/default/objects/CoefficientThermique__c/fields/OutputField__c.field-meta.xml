@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OutputField__c</fullName>
+    <description>Valeur formaté du coefficient thermique pour affichage au client (PDF).
+Utilisé dans la Price Rule Price016Cal</description>
+    <externalId>false</externalId>
+    <formula>IF(
+	CONTAINS(TEXT(Product__r.Family), &quot;Porte&quot;),
+	IF (ValeurCoeff1__c&lt;1, &quot;Ud = 0&quot; &amp;  TEXT(ValeurCoeff1__c) &amp; &quot;W/m2.K&quot; ,&quot;Ud = &quot; &amp;  TEXT(ValeurCoeff1__c) &amp; &quot;W/m2.K&quot;),
+	IF(
+		CONTAINS(TEXT(Product__r.Family) , &quot;Volet&quot;),
+		IF(ValeurCoeff1__c&lt;1,&quot;dR = 0&quot; &amp;  TEXT(ValeurCoeff1__c) ,&quot;dR = &quot; &amp;  TEXT(ValeurCoeff1__c) ),
+		IF (ValeurCoeff1__c&lt;1,&quot;Uw = 0&quot; &amp;  TEXT(ValeurCoeff1__c) &amp; &quot;W/m2.K, Sw = 0&quot; &amp; TEXT(ValeurCoeff2__c) , &quot;Uw = &quot; &amp;  TEXT(ValeurCoeff1__c) &amp; &quot;W/m2.K, Sw = 0&quot; &amp; TEXT(ValeurCoeff2__c) )
+	)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Valeur formatée</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_EntityVersion_ParentRCSNumberRequi</fullName>
+    <active>true</active>
+    <description>Numéro RCS obligatoire pour les entités sans parent</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+ISBLANK( parentEntity__c ) &amp;&amp;
+ISBLANK( RCSNumber__c )</errorConditionFormula>
+    <errorDisplayField>RCSNumber__c</errorDisplayField>
+    <errorMessage>Numéro RCS obligatoire!</errorMessage>
+</ValidationRule>

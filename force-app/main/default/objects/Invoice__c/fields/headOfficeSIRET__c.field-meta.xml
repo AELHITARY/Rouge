@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>headOfficeSIRET__c</fullName>
+    <defaultValue>40137531604330</defaultValue>
+    <externalId>false</externalId>
+    <label>N° SIRET du siège social</label>
+    <precision>14</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Magasins_DR_Est__c</fullName>
+    <externalId>false</externalId>
+    <label>Magasins (DR Est)</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>AIX EN PROVENCE</fullName>
+                <default>false</default>
+                <label>AIX EN PROVENCE</label>
+            </value>
+            <value>
+                <fullName>ALBERTVILLE</fullName>
+                <default>false</default>
+                <label>ALBERTVILLE</label>
+            </value>
+            <value>
+                <fullName>ALES</fullName>
+                <default>false</default>
+                <label>ALES</label>
+            </value>
+            <value>
+                <fullName>ANNECY</fullName>
+                <default>false</default>
+                <label>ANNECY</label>
+            </value>
+            <value>
+                <fullName>ANNEMASSE</fullName>
+                <default>false</default>
+                <label>ANNEMASSE</label>
+            </value>
+            <value>
+                <fullName>ANTIBES</fullName>
+                <default>false</default>
+                <label>ANTIBES</label>
+            </value>
+            <value>
+                <fullName>AUBAGNE</fullName>
+                <default>false</default>
+                <label>AUBAGNE</label>
+            </value>
+            <value>
+                <fullName>AVIGNON</fullName>
+                <default>false</default>
+                <label>AVIGNON</label>
+            </value>
+            <value>
+                <fullName>BEZIERS</fullName>
+                <default>false</default>
+                <label>BEZIERS</label>
+            </value>
+            <value>
+                <fullName>BOURG EN BRESSE</fullName>
+                <default>false</default>
+                <label>BOURG EN BRESSE</label>
+            </value>
+            <value>
+                <fullName>CANNES</fullName>
+                <default>false</default>
+                <label>CANNES</label>
+            </value>
+            <value>
+                <fullName>CHALON SUR SAONE</fullName>
+                <default>false</default>
+                <label>CHALON SUR SAONE</label>
+            </value>
+            <value>
+                <fullName>CHAMBERY</fullName>
+                <default>false</default>
+                <label>CHAMBERY</label>
+            </value>
+            <value>
+                <fullName>DIJON</fullName>
+                <default>false</default>
+                <label>DIJON</label>
+            </value>
+            <value>
+                <fullName>DRAGUIGNAN</fullName>
+                <default>false</default>
+                <label>DRAGUIGNAN</label>
+            </value>
+            <value>
+                <fullName>FREJUS</fullName>
+                <default>false</default>
+                <label>FREJUS</label>
+            </value>
+            <value>
+                <fullName>GRASSE</fullName>
+                <default>false</default>
+                <label>GRASSE</label>
+            </value>
+            <value>
+                <fullName>GRENOBLE</fullName>
+                <default>false</default>
+                <label>GRENOBLE</label>
+            </value>
+            <value>
+                <fullName>HYERES</fullName>
+                <default>false</default>
+                <label>HYERES</label>
+            </value>
+            <value>
+                <fullName>LA TOUR DU PIN</fullName>
+                <default>false</default>
+                <label>LA TOUR DU PIN</label>
+            </value>
+            <value>
+                <fullName>LONS LE SAUNIER</fullName>
+                <default>false</default>
+                <label>LONS LE SAUNIER</label>
+            </value>
+            <value>
+                <fullName>LYON GAILLETON</fullName>
+                <default>false</default>
+                <label>LYON GAILLETON</label>
+            </value>
+            <value>
+                <fullName>LYON JEAN JAURES</fullName>
+                <default>false</default>
+                <label>LYON JEAN JAURES</label>
+            </value>
+            <value>
+                <fullName>LYON MARIETTON</fullName>
+                <default>false</default>
+                <label>LYON MARIETTON</label>
+            </value>
+            <value>
+                <fullName>LYON VITTON</fullName>
+                <default>false</default>
+                <label>LYON VITTON</label>
+            </value>
+            <value>
+                <fullName>MACON</fullName>
+                <default>false</default>
+                <label>MACON</label>
+            </value>
+            <value>
+                <fullName>MANOSQUE</fullName>
+                <default>false</default>
+                <label>MANOSQUE</label>
+            </value>
+            <value>
+                <fullName>MARIGNANE</fullName>
+                <default>false</default>
+                <label>MARIGNANE</label>
+            </value>
+            <value>
+                <fullName>MARSEILLE BAILLE</fullName>
+                <default>false</default>
+                <label>MARSEILLE BAILLE</label>
+            </value>
+            <value>
+                <fullName>MARSEILLE BANON</fullName>
+                <default>false</default>
+                <label>MARSEILLE BANON</label>
+            </value>
+            <value>
+                <fullName>MONTELIMAR</fullName>
+                <default>false</default>
+                <label>MONTELIMAR</label>
+            </value>
+            <value>
+                <fullName>MONTPELLIER SAINT BRES</fullName>
+                <default>false</default>
+                <label>MONTPELLIER SAINT BRES</label>
+            </value>
+            <value>
+                <fullName>NICE DANTE</fullName>
+                <default>false</default>
+                <label>NICE DANTE</label>
+            </value>
+            <value>
+                <fullName>NIMES</fullName>
+                <default>false</default>
+                <label>NIMES</label>
+            </value>
+            <value>
+                <fullName>ORANGE</fullName>
+                <default>false</default>
+                <label>ORANGE</label>
+            </value>
+            <value>
+                <fullName>PERTUIS</fullName>
+                <default>false</default>
+                <label>PERTUIS</label>
+            </value>
+            <value>
+                <fullName>ROANNE</fullName>
+                <default>false</default>
+                <label>ROANNE</label>
+            </value>
+            <value>
+                <fullName>ROMANS SUR ISERE</fullName>
+                <default>false</default>
+                <label>ROMANS SUR ISERE</label>
+            </value>
+            <value>
+                <fullName>SAINT ETIENNE</fullName>
+                <default>false</default>
+                <label>SAINT ETIENNE</label>
+            </value>
+            <value>
+                <fullName>SALON DE PROVENCE</fullName>
+                <default>false</default>
+                <label>SALON DE PROVENCE</label>
+            </value>
+            <value>
+                <fullName>SETE</fullName>
+                <default>false</default>
+                <label>SETE</label>
+            </value>
+            <value>
+                <fullName>TOULON</fullName>
+                <default>false</default>
+                <label>TOULON</label>
+            </value>
+            <value>
+                <fullName>VALENCE</fullName>
+                <default>false</default>
+                <label>VALENCE</label>
+            </value>
+            <value>
+                <fullName>VIENNE</fullName>
+                <default>false</default>
+                <label>VIENNE</label>
+            </value>
+            <value>
+                <fullName>VILLEFRANCHE SUR SAONE</fullName>
+                <default>false</default>
+                <label>VILLEFRANCHE SUR SAONE</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>3</visibleLines>
+</CustomField>

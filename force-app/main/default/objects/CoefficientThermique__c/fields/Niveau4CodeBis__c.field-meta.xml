@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Niveau4CodeBis__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF( ProduitNiveau4__r.OptionDiscriminante__c = TRUE,
+CodeProduitNiveau4__c &amp;&quot;-DISCR&quot;,
+CodeProduitNiveau4__c )</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Niveau 4 Code Bis</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

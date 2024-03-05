@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <decisions>
+        <name>If_ExpirationDate_Today</name>
+        <label>If ExpirationDate &lt; Today</label>
+        <locationX>224</locationX>
+        <locationY>322</locationY>
+        <defaultConnectorLabel>Résultat par défaut</defaultConnectorLabel>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.expirationDate__c</leftValueReference>
+                <operator>LessThan</operator>
+                <rightValue>
+                    <elementReference>$Flow.CurrentDate</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_NCC_Status</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <description>Non-conformité commande - Flux exécuté tous les jours à 1h00 pour expirer les non-conformités de commande si la date d&apos;expiration est échue</description>
+    <interviewLabel>Devis CPQ - Expiration {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>OrderNonCompliance - Batch - Expiration</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <name>Update_NCC_Status</name>
+        <label>Update NCC Status</label>
+        <locationX>420</locationX>
+        <locationY>324</locationY>
+        <inputAssignments>
+            <field>status__c</field>
+            <value>
+                <stringValue>Expiré</stringValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>49</locationX>
+        <locationY>50</locationY>
+        <connector>
+            <targetReference>If_ExpirationDate_Today</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>status__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>En cours</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>expirationDate__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>OrderNonCompliance__c</object>
+        <schedule>
+            <frequency>Daily</frequency>
+            <startDate>2021-07-08</startDate>
+            <startTime>01:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

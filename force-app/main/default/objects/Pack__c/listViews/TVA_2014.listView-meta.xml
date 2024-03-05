@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TVA_2014</fullName>
+    <columns>NAME</columns>
+    <columns>IDPack__c</columns>
+    <columns>IDRevision__c</columns>
+    <columns>CodePere__c</columns>
+    <columns>CodeFils__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>LAST_UPDATE</field>
+        <operation>equals</operation>
+        <value>12/31/2013 12:00 AM</value>
+    </filters>
+    <label>TVA 2014</label>
+    <language>fr</language>
+</ListView>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MODIFS_DL</fullName>
+    <columns>NAME</columns>
+    <columns>codeMagasin__c</columns>
+    <columns>emailMagasin__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>codeMagasin__c</field>
+        <operation>equals</operation>
+        <value>MAG0020</value>
+    </filters>
+    <label>MODIFS DL</label>
+    <language>fr</language>
+</ListView>

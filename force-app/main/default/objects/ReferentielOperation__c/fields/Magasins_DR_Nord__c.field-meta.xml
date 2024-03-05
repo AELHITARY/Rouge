@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Magasins_DR_Nord__c</fullName>
+    <externalId>false</externalId>
+    <label>Magasins (DR Nord)</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>AMIENS</fullName>
+                <default>false</default>
+                <label>AMIENS</label>
+            </value>
+            <value>
+                <fullName>ARPAJON</fullName>
+                <default>false</default>
+                <label>ARPAJON</label>
+            </value>
+            <value>
+                <fullName>ARRAS</fullName>
+                <default>false</default>
+                <label>ARRAS</label>
+            </value>
+            <value>
+                <fullName>ATHIS MONS</fullName>
+                <default>false</default>
+                <label>ATHIS MONS</label>
+            </value>
+            <value>
+                <fullName>AUXERRE</fullName>
+                <default>false</default>
+                <label>AUXERRE</label>
+            </value>
+            <value>
+                <fullName>BEAUVAIS</fullName>
+                <default>false</default>
+                <label>BEAUVAIS</label>
+            </value>
+            <value>
+                <fullName>BETHUNE</fullName>
+                <default>false</default>
+                <label>BETHUNE</label>
+            </value>
+            <value>
+                <fullName>BOULOGNE SUR MER</fullName>
+                <default>false</default>
+                <label>BOULOGNE SUR MER</label>
+            </value>
+            <value>
+                <fullName>BOURG LA REINE</fullName>
+                <default>false</default>
+                <label>BOURG LA REINE</label>
+            </value>
+            <value>
+                <fullName>BRIE COMTE ROBERT</fullName>
+                <default>false</default>
+                <label>BRIE COMTE ROBERT</label>
+            </value>
+            <value>
+                <fullName>CHALONS EN CHAMPAGNE</fullName>
+                <default>false</default>
+                <label>CHALONS EN CHAMPAGNE</label>
+            </value>
+            <value>
+                <fullName>CHAMPIGNY</fullName>
+                <default>false</default>
+                <label>CHAMPIGNY</label>
+            </value>
+            <value>
+                <fullName>CHANTILLY</fullName>
+                <default>false</default>
+                <label>CHANTILLY</label>
+            </value>
+            <value>
+                <fullName>CHARLEVILLE</fullName>
+                <default>false</default>
+                <label>CHARLEVILLE</label>
+            </value>
+            <value>
+                <fullName>CHARTRES</fullName>
+                <default>false</default>
+                <label>CHARTRES</label>
+            </value>
+            <value>
+                <fullName>CHELLES</fullName>
+                <default>false</default>
+                <label>CHELLES</label>
+            </value>
+            <value>
+                <fullName>COMPIEGNE</fullName>
+                <default>false</default>
+                <label>COMPIEGNE</label>
+            </value>
+            <value>
+                <fullName>CRETEIL</fullName>
+                <default>false</default>
+                <label>CRETEIL</label>
+            </value>
+            <value>
+                <fullName>DOUAI</fullName>
+                <default>false</default>
+                <label>DOUAI</label>
+            </value>
+            <value>
+                <fullName>DREUX</fullName>
+                <default>false</default>
+                <label>DREUX</label>
+            </value>
+            <value>
+                <fullName>DUNKERQUE</fullName>
+                <default>false</default>
+                <label>DUNKERQUE</label>
+            </value>
+            <value>
+                <fullName>ECOUEN</fullName>
+                <default>false</default>
+                <label>ECOUEN</label>
+            </value>
+            <value>
+                <fullName>ENGHIEN</fullName>
+                <default>false</default>
+                <label>ENGHIEN</label>
+            </value>
+            <value>
+                <fullName>EPERNAY</fullName>
+                <default>false</default>
+                <label>EPERNAY</label>
+            </value>
+            <value>
+                <fullName>EVREUX</fullName>
+                <default>false</default>
+                <label>EVREUX</label>
+            </value>
+            <value>
+                <fullName>FONTAINEBLEAU</fullName>
+                <default>false</default>
+                <label>FONTAINEBLEAU</label>
+            </value>
+            <value>
+                <fullName>HOUILLES</fullName>
+                <default>false</default>
+                <label>HOUILLES</label>
+            </value>
+            <value>
+                <fullName>JOUARS PONTCHARTRAIN</fullName>
+                <default>false</default>
+                <label>JOUARS PONTCHARTRAIN</label>
+            </value>
+            <value>
+                <fullName>LE BOURGET</fullName>
+                <default>false</default>
+                <label>LE BOURGET</label>
+            </value>
+            <value>
+                <fullName>LE HAVRE</fullName>
+                <default>false</default>
+                <label>LE HAVRE</label>
+            </value>
+            <value>
+                <fullName>LENS</fullName>
+                <default>false</default>
+                <label>LENS</label>
+            </value>
+            <value>
+                <fullName>LE RAINCY</fullName>
+                <default>false</default>
+                <label>LE RAINCY</label>
+            </value>
+            <value>
+                <fullName>LEVALLOIS</fullName>
+                <default>false</default>
+                <label>LEVALLOIS</label>
+            </value>
+            <value>
+                <fullName>LILLE</fullName>
+                <default>false</default>
+                <label>LILLE</label>
+            </value>
+            <value>
+                <fullName>MANTES LA JOLIE</fullName>
+                <default>false</default>
+                <label>MANTES LA JOLIE</label>
+            </value>
+            <value>
+                <fullName>MARCQ EN BAROEUL</fullName>
+                <default>false</default>
+                <label>MARCQ EN BAROEUL</label>
+            </value>
+            <value>
+                <fullName>MAUBEUGE</fullName>
+                <default>false</default>
+                <label>MAUBEUGE</label>
+            </value>
+            <value>
+                <fullName>MEAUX</fullName>
+                <default>false</default>
+                <label>MEAUX</label>
+            </value>
+            <value>
+                <fullName>MELUN</fullName>
+                <default>false</default>
+                <label>MELUN</label>
+            </value>
+            <value>
+                <fullName>MONTREUIL</fullName>
+                <default>false</default>
+                <label>MONTREUIL</label>
+            </value>
+            <value>
+                <fullName>MONTROUGE</fullName>
+                <default>false</default>
+                <label>MONTROUGE</label>
+            </value>
+            <value>
+                <fullName>PALAISEAU</fullName>
+                <default>false</default>
+                <label>PALAISEAU</label>
+            </value>
+            <value>
+                <fullName>PARIS COTY</fullName>
+                <default>false</default>
+                <label>PARIS COTY</label>
+            </value>
+            <value>
+                <fullName>PARIS GARIBALDI</fullName>
+                <default>false</default>
+                <label>PARIS GARIBALDI</label>
+            </value>
+            <value>
+                <fullName>PARIS LA FAYETTE</fullName>
+                <default>false</default>
+                <label>PARIS LA FAYETTE</label>
+            </value>
+            <value>
+                <fullName>PARIS LEDRU ROLLIN</fullName>
+                <default>false</default>
+                <label>PARIS LEDRU ROLLIN</label>
+            </value>
+            <value>
+                <fullName>PARIS ROME</fullName>
+                <default>false</default>
+                <label>PARIS ROME</label>
+            </value>
+            <value>
+                <fullName>POISSY</fullName>
+                <default>false</default>
+                <label>POISSY</label>
+            </value>
+            <value>
+                <fullName>PROVINS</fullName>
+                <default>false</default>
+                <label>PROVINS</label>
+            </value>
+            <value>
+                <fullName>RAMBOUILLET</fullName>
+                <default>false</default>
+                <label>RAMBOUILLET</label>
+            </value>
+            <value>
+                <fullName>REIMS</fullName>
+                <default>false</default>
+                <label>REIMS</label>
+            </value>
+            <value>
+                <fullName>ROUEN RIVE GAUCHE</fullName>
+                <default>false</default>
+                <label>ROUEN RIVE GAUCHE</label>
+            </value>
+            <value>
+                <fullName>SAINT OMER</fullName>
+                <default>false</default>
+                <label>SAINT OMER</label>
+            </value>
+            <value>
+                <fullName>SAINT QUENTIN</fullName>
+                <default>false</default>
+                <label>SAINT QUENTIN</label>
+            </value>
+            <value>
+                <fullName>SENS</fullName>
+                <default>false</default>
+                <label>SENS</label>
+            </value>
+            <value>
+                <fullName>SEVRES</fullName>
+                <default>false</default>
+                <label>SEVRES</label>
+            </value>
+            <value>
+                <fullName>SOISSONS</fullName>
+                <default>false</default>
+                <label>SOISSONS</label>
+            </value>
+            <value>
+                <fullName>TOURCOING</fullName>
+                <default>false</default>
+                <label>TOURCOING</label>
+            </value>
+            <value>
+                <fullName>TROYES TURENNE</fullName>
+                <default>false</default>
+                <label>TROYES TURENNE</label>
+            </value>
+            <value>
+                <fullName>VALENCIENNES GIRARD</fullName>
+                <default>false</default>
+                <label>VALENCIENNES GIRARD</label>
+            </value>
+            <value>
+                <fullName>VERSAILLES</fullName>
+                <default>false</default>
+                <label>VERSAILLES</label>
+            </value>
+            <value>
+                <fullName>VILLEMOISSON</fullName>
+                <default>false</default>
+                <label>VILLEMOISSON</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>3</visibleLines>
+</CustomField>

@@ -1,0 +1,1895 @@
+<apex:page controller="Ctrl_Calendrier" action="{!pageLoad}" docType="html-5.0" sidebar="false" title="Calendrier K par K">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.VisualStrap_Resources, 'js/bootstrap.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.FullCalendar, 'fullcalendar/lib/moment.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.FullCalendar, 'fullcalendar/fullcalendar.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.FullCalendar, 'fullcalendar/locale/fr.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.qTip_js, 'jquery.qtip.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/media/js/jquery.dataTables.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/dataTables.bootstrap.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/sorting/natural.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/bootstrap-datepicker.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/locales/bootstrap-datepicker.fr.js')}" />
+    <!-- <script type="text/javascript">(function() {var walkme = document.createElement('script'); walkme.type = 'text/javascript'; walkme.async = true; walkme.src = '{!walkMeURL}';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(walkme, s); window._walkmeConfig = {smartLoad:true}; })();
+    </script> -->
+    <apex:includeLightning />
+
+    <script type="text/javascript">
+        // Initialisation des variables
+        var j$ = jQuery.noConflict();
+        var weekEnds = true;
+        var lastView = 'agendaWeek';
+        var lastDay = '';
+        var colorTemp = '';
+        var dayTemp = null;
+        vendeursIDs = new Array();
+        var htmlLoading;
+        var datepicker;
+        var daysHidden = [0];
+        var loadingCompteur = 0;
+        var noActivitiesMsg = '{!$Label.AucunEnregTrouve}';
+        var selectDayEventMsg = 'Sélectionnez un jour pour voir la liste des activités';
+        var proximityMode = '{!proximityMode}';
+        var classValueChecked = 'checked';
+        var classValueActive = 'active';
+        var responsableId;
+        var pageLoaded = false;
+        var proximityMode = '{!proximityMode}';
+        var hasReaffectationPermission = '{!hasReaffectationPermission}';
+
+        /* INIT JS PAGE                                              */
+        /*-----------------------------------------------------------*/
+        j$(document).ready(function() {
+            var startDate;
+            var endDate;
+            htmlLoading = j$("#loading");
+
+            // Initialisation du datepicker
+            j$("#datetimepicker1").datepicker({
+                format: "dd/mm/yyyy",
+                language: "fr",
+                autoclose: true,
+                todayHighlight: true,
+                showOnFocus: false
+            }).on('changeDate', dateChanged);
+
+            // Initialisation des données de session stockées (type de vue et jour)
+            if(localStorage.getItem("lastView") != 'undefined' && localStorage.getItem("lastView") != null){
+                lastView = localStorage.getItem("lastView");
+            } else {
+                localStorage.setItem("lastView", 'agendaWeek');
+            }
+            if(localStorage.getItem("lastDay") != 'undefined' && localStorage.getItem("lastDay") != null){
+                lastDay = localStorage.getItem("lastDay");
+            }
+
+            // Initialisation des données de session stockées (boutons Taches, Samedi et Dimanche)
+            if(localStorage.getItem("localTask") == "unchecked"){
+                j$('#filter-button-Tasks').removeClass(classValueChecked).removeClass(classValueActive);
+            }
+            if(localStorage.getItem("localSat") == "unchecked"){
+                j$('#filter-button-Samedi').removeClass(classValueChecked).removeClass(classValueActive);
+                daysHidden.push(6);
+            }
+            if(localStorage.getItem("localSun") == "checked"){
+                j$('#filter-button-Dimanche').addClass(classValueChecked).addClass(classValueActive);
+                for(var i = 0; i < daysHidden.length; i++) {
+                    if(daysHidden[i] == 0) {
+                        delete daysHidden[i];
+                    }
+                }
+            }
+            // Initialisation des données de session stockées (Boutons de la légende)
+            if(localStorage.getItem("localPris") == "unchecked")
+                j$('#filter-button-Pris').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localNonConf") == "unchecked")
+                j$('#filter-button-NonConf').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localEff") == "unchecked")
+                j$('#filter-button-Eff').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localNonEff") == "unchecked")
+                j$('#filter-button-NonEff').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localDep") == "unchecked")
+                j$('#filter-button-Dep').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localReaff") == "unchecked")
+                j$('#filter-button-Reaff').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localAnnulC") == "unchecked")
+                j$('#filter-button-AnnulC').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localR0") == "unchecked")
+                j$('#filter-button-R0').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localR1") == "unchecked")
+                j$('#filter-button-R1').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localR2") == "unchecked")
+                j$('#filter-button-R2').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localR") == "unchecked")
+                j$('#filter-button-R').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localAnnexe") == "unchecked")
+                j$('#filter-button-Annexe').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localProsp") == "unchecked")
+                j$('#filter-button-Prosp').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localActif") == "unchecked")
+                j$('#filter-button-Actif').removeClass(classValueChecked).removeClass(classValueActive);
+            if(localStorage.getItem("localPassif") == "unchecked")
+                j$('#filter-button-Passif').removeClass(classValueChecked).removeClass(classValueActive);
+
+            // Initialisation des données de session stockées (Tranche horaire d'affichage du calendrier)
+            if(localStorage.getItem("localStartHour") != null && localStorage.getItem("localStartHour") != 'undefined'){
+                startDate = localStorage.getItem("localStartHour");
+                j$("[id$=filter-startHours]").val(localStorage.getItem("localStartHour"));
+            } else {
+                startDate = j$("[id$=filter-startHours]")[0].value;
+            }
+
+            if(localStorage.getItem("localEndHour") != null && localStorage.getItem("localEndHour") != 'undefined'){
+                endDate = localStorage.getItem("localEndHour");
+                j$("[id$=filter-endHours]").val(localStorage.getItem("localEndHour"));
+            } else {
+                endDate = j$("[id$=filter-endHours]")[0].value;
+            }
+
+            // Initialisation du calendrier, du magasin et des vendeurs
+            renderCalendar(weekEnds, startDate, endDate, lastView, lastDay);
+            var codeMagasinActuel;
+            if(localStorage.getItem("localMag") != null && localStorage.getItem("localMag") != 'undefined' && proximityMode != 'true'){
+                codeMagasinActuel = j$("[id$=codeMagasinActuel]")[0].value;
+                var codeMagasinsMap = JSON.parse('{!JSENCODE(codeMagasinsMap)}');
+
+                var i = 0;
+                for(i=0;i<codeMagasinsMap.length;i++){
+                    if(localStorage.getItem("localMag") == codeMagasinsMap[i]){
+                        j$("[id$=codeMagasinActuel]").val(localStorage.getItem("localMag"));
+                        codeMagasinActuel = localStorage.getItem("localMag");
+                    }
+                }
+            } else {
+                codeMagasinActuel = j$("[id$=codeMagasinActuel]")[0].value;
+            }
+            getVendeursByMagasin(codeMagasinActuel);
+
+            for(i=0;i<vendeursIDs.length;i++){
+                if(localStorage.getItem(vendeursIDs[i]) == "unchecked"){
+                    j$('#' + vendeursIDs[i]).prop(classValueChecked, false);
+                }
+            }
+
+            // Récupération des jours affichés sur le calendrier (debut et fin)
+            var view = j$('#calendar').fullCalendar('getView');
+            var jour1 = view.start.date();
+            var mois1 = view.start.month();
+            var annee1 = view.start.year();
+            var jour2 = view.end.date();
+            var mois2 = view.end.month();
+            var annee2 = view.end.year();
+
+            // Initialisation du composant lightning d'affichage des RDV de service
+            initDatatable(annee1, mois1, jour1, annee2, mois2, jour2);
+
+            // Init des bouton onclick
+            initOncklickEventPanel();
+            initOncklickEventCalendar();
+        });
+
+        /* FONCTION INITIALISATION DES BOUTON ONCLICK DU CALENDRIER  */
+        /*-----------------------------------------------------------*/
+        function initOncklickEventCalendar(){
+            // Boutons "Précédent (<)", "Suivant (>)", "Aujourd'hui", "31"
+            j$('.fc-prev-button, .fc-next-button, .fc-today-button, .fc-month-button').click(function() {
+                var view = j$('#calendar').fullCalendar('getView');
+                localStorage.setItem("lastView", view.name);
+                lastView = view.name;
+                filtreEvent();
+                if(colorTemp != ''){
+                    j$(dayTemp).css('background-color', colorTemp);
+                }
+                document.getElementsByClassName("panel-activities-body")[0].innerHTML = noActivitiesMsg;
+                document.getElementsByClassName("panel-activities-title")[0].innerHTML = selectDayEventMsg;
+            });
+
+            // Boutons "7", "1"
+            j$('.fc-agendaWeek-button, .fc-agendaDay-button').click(function() {
+                var view = j$('#calendar').fullCalendar('getView');
+                localStorage.setItem("lastView", view.name);
+                lastView = view.name;
+                if(view.name != 'month'){
+                    filtreEvent();
+                }
+                if(colorTemp != ''){
+                    j$(dayTemp).css('background-color', colorTemp);
+                }
+                document.getElementsByClassName("panel-activities-body")[0].innerHTML = noActivitiesMsg;
+                document.getElementsByClassName("panel-activities-title")[0].innerHTML = selectDayEventMsg;
+            });
+        }
+
+        /* FONCTION INITIALISATION DES BOUTON ONCLICK DU PANEL       */
+        /*-----------------------------------------------------------*/
+        function initOncklickEventPanel(){
+            // Init des fonctions onClick
+            j$('#filter-button-AllEvents').click(function(){
+                // Bouton "Tout cocher" de la légende
+                if(j$('#filter-button-AllEvents').hasClass(classValueChecked))
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                else
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+
+                if(j$('#filter-button-AllEvents').hasClass(classValueChecked)){
+                    j$('#filter-button-Pris, #filter-button-NonConf, #filter-button-Eff , #filter-button-NonEff, #filter-button-Dep, #filter-button-Reaff, #filter-button-AnnulC, #filter-button-R0, #filter-button-R1, #filter-button-R2, #filter-button-R, #filter-button-Annexe, #filter-button-Prosp, #filter-button-Actif, #filter-button-Passif').addClass(classValueChecked);
+                    j$('#filter-button-Pris, #filter-button-NonConf, #filter-button-Eff , #filter-button-NonEff, #filter-button-Dep, #filter-button-Reaff, #filter-button-AnnulC, #filter-button-R0, #filter-button-R1, #filter-button-R2, #filter-button-R, #filter-button-Annexe, #filter-button-Prosp, #filter-button-Actif, #filter-button-Passif').addClass(classValueActive);
+                    localStorage.setItem("localPris", "checked");
+                    localStorage.setItem("localNonConf", "checked");
+                    localStorage.setItem("localEff", "checked");
+                    localStorage.setItem("localNonEff", "checked");
+                    localStorage.setItem("localDep", "checked");
+                    localStorage.setItem("localReaff", "checked");
+                    localStorage.setItem("localAnnulC", "checked");
+                    localStorage.setItem("localR0", "checked");
+                    localStorage.setItem("localR1", "checked");
+                    localStorage.setItem("localR2", "checked");
+                    localStorage.setItem("localR", "checked");
+                    localStorage.setItem("localAnnexe", "checked");
+                    localStorage.setItem("localProsp", "checked");
+                    localStorage.setItem("localActif", "checked");
+                    localStorage.setItem("localPassif", "checked");
+                } else{
+                    j$('#filter-button-Pris, #filter-button-NonConf, #filter-button-Eff , #filter-button-NonEff, #filter-button-Dep, #filter-button-Reaff, #filter-button-AnnulC, #filter-button-R0, #filter-button-R1, #filter-button-R2, #filter-button-R, #filter-button-Annexe, #filter-button-Prosp, #filter-button-Actif, #filter-button-Passif').removeClass(classValueChecked);
+                    j$('#filter-button-Pris, #filter-button-NonConf, #filter-button-Eff , #filter-button-NonEff, #filter-button-Dep, #filter-button-Reaff, #filter-button-AnnulC, #filter-button-R0, #filter-button-R1, #filter-button-R2, #filter-button-R, #filter-button-Annexe, #filter-button-Prosp, #filter-button-Actif, #filter-button-Passif').removeClass(classValueActive);
+                    localStorage.setItem("localPris", "unchecked");
+                    localStorage.setItem("localNonConf", "unchecked");
+                    localStorage.setItem("localEff", "unchecked");
+                    localStorage.setItem("localNonEff", "unchecked");
+                    localStorage.setItem("localDep", "unchecked");
+                    localStorage.setItem("localReaff", "unchecked");
+                    localStorage.setItem("localAnnulC", "unchecked");
+                    localStorage.setItem("localR0", "unchecked");
+                    localStorage.setItem("localR1", "unchecked");
+                    localStorage.setItem("localR2", "unchecked");
+                    localStorage.setItem("localR", "unchecked");
+                    localStorage.setItem("localAnnexe", "unchecked");
+                    localStorage.setItem("localProsp", "unchecked");
+                    localStorage.setItem("localActif", "unchecked");
+                    localStorage.setItem("localPassif", "unchecked");
+                }
+                filtreEvent();
+            });
+
+            // Bouton "Tout cocher" du magasin
+            j$('#filter-button-AllVendeurs').click(function() {
+                if(j$('#filter-button-AllVendeurs').hasClass(classValueChecked))
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                else
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+
+                if(j$('#filter-button-AllVendeurs').hasClass(classValueChecked)){
+                    for(i=0;i<vendeursIDs.length;i++){
+                        j$('#' + vendeursIDs[i]).prop(classValueChecked, true);
+                        j$('#' + vendeursIDs[i]).prop(classValueActive, true);
+                    }
+                }
+                else{
+                    for(i=0;i<vendeursIDs.length;i++){
+                        j$('#' + vendeursIDs[i]).prop(classValueChecked, false);
+                        j$('#' + vendeursIDs[i]).prop(classValueActive, false);
+                    }
+                }
+
+                filtreEvent();
+            });
+
+            // Boutons du panel "Légende"
+            j$('#filter-button-Pris').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localPris", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localPris", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-NonConf').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localNonConf", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localNonConf", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-Eff').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localEff", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localEff", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-NonEff').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localNonEff", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localNonEff", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-Dep').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localDep", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localDep", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-Reaff').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localReaff", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localReaff", "checked");
+                }
+                filtreEvent();
+            });
+            
+           j$('#filter-button-AnnulC').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localAnnulC", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localAnnulC", "checked");
+                }
+                filtreEvent();
+            });
+
+           j$('#filter-button-R0').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localR0", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);;
+                    localStorage.setItem("localR0", "checked");
+                    if(!j$('#filter-button-Actif').hasClass(classValueChecked) && !j$('#filter-button-Passif').hasClass(classValueChecked)){
+                        j$('#filter-button-Actif, #filter-button-Passif').addClass(classValueChecked).addClass(classValueActive);
+                        localStorage.setItem("localActif", "checked");
+                        localStorage.setItem("localPassif", "checked");
+                    }
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-R1').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localR1", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);;
+                    localStorage.setItem("localR1", "checked");
+                    if(!j$('#filter-button-Actif').hasClass(classValueChecked) && !j$('#filter-button-Passif').hasClass(classValueChecked)){
+                        j$('#filter-button-Actif, #filter-button-Passif').addClass(classValueChecked).addClass(classValueActive);
+                        localStorage.setItem("localActif", "checked");
+                        localStorage.setItem("localPassif", "checked");
+                    }
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-R2').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localR2", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);;
+                    localStorage.setItem("localR2", "checked");
+                    if(!j$('#filter-button-Actif').hasClass(classValueChecked) && !j$('#filter-button-Passif').hasClass(classValueChecked)){
+                        j$('#filter-button-Actif, #filter-button-Passif').addClass(classValueChecked).addClass(classValueActive);
+                        localStorage.setItem("localActif", "checked");
+                        localStorage.setItem("localPassif", "checked");
+                    }
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-R').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localR", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);;
+                    localStorage.setItem("localR", "checked");
+                    if(!j$('#filter-button-Actif').hasClass(classValueChecked) && !j$('#filter-button-Passif').hasClass(classValueChecked)){
+                        j$('#filter-button-Actif, #filter-button-Passif').addClass(classValueChecked).addClass(classValueActive);
+                        localStorage.setItem("localActif", "checked");
+                        localStorage.setItem("localPassif", "checked");
+                    }
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-Annexe').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localAnnexe", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localAnnexe", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-Prosp').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localProsp", "unchecked");
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localProsp", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-Actif').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localActif", "unchecked");
+                    if(!j$('#filter-button-Passif').hasClass(classValueChecked)){
+                        j$('#filter-button-R0, #filter-button-R1, #filter-button-R2, #filter-button-R').removeClass(classValueChecked).removeClass(classValueActive);
+                        localStorage.setItem("localR0", "unchecked");
+                        localStorage.setItem("localR1", "unchecked");
+                        localStorage.setItem("localR2", "unchecked");
+                        localStorage.setItem("localR", "unchecked");
+                    }
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localActif", "checked");
+                }
+                filtreEvent();
+            });
+
+            j$('#filter-button-Passif').click(function(){
+                if(j$(this).hasClass(classValueChecked)){
+                    j$(this).removeClass(classValueChecked).removeClass(classValueActive);
+                    localStorage.setItem("localPassif", "unchecked");
+                    if(!j$('#filter-button-Actif').hasClass(classValueChecked)){
+                        j$('#filter-button-R0, #filter-button-R1, #filter-button-R2, #filter-button-R').removeClass(classValueChecked).removeClass(classValueActive);
+                        localStorage.setItem("localR0", "unchecked");
+                        localStorage.setItem("localR1", "unchecked");
+                        localStorage.setItem("localR2", "unchecked");
+                        localStorage.setItem("localR", "unchecked");
+                    }
+                } else {
+                    j$(this).addClass(classValueChecked).addClass(classValueActive);
+                    localStorage.setItem("localPassif", "checked");
+                }
+                filtreEvent();
+            });
+        }
+
+        /* FONCTION DE POST AFFICHAGE ET D'AFFICHAGE DES ACTIVITES   */
+        /*-----------------------------------------------------------*/
+        function filtreEvent(){
+            var checkTask=checkR0=checkR1=checkR2=checkR=checkAnnexe=checkProsp=checkPris=checkNonConf=checkEff=checkNonEff=checkDep=checkReaff=checkAnnulC=checkActif=checkPassif=false;
+
+            // Chargement
+            htmlLoading.removeClass("hidden").addClass("show");
+            loadingCompteur = 0;
+
+            // Filtres
+            if(j$('#filter-button-R0').hasClass(classValueChecked))
+                checkR0 = true;
+            if(j$('#filter-button-R1').hasClass(classValueChecked))
+                checkR1 = true;
+            if(j$('#filter-button-R2').hasClass(classValueChecked))
+                checkR2 = true;
+            if(j$('#filter-button-R').hasClass(classValueChecked))
+                checkR = true;
+            if(j$('#filter-button-Annexe').hasClass(classValueChecked))
+                checkAnnexe = true;
+            if(j$('#filter-button-Prosp').hasClass(classValueChecked))
+                checkProsp = true;
+            if(j$('#filter-button-Pris').hasClass(classValueChecked))
+                checkPris = true;
+            if(j$('#filter-button-NonConf').hasClass(classValueChecked))
+                checkNonConf = true;
+            if(j$('#filter-button-Eff').hasClass(classValueChecked))
+                checkEff = true;
+            if(j$('#filter-button-NonEff').hasClass(classValueChecked))
+                checkNonEff = true;
+            if(j$('#filter-button-Dep').hasClass(classValueChecked))
+                checkDep = true;
+            if(j$('#filter-button-Reaff').hasClass(classValueChecked))
+                checkReaff = true;
+            if(j$('#filter-button-AnnulC').hasClass(classValueChecked))
+                checkAnnulC = true;
+            if(j$('#filter-button-Tasks').hasClass(classValueChecked))
+                checkTask = true;
+            if(j$('#filter-button-Actif').hasClass(classValueChecked))
+                checkActif = true;
+            if(j$('#filter-button-Passif').hasClass(classValueChecked))
+                checkPassif = true;
+
+            // Filtre sur les vendeur
+            vendeurList = new Array();
+            for(var i=0;i<vendeursIDs.length;i++){
+                if(j$('#' + vendeursIDs[i]).is(':checked')){
+                    vendeurList.push(vendeursIDs[i]);
+                }
+            }
+
+            // Stockage du jour
+            var selectedDay = j$('#calendar').fullCalendar('getDate').format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+            localStorage.setItem("lastDay", selectedDay);
+            lastDay = selectedDay;
+
+            // Récupération des jours affichés sur le calendrier (debut et fin)
+            var view = j$('#calendar').fullCalendar('getView');
+            // Premier jour affiché (inclu)
+            var jour1 = view.start.date();
+            var mois1 = view.start.month();
+            var annee1 = view.start.year();
+            // Dernier jour affiché (inclu)
+            var jour2cor = view.end.add(-1).date();
+            var mois2cor = view.end.add(-1).month();
+            var annee2cor = view.end.add(-1).year();
+
+            var startDate = formatDateTime(moment(view.start));
+            var endDate = formatDateTime(moment(view.end).add(1, 'days'));
+
+            var codeMagasinActuel = j$("[id$=codeMagasinActuel]")[0].value;
+            
+            // Suppression des events déjà affichés sur le calendrier            
+            j$('#calendar').fullCalendar('removeEvents');
+
+            if(vendeurList.length != 0){    
+                // Désactivation des boutons de la page 
+                loadBar('disable');
+                j$(":input").attr("disabled", true);
+
+                // Boucle sur chaque vendeurs
+                for(i=0;i<vendeurList.length;i++){
+                    var isResponsable = false;
+                    if(vendeurList[i] == responsableId) isResponsable = true;
+                    // EVENTS & TASKS
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.Ctrl_Calendrier.getActivitiesForUser}', vendeurList[i], startDate, endDate, checkR0, checkR1, checkR2, checkR, checkAnnexe, checkProsp, checkPris,
+                        checkNonConf,checkEff,checkNonEff,checkDep, checkReaff, checkTask, checkActif, checkPassif, isResponsable, codeMagasinActuel, checkAnnulC,
+                        function(result, event) {
+                        if (event.status) {
+                            var eventTable = new Array();
+                            j$.each(result, function(index, e){
+                                var eventRendered = {
+                                    title: e.title + ' \n' + e.vendeurName,
+                                    start: e.startString,
+                                    end: e.endString,
+                                    url: e.url,
+                                    allDay: e.allDay,
+                                    className: e.className,
+                                    colorBar: e.colorBar,
+                                    eventId: e.eventId,
+                                    description: e.title,
+                                    emplacement: e.emplacement,
+                                    vendeur: e.vendeurName,
+                                    vendeurId: e.vendeurId,
+                                    priority: e.priority,
+                                    status: e.status,
+                                    icone: e.vendeurIcon,
+                                    compte: e.compte,
+                                    createdDate: e.createdDate,
+                                    createdName: e.createdName,
+                                    chantier: e.chantier,
+                                    isActive: e.isActive,
+                                    origine: e.origineProjet,
+                                    infoProspec: e.infoProspec,
+                                    champProspec: e.champProspec
+                                };
+                                eventTable.push(eventRendered);
+                            });
+                            j$('#calendar').fullCalendar( 'addEventSource', eventTable );
+                            loadingCompteur = loadingCompteur + 1;
+                        } else if (event.type === 'exception') {
+                            alert(event.message);
+                            loadingCompteur = loadingCompteur + 1;
+                        } else {
+                            alert(event.message);
+                            loadingCompteur = loadingCompteur + 1;
+                        }
+                        if(loadingCompteur == vendeurList.length-1){
+                            //htmlLoading.removeClass("show").addClass("hidden");
+                        }
+                        // Delete if multiple components
+                        var auraErrorMessage = document.getElementById('auraErrorMessage');
+                        var unknownError = "This page has an error. You might just need to refresh it. Error in $A.getCallback() [Cannot read property 'getElementsByClassName' of null] Failing descriptor: {ldt:datatableDev}"
+                        if(auraErrorMessage != null && auraErrorMessage.innerText == unknownError){
+                            auraErrorMessage.innerText = '';
+                        }
+
+                    },
+                    {buffer: false, escape: true}
+                    );
+                }
+
+                console.log('hasReaffectationPermission ' + hasReaffectationPermission);
+                if(hasReaffectationPermission == 'true'){
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.Ctrl_Calendrier.getActivitiesForStore}', vendeurList, startDate, endDate, checkR0, checkR1, checkR2, checkR, checkAnnexe, checkProsp, checkPris,
+                        checkNonConf,checkEff,checkNonEff,checkDep, checkReaff, checkTask, checkActif, checkPassif, isResponsable, codeMagasinActuel, checkAnnulC,
+                        function(result, event) {
+                        if (event.status) {
+                            var eventTable = new Array();
+                            j$.each(result, function(index, e){
+                                var eventRendered = {
+                                    title: e.title + ' \n' + e.vendeurName,
+                                    start: e.startString,
+                                    end: e.endString,
+                                    url: e.url,
+                                    allDay: e.allDay,
+                                    className: e.className,
+                                    colorBar: e.colorBar,
+                                    eventId: e.eventId,
+                                    description: e.title,
+                                    emplacement: e.emplacement,
+                                    vendeur: e.vendeurName,
+                                    vendeurId: e.vendeurId,
+                                    priority: e.priority,
+                                    status: e.status,
+                                    icone: e.vendeurIcon,
+                                    compte: e.compte,
+                                    createdDate: e.createdDate,
+                                    createdName: e.createdName,
+                                    chantier: e.chantier,
+                                    isActive: e.isActive,
+                                    origine: e.origineProjet,
+                                    infoProspec: e.infoProspec,
+                                    champProspec: e.champProspec
+                                };
+                                eventTable.push(eventRendered);
+                            });
+                            j$('#calendar').fullCalendar( 'addEventSource', eventTable );
+                            loadingCompteur = loadingCompteur + 1;
+                        } else if (event.type === 'exception') {
+                            alert(event.message);
+                            loadingCompteur = loadingCompteur + 1;
+                        } else {
+                            alert(event.message);
+                            loadingCompteur = loadingCompteur + 1;
+                        }
+                        if(loadingCompteur == vendeurList.length-1){
+                            //htmlLoading.removeClass("show").addClass("hidden");
+                        }
+                        // Delete if multiple components
+                        var auraErrorMessage = document.getElementById('auraErrorMessage');
+                        var unknownError = "This page has an error. You might just need to refresh it. Error in $A.getCallback() [Cannot read property 'getElementsByClassName' of null] Failing descriptor: {ldt:datatableDev}"
+                        if(auraErrorMessage != null && auraErrorMessage.innerText == unknownError){
+                            auraErrorMessage.innerText = '';
+                        }
+
+                    },
+                    {buffer: false, escape: true}
+                    );
+                }
+                
+            }
+            // Mise à jour du titre du tableau des RDV de service
+            editDataTableTitle(annee1, mois1, jour1, annee2cor, mois2cor, jour2cor);
+            if(pageLoaded == true){
+                // Mise à jour du tableau des RDV de service
+                var startDatetime = new Date(annee1, mois1, jour1, 0, 0, 0, 0);
+                var endDatetime = new Date(annee2cor, mois2cor, jour2cor+1, 0, 0, 0, 0);
+                $Lightning.use("c:ServiceAppointmentsTableApp", function() {
+                    // Appel à un evenement lightning
+                    var eventRerenderRows;
+                    eventRerenderRows = $A.get("e.c:eventDatatableDevRerenderRows");
+                    eventRerenderRows.setParams({
+                        "codeMagasin" : j$("[id$=codeMagasinActuel]")[0].value,
+                        "userRole" : j$("[id$=userProfile]")[0].value,
+                        "userName" : '{!userName}',
+                        "startDatetime" : startDatetime,
+                        "endDatetime" : endDatetime
+                    });
+                    eventRerenderRows.fire();
+                });
+            }
+            pageLoaded = true;
+            
+
+            // Déselection du jour
+            if(colorTemp != ''){
+                j$(dayTemp).css('background-color', colorTemp);
+            }
+            document.getElementsByClassName("panel-activities-body")[0].innerHTML = noActivitiesMsg;
+            document.getElementsByClassName("panel-activities-title")[0].innerHTML = selectDayEventMsg;
+        }
+        
+        /* FORMAT DATE UTC                                   */
+        /*---------------------------------------------------*/
+        function formatDateTime(value) {
+            var dateUTC = new Date(value.format());
+            return dateUTC.toUTCString(); //Salesforce fonctionne en UTC
+        }
+
+        /* FONCTION DE GENERATION DU TABLEAU DES ACTIVITES                              */
+        /*------------------------------------------------------------------------------*/
+        function generateActivitiesTable(dateSelectioned, event) {
+            // Initialisation
+            var eventsCalendar = j$('#calendar').fullCalendar('clientEvents');
+            var eventsCalendarFiltered = new Array();
+            // Récupération de l'ancien css
+            if(colorTemp != ''){
+                j$(dayTemp).css('background-color', colorTemp);
+            }
+            // Sauvegarde CSS
+            if(event != 'dayView'){
+                // Sauvegarde du css actuel
+                dayTemp = event;
+                colorTemp = event.css( "background-color" );
+                // css de selection
+                event.css('background-color', '#F9F9F9');
+            }
+
+            // Filtrage du tableau pour récupérer ceux du jour
+            for(var i=0; i < eventsCalendar.length; i++){
+                var eventMomentStart = eventsCalendar[i].start;
+                var eventMomentEnd = eventsCalendar[i].end;
+                if(eventsCalendar[i].eventId != null &&
+                    ( (eventMomentStart.year() == dateSelectioned.year() && eventMomentStart.month() == dateSelectioned.month() && eventMomentStart.date() == dateSelectioned.date()) ||
+                    eventMomentEnd != null && ((eventMomentEnd.year() == dateSelectioned.year() && eventMomentEnd.month() == dateSelectioned.month() && eventMomentEnd.date() == dateSelectioned.date()) ||
+                    (eventMomentStart.date() != eventMomentEnd.date() && eventMomentStart < dateSelectioned && eventMomentEnd >= dateSelectioned))) ){
+                    eventsCalendarFiltered.push(eventsCalendar[i]);
+                }
+            }
+
+            // Titre du tableau
+            var panelTitle = 'Activités du ' + dateSelectioned.format("DD") + '/' + dateSelectioned.format("MM") + '/' + dateSelectioned.format("YYYY");
+            document.getElementsByClassName("panel-activities-title")[0].innerHTML = panelTitle;
+            // Construction tableau d'activités
+            if(eventsCalendarFiltered.length == 0){
+                document.getElementsByClassName("panel-activities-body")[0].innerHTML = '{!$Label.AucunEnregTrouve}';
+            } else {
+                var text = '';
+                text += '<table class="table table-striped table-bordered table-hover dataTable" id="activities-table">';
+                text += '<thead><tr>';
+                text += '<th>Action</th>';
+                text += '<th>Titre de l\'activité</th>';
+                text += '<th>Type</th>';
+                text += '<th>Horaires</th>';
+                text += '<th>Statut</th>';
+                text += '<th>Emplacement</th>';
+                text += '<th>Priorité</th>';
+                text += '<th>Vendeur</th>';
+                text += '</tr></thead>';
+
+                for(var i=0; i < eventsCalendarFiltered.length; i++){
+                    var eventFiltered = eventsCalendarFiltered[i];
+                    // Gestion du texte "Horaire"
+                    var horaire = formatHoraireActivity(eventFiltered.allDay, eventFiltered.start, eventFiltered.end);
+                    // Gestion du texte pour "Type"
+                    var actType = formatTypeActivity(eventFiltered.className);
+                    // Gestion du texte pour "Emplacement"
+                    if(eventFiltered.emplacement == '') eventFiltered.emplacement = 'Non renseigné';
+                    // Construction ligne de tableau
+                    text += '<tr><td>';
+                    if(eventFiltered.status == 'A faire')
+                        text += '<a class="glyphicon glyphicon-ok" href="#" title="Clôturer la tache" onClick="closeTask(\'' + eventFiltered.eventId + '\')"></a> | ';
+                    var urlEditEvent = "/" + eventFiltered.eventId + "/e?retURL={!$Page.VF_Calendrier}";
+
+                        text += '<a class="glyphicon glyphicon-pencil" href="'+ urlEditEvent + '"></a></td>';
+                    text += '<td><a href="/' + eventFiltered.eventId + '">' + eventFiltered.description + '</a></td>';
+                    text += '<td>' + actType  + '</td>';
+                    text += '<td>' + horaire + '</td>';
+                    text += '<td>' +  eventFiltered.status + '</td>';
+                    text += '<td>' +  eventFiltered.emplacement + '</td>';
+                    text += '<td>' +  eventFiltered.priority + '</td>';
+                    text += '<td>';
+                    text += '   <span>';
+                    text += '       <img src="'+ eventFiltered.icone +'" class="chatter-photo chatter-avatar vendeur-photo chatter-avatarTiny chatter-avatarInline"/>';
+                    text += '       <a href="/'+ eventFiltered.vendeurId +'">'+ eventFiltered.vendeur +'</a>';
+                    text += '   </span>';
+                    text += '</td>'
+                    text += '</tr>';
+                }
+                text += '</table>';
+                document.getElementsByClassName("panel-activities-body")[0].innerHTML = text;
+                // Active Datatable
+                activeSorterTable();
+            }
+        }
+
+        /* FONCTION DE GENERATION DE LA TOOLTIP LORS DE LA SELECTION D'UNE ACTIVITE     */
+        /*------------------------------------------------------------------------------*/
+        function generateActivityTooltip(event, element) {
+            // Affichage de l'event avec son tooltip
+            var creation = moment(event.createdDate).format('DD/MM/YYYY [à] HH:mm:ss');
+            // Gestion du texte "Horaire"
+            var horaire = formatHoraireActivity(event.allDay, event.start, event.end);
+            // Gestion du texte pour "Type"
+            var actType = formatTypeActivity(event.className);
+
+            var origineCodesParsed = JSON.parse('{!JSENCODE(origineCodesSerialized)}');
+            var eventOrigine = '';
+            for(i=0;i<origineCodesParsed.length;i++){
+                if(origineCodesParsed[i].PickValue__c == event.origine) eventOrigine = origineCodesParsed[i].ConvertedValue__c;
+            }
+
+            if(event.colorBar != '') {
+                var leftBarHtml = '<div class="leftBar" style="background-color:' + event.colorBar + ';"> </div>';
+                if(actType == 'R0' || actType == 'R1' || actType == 'R2' || actType == 'R+'){
+                    var rightBarHtml = '';
+                    if(event.isActive == 'actif') rightBarHtml='<div class="rightBar rdv-actif" style="background-color:red; float:right; padding-left:2px; margin:5px; font-size:11px">' + eventOrigine + '</div>';
+                    else if(event.isActive == 'passif') rightBarHtml='<div class="rightBar rdv-passif" style="background-color:green; float:right; padding-left:2px; margin:5px; font-size:11px">' + eventOrigine + '</div>';
+                    var contentModif = leftBarHtml + rightBarHtml + j$(element).html();
+                } else var contentModif = leftBarHtml + j$(element).html();
+
+                element.html(contentModif);
+            }
+            if(event.compte == null) event.compte = '';
+            if(event.createdName == null) event.createdName = '';
+            if(event.emplacement == '') event.emplacement = 'Emplacement non renseigné';
+
+            var title = (typeof event.statut === "undefined") ? event.description + ' (' + actType + ')' : event.description + ' (' + actType + ' ' + event.statut + ')';
+            var description =  '<b>Vendeur : </b>' + event.vendeur + '<br/>'
+                            +  '<b>Horaires : </b>' + horaire + '<br/>'
+                            +  '<b>Emplacement : </b>' + event.emplacement + '<br/>';
+            if(event.compte != null && event.compte != ''){
+                description += '<b>Client : </b>' + event.compte + '<br/>';
+            }
+            if(event.chantier != null && event.chantier != ''){
+                description += '<b>Chantier : </b>' + event.chantier + '<br/>';
+            }
+            if(event.origine != null && event.origine != ''){
+                description += '<b>Origine du projet : </b>' + event.origine + '<br/>';
+            }
+            if(event.infoProspec != null && event.infoProspec != 'null' && event.infoProspec != '' && event.champProspec != null && event.champProspec != 'null' && event.champProspec != ''){
+                description += '<b>' + event.infoProspec + '</b>' + event.champProspec + '<br/>';
+            }
+                description += '<b>Création : </b>' + creation + ' par ' + event.createdName;
+            // Initialisation tooltip pour l'activité
+            if(event.eventId != null) {
+                element.qtip({
+                    content: {
+                        text: description,
+                        title: title
+                    },
+                    position: {
+                        viewport: j$('#calendar'),
+                        my: 'bottom center',
+                        at: 'top center',
+                        target: 'event',
+                    },
+                    adjust: {
+                        mouse: false,
+                        scroll: false
+                    },
+                    hide: {
+                        leave: true
+                    },
+                    show: {
+                        delay: 200,
+                        solo: true,
+                        effect: function(offset) {
+                            j$(this).slideDown(150);
+                        }
+                    },
+                    style: 'qtip-bootstrap'
+                }).qtip('api');
+            }
+        }
+
+        /* FONCTION DE FORMATAGE DU TYPE D'ACTIVITE                                     */
+        /*------------------------------------------------------------------------------*/
+        function formatTypeActivity(classname) {
+            var activityType = '';
+            if(classname == 'event-r0') activityType = 'R0';
+            else if(classname == 'event-r1') activityType = 'R1';
+            else if(classname == 'event-r2') activityType = 'R2';
+            else if(classname == 'event-rplus') activityType = 'R+';
+            else if(classname == 'event-prospection') activityType = 'Prospection';
+            else if(classname == 'event-other') activityType = 'Annexe';
+            else activityType = '';
+            return activityType;
+        }
+
+        /* FONCTION DE FORMATAGE DU STATUT D'ACTIVITE                                   */
+        /*------------------------------------------------------------------------------*/
+        function formatHoraireActivity(allDay, start, end) {
+            var startHour = '';
+            var endHour = '';
+            var horaireActivity = '';
+
+            if(moment(start).date() < moment(end).date()){
+                if(allDay){
+                    horaireActivity = 'Toute la journée';
+                } else {
+                    startHour = moment(start).format("DD/MM/YYYY [à] HH[h]mm");
+                    endHour = moment(end).format("DD/MM/YYYY [à] HH[h]mm");
+                    horaireActivity = 'Du ' + startHour + ' au ' + endHour;
+                }
+            } else {
+                if(allDay){
+                    horaireActivity = 'Toute la journée';
+                } else {
+                    startHour = moment(start).format("HH[h]mm");
+                    endHour = moment(end).format("HH[h]mm");
+                    horaireActivity = 'De ' + startHour + ' à ' + endHour;
+                }
+            }
+            return horaireActivity;
+        }
+
+        /* FONCTION D'INITIALISATION DU CALENDRIER                                      */
+        /*------------------------------------------------------------------------------*/
+        function renderCalendar(displayWeekEnds,startHour,endHour, lastView, lastDay) {
+            // Initialisation
+            j$('#calendar').fullCalendar({
+                locale: 'fr',
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                defaultView: lastView,
+                firstDay: 2,
+                height: 'auto',
+                editable: ('{!activeDrapNDrop}' == 'false') ? false : true,
+                eventLimit: true, // allow "more" link when too many events
+                minTime: '0' + startHour + ':00:00',
+                maxTime: '' + endHour + ':00:00',
+                buttonIcons: false, // show the prev/next text
+                weekNumbers: true,
+                weekends: displayWeekEnds,
+                hiddenDays: daysHidden,
+                droppable: true,
+
+                buttonIcons: {
+                    prev: 'left-single-arrow',
+                    next: 'right-single-arrow',
+                    prevYear: 'left-double-arrow',
+                    nextYear: 'right-double-arrow'
+                },
+                buttonText:{
+                    month:    '31',
+                    week:     '7',
+                    day:      '1'
+                },
+                dayRender: function( date, cell ) {
+                    // Ajout du bouton de création d'événement pour chaque jours
+                    var view = j$('#calendar').fullCalendar('getView');
+                    var dateFormated = date.format('L');
+                    if(view.name == 'month'){
+                        if(proximityMode != 'true'){
+                            var action = '<a href="/setup/ui/recordtypeselect.jsp?ent=Event&retURL=%2Fapex%2FVF_Calendrier%3FretURL%3D%252Fapex%252FVF_Calendrier%253Fid%26sfdc.override&save_new_url=%2F00U%2Fe%3FretURL%3D%252Fapex%252FVF_Calendrier&evt4=' + dateFormated + '" target="_parent" class="addLink" style="display: block; position:absolute; bottom:0px;"><img src="/s.gif" alt="Ajouter un événement - '+dateFormated+'" class="addNewEventIcon" title="Ajouter un événement - '+dateFormated+'" style="margin-right:0px;"></a>';
+                            j$(cell).append(action);
+                        }
+                    }
+                },
+                eventClick: function(calEvent, jsEvent, view) {
+                    if (calEvent.url) {                        
+                        // Lightning
+                        if(sforce !== undefined && sforce.one !== undefined) {
+                            sforce.one.navigateToSObject(calEvent.eventId);
+                        // Classic
+                        } else {
+                            window.open(calEvent.url);
+                        }
+                        return false;
+                    }
+                },
+                eventRender: function(event, element) {
+                    // Affichage détail activité lors du double click
+                    element.bind('dblclick', function() {
+                        displayEvent(event.eventId + '/e');
+                    });
+                    // Generation de la toolip lors du survol de l'activité
+                    generateActivityTooltip(event, element);
+                },
+                eventDrop: function(event, delta, revertFunc) {
+                    changeEventDateTime(event, revertFunc);
+                },
+                eventResize: function(event, delta, revertFunc) {
+                    changeEventDateTime(event, revertFunc);
+                },
+                eventAfterAllRender: function(view) {
+                    var objectId = '{!objectId}';
+                    var addPlusToDay = function (dayOfWeek) { // Adds a button to a day number (1 through 7)
+                    var day = moment(view.start).add(dayOfWeek, 'd');
+
+                    // Mode Affectation planning
+                    if(proximityMode == 'true'){
+                        var vendeurName = '';
+                        var listVendeursDistanceParsed = JSON.parse('{!JSENCODE(vendeursMagasin)}');
+
+                        // Filtre sur les vendeur
+                        var i = 0;
+                        var vendeurId;
+                        for(i=0;i<vendeursIDs.length;i++){
+                            if(j$('#' + vendeursIDs[i]).is(':checked')){
+                                vendeurId = vendeursIDs[i];
+                            }
+                        }
+
+                        if(listVendeursDistanceParsed != null){
+                            for(i=0;i<listVendeursDistanceParsed.length;i++){
+                                if(listVendeursDistanceParsed[i].UserId == vendeurId){
+                                    vendeurName = listVendeursDistanceParsed[i].UserName;
+                                }
+                            }
+                        }
+                        if (view.name == 'month') {
+                            var plus = j$('<img src="/s.gif" alt="Ajouter un événement - '+ day.format('L') +
+                                    '" class="addNewEventIcon" title="Ajouter un événement - '+day.format('L')+
+                                    '" style="display: block; position:absolute; top:2px; margin-right:0px;" onclick="autoCreate(\'' + objectId + '\',\'' + vendeurId + '\',\'' + day.format('L') + '\');"/>');
+
+                            if(j$('#filter-button-Dimanche').hasClass(classValueChecked)){
+                                if(j$('#filter-button-Samedi').hasClass(classValueChecked)){
+                                    plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek));
+                                } else {
+                                    if(dayOfWeek == 0 || dayOfWeek == 1 || dayOfWeek == 2 || dayOfWeek == 3){
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek));
+                                    } else if(dayOfWeek == 5 || dayOfWeek == 6 || dayOfWeek == 7 || dayOfWeek == 8 || dayOfWeek == 9 || dayOfWeek == 10) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-1));
+                                    } else if(dayOfWeek == 12 || dayOfWeek == 13 || dayOfWeek == 14 || dayOfWeek == 15 || dayOfWeek == 16 || dayOfWeek == 17) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-2));
+                                    } else if(dayOfWeek == 19 || dayOfWeek == 20 || dayOfWeek == 21 || dayOfWeek == 22 || dayOfWeek == 23 || dayOfWeek == 24) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-3));
+                                    } else if(dayOfWeek == 26 || dayOfWeek == 27 || dayOfWeek == 28 || dayOfWeek == 29 || dayOfWeek == 30 || dayOfWeek == 31) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-4));
+                                    } else if(dayOfWeek == 33 || dayOfWeek == 34 || dayOfWeek == 35 || dayOfWeek == 36 || dayOfWeek == 37 || dayOfWeek == 38) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-5));
+                                    } else if(dayOfWeek == 40 || dayOfWeek == 41) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-6));
+                                    }
+                                }
+                            } else {
+                                if(j$('#filter-button-Samedi').hasClass(classValueChecked)){
+                                    if(dayOfWeek == 0 || dayOfWeek == 1 || dayOfWeek == 2 || dayOfWeek == 3 || dayOfWeek == 4){
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek));
+                                    } else if(dayOfWeek == 6 || dayOfWeek == 7 || dayOfWeek == 8 || dayOfWeek == 9 || dayOfWeek == 10 || dayOfWeek == 11) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-1));
+                                    } else if(dayOfWeek == 13 || dayOfWeek == 14 || dayOfWeek == 15 || dayOfWeek == 16 || dayOfWeek == 17 || dayOfWeek == 18) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-2));
+                                    } else if(dayOfWeek == 20 || dayOfWeek == 21 || dayOfWeek == 22 || dayOfWeek == 23 || dayOfWeek == 24 || dayOfWeek == 25) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-3));
+                                    } else if(dayOfWeek == 27 || dayOfWeek == 28 || dayOfWeek == 29 || dayOfWeek == 30 || dayOfWeek == 31 || dayOfWeek == 32) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-4));
+                                    } else if(dayOfWeek == 34 || dayOfWeek == 35 || dayOfWeek == 36 || dayOfWeek == 37 || dayOfWeek == 38 || dayOfWeek == 39) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-5));
+                                    } else if(dayOfWeek == 41) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-6));
+                                    }
+                                } else {
+                                    if(dayOfWeek == 0 || dayOfWeek == 1 || dayOfWeek == 2 || dayOfWeek == 3){
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek));
+                                    } else if(dayOfWeek == 6 || dayOfWeek == 7 || dayOfWeek == 8 || dayOfWeek == 9 || dayOfWeek == 10) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-2));
+                                    } else if(dayOfWeek == 13 || dayOfWeek == 14 || dayOfWeek == 15 || dayOfWeek == 16 || dayOfWeek == 17) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-4));
+                                    } else if(dayOfWeek == 20 || dayOfWeek == 21 || dayOfWeek == 22 || dayOfWeek == 23 || dayOfWeek == 24) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-6));
+                                    } else if(dayOfWeek == 27 || dayOfWeek == 28 || dayOfWeek == 29 || dayOfWeek == 30 || dayOfWeek == 31) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-8));
+                                    } else if(dayOfWeek == 34 || dayOfWeek == 35 || dayOfWeek == 36 || dayOfWeek == 37 || dayOfWeek == 38) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-10));
+                                    } else if(dayOfWeek == 41) {
+                                        plus.appendTo(j$('#calendar .fc-day-grid .fc-row .fc-content-skeleton tbody tr td:not(.fc-week-number)').get(dayOfWeek-12));
+                                    }
+                                }
+
+                            }
+                        } else {
+                            var plus = j$('<img src="/s.gif" alt="Ajouter un événement - '+ day.format('L') +
+                                    '" class="addNewEventIcon" title="Ajouter un événement - '+day.format('L')+
+                                    '" style="display: block; position:absolute; bottom:0px; margin-right:0px;" onclick="autoCreate(\'' + objectId + '\',\'' + vendeurId + '\',\'' + day.format('L') + '\');"/>');
+                            if(j$('#filter-button-Dimanche').hasClass(classValueChecked) && !j$('#filter-button-Samedi').hasClass(classValueChecked) && dayOfWeek == 4){
+                            } else if(!j$('#filter-button-Dimanche').hasClass(classValueChecked) && j$('#filter-button-Samedi').hasClass(classValueChecked) && dayOfWeek == 5){
+                            } else if(j$('#filter-button-Dimanche').hasClass(classValueChecked) && !j$('#filter-button-Samedi').hasClass(classValueChecked) && (dayOfWeek == 5 || dayOfWeek == 6)){
+                                plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek-1));
+                            } else if(!j$('#filter-button-Dimanche').hasClass(classValueChecked) && j$('#filter-button-Samedi').hasClass(classValueChecked) && dayOfWeek == 6){
+                                plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek-1));
+                            } else if(!j$('#filter-button-Dimanche').hasClass(classValueChecked) && !j$('#filter-button-Samedi').hasClass(classValueChecked) && (dayOfWeek == 4 || dayOfWeek == 5)){
+                            } else if(!j$('#filter-button-Dimanche').hasClass(classValueChecked) && !j$('#filter-button-Samedi').hasClass(classValueChecked) && dayOfWeek == 6){
+                                plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek-2));
+                            } else {
+                                plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek));
+                            }
+                        }
+                       } else {
+                        if (view.name != 'month') {
+                            var plus = j$('<a href="/setup/ui/recordtypeselect.jsp?ent=Event&retURL=%2Fapex%2FVF_Calendrier%3FretURL%3D%252Fapex%252FVF_Calendrier%253Fid%26sfdc.override&save_new_url=%2F00U%2Fe%3FretURL%3D%252Fapex%252FVF_Calendrier&evt4=' + day.format('L') +
+                                        '" target="_parent" class="addLink"' +
+                                        ' style="display: block; position:absolute; bottom:0px;">' +
+                                        '<img src="/s.gif" alt="Ajouter un événement - '+ day.format('L') +
+                                        '" class="addNewEventIcon" title="Ajouter un événement - '+day.format('L')+
+                                        '" style="margin-right:0px;"></a>');
+                            if(j$('#filter-button-Dimanche').hasClass(classValueChecked) && !j$('#filter-button-Samedi').hasClass(classValueChecked)){
+                                if(dayOfWeek == 0 || dayOfWeek == 1 || dayOfWeek == 2 || dayOfWeek == 3){
+                                    plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek));
+                                } else if(dayOfWeek == 5 || dayOfWeek == 6) plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek-1));
+                            } else if(!j$('#filter-button-Dimanche').hasClass(classValueChecked) && j$('#filter-button-Samedi').hasClass(classValueChecked)){
+                                if(dayOfWeek == 0 || dayOfWeek == 1 || dayOfWeek == 2 || dayOfWeek == 3 || dayOfWeek == 4){
+                                    plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek));
+                                } else if(dayOfWeek == 6) plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek-1));
+                            } else if(!j$('#filter-button-Dimanche').hasClass(classValueChecked) && !j$('#filter-button-Samedi').hasClass(classValueChecked)){
+                                if(dayOfWeek == 0 || dayOfWeek == 1 || dayOfWeek == 2 || dayOfWeek == 3){
+                                    plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek));
+                                } else if(dayOfWeek == 6) plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek-2));
+                            } else {
+                                plus.appendTo(j$('#calendar .fc-day-grid .fc-content-skeleton tbody tr:first td:not(.fc-axis)').get(dayOfWeek));
+                            }
+                        }
+                       }
+
+                   }
+                   if (view.name == 'agendaWeek') {
+                       var days = [0,1,2,3,4,5,6];
+                       j$.each(days, addPlusToDay);
+                   }
+                   if (view.name == 'agendaDay') {
+                       addPlusToDay(0);
+                       var dateParam = view.start;
+                       generateActivitiesTable(dateParam, 'dayView');
+                   }
+                   if (view.name == 'month') {
+                       var days = [];
+                       for(i=1; i<=42; i++) days.push(i);
+                       j$.each(days, addPlusToDay);
+                   }
+
+                   // Filtre sur les vendeur
+                   var vendeurList = new Array();
+                   for(var i=0;i<vendeursIDs.length;i++){
+                       if(j$('#' + vendeursIDs[i]).is(':checked')){
+                           vendeurList.push(vendeursIDs[i]);
+                       }
+                   }
+
+                    if(loadingCompteur == vendeurList.length-1 || vendeurList.length == 0){
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        loadBar('enable');
+                        j$(":input").attr("disabled", false);
+                        if('{!userProfile}'.indexOf('Vendeur') >= 0 || '{!userProfile}'.indexOf('K/K - RV') >= 0) j$('#codeMagasinActuel').attr("disabled", true);
+                    }
+
+               },
+               dayClick: function(date, jsEvent, view, eventSources) {
+                   // Appel la fonction pour le tableau des activités
+                   j$('#calendar').fullCalendar('gotoDate', date);
+                   generateActivitiesTable(date, j$(this));
+               }
+           });
+
+           if(moment(localStorage.getItem("lastDay")).isValid()){
+               j$('#calendar').fullCalendar('gotoDate', moment(lastDay));
+           }
+        }
+
+        /*------------------------------------------*/
+        /* FONCTION DE CREATION DE CHANTIER/PROJET  */
+        /*------------------------------------------*/
+        function autoCreate(objectId, vendeurId, day){
+            var userProfile = j$("[id$=userProfile]")[0].value;
+            var isCall = '{!isCall}';
+            var codeMagasinActuel = j$("[id$=codeMagasinActuel]")[0].value;
+            var commercialRecordTypeId = '{!commercialRecordType}';
+            var objectName = '{!objectName}';
+            // Chargement
+            activeLoading(true);
+            // Traitement
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Calendrier.objectCreate}', objectId, vendeurId,
+                function(result, event) {
+                    if (event.status) {
+                        var vendeurIdCut = vendeurId.substring(0, 15);
+                        if(result.opportunityId != null){
+                            if(isCall == 'true'){
+                                location.href = '/00U/e?RecordType=' + commercialRecordTypeId +
+                                        '&evt1_lkid=' + vendeurIdCut +
+                                        '&evt4=' + day +
+                                        '&evt3_lkid=' + result.opportunityId +
+                                        '&evt2=' + result.contactName +
+                                        '&evt3=' + result.oppName +
+                                        '&ent=Event&retURL={!$Page.VF_Calendrier}' +
+                                        '&evt1=' + result.vendeurName;
+                            } else {
+                                location.href = '/setup/ui/recordtypeselect.jsp?ent=Event&retURL{!$Page.VF_Calendrier}%3FretURL%3D%252Fapex%252FVF_Calendrier%253Fid%26sfdc.override' +
+                                    '&evt1_lkid=' + vendeurIdCut +
+                                    '&evt4=' + day +
+                                    '&evt3_lkid=' + result.opportunityId +
+                                    '&evt2=' + result.contactName +
+                                    '&evt3=' + result.oppName +
+                                    '&evt1=' + result.vendeurName;
+                            }
+                        } else if(result.contactId != null){
+                            location.href= '/setup/ui/recordtypeselect.jsp?ent=Event&retURL={!$Page.VF_Calendrier}%3FretURL%3D%252Fapex%252FVF_Calendrier%253Fid%26sfdc.override'+
+                                    '&save_new_url=/00U/e?retURL={!$Page.VF_Calendrier}%3FobjectId%3D' + objectId + '%2526objectName%253D' + objectName + '%2526codeMagasin%253D' + codeMagasinActuel +
+                                    '&evt1=' + result.vendeurName +
+                                    '&evt1_lkid=' + vendeurIdCut +
+                                    '&evt4=' + day +
+                                    '&evt3_mlktp=001&evt2=' + result.contactName;
+                        } else {
+                            alert('L\'objet est non conforme pour cette action');
+                        }
+                    } else if (event.type === 'exception') {
+                        activeLoading(false);
+                        alert(event.message);
+                    } else {
+                        activeLoading(false);
+                        alert(event.message);
+                    }
+                },
+            {escape: true}
+            );
+        }
+
+        /*--------------------------*/
+        /* FONCTION DE REDIRECTION  */
+        /*--------------------------*/
+        function displayEvent(eventId){
+            window.location.href = "/" + eventId + "?retURL={!$Page.VF_Calendrier}";
+        }
+
+        /*---------------------------------------------*/
+        /* FONCTION DE CHANGEMENT DE JOUR OU D'HEURE   */
+        /*---------------------------------------------*/
+        function changeEventDateTime(event, revertFunc) {
+            var eventStartDate = event.start.format('YYYY-MM-DD HH:mm:ss');
+            if(event.end != null){
+                var eventEndDate = event.end.format('YYYY-MM-DD HH:mm:ss');
+            } else {
+                var eventEndDate = event.start.format('YYYY-MM-DD HH:mm:ss');
+            }
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Calendrier.changeEventDateTime}', event.eventId, event.allDay,
+                eventStartDate, eventEndDate,
+                function(result, event) {
+                    if (event.status) {
+
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+            {escape: true}
+            );
+
+            // Déselection du jour
+            if(colorTemp != ''){
+                j$(dayTemp).css('background-color', colorTemp);
+            }
+            document.getElementsByClassName("panel-activities-body")[0].innerHTML = noActivitiesMsg;
+            document.getElementsByClassName("panel-activities-title")[0].innerHTML = selectDayEventMsg;
+        }
+
+        /*--------------------------------------------------*/
+        /* FONCTION DE RECHERCHE DES VENDEURS PAR MAGASIN   */
+        /*--------------------------------------------------*/
+        function getVendeursByMagasin(codeMagasin){
+            var codeMagasinActuel;
+            j$('#filter-button-AllVendeurs').prop(classValueChecked, false);
+            if(codeMagasin == null){
+                codeMagasinActuel = j$("[id$=codeMagasinActuel]")[0].value;
+            } else{
+                codeMagasinActuel = codeMagasin;
+            }
+            vendeursIDs = new Array();
+            localStorage.setItem("localMag", codeMagasinActuel);
+
+            // Affectation proximité (planning)
+            if(proximityMode == 'true'){
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_Calendrier.getVendeursByDistanceRemote}', codeMagasinActuel, '{!objectName}', '{!objectId}',
+                    function(result, event) {
+                        if (event.status) {
+                            var content = '';
+                            if(result != null){
+
+                                var vendeursInfoList = JSON.parse(result);
+                                // Cacher le bouton "Afficher tous les vendeurs" et afficher le magasin de subtitution
+                                j$('#filter-button-AllVendeurs').remove();
+                                j$("[id$='substituteMag']").prop("value", "Afficher {!libelleMagasinSubstitution}");
+
+                                var content = '';
+                                if(vendeursInfoList != null) {
+                                    content = '<thead><tr><th>Vendeurs du magasin (' + vendeursInfoList.length + ')</th></tr></thead><tbody>';
+                                    vendeursInfoList.forEach(function(vendeur, index) {
+                                        var distanceVendeur;
+                                        var lineStyle = '';
+                                        // Distance
+                                        if(vendeur.Distance == null) distanceVendeur = 'n/a';
+                                        else distanceVendeur = Math.round(vendeur.Distance*10)/10 + ' km';
+                                        // Style ligne
+                                        if(vendeur.isResponsable){
+                                            lineStyle += 'font-weight: bold;';
+                                            responsableId = vendeur.UserId;
+                                        }
+                                        if(vendeur.Position == 1) lineStyle += ' font-style: italic;';
+                                        if(!vendeur.Vendeur.effectueVentes__c) lineStyle += ' color: grey;';
+                                        content += '<tr>';
+                                        content += '<td style="'+lineStyle+'">';
+                                        if(index == 0 || vendeur.Position == 1)
+                                            content += '<input type="radio" name="vendeursChecked" id="' + vendeur.UserId + '" value="' + vendeur.UserId + '" onClick="filtreEvent();" checked/>  ' + vendeur.UserName + ' (' + distanceVendeur + ')';
+                                        else
+                                            content += '<input type="radio" name="vendeursChecked" id="' + vendeur.UserId + '" value="' + vendeur.UserId + '" onClick="filtreEvent();"/>  ' + vendeur.UserName + ' (' + distanceVendeur + ')';
+                                        content += '        <a style="float:right;" href="/'+ vendeur.UserId +'">';
+                                        content += '            <img src="'+ vendeur.Vendeur.SmallPhotoUrl +'" class="vendeur-photo"/>';
+                                        content += '        </a>';
+                                        content += '    </td>';
+                                        content += '</tr>';
+                                        vendeursIDs.push(vendeur.UserId);
+                                    });
+                                    content += '</tbody>';
+                                }
+                            }
+                            j$('[id=vendeurs]').html(content);
+                            htmlLoading.removeClass("show").addClass("hidden");
+                        } else if (event.type === 'exception') {
+                            htmlLoading.removeClass("show").addClass("hidden");
+                            alert(event.message);
+                        } else {
+                            htmlLoading.removeClass("show").addClass("hidden");
+                            alert(event.message);
+                        }
+                        filtreEvent();
+                    },
+                {escape: false}
+                );
+            } else {
+                var userProf = '{!userProfile}';
+                var userId = '{!userId}';
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_Calendrier.getVendeursByMagasin}', codeMagasinActuel,
+                    function(result, event) {
+                        if (event.status) {
+                            var content = '';
+                            if(result != null){
+                                content = '<thead><tr><th>Vendeurs du magasin (' + result.length + ')</th></tr></thead><tbody>';
+                                j$.each(result,function( index, element){
+                                    if(userProf.indexOf('Vendeur') < 0 || (userProf.indexOf('Vendeur') >= 0 && userId == element.UserId)){
+                                        var lineStyle = '';
+                                        if(!element.Vendeur.effectueVentes__c) lineStyle += ' color: grey;';
+                                        if(element.isResponsable) {
+                                            lineStyle += ' font-weight: bold;';
+                                            responsableId = element.UserId;
+                                        }
+                                        content += '<tr>';
+                                        content += '    <td style="'+lineStyle+'">';
+                                        content += '        <input type="checkbox" name="vendeursChecked" id="' + element.UserId + '" value="' + element.UserId + '" onClick="filtreEvent();" checked/>  ' + element.Vendeur.FirstName + ' ' + element.Vendeur.LastName;
+                                        content += '        <a style="float:right;" href="/'+ element.UserId +'">';
+                                        content += '            <img src="'+ element.Vendeur.SmallPhotoUrl +'" class="vendeur-photo"/>';
+                                        content += '        </a>';
+                                        content += '    </td>';
+                                        content += '</tr>';
+                                        vendeursIDs.push(element.UserId);
+                                    }
+                                });
+                                content += '</tbody>';
+                            }
+                            j$('[id=vendeurs]').html(content);
+                            htmlLoading.removeClass("show").addClass("hidden");
+                        } else if (event.type === 'exception') {
+                            htmlLoading.removeClass("show").addClass("hidden");
+                            alert(event.message);
+                        } else {
+                            htmlLoading.removeClass("show").addClass("hidden");
+                            alert(event.message);
+                        }
+                        filtreEvent();
+                    },
+                {escape: false}
+                );
+            }
+
+            // Affichage du message de bienvenue
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Calendrier.getMagasinInfos}', codeMagasinActuel,
+                function(result, event) {
+                    if (event.status) {
+                        if(result != null){
+                            let mag = result;
+                            if(mag != undefined && mag.internalMessage__c != null && mag.internalMessage__c != 'undefined' && mag.Id != undefined && mag.Id.startsWith('001')){
+                                j$('#calWelcomeMessage').removeClass("hidden").addClass("show");
+                                j$('[id=calWelcomeMessage]').html(mag.internalMessage__c);
+                            } else {
+                                j$('#calWelcomeMessage').removeClass("show").addClass("hidden");
+                                j$('[id=calWelcomeMessage]').html('');
+                            }
+                        }
+                        htmlLoading.removeClass("show").addClass("hidden");
+                    } else if (event.type === 'exception') {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        alert(event.message);
+                    } else {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        alert(event.message);
+                    }
+                },
+            {escape: false}
+            );
+        }
+
+        /*-----------------------------------------------------*/
+        /* FONCTION DE FILTRAGE DES PLAGES HORAIRES VISIBLES   */
+        /*-----------------------------------------------------*/
+        function getPeriodesVisibles(){
+            var startDate = j$("[id$=filter-startHours]")[0].value;
+            var endDate = j$("[id$=filter-endHours]")[0].value;
+
+            localStorage.setItem("localStartHour", startDate);
+            localStorage.setItem("localEndHour", endDate);
+            j$('#calendar').fullCalendar('destroy');
+            renderCalendar(weekEnds, startDate, endDate, lastView, lastDay);
+            initOncklickEventCalendar();
+            filtreEvent();
+        }
+
+        /* FONCTIONS DE FILTRAGE SUR LES JOURS DU WEEK END   */
+        /*---------------------------------------------------*/
+        function getTask(){
+            daysHidden = new Array();
+            if(j$('#filter-button-Tasks').hasClass(classValueChecked)){
+                j$('#filter-button-Tasks').removeClass(classValueChecked).removeClass(classValueActive);
+                localStorage.setItem("localTask", "unchecked");
+            } else {
+                j$('#filter-button-Tasks').addClass(classValueChecked).addClass(classValueActive);
+                localStorage.setItem("localTask", "checked");
+            }
+            filtreEvent();
+        }
+        function getSamedi(){
+            daysHidden = new Array();
+            if(j$('#filter-button-Dimanche').hasClass(classValueChecked)){
+            } else { daysHidden.push(0); }
+
+            if(j$('#filter-button-Samedi').hasClass(classValueChecked)){
+                j$('#filter-button-Samedi').removeClass(classValueChecked).removeClass(classValueActive);
+                localStorage.setItem("localSat", "unchecked");
+                daysHidden.push(6);
+            } else {
+                j$('#filter-button-Samedi').addClass(classValueChecked).addClass(classValueActive);
+                localStorage.setItem("localSat", "checked");
+            }
+
+            var startDate = j$("[id$=filter-startHours]")[0].value;
+            var endDate = j$("[id$=filter-endHours]")[0].value;
+            j$('#calendar').fullCalendar('destroy');
+            renderCalendar(weekEnds, startDate, endDate, lastView, lastDay);
+            initOncklickEventCalendar();
+            filtreEvent();
+        }
+        function getDimanche(){
+            daysHidden = new Array();
+            if(j$('#filter-button-Dimanche').hasClass(classValueChecked)){
+                j$('#filter-button-Dimanche').removeClass(classValueChecked).removeClass(classValueActive);
+                localStorage.setItem("localSun", "unchecked");
+                daysHidden.push(0);
+            } else {
+                j$('#filter-button-Dimanche').addClass(classValueChecked).addClass(classValueActive);
+                localStorage.setItem("localSun", "checked");
+            }
+
+            if(j$('#filter-button-Samedi').hasClass(classValueChecked)){
+            } else { daysHidden.push(6); }
+
+            var startDate = j$("[id$=filter-startHours]")[0].value;
+            var endDate = j$("[id$=filter-endHours]")[0].value;
+            j$('#calendar').fullCalendar('destroy');
+            renderCalendar(weekEnds, startDate, endDate, lastView, lastDay);
+            initOncklickEventCalendar();
+            filtreEvent();
+        }
+
+        /* FONCTION DE FERMETURE DES TACHES   */
+        /*------------------------------------*/
+        function closeTask(taskId){
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Calendrier.closeTask}', taskId,
+                function(result, event) {
+                    if (event.status) {
+                        location.reload();
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+            {escape: true}
+            );
+        }
+
+        /* FONCTION DE CHANGEMENT DE JOUR VIA LE DATAPICKER  */
+        /*---------------------------------------------------*/
+        function dateChanged(event) {
+            var localStorageTemp = localStorage.getItem("lastView");
+            if(localStorageTemp != 'undefined' && localStorageTemp != null && moment(localStorage.getItem("lastDay")).isValid()){
+                var formatedDate = new Date(event.date);
+                var momentDate = moment(formatedDate);
+                j$('#calendar').fullCalendar( 'changeView', 'agendaDay' );
+                j$('#calendar').fullCalendar('gotoDate', moment(momentDate, "MM-DD-YYYY"));
+                filtreEvent();
+            }
+        }
+
+        function activeLoading(statut) {
+            if(statut) {
+                htmlLoading.removeClass("hidden").addClass("show");
+                loadBar('disable');
+                j$(":input").attr("disabled", true);
+            } else {
+                htmlLoading.removeClass("show").addClass("hidden");
+                loadBar('enable');
+                j$(":input").attr("disabled", false);
+                if('{!userProfile}'.indexOf('Vendeur') >= 0 || '{!userProfile}'.indexOf('K/K - RV') >= 0)
+                    j$('#codeMagasinActuel').attr("disabled", true);
+            }
+        }
+
+        function loadBar(statut){
+            if (statut=='enable'){
+                j$(document.body).css( {"cursor": "default"} );
+                j$("body").css( {"cursor": "default"} );
+                j$("#loading").css("visibility", "hidden");
+            } else if (statut=='disable'){
+                j$(document.body).css( {"cursor": "wait"} );
+                j$("body").css( {"cursor": "wait"} );
+                j$("#loading").css( {"visibility": "visible"} );
+            }
+        }
+
+        /* DATATABLE                                         */
+        /*---------------------------------------------------*/
+        function activeSorterTable() {
+            j$("[id$=activities-table]").dataTable({
+                responsive: true,
+                "bRetrieve": true,
+                "language": {
+                    "url": "{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/l18n/French.json')}"
+                },
+                "aaSorting": [[ 7, "asc" ], [ 3, "asc" ]],
+                "aoColumnDefs": [
+                    { "bSortable": false, "aTargets": [ 0 ] }
+                ]
+            });
+        }
+
+        /* FONCTION DE CREATION DE COMPOSANT LIGHTNING POUR AFFICHER LES RDV DE SERVICE  */
+        /*-------------------------------------------------------------------------------*/
+        function initDatatable(annee1, mois1, jour1, annee2, mois2, jour2){
+            // Mise à jour du titre du tableau des RDV de service
+            editDataTableTitle(annee1, mois1, jour1, annee2, mois2, jour2);
+
+            // Création du composant DataTableDev pour afficher les RDV de service via composant lightning
+            var startDatetime = new Date(annee1, mois1, jour1, 0, 0, 0, 0);
+            var endDatetime = new Date(annee2, mois2, jour2, 0, 0, 0, 0);
+            $Lightning.use("c:ServiceAppointmentsTableApp", function() {
+                $Lightning.createComponent("c:ServiceAppointmentsTable",
+                    {
+                        codeMagasin : j$("[id$=codeMagasinActuel]")[0].value,
+                        userRole : j$("[id$=userProfile]")[0].value,
+                        userName : '{!userName}',
+                        startDatetime : startDatetime,
+                        endDatetime : endDatetime
+                    },
+                   'table-serviceAppointments',
+                   function(cmp) {
+                        
+                   }
+                );
+            });
+        }
+
+        /* FONCTION DE CREATION DE COMPOSANT LIGHTNING POUR AFFICHER LES RDV DE SERVICE  */
+        /*-------------------------------------------------------------------------------*/
+        function editDataTableTitle(annee1, mois1, jour1, annee2, mois2, jour2){
+            // Mise à jour du titre du tableau des RDV de service
+            mois1++; mois2++;
+            if(mois1.toString().length == 1) mois1 = '0'+mois1;
+            if(jour1.toString().length == 1) jour1 = '0'+jour1;
+            if(mois2.toString().length == 1) mois2 = '0'+mois2;
+            if(jour2.toString().length == 1) jour2 = '0'+jour2;
+            var startDay = jour1+'/'+mois1+'/'+annee1;
+            var endDay = jour2+'/'+mois2+'/'+annee2;
+            var panelTitle = '';
+            // Cas d'affichage journalier
+            if(startDay == endDay){
+                panelTitle = 'Rendez-vous de service du '+startDay+'';
+            // Cas hebdomadaire / mensuel
+            } else {
+                panelTitle = 'Rendez-vous de service du '+startDay+' au '+endDay+'';
+            }
+            document.getElementsByClassName("panel-serviceAppointment-title")[0].innerHTML = panelTitle;
+        }
+    </script>
+    <style type="text/css">
+        @media all and (orientation: landscape) {}
+
+        body {
+            background-color: #FFF !important;
+        }
+
+        #cal-legend ul {margin:0;padding:0;list-style:none;}
+        #cal-legend ul li {margin:0;padding:5px;}
+        #cal-legend #legend-commerciale li span, #cal-legend #legend-rdv-actif li span, #cal-legend #legend-rdv-passif li span {display:block; height:15px; width:16px; margin-left:2px; margin-right:3px; float:left; border-radius:4px;}
+        #cal-legend #legend-statut li span {display:block; height:6px; width:30px; margin-left:2px; margin-right:3px; float:left; border-radius:2px;margin-top:5px;}
+        /*#calendar {margin-top:20px;}*/
+        #calendar a:hover {color:#fff !important;}
+
+        .fc-event-inner {padding: 2px;}
+        .fc-other-month {background-color: #f4f4f4;}
+        .fc-today  {background-color: #f0faff;}
+        .fc-event-container {z-index:10;}
+        .fc-center {font-size:22px; font-weight:bold;}
+
+        .leftBar { height:5px; font-size: 5px; border-top-left-radius: 1px; border-bottom-left-radius: 1px; }
+        .rightBar { width:15px; height:15px; font-size: 5px; border-top-left-radius: 1px; border-bottom-left-radius: 1px;}
+        .event-available { background:green; border-color:green; margin: 0px !important; background-image: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(255,255,255,.5) 30px, rgba(255,255,255,.5) 60px); }
+        .event-r0 { background:#00FFFF; border-color:#00FFFF; }
+        .event-r1 { background:#73C2FB; border-color:#73C2FB; }
+        .event-r2 { background:#6B72FF; border-color:#6B72FF; }
+        .event-rplus { background:#0B00AD; border-color:#0B00AD;}
+        .event-other { background:#CECECE ; border-color:#CECECE; color: #000; }
+        .event-prospection { background:#f5c130; border-color:#f5c130; }
+        .event-task { background:#754D82; border-color:#754D82; }
+        .rdv-pris { background:red; border-color:red; }
+        .rdv-nonConfirme { background:orange; border-color:orange; }
+        .rdv-effectue { background:green; border-color:green; }
+        .rdv-nonEffectue { background:black; border-color:black; }
+        .rdv-deplace, .rdv-aReaffecter { background:violet; border-color:violet; }
+        .rdv-annuleCall { background:grey; border-color:grey; }
+        .rdv-actif { background:url('{! URLFOR($Resource.FullCalendar, 'img/actif.png') }') }
+        .rdv-passif { background:url('{! URLFOR($Resource.FullCalendar, 'img/passif.png') }') }
+        .fc-bgevent {background:#C4C4C4;}
+
+        .page-header{
+            font-size: 30px;
+            text-align: center;
+            margin: 15px 0px 10px;
+        }
+
+        .adresseBlock{
+            float:left;
+            font-size:14px;
+        }
+
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height:100%;
+            margin-top: -10px;
+            line-height: 20px;
+            text-align: center;
+            z-index:10;
+        }
+
+        .section {
+            height: 500px;
+            line-height: 500px; }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative; }
+
+        /* Loaders */
+        .loader-quart {
+            border-radius: 20px;
+            border: 4px solid rgba(0, 0, 0, 0.4); }
+
+        .loader-quart:after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            bottom: -4px;
+            right: -4px;
+            border-radius: 20px;
+            border: 4px solid transparent;
+            border-top-color: #000;
+            -webkit-animation: spin 1s linear infinite;
+            -moz-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite; }
+
+        .vendeur-photo {
+            margin-right: 3px;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Animations */
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg); } }
+        @-moz-keyframes spin {
+            from {
+                -moz-transform: rotate(0deg); }
+
+            to {
+                -moz-transform: rotate(360deg); } }
+        @keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg); } }
+    </style>
+
+    <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.FullCalendar, 'fullcalendar/fullcalendar.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.qTip_js, 'jquery.qtip.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.FullCalendar, 'fullcalendar/fullcalendar.print.css')}" html-media="print"/>
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrapDatepicker_js, 'css/datepicker.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/dataTables.bootstrap.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Datatable_CSS)}"/>
+
+    <div class="adresseBlock">
+        <div>{!adresseLigne1}</div>
+        <div>{!adresseLigne2}</div>
+        <div>{!adresseLigne3}</div>
+    </div>
+    <c:pageheader title="Calendrier de" icon="calendar" subtitle="{!userName}"/>
+    <div id="calPanel">
+        <div id="calWelcomeMessage" class="text-center alert alert-warning hidden" role="alert">
+            Le Service Client KparK est ouvert pendant l’été pour nos clients (infos, prise de rdv, sav) ! 
+            Cependant, aucun rdv ne sera positionné, par le service client, sur les calendriers Magasin entre le 01/08/2022 et le 22/08/2022 inclus
+        </div>
+        <div id="cal-options" class="row">
+            <apex:form >
+                <apex:outputPanel id="hiddenFields">
+                    <apex:inputHidden id="userId" value="{!userId}" />
+                    <apex:inputHidden id="userProfile" value="{!userProfile}" />
+                </apex:outputPanel>
+                <apex:actionFunction name="substituteMag" action="{!magSubstitution}"></apex:actionFunction>
+            </apex:form>
+            
+            <apex:form styleClass="form-inline col-md-12">
+                <div class="form-group col-md-8">
+                    <label class="checkboxLabel" style="margin-left:10px;">De : </label>
+                    <apex:selectlist style="margin-left:1%; margin-right:1%;" styleClass="fc-button fc-state-default fc-corner-right" id="filter-startHours" size="1" value="{!heureDebut}" onChange="getPeriodesVisibles();">
+                        <apex:selectOptions value="{!heuresDebut}" />
+                    </apex:selectlist>
+                    <label class="checkboxLabel"> à : </label>
+                    <apex:selectlist style="margin-left:1%;" styleClass="fc-button fc-state-default fc-corner-right" id="filter-endHours" size="1" value="{!heureFin}" onChange="getPeriodesVisibles();">
+                        <apex:selectOptions value="{!heuresFin}" />
+                    </apex:selectlist>
+                    <label class="checkboxLabel" style="margin-left:1%;"> inclure les : </label>
+                    <button type="button" class="btn btn-default checked active" id="filter-button-Samedi" data-toggle="button" onClick="getSamedi();">Samedi</button>
+                    <button type="button" class="btn btn-default" id="filter-button-Dimanche" data-toggle="button" onClick="getDimanche();">Dimanche</button>
+                    <button type="button" class="btn btn-default checked active" id="filter-button-Tasks" data-toggle="button" onClick="getTask();">Taches</button>
+                    <label style="margin-left:1%;">Aller au : </label>
+                    <div id="datetimepicker1" class="input-append date input-group">
+                        <input type="text" id="datepicker" class="hide"></input>
+                        <span id="dp2" class="btn btn-default" style="padding:2px 8px;"><i class="glyphicon glyphicon-calendar"></i></span>
+                    </div>
+                </div>
+            </apex:form>
+        </div>
+
+        <div class="row" style="padding: 0px 10px;">
+            <table style="margin-top:10px;">
+                <tr>
+                    <td style="width:22%;" valign="top">
+                        <div class="panel panel-primary" style="margin-right:5px;">
+                            <div class="panel-heading"><h3 class="panel-title">Vendeurs par magasin</h3></div>
+                            <div id="cal-legend" class="panel-body">
+                                <ul id="magasin">
+                                    <li><strong>Magasin : </strong></li>
+                                    <li>
+                                        <apex:form >
+                                            <apex:selectlist tabIndex="1" styleClass="form-control input-sm" id="codeMagasinActuel" size="1" value="{!codeMagasinActuel}" onChange="getVendeursByMagasin(null);"
+                                                disabled="{!(CONTAINS($Profile.Name, 'RVJ') || CONTAINS($Profile.Name, 'RV') || CONTAINS($Profile.Name, 'Vendeur')) && !unlockMagasin}"
+                                                readonly="{!(CONTAINS($Profile.Name, 'RVJ') || CONTAINS($Profile.Name, 'RV') || CONTAINS($Profile.Name, 'Vendeur')) && !unlockMagasin}">
+                                                <apex:selectOptions value="{!magasinOptionList}" />
+                                            </apex:selectlist>
+                                        </apex:form>
+                                    </li>
+                                </ul>
+                                <ul id="magasin">
+                                    <li id="checkVendeursBlock">
+                                        <apex:form >
+                                            <apex:commandlink action="{!magSubstitution}" target="_blank">
+                                                <apex:commandButton id="substituteMag"  value="Magasin de Substitution" styleClass="btn btn-default" rendered="{!CONTAINS(codeMagasinSubstitution, '0') && proximityMode}"/>
+                                            </apex:commandlink>
+                                            <button type="button" class="btn btn-default checked active" id="filter-button-AllVendeurs" data-toggle="button">Tout cocher/décocher</button>
+                                        </apex:form>
+                                    </li>
+                                </ul>
+                                <apex:outputPanel layout="block" style="max-height:240px; overflow: auto"><table class="table table-condensed table-striped table-hover" id="vendeurs"></table></apex:outputPanel>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary" style="margin-right:5px;">
+                            <div class="panel-heading"><h3 class="panel-title">Légende</h3></div>
+                            <div id="cal-legend" class="panel-body">
+                                <ul id="commerciale">
+                                    <li><button type="button" class="btn btn-default checked active" id="filter-button-AllEvents" data-toggle="button">Tout cocher/décocher</button></li>
+                                </ul>
+                                <div class="row" style="padding-right: 15px; padding-left: 15px;">
+                                    <ul id="legend-commerciale" class="col-md-6">
+                                        <li><strong>Type RDV : </strong></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-R0" data-toggle="button" style="width:100%;"><span class="event-r0"></span>R0</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-R1" data-toggle="button" style="width:100%;"><span class="event-r1"></span>R1</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-R2" data-toggle="button" style="width:100%;"><span class="event-r2"></span>R2</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-R" data-toggle="button" style="width:100%;"><span class="event-rplus"></span>R+</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-Annexe" data-toggle="button" style="width:100%;"><span class="event-other"></span>Annex.</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-Prosp" data-toggle="button" style="width:100%;"><span class="event-prospection"></span>Prospe.</button></li>
+                                    </ul>
+                                    <ul id="legend-statut" class="col-md-6">
+                                        <li><strong>Statut : </strong></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-Pris" data-toggle="button" style="width:100%;"><span class="rdv-pris"></span>Pris</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-NonConf" data-toggle="button" style="width:100%;"><span class="rdv-nonConfirme"></span>Non confirmé</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-Eff" data-toggle="button" style="width:100%;"><span class="rdv-effectue"></span>Effectué</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-NonEff" data-toggle="button" style="width:100%;"><span class="rdv-nonEffectue"></span>Non effectué</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-Reaff" data-toggle="button" style="width:100%;"><span class="rdv-aReaffecter"><br/></span>A Réaffecter</button></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-AnnulC" data-toggle="button" style="width:100%;"><span class="rdv-annuleCall"><br/></span>Annulé Call</button></li>
+                                    </ul>
+                                </div>
+                                <div class="row" style="padding-right: 15px; padding-left: 15px;">
+                                    <ul id="legend-rdv-actif" class="col-md-6">
+                                        <li><strong>Origine RDV : </strong></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-Actif" data-toggle="button" style="width:100%;"><span class="rdv-actif"></span>RDV Actif</button></li>
+                                    </ul>
+                                    <ul id="legend-rdv-passif" class="col-md-6">
+                                        <li><strong>&nbsp;</strong></li>
+                                        <li><button type="button" class="btn btn-default checked active" id="filter-button-Passif" data-toggle="button" style="width:100%;"><span class="rdv-passif"></span>RDV Passif</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="width:78%">
+                        <div id="calendar"></div>
+                        <div id="loading" class="section" style="visibility: visible;">
+                            <div id="loading-block" style="position: fixed; top:45%; left:40%; width:300px; display:block; background-color:white; border:1px solid black; padding:10px;">
+                                <span class="loader loader-quart"></span>
+                                Chargement en cours... Veuillez patienter
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary" style="margin-top:15px;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title panel-activities-title">Selectionner un jour pour voir la liste des évènements</h3>
+                            </div>
+                            <div class="panel-body panel-activities-body">
+                                {!$Label.AucunEnregTrouve}
+                            </div>
+                        </div>
+                        <div class="panel panel-primary" style="margin-top:15px;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title panel-serviceAppointment-title"></h3>
+                            </div>
+                            <div class="panel-body panel-activities-body">
+                                <div id="table-serviceAppointments" class="lightningComponentMap"/>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</apex:page>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Email d&apos;erreur</description>
+        <name>Email_Erreur</name>
+        <label>Email Erreur</label>
+        <locationX>394</locationX>
+        <locationY>310</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>franck.gourdeaux@kpark.fr,tma.development.team.kpark@soprasteria.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <stringValue>support@kpark.fr</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>messageEmailErreur</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>[Kube] Le flux de connexion pour l&apos;utilisateur {!LoginFlow_UserId} a échoué</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <apiVersion>49.0</apiVersion>
+    <assignments>
+        <description>Mise à jour du champ Dernière activité le</description>
+        <name>MAJ_Derni_re_Connexion</name>
+        <label>MAJ Dernière Connexion</label>
+        <locationX>382</locationX>
+        <locationY>50</locationY>
+        <assignmentItems>
+            <assignToReference>user.derniereConnexion__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>MAJ_Utilisateur</targetReference>
+        </connector>
+    </assignments>
+    <description>Flux exécuté à la connexion d&apos;un utilisateur</description>
+    <interviewLabel>Utilisateur - Gestion à la Connexion {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Utilisateur - Gestion à la connexion</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordLookups>
+        <description>Récupération des informations de l&apos;utilisateur</description>
+        <name>Utilisateur</name>
+        <label>Utilisateur</label>
+        <locationX>233</locationX>
+        <locationY>50</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>MAJ_Derni_re_Connexion</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Email_Erreur</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>LoginFlow_UserId</elementReference>
+            </value>
+        </filters>
+        <object>User</object>
+        <outputReference>user</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>derniereConnexion__c</queriedFields>
+    </recordLookups>
+    <recordUpdates>
+        <description>Mise à jour de la date der dernière activité</description>
+        <name>MAJ_Utilisateur</name>
+        <label>MAJ Utilisateur</label>
+        <locationX>547</locationX>
+        <locationY>50</locationY>
+        <faultConnector>
+            <targetReference>Email_Erreur</targetReference>
+        </faultConnector>
+        <inputReference>user</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>50</locationY>
+        <connector>
+            <targetReference>Utilisateur</targetReference>
+        </connector>
+    </start>
+    <status>Draft</status>
+    <textTemplates>
+        <description>Message pour l&apos;email d&apos;erreur</description>
+        <name>messageEmailErreur</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>Erreur : {!$Flow.FaultMessage}
+
+VALEUR DES RESSOURCES
+ID Utilisateur : {!LoginFlow_UserId}
+Utilisateur : {!user}
+Date/heure du jour : {!$Flow.CurrentDateTime}</text>
+    </textTemplates>
+    <variables>
+        <name>LoginFlow_UserId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>user</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>User</objectType>
+    </variables>
+</Flow>

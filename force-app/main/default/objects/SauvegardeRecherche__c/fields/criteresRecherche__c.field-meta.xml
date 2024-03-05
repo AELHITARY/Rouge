@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>criteresRecherche__c</fullName>
+    <description>CRM-449 : Critères de recherche saisis par l’utilisateur</description>
+    <externalId>false</externalId>
+    <label>Critères de recherche</label>
+    <length>131072</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

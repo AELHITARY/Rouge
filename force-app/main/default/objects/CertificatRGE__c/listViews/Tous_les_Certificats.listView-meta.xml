@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tous_les_Certificats</fullName>
+    <columns>NAME</columns>
+    <columns>codeDepot__c</columns>
+    <columns>dateDebutValidite__c</columns>
+    <columns>dateFinValidite__c</columns>
+    <columns>numCertificat__c</columns>
+    <columns>numSiret__c</columns>
+    <columns>IBAN__c</columns>
+    <columns>bic__c</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <label>Tous les Certificats</label>
+    <language>fr</language>
+</ListView>

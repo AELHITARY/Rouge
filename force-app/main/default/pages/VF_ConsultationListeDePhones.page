@@ -1,0 +1,2123 @@
+<apex:page title="Consultation de listes de phones" docType="html-5.0" controller="Ctrl_ConsultationListeDePhones" action="{!insertUserStats}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/custom-theme/jquery-ui-1.12.1.min.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'css/cartographie.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/dataTables.bootstrap.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrapDatepicker_js, 'css/datepicker.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.KparK_Datatable_CSS)}" />
+    <style type="text/css">      
+        .custom-popup .leaflet-popup-content {
+            height: 90px;
+        }     
+        .caseEditable {
+            background-color:#F6E7CE;
+        }
+            
+        /* Bootstrap */
+        .visualstrap .table > thead > tr > th, .visualstrap .table > tbody > tr > th, .visualstrap .table > tfoot > tr > th, .visualstrap .table > thead > tr > td, .visualstrap .table > tbody > tr > td, .visualstrap .table > tfoot > tr > td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 4px;
+        }
+
+        .picklistStyle{
+            width:100%;
+            float:right;
+            padding:5px 10px;
+            font-size:12px;
+            line-height:1.5;
+            border-radius:3px;
+            color: #555555;
+            background-color: #ffffff;
+            border:1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing:border-box;
+            transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+
+        .lookupInput input{
+            width:90%;
+            padding:5px 10px;
+            font-size:12px;
+            line-height:1.5;
+            border-radius:3px;
+            color: #555555;
+            background-color: #ffffff;
+            border:1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing:border-box;
+            transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+            
+        .dateTimeRdvField {
+            align-items: center;
+            -webkit-float:right;
+            height: 26px;
+            padding:0px 6px;
+            font-size:11px;
+            line-height:1;
+            border-radius:3px;
+            color: #555555;
+            background-color: #ffffff;
+            border:1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing:border-box;
+            transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+            
+        .integerField {
+            align-items: center;
+            -webkit-float:right;
+            height: 26px;
+            width: 70px;
+            padding:0px 6px;
+            font-size:11px;
+            line-height:1;
+            border-radius:3px;
+            color: #555555;
+            background-color: #ffffff;
+            border:1px solid #cccccc;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-sizing:border-box;
+            transition:border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+
+        input[type="date"]:: -webkit-calendar-picker-indicator{
+            -webkit-padding-start: 1px;
+        }
+            
+        #indicateurs .well {
+            padding: 10px !important;
+            margin-bottom:0px !important;
+            padding-bottom:0px !important;
+        }
+            
+        #loading {
+            /* position: absolute;
+            top: 25%;
+            left: 0; */
+            width: 100%;
+            margin-top: 10px;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        #loadingDiv{
+              background: #444;
+              display: fixed;
+              opacity: 0.9;
+              left: 50%;
+              position: fixed;
+              top: 50%;
+              vertical-align: middle;
+              z-index: 100000;
+        }
+
+        .section {
+            height: 20px;
+            line-height: 20px; }
+    
+        /* Collapsable Panels */
+        .panel-heading {
+            cursor: pointer;
+        }
+    
+        .panel-heading a:hover, .panel-heading a:enabled, .panel-heading a:active, .panel-heading a:visited {
+            text-decoration:none;
+        }
+    
+        .panel-heading a:after {
+            font-family:'Glyphicons Halflings';
+            content:"\e114";
+            float: right;
+        }
+        .panel-heading a.collapsed:after {
+            content:"\e080";
+        }
+            
+        /* Loaders */
+        .loader {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative; }
+
+        .loader-quart {
+            border-radius: 20px;
+            border: 4px solid rgba(0, 0, 0, 0.4); }
+
+        .loader-quart:after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            bottom: -4px;
+            right: -4px;
+            border-radius: 20px;
+            border: 4px solid transparent;
+            border-top-color: #000;
+            -webkit-animation: spin 1s linear infinite;
+            -moz-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite; }
+
+        .loader2 {
+            width: 15px;
+            height: 15px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative; }
+
+        .loader2-quart {
+            border-radius: 15px;
+            border: 3px solid rgba(0, 0, 0, 0.4); }
+
+        .loader2-quart:after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            bottom: -3px;
+            right: -3px;
+            border-radius: 15px;
+            border: 3px solid transparent;
+            border-top-color: #000;
+            -webkit-animation: spin 1s linear infinite;
+            -moz-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite; }
+
+        /* Animations */
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg); } }
+        @-moz-keyframes spin {
+            from {
+                -moz-transform: rotate(0deg); }
+
+            to {
+                -moz-transform: rotate(360deg); } }
+        @keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg); } }
+            
+        /* Datatable */
+        .table-liste thead {
+            display: table-header-group;
+            background-color: #dddddd;
+        }
+
+        .table-liste th {
+            white-space: normal;
+        }
+            
+        body.modal-open div.modal-backdrop { 
+            z-index: 0; 
+        }
+            
+        .selectedLine.even, .selectedLine.even td  {
+            background-color: #D8DEED !important;
+        }
+            
+        .selectedLine.odd, .selectedLine.odd td  {
+            background-color: #B0BED9 !important;
+        }
+        
+        :-ms-input-placeholder { /* IE10–11 */
+            color: #ccc !important;
+        }
+            
+        .btn-xsm {
+            padding: 5px 6px !important;
+            font-size: 11px !important;
+            line-height: 1.5 !important;
+            border-radius: 3px !important;
+            color: #428bca !important;
+        }
+    </style>
+
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui.1.12.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet-control-geocoder/Control.Geocoder.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'js/cartographie.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'classes/dqe.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'jquery.dqe.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_Knob_js, 'JQuery-Knob/dist/jquery.knob.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/media/js/jquery.dataTables.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/dataTables.bootstrap.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/plugin/sorting/natural.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/bootstrap-datepicker.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrapDatepicker_js, 'js/locales/bootstrap-datepicker.fr.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.FullCalendar, 'lib/moment.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.Cartographie, 'proj4s/proj4js-combined.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.Cartographie, 'proj4s/EPSG27572.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.Cartographie, 'proj4s/EPSG4326.js')}" />
+    <apex:remoteobjects >
+        <apex:remoteobjectmodel name="ListePhoningVendeur__c" fields="Id, Name">
+            <apex:remoteobjectfield name="DR_Filtre__c" jsshorthand="filtreDR" />
+            <apex:remoteobjectfield name="DV_Filtre__c" jsshorthand="filtreDV" />
+            <apex:remoteobjectfield name="magasin_Filtre__c" jsshorthand="filtreMag" />
+        </apex:remoteobjectmodel>
+    </apex:remoteobjects>
+    <script type="text/javascript">
+        $j = jQuery.noConflict();
+        var datatableOptions;
+        var selectedPOIid = '';
+        var selectedPOIcolor = '';
+        var selectedIconMapId = '';
+        var selectedIconMapColor = '';
+        var phoneIdListe = [];
+        var selectedClass = 'selectedLine';
+        var script;
+        var marqueursList = {};
+        var dateDebutActuelle = '';
+        var dateFinActuelle = '';
+        var dateDebutIsEmpty = false;
+        var dateFinIsEmpty = false;
+        var compteIdListe = [];
+        var phoneDetailsListe = [];
+
+        // Initialisation des jauges, et leur couleurs
+        var jaugeAppeleDebriefe;
+        var jaugeArgumentation;
+        var jaugeRDVPris;
+        var red = '#d9534f';
+        var orange = '#f0ad4e';
+        var green = '#5cb85c';
+
+        // Check navigateur
+        var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+        var isFirefox = typeof InstallTrigger !== 'undefined';
+        var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0 || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification);
+        var isIE = /*@cc_on!@*/false || !!document.documentMode;
+        var isChrome = !!window.chrome && !!window.chrome.webstore;
+        var isMobile = isMobile();
+
+        // Initialisation des textes pour les messages d'erreur
+        var validationDatePasseeError =             "{!$Label.ldp_erreur_dateFutur}";
+        var validationDureeNegativeError =          "{!$Label.ldp_erreur_dureeNegative}";
+        var validationDateInconnueError =           "{!$Label.ldp_erreur_dateRDVValide}";
+        var validationHeureInconnueError =          "{!$Label.ldp_erreur_heureRDVValide}";
+        var validationRegionObligatoireError =      "{!$Label.ldp_erreur_regionObligatoire}";
+        var validationDatePositiveError =           "{!$Label.ldp_erreur_datePositive}";
+        var validationDateDebutLeftBorder =         "{!$Label.ldp_erreur_debutLeftBorder}";
+        var validationDateFinLeftBorder =           "{!$Label.ldp_erreur_finLeftBorder}";
+        var validationDateRightBorder =             "{!$Label.ldp_erreur_rightBorder}";
+
+        // Textes informatifs
+        var dateMinValid = '01/01/2017'; // Date min de validation des RDV
+        var noResults = 'Pas de résultats.' // Texte si la recherche ne renvoie rien
+
+        // Status des devis utilisés pour le graphique en camembert
+        var STATUT_DEVIS = {TRANSMIS: "{!STATUT_DEVIS[0]}", VENDU_ATT: "{!STATUT_DEVIS[1]}", VENDU_ENR: "{!STATUT_DEVIS[2]}", VENDU_INC: "{!STATUT_DEVIS[3]}"};
+
+        // Initialisation des actions
+        var ACTIONS_PHONES = {UPDATE:'update', REMOVE:'remove', LOAD:'load', ACTIONS:'actions'};
+
+        // Initialisation du nom des filtres
+        var FILTRES_PHONES = {DEBRIEFE: 'Debriefe', ADEBRIEFER: 'ADebriefer'};
+
+        // Initialisation des filtres sélectionnés ou non
+        sessionStorage.setItem("Debriefe","nselected");
+        sessionStorage.setItem("ADebriefer","nselected");
+
+        // Valeurs des champs stockées en session (définies avec refreshFieldsInitValues)
+        var fieldInitValue_DR;
+        var fieldInitValue_DV;
+        var fieldInitValue_magasin;
+        var fieldInitValue_vendeur;
+        var fieldInitValue_statut;
+        var fieldInitValue_dateDebut;
+        var fieldInitValue_dateFin;
+        var fieldInitValue_LDP;
+
+        // Initialisation des types de point
+        dotTypeColor = window.dotTypeColor || {};
+        dotTypeColor.REDFLAG       = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/flag-export-red.png')}";
+        dotTypeColor.YELLOWFLAG    = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/flag-export-yellow.png')}";
+        dotTypeColor.GREENFLAG     = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/flag-export-green.png')}";
+        dotTypeColor.Debriefe      = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/flag-export-green.png')}";
+        dotTypeColor.ADebriefer    = "{!URLFOR($Resource.Cartographie, 'img/listeDePhones/flag-export-red.png')}";
+
+        // Chargement librairie des graphiques Google Chart
+        google.charts.load('current', {'packages':['corechart']});
+
+        // Initialisation des types de point
+        dotType = window.dotType || {};
+        dotType.Debriefe                   = FILTRES_PHONES.DEBRIEFE;
+        dotType.ADebriefer                 = FILTRES_PHONES.ADEBRIEFER;
+        dotType.SEARCH                     = "Search"; //Pour la search box
+
+        // Geocodage
+        // Creation des objets source (LE2) et destination (Lat/Long)
+        var source = new Proj4js.Proj('EPSG:27572');
+        var dest = new Proj4js.Proj('EPSG:4326');
+        var map, searchBox, sectorPolygon;
+        var sectorName, sectorCode='';
+        var latitude_min = 90; 
+        var longitude_max = -180; 
+        var latitude_max  = -90; 
+        var longitude_min = 180;
+        var init = false;
+
+        var sectorCoordsArray = []; // Tableau des coordonées Lat/Long après convertions
+        var markersArray = {}; // Tableau des markers
+        var poinVisibleList = {}; // Tableau des points visible sur la carte
+
+        // Page Init
+        $j(document).ready(function(){
+            initializeMap();
+
+            //TODO : utiliser les options data et deferRender pour améliorer les performances lors de nombreux résultats?
+            // Option du datatable
+            datatableOptions = {
+                responsive: true,
+                "bRetrieve": true,
+                "language": {
+                    "url": "{!URLFOR($Resource.DataTables_js, 'DataTables-1.10.6/l18n/French.json')}"
+                },
+                "aaSorting": [[ 1, "asc" ]],
+                "columnDefs": [
+                    { "orderable": false, "targets": [ 0, 8, 9, 10, 11, 12 ] },
+                    { "type": "natural", "targets": [ 0 ] }
+                ]
+            };
+
+            // Init du datepicker
+            $('#input-datetimepicker').datepicker({
+                format: "dd/mm/yyyy",
+                language: "fr",
+                autoclose: true,
+                todayHighlight: true,
+                showOnFocus: false
+            });
+            $('#input-datetimepicker2').datepicker({
+                format: "dd/mm/yyyy",
+                language: "fr",
+                autoclose: true,
+                todayHighlight: true,
+                showOnFocus: false
+            });
+
+            // Chargement des indicateurs/jauges
+            jaugeAppeleDebriefe = $(".jaugeAppeleDebriefe");
+            jaugeArgumentation = $(".jaugeArgumentation");
+            jaugeRDVPris = $(".jaugeRDVPris");
+            jaugeAppeleDebriefe.knob({ 'format' : function (value) { return value + '%'; }});
+            jaugeArgumentation.knob({ 'format' : function (value) { return value + '%'; }});
+            jaugeRDVPris.knob({ 'format' : function (value) { return value + '%'; }});
+
+            //Initialisaiton des champs
+            var userId = sessionStorage.getItem('userId');
+            if(userId != '{!userinfos.Id}') {
+                sessionStorage.clear();
+                sessionStorage.setItem('userId', '{!userinfos.Id}');
+            }
+            setFieldsToStoredValues();
+            $j(document).on("change", "[id$=region]", function(){remindField('DR', this.value);});
+            $j(document).on("change", "[id$=dv]", function(){remindField('DV', this.value);});
+            $j(document).on("change", "[id$=magasin]", function(){remindField('magasin', this.value);});
+            $j(document).on("change", "[id$=vendeur]", function(){remindField('vendeur', this.value);});
+            $j(document).on("change", "[id$=statut]", function(){remindField('statut', this.value);});
+            $j(document).on("change", "[id$=listeDePhoneSelection]", function(){remindField('LDP', this.value);});
+
+            $('#input-datetimepicker').datepicker().on('changeDate', function(e) {
+                dateDebutActuelle = moment(e.currentTarget.firstElementChild.value, "DD/MM/YYYY").format('YYYY-MM-DD');
+                $j("[id$=dateDebutTemp]")[0].value = dateDebutActuelle;
+                remindField('dateDebut', dateDebutActuelle);
+                dateDebutIsEmpty = true;
+                rerenderDateDebut();
+                searchPhones();
+            });
+
+            $('#input-datetimepicker').datepicker().on('clearDate', function(e) {
+                dateDebutActuelle = '';
+                $j("[id$=dateDebutTemp]")[0].value = '';
+                remindField('dateDebut', '');
+                rerenderDateDebut();
+                searchPhones();
+            });
+
+            $('#input-datetimepicker2').datepicker().on('changeDate', function(e) {
+                dateFinActuelle = moment(e.currentTarget.firstElementChild.value, "DD/MM/YYYY").format('YYYY-MM-DD');
+                $j("[id$=dateFinTemp]")[0].value = dateFinActuelle;
+                remindField('dateFin', dateFinActuelle);
+                dateFinIsEmpty = true;
+                rerenderDateFin();
+                searchPhones();
+            });
+
+            $('#input-datetimepicker2').datepicker().on('clearDate', function(e) {
+                dateFinActuelle = '';
+                $j("[id$=dateFinTemp]")[0].value = '';
+                remindField('dateFin', '');
+                rerenderDateFin();
+                searchPhones();
+            });
+
+            showCancelLDP();
+            //searchPhones();
+        });
+
+        /* Remplit les champs avec les valeurs stockées en session  */
+        /*----------------------------------------------------------*/
+        function setFieldsToStoredValues(){
+            // Récupération des valeurs des champs stockées en session
+            refreshFieldsInitValues();
+
+            if(fieldInitValue_statut != null) {
+                var fieldElem_statut = $j("[id$=statut]")[0];
+                fieldElem_statut.value = fieldInitValue_statut;
+                //eventFire(fieldElem_statut, 'change');
+            }
+
+            updateControllerFields(fieldInitValue_DR,
+                                   fieldInitValue_DV,
+                                   fieldInitValue_magasin,
+                                   fieldInitValue_vendeur,
+                                   fieldInitValue_dateDebut,
+                                   fieldInitValue_dateFin,
+                                   fieldInitValue_LDP);
+
+            var formattedDateDebut = moment(fieldInitValue_dateDebut, "YYYY-MM-DD").format('DD/MM/YYYY');
+            var formattedDateFin = moment(fieldInitValue_dateFin, "YYYY-MM-DD").format('DD/MM/YYYY');
+
+            if(fieldInitValue_dateDebut != null && fieldInitValue_dateDebut != '') {
+                $("#input-datetimepicker").datepicker('setDate', formattedDateDebut);
+                dateDebutActuelle = fieldInitValue_dateDebut;
+            } else
+                $("#input-datetimepicker").datepicker('clearDates');
+            if(fieldInitValue_dateFin != null && fieldInitValue_dateFin != '' ) {
+                $("#input-datetimepicker2").datepicker('setDate', formattedDateFin);
+                dateFinActuelle = fieldInitValue_dateFin;
+            } else
+                $("#input-datetimepicker2").datepicker('clearDates');
+
+         }
+
+        /* Assigne aux variables d'init les valeurs stockées en session */
+        /*--------------------------------------------------------------*/
+        function refreshFieldsInitValues(){
+            fieldInitValue_DR = sessionStorage.getItem("field_DR");
+            fieldInitValue_DV = sessionStorage.getItem("field_DV");
+            fieldInitValue_magasin = sessionStorage.getItem("field_magasin");
+            fieldInitValue_vendeur = sessionStorage.getItem("field_vendeur");
+            fieldInitValue_statut = sessionStorage.getItem("field_statut");
+            fieldInitValue_dateDebut = sessionStorage.getItem("field_dateDebut");
+            fieldInitValue_dateFin = sessionStorage.getItem("field_dateFin");
+            fieldInitValue_LDP = sessionStorage.getItem("field_LDP");
+        }
+
+        /* Fonction de debrief de masse pour appel et argu          */
+        /*----------------------------------------------------------*/
+        function massDebrief(colonne){
+            for(var i=0; i<phoneIdListe.length; i++){
+                if(document.getElementById(colonne+'all').checked) {
+                    if(!document.getElementById(colonne+phoneIdListe[i]).checked) updateActionPhoneButtons(phoneIdListe[i], ACTIONS_PHONES.UPDATE);
+                    document.getElementById(colonne+phoneIdListe[i]).checked = true;
+                } else if(!document.getElementById(colonne+'all').checked) {
+                    if(document.getElementById(colonne+phoneIdListe[i]).checked) updateActionPhoneButtons(phoneIdListe[i], ACTIONS_PHONES.UPDATE);
+                    document.getElementById(colonne+phoneIdListe[i]).checked = false;
+                }
+            }
+        }
+
+        /* Fonction d'enroulage/déroulage des panels                */
+        /*----------------------------------------------------------*/
+        function showOrHidePanelCollapse(panelName) {
+            $j("#"+panelName).collapse('toggle');
+            $j("#"+panelName+"Title").toggleClass("collapsed");
+            if(panelName == "selection"){
+                $j("#"+panelName).on('hidden.bs.collapse', function () {
+                    $j("#selectionTitle").html(selectionTitleConstruct());
+                })
+                $j("#"+panelName).on('shown.bs.collapse', function () {
+                    $j("#selectionTitle").html("Sélection");
+                })
+            }
+        }
+
+        /* Fonction de construction du titre du menu enroulé        */
+        /*----------------------------------------------------------*/
+        function selectionTitleConstruct() {
+            var textResult = "";
+            var obj = new Object();
+            obj = argumentConstruction();
+
+            if(obj['magasin'] != '') textResult += obj['magasinName'];
+            else if(obj['dv'] != '') textResult += obj['dvName'];
+            else if(obj['dr'] != '') textResult += obj['drName'];
+            if(obj['vendeurName'] != '')
+                textResult += ' - '+obj['vendeurName'];
+            if(obj['statut'] != '')
+                textResult += ' - '+obj['statut'];
+            if(obj['dateDebut'] != '')
+                textResult += ' - à partir du '+moment(obj['dateDebut']).format('DD/MM/YYYY');
+            if(obj['dateFin'] != '')
+                textResult += ' - jusqu\'au '+moment(obj['dateFin']).format('DD/MM/YYYY');
+
+            return textResult;
+        }
+
+        /* Fonction de mise à jour des boutons d'actions d'un phone */
+        /*----------------------------------------------------------*/
+        function updateActionPhoneButtons(id, type){
+            var blockDetails   = $j("#actionsDetails"+id);
+            var blockUpdate    = $j("#actionsUpdates"+id);
+            var blockLoader    = $j("#actionsLoader"+id);
+            if(type == "update"){
+                blockDetails.removeClass('show').addClass('hidden');
+                blockUpdate.removeClass('hidden').addClass('show');
+            } else if(type == "load"){
+                blockUpdate.removeClass('show').addClass('hidden');
+                blockLoader.removeClass('hidden').addClass('show');
+            } else if(type == "actions"){
+                blockLoader.removeClass('show').addClass('hidden');
+                blockDetails.removeClass('hidden').addClass('show');
+            }
+        }
+
+        /* Fonction de validation du champ date RDV             */
+        /*----------------------------------------------------------*/
+        function checkRDVDate(id, value){
+            var regex = /^([012]?[0-9]|3[0-1])([/])([0]?[0-9]|1[0-2])([/])([2]([0-9]{3}))$/;
+
+            if(regex.test(value))
+                $j("#rdv_date_"+id).val(value);
+            else
+                $j("#rdv_date_"+id).val('');
+            updateActionPhoneButtons(id,ACTIONS_PHONES.UPDATE);
+        }
+
+        /* Fonction de validation du champ heure RDV                */
+        /*----------------------------------------------------------*/
+        function checkRDVTimeStart(id, value){
+            var regex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+            if(regex.test(value))
+                $j("#rdv_time_start_"+id).val(value);
+            else
+                $j("#rdv_time_start_"+id).val('');
+            updateActionPhoneButtons(id,ACTIONS_PHONES.UPDATE);
+        }
+
+        /* Fonction de validation du champ durée RDV                */
+        /*----------------------------------------------------------*/
+        function checkDureeRDVValue(id){
+            var dureeRDV = $j("#rdv_duree_"+id).val();
+            if(dureeRDV < 0) dureeRDV = 0;
+            else if(dureeRDV > 9999) dureeRDV = 9999;
+            $j("#rdv_duree_"+id).val(dureeRDV);
+        }
+
+        /* Fonction de selection d'un POI                           */
+        /*----------------------------------------------------------*/
+        function selectPOI(id, compteId){
+            // Rétablissement de l'ancien POI sélectionné
+            var e = marqueursList[selectedIconMapId];
+
+            if(selectedPOIid != '')     $j("[id$=poiIcon"+selectedPOIid+"]").html(selectedPOIcolor);
+            if(selectedIconMapId != '')  {
+                var savedIcon = L.icon({
+                    iconUrl: selectedIconMapColor,
+                    iconSize:     [32,37], // size of the icon
+                    iconAnchor:   [16,37], // point of the icon which will correspond to marker's location
+                    popupAnchor:  [0, -37] // point from which the popup should open relative to the iconAnchor
+                });
+                marqueursList[selectedIconMapId].setIcon(savedIcon);
+            }
+            // Mise à jour et sauvegarde du nouveau POI sélectionné (liste)
+            selectedPOIid = id;
+            selectedPOIcolor = $j("[id$=poiIcon"+id+"]").html();
+            $j("[id$=poiIcon"+id+"]").html('<img  style="height:100%; width:100%;" src="'+dotTypeColor.YELLOWFLAG+'">');
+            // Mise à jour et sauvegarde du nouveau POI sélectionné (map)
+            if(marqueursList[compteId] != null) {
+                selectedIconMapId = compteId;
+                selectedIconMapColor = marqueursList[compteId].options.icon.options.iconUrl;
+                // Construction du marker
+                var markIcon = L.icon({
+                    iconUrl: dotTypeColor.YELLOWFLAG,
+                    iconSize:     [32,37], // size of the icon
+                    iconAnchor:   [16,37], // point of the icon which will correspond to marker's location
+                    popupAnchor:  [0, -37] // point from which the popup should open relative to the iconAnchor
+                });
+                marqueursList[compteId].setIcon(markIcon);
+                //map.setView(marqueursList[compteId]);
+                var latlngPosition = L.latLng(parseFloat(marqueursList[compteId]._latlng.lat), parseFloat(marqueursList[compteId]._latlng.lng));
+                map.panTo(latlngPosition);
+            }
+        }
+
+        /* Fonction de selection d'un phone dans le tableau         */
+        /*----------------------------------------------------------*/
+        function selectedLine(id){
+            if($j('#tableLine'+id+'').hasClass(selectedClass))
+                $j('#tableLine'+id+'').removeClass(selectedClass);
+            else if(!$j('#tableLine'+id+'').hasClass(selectedClass))
+                $j('#tableLine'+id+'').addClass(selectedClass);
+        }
+
+        /* Fonction de validation de la date RDV                    */
+        /*----------------------------------------------------------*/
+        function validationDateRDV(id, value) {
+            var now = moment();
+            if(value > now) return true;
+            else return false;
+        }
+
+        /* Fonction d'affichage des liserets erreurs sur les lignes */
+        /*----------------------------------------------------------*/
+        function errorLiseret(id){
+            var dateRDVTemp = $j("[id$=rdv_date_"+id+"]")[0].value;
+            var timeRDVTemp = $j("[id$=rdv_time_start_"+id+"]")[0].value;
+
+            if(moment(dateRDVTemp+' '+timeRDVTemp) > moment()) {
+                $j("[id$=rdv_time_start_"+id+"]").css('border-color', '#CCCCCC');
+                $j("[id$=rdv_date_"+id+"]").css('border-color', '#CCCCCC');
+            } else if(moment(dateRDVTemp).dayOfYear() == moment().dayOfYear()) {
+                $j("[id$=rdv_time_start_"+id+"]").css('border-color', 'red');
+                $j("[id$=rdv_date_"+id+"]").css('border-color', '#CCCCCC');
+            } else if(dateRDVTemp == '' && timeRDVTemp == '') {
+                $j("[id$=rdv_time_start_"+id+"]").css('border-color', '#CCCCCC');
+                $j("[id$=rdv_date_"+id+"]").css('border-color', '#CCCCCC');
+            } else {
+                $j("[id$=rdv_time_start_"+id+"]").css('border-color', 'red');
+                $j("[id$=rdv_date_"+id+"]").css('border-color', 'red');
+
+            }
+        }
+
+        /* Fonction d'affichage du bouton d'annulation d'une LDP    */
+        /*----------------------------------------------------------*/
+        function showCancelLDP(){ 
+            var ldpValue = $j("[id$=listeDePhoneSelection]")[0].value; 
+            if(ldpValue == null || ldpValue == '')
+                $j('[id$=cancelLDP]').removeClass('show').addClass('hidden');
+            else {
+                 Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.Ctrl_ConsultationListeDePhones.getPhoneInfos}', ldpValue,
+                        function(result, event) {
+                            if (event.status) {
+                                if(result.statut__c != '{!phoneStatutAnnule}')
+                                    $j('[id$=cancelLDP]').removeClass('hidden').addClass('show');
+                                else
+                                    $j('[id$=cancelLDP]').removeClass('show').addClass('hidden');
+                            } else {
+                                alert(event.message);
+                            }
+                        },
+                    { buffer: false, escape: true, timeout: 30000 }
+                );
+            }
+        }
+
+        /* Activation / Désactivation du loader                     */
+        /*----------------------------------------------------------*/
+        function loading(isLoading){
+            if(isLoading){
+                $j("#loading").removeClass('hidden').addClass('show');
+                $j("#affichage").removeClass('show').addClass('hidden');
+                $j('button').prop('disabled', true);
+                $j('input[type="submit"]').prop('disabled', true);
+            } else {
+                $j("#loading").removeClass('show').addClass('hidden');
+                $j("#affichage").removeClass('hidden').addClass('show');
+                $j('button').prop('disabled', false);
+                $j('input[type="submit"]').prop('disabled', false);
+            }
+        }
+
+        /* Selection/Déselection de masse des checkbox              */
+        /*----------------------------------------------------------*/
+        function selectedCheckboxes(type){
+            if($j("."+selectedClass).length == 0) // Vérifie les lignes sélectionnées
+                var lines = $j("[id^=tableLine]"); // Récupération de toutes les lignes du tableau
+            else
+                var lines = $j("."+selectedClass); // Récupération seulement des lignes sélectionnées
+            // Detect IE
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
+            lines.each(function( index ) {
+                var appelBox = this.children[8].children[0];
+                var arguBox = this.children[9].children[0];
+                if(type == 'appel'){
+                    if($j("[id$=appel_all]")[0].checked && !$j(appelBox).is(':checked')){
+                        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) 
+                            $j(appelBox).checked = true;
+                        else
+                            $j(appelBox).prop("checked", true);
+                        eventFire(appelBox, 'click');
+                    } else if(!$j("[id$=appel_all]")[0].checked && $j(appelBox).is(':checked')){
+                        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) 
+                            $j(appelBox).checked = false;
+                        else
+                            $j(appelBox).prop("checked", false);
+                        eventFire(appelBox, 'click');
+                    }
+                } else if(type == 'argu'){
+                    if($j("[id$=argu_all]")[0].checked && !$j(arguBox).is(':checked')){
+                        $j(arguBox).prop("checked", true);
+                        //$j(arguBox).checked = true;
+                        eventFire(arguBox, 'click');
+                    } else if(!$j("[id$=argu_all]")[0].checked && $j(arguBox).is(':checked')){
+                        $j(arguBox).prop("checked", false);
+                        //$j(arguBox).checked = false;
+                        eventFire(arguBox, 'click');
+                    }
+                }
+            });
+        }
+
+        /* Récupère les phones pour mise à jour des indicateurs                         */
+        /*------------------------------------------------------------------------------*/
+        function loadDataIndicateurs(){
+            processIndicatorsObjectifs(phoneDetailsListe);
+        }
+
+        /* Fonction d'affichage des indicateurs (jauge, couleur, %)                     */
+        /*------------------------------------------------------------------------------*/
+        function processIndicatorsObjectifs(result) {
+            // Récupération des éléments HTML
+            var objectifAppeleDebriefe = $j("[id$=objectifAppeleDebriefe]")[0];
+            var objectifArgumentation = $j("[id$=objectifArgumentation]")[0];
+            var objectifRDVPris = $j("[id$=objectifRDVPris]")[0];
+            var objectifAppeleDebriefeIc = $j("[id$=objectifAppeleDebriefeIc]");
+            var objectifArgumentationIc = $j("[id$=objectifArgumentationIc]");
+            var objectifRDVPrisIc = $j("[id$=objectifRDVPrisIc]");
+
+            var nbPhonesDebriefe = 0;
+            var nbPhonesArgu = 0;
+            var nbPhonesRDV = 0;
+            var nbPhones = result.length;
+
+            // Alimentation des compteurs pour les jauges
+            for(var i=0; i<nbPhones; i++){
+                if(result[i].debriefe__c == true || result[i].appelEffectue__c == true) nbPhonesDebriefe++;
+                if(result[i].argumentationEffectuee__c == true) nbPhonesArgu++;
+                if(result[i].RDV__c != null && result[i].RDV__c != undefined && result[i].RDV__c != '') nbPhonesRDV++;
+            }
+
+            // Mise à jour des objectifs
+            var objectifAppeleDebriefeText = nbPhonesDebriefe + ' / ' + nbPhones;
+            var objectifArgumentationText = nbPhonesArgu + ' / ' + nbPhones;
+            var objectifRDVPrisText = nbPhonesRDV + ' / ' + nbPhones;
+            var realisationPhonesDebriefe = (nbPhonesDebriefe/nbPhones)*100;
+            var realisationPhonesArgu = (nbPhonesArgu/nbPhones)*100;
+            var realisationPhonesRDV = (nbPhonesRDV/nbPhones)*100;
+
+            // Fix pour Firefox
+            if(document.all){
+                objectifAppeleDebriefe.innerText = objectifAppeleDebriefeText;
+                objectifArgumentation.innerText = objectifArgumentationText;
+                objectifRDVPris.innerText = objectifRDVPrisText;
+            } else{
+                objectifAppeleDebriefe.textContent = objectifAppeleDebriefeText;
+                objectifArgumentation.textContent = objectifArgumentationText;
+                objectifRDVPris.textContent = objectifRDVPrisText;
+            }
+
+            // Couleurs des jauges
+            var contactActifColor = getIndicateurColor(realisationPhonesDebriefe);
+            var nbVenteColor = getIndicateurColor(realisationPhonesArgu);
+            var CAVenteColor = getIndicateurColor(realisationPhonesRDV);
+
+            // Paramètrage des jauges
+            if(realisationPhonesDebriefe > 100){  jaugeAppeleDebriefe.trigger('configure', {'max':realisationPhonesDebriefe}); }
+            if(realisationPhonesArgu > 100){  jaugeArgumentation.trigger('configure', {'max':realisationPhonesArgu}); }
+            if(realisationPhonesRDV > 100){  jaugeRDVPris.trigger('configure', {'max':realisationPhonesRDV}); }
+            jaugeAppeleDebriefe.trigger('configure', {  "fgColor":contactActifColor, "inputColor":contactActifColor });
+            jaugeAppeleDebriefe.val(realisationPhonesDebriefe).trigger('change');
+            objectifAppeleDebriefeIc.css('color', contactActifColor);
+            jaugeArgumentation.trigger('configure', {  "fgColor":nbVenteColor, "inputColor":nbVenteColor });
+            jaugeArgumentation.val(realisationPhonesArgu).trigger('change');
+            objectifArgumentationIc.css('color', nbVenteColor);
+            jaugeRDVPris.trigger('configure', {  "fgColor":CAVenteColor, "inputColor":CAVenteColor });
+            jaugeRDVPris.val(realisationPhonesRDV).trigger('change');
+            objectifRDVPrisIc.css('color', CAVenteColor);
+        }
+
+        /* Fonction de coloris pour les jauges d'indicateurs        */
+        /*----------------------------------------------------------*/
+        function getIndicateurColor(realisation) {
+            var color = red;
+            if(realisation > 80 && realisation <= 100)  color = green;
+            if(realisation > 20 && realisation <= 80)   color = orange;
+            if(realisation > 0 && realisation <= 20)    color = red;
+            return color;
+        }
+
+        /* Récupère les informations pour le graphique de type Pie                      */
+        /*------------------------------------------------------------------------------*/
+        function getCAGenere() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ConsultationListeDePhones.getPieChartInfos}', compteIdListe,
+                    function(result, event) {
+                        if (event.status) {
+                            if(result != null && (result['transmis'] > 0 || result['venduAttente'] > 0 || result['venduEnregistre'] > 0 || result['venduIncontournable'] > 0)) {
+                                // Affichage du rapport "Nombre total de RDV commerciaux" pour le magasin
+                                var dataCamembertCAgenere = google.visualization.arrayToDataTable([
+                                    ['Statut', 'Nombre'],
+                                    [STATUT_DEVIS.TRANSMIS, parseFloat(result['transmis'])],
+                                    [STATUT_DEVIS.VENDU_ATT, parseFloat(result['venduAttente'])],
+                                    [STATUT_DEVIS.VENDU_ENR, parseFloat(result['venduEnregistre'])],
+                                    [STATUT_DEVIS.VENDU_INC, parseFloat(result['venduIncontournable'])]]);
+
+                                var optionsCamembertCAgenere = {
+                                    backgroundColor: '#f5f5f5',
+                                    pieSliceText: 'value',
+                                    width: '100%',
+                                    height: '100%',
+                                    legend: {
+                                        position: 'bottom'
+                                    },
+                                    chartArea: {
+                                        left: "3%",
+                                        top: "3%",
+                                        height: "94%",
+                                        width: "94%"
+                                    }
+                                };
+
+                                // Initialisation des graphiques
+                                $j("#camembertCAGenere").html('');
+                                var chartCamembertCAgenere = new google.visualization.PieChart(document.getElementById('camembertCAGenere'));
+                                chartCamembertCAgenere.draw(dataCamembertCAgenere, optionsCamembertCAgenere);
+                            } else {
+                                $j("#camembertCAGenere").html('<br/><br/><br/><br/>Aucun CA généré<br/>sur les comptes renvoyés');
+                            }
+                        } else if (event.type === 'exception') {
+                            alert(event.message);
+                        } else {
+                            alert(event.message);
+                        }
+                    },
+                { buffer: false, escape: true, timeout: 30000 }
+            );
+        }
+
+        /* Fonction pour la mise à jour d'un phone                  */
+        /*----------------------------------------------------------*/
+        function updatePhone(id, action) {
+            var appel           = $j("[id$=appel_"+id+"]")[0].checked;
+            var argu            = $j("[id$=argu_"+id+"]")[0].checked;
+            var dateRDV         = $j("#rdv_date_"+id).val();
+            var timeStartRDV    = $j("#rdv_time_start_"+id).val();
+            var dureeRDV        = $j("#rdv_duree_"+id).val();
+            var errorDIV        = $j("#actions_"+id)[0];
+            if(dateRDV != '') dateRDV = moment(dateRDV , ["YYYY-MM-DD", "DD/MM/YYYY"]).format("YYYY-MM-DD");
+
+            var dateTimeStartRDV = moment(dateRDV + ' ' + timeStartRDV);
+            var htmlMsgError = $j("[id$=msgErrorListe]");
+
+            if(action == ACTIONS_PHONES.UPDATE && dateRDV != '' && timeStartRDV != '' && dureeRDV == '') {
+                dureeRDV = '{!defaultDureeRDV}';
+            }
+
+            if(action == ACTIONS_PHONES.UPDATE && dateRDV == '' && (timeStartRDV != '' || (dureeRDV != '' && dureeRDV != 0))) {
+                htmlMsgError.html(validationDateInconnueError);
+                errorDIV.style.color = 'red';
+                return;
+            } else htmlMsgError.html('');
+
+            if(action == ACTIONS_PHONES.UPDATE && dateRDV){
+                if(timeStartRDV == '') {
+                    htmlMsgError.html(validationHeureInconnueError);
+                    errorDIV.style.color = 'red';
+                    return;
+                } else htmlMsgError.html('');
+
+                var isValidStartDate = validationDateRDV(id, dateTimeStartRDV);
+
+                if(!isValidStartDate) {
+                    htmlMsgError.html(validationDatePasseeError);
+                    errorDIV.style.color = 'red';
+                    return;
+                } else htmlMsgError.html('');
+            }
+
+            // Chargement
+            updateActionPhoneButtons(id,ACTIONS_PHONES.LOAD);
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ConsultationListeDePhones.updatePhone}', id, appel, argu, dateRDV, timeStartRDV, dureeRDV, action,
+                    function(result, event) {
+                        if (event.status) {
+                            var displayDateRDV;
+                            if(isIE || isFirefox)   displayDateRDV = moment(result.dateHeureRDV__c).format('DD/MM/YYYY');
+                            else                    displayDateRDV = moment(result.dateHeureRDV__c).format('YYYY-MM-DD');
+                            var displayStartTimeRDV = moment(result.dateHeureRDV__c).format('HH:mm');
+                            var displayDureeRDV = dureeRDV;
+                            var displayDernierAppel = moment(result.compte__r.dateDernierAppelSortantKparK__c).format('DD/MM/YYYY');
+
+                            if(action == ACTIONS_PHONES.REMOVE){
+                                $j("[id$=appel_"+id+"]")[0].checked = result.appelEffectue__c;
+                                $j("[id$=argu_"+id+"]")[0].checked = result.argumentationEffectuee__c;
+                                if(result.dateHeureRDV__c != null) {
+                                    $j("[id$=rdv_date_"+id+"]")[0].value = displayDateRDV;
+                                    $j("[id$=rdv_time_start_"+id+"]")[0].value = displayStartTimeRDV;
+                                } else {
+                                    $j("[id$=rdv_date_"+id+"]")[0].value = '';
+                                    $j("[id$=rdv_time_start_"+id+"]")[0].value = '';
+                                }
+                            } else if(action == ACTIONS_PHONES.UPDATE){
+                                $j("[id$=dateAppSortant_"+id+"]").html(displayDernierAppel);
+
+                                var numberToChange;
+                                for(x=0;x<phoneDetailsListe.length;x++){
+                                    if(phoneDetailsListe[x].Id == result.Id){
+                                        numberToChange = x;
+                                    }
+                                }
+                                phoneDetailsListe[numberToChange] = result;
+                            }
+
+                            if(result.dureeRDV__c != null) {
+                                $j("[id$=rdv_duree_"+id+"]")[0].value = result.dureeRDV__c;
+                            } else {
+                                $j("[id$=rdv_duree_"+id+"]")[0].value = '';
+                            }
+
+                            if (result.appelEffectue__c == true || result.argumentationEffectuee__c == true || result.dateHeureRDV__c != null){
+                                $j("[id$=poiIcon"+id+"]").html('<img style="height:100%; width:100%;" src="'+dotTypeColor.GREENFLAG+'">');
+                                marqueursList[result.compte__c].setIcon(dotTypeColor.GREENFLAG);
+                            } else {
+                                $j("[id$=poiIcon"+id+"]").html('<img style="height:100%; width:100%;" src="'+dotTypeColor.REDFLAG+'">');
+                                marqueursList[result.compte__c].setIcon(dotTypeColor.REDFLAG);
+                            }
+
+                            if(result.compte__r.nbPhonings__c != null) {
+                                $j("[id$=nbAppSortant_"+id+"]").html(result.compte__r.nbPhonings__c);
+                            }
+
+                            var contenu = setIcons(result);
+                            $j("#actions_"+id+"").html(contenu);
+                            errorDIV.style.color = 'black';
+
+                            // Mise à jour des boutons d'action
+                            updateActionPhoneButtons(id,ACTIONS_PHONES.ACTIONS);
+
+                            // Mise à jour des indicateurs
+                            loadDataIndicateurs();
+                            getCAGenere();
+                        } else if (event.type === 'exception') {
+                            updateActionPhoneButtons(id,ACTIONS_PHONES.ACTIONS);
+                            alert(event.message);
+                        } else {
+                            updateActionPhoneButtons(id,ACTIONS_PHONES.ACTIONS);
+                            alert(event.message);
+                        }
+                    },
+                { buffer: false, escape: true, timeout: 30000 }
+            );
+        }
+
+        function checkDates(dateDebut, dateFin)
+        {
+            var htmlMsgErrorDateDebut = $j("[id$=msgErrorDateDebut]");
+            var htmlMsgErrorDateFin = $j("[id$=msgErrorDateFin]");
+            var valid = true;
+
+            if(dateDebut != '')
+            {
+                // Date de début doit être supérieure à 01/01/2017
+                if(moment(dateDebut) < moment('01/01/2017')) {
+                    htmlMsgErrorDateDebut.html(validationDateDebutLeftBorder);
+                    valid = false;
+                }
+
+                // Date de début doivent être inférieure à la date du jour
+                else if(moment(dateDebut) > moment()) {
+                    htmlMsgErrorDateDebut.html(validationDateRightBorder);
+                    valid = false;
+                } else htmlMsgErrorDateDebut.html('');
+            } else htmlMsgErrorDateDebut.html('');
+
+            if(dateFin != ''){
+                // Date de début doit être supérieure à 01/01/2017
+                if(moment(dateFin) < moment(dateMinValid)) {
+                    htmlMsgErrorDateFin.html(validationDateFinLeftBorder);
+                    valid = false;
+                }
+
+                // Date de début doit être inférieure à la date de fin
+                else if(moment(dateDebut) > moment(dateFin)) {
+                    htmlMsgErrorDateFin.html(validationDatePositiveError);
+                    valid = false;
+                }
+
+                // Date de fin doivent être inférieure à la date du jour
+                else if(moment(dateFin) > moment()) {
+                    htmlMsgErrorDateFin.html(validationDateRightBorder);
+                    valid = false;
+                } else htmlMsgErrorDateFin.html('');
+            } else htmlMsgErrorDateFin.html('');
+
+            return valid;
+        }
+
+        /* Fonction pour la recherche de phones                     */
+        /*----------------------------------------------------------*/
+        function searchPhones() {
+            var argument = new Object();
+            argument = argumentConstruction();
+
+            var htmlMsgErrorObligatoire =   $j("[id$=msgErrorObligatoire]");
+            var errorDetected = false;
+
+            // Champs obligatoires
+            htmlMsgErrorObligatoire.html('');
+            if(argument['dr'] == '') {
+                htmlMsgErrorObligatoire.html(validationRegionObligatoireError);
+                errorDetected = true;
+            } else htmlMsgErrorObligatoire.html('');
+
+            if(!checkDates(argument['dateDebut'], argument['dateFin'])) {
+                errorDetected = true;
+            }
+
+            if(errorDetected == true)
+                return;
+            else
+                loading(true);
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ConsultationListeDePhones.recuperePhones}', argument,
+                    function(result, event) {
+                        if (event.status) {
+                            phoneIdListe = [];
+                            compteIdListe = [];
+                            phoneDetailsListe = [];
+                            if(result.length > 0) {
+                                var contenu= '';
+                                var nombre = '(' + result.length + ')';
+                                var k = 0;
+                                var nombreRefus = 0;
+                                for(var n=0; n<result.length; n++){
+                                    if (result[n].compte__r && result[n].compte__r.optinTelephoneDomicileKparK__c == false && result[n].compte__r.optinTelephoneMobileKparK__c == false){
+                                        nombreRefus++;
+                                    }
+                                }
+                                contenu+= (result.length) + ' résultats ont été trouvés. Résultats non-affichés : ' + nombreRefus + ' sont en refus de démarchage téléphonique.<br/><br/>';
+                                contenu+= '<table style="table-layout: fixed; width: 100%;" class="table table-bordered table-hover dataTable table-liste" id="resultTable">';
+                                if(result.length > 0){
+/* Insertion des titres */          contenu+= '<thead><tr>';
+                                    contenu+= ' <th style="width:2.5%;">POI</th>';
+                                    contenu+= ' <th style="width:12%;">Compte</th>';
+                                    contenu+= ' <th style="width:5%;">Type</th>';
+                                    contenu+= ' <th style="width:6%;">Tél. Domicile</th>';
+                                    contenu+= ' <th style="width:6%;">Tél. Portable</th>';
+                                    contenu+= ' <th style="width:6%;">Autre Tel.</th>';
+                                    contenu+= ' <th style="width:3%;">Nb Appel</th>';
+                                    contenu+= ' <th style="width:6%;">Dernier appel</th>';
+                                    contenu+= ' <th style="width:3%;">Appel<br/><input onClick="selectedCheckboxes(\'appel\');" id="appel_all" type="checkbox" style="display:block; margin-left:auto; margin-right:auto;"></th>';
+                                    contenu+= ' <th style="width:3%;">Argu<br/><input onClick="selectedCheckboxes(\'argu\');" id="argu_all" type="checkbox" style="display:block; margin-left:auto; margin-right:auto;""></th>';
+                                    contenu+= ' <th style="width:15.5%;">RDV<br/>(jj/mm/aaaa à hh:mm)</th>';
+                                    contenu+= ' <th style="width:5.5%;">Durée<br/>(min)</th>';
+                                    contenu+= ' <th style="width:5%;">Actions</th>';
+                                    contenu+= '</tr></thead>';
+                                }
+/* Boucle sur les lignes */     for(k=0; k<result.length; k++) {
+                                    if (result[k].compte__r && (result[k].compte__r.optinTelephoneDomicileKparK__c != false || result[k].compte__r.optinTelephoneMobileKparK__c != false)){
+                                        if (result[k].Name == 'Jesuisunevaleurutiliseepourfairepasserunid'){
+                                            // Ecriture de la requête dans un SPAN caché pour décodage des caractères spéciaux
+                                            $j("[id$=decodeIt]").html(result[k].profession__c);
+                                            if(document.all)
+                                                rerenderRequete($j("[id$=decodeIt]")[0].innerText);
+                                            else
+                                                rerenderRequete($j("[id$=decodeIt]")[0].textContent);
+                                        } else {
+                                            var stringDernielAppel = '';
+                                            phoneIdListe.push(result[k].Id);
+                                            compteIdListe.push(result[k].compte__c);
+                                            phoneDetailsListe.push(result[k]);
+
+                                            var displayDateRDV = moment(result[k].dateHeureRDV__c).format('YYYY-MM-DD');
+                                            var displayStartTimeRDV = moment(result[k].dateHeureRDV__c).format('HH:mm');
+                                            var displayEndTimeRDV = (moment(result[k].dateHeureRDV__c).add(result[k].dureeRDV__c, 'm')).format('HH:mm');
+
+                                            // Met les valeurs null à vide
+                                            result[k] = setupAllFields(result[k]);
+
+                                            if(result[k].compte__r.dateDernierAppelSortantKparK__c == null){stringDernielAppel = 'N/A';}
+                                            else{
+                                                var dateDernierAppel = new Date(result[k].compte__r.dateDernierAppelSortantKparK__c);
+                                                stringDernielAppel = moment(dateDernierAppel).format('DD/MM/YYYY');
+                                            }
+
+/* Insertion d'une ligne */                 contenu+= '<tr width="100%" id ="tableLine' + result[k].Id + '">';
+                                            if (result[k].debriefe__c == true){
+                                                contenu+= '<td style="width:4%;"><button id ="poiIcon' + result[k].Id + '" onClick="selectPOI(\''+result[k].Id+'\',\''+result[k].compte__r.Id+'\')" style="width:25px;"><img style="height:100%; width:100%;" src="'+dotTypeColor.GREENFLAG+'"></button></td>';
+                                            } else {
+                                                contenu+= '<td style="width:4%;"><button id ="poiIcon' + result[k].Id + '" onClick="selectPOI(\''+result[k].Id+'\',\''+result[k].compte__r.Id+'\')" style="width:25px;"><img style="height:100%; width:100%;" src="'+dotTypeColor.REDFLAG+'"></button></td>';
+                                            }
+                                            contenu+= '<td style="width:12%;" onClick="selectedLine(\''+result[k].Id+'\')"><a href="/' + result[k].compte__r.Id + '" >' + result[k].compte__r.Name + '</a></td>';
+                                            contenu+= '<td style="width:6%;" onClick="selectedLine(\''+result[k].Id+'\')">' + result[k].compte__r.Type + '</td>';
+                                            if (result[k].compte__r.optinTelephoneDomicileKparK__c == true){
+                                                contenu+= '<td style="width:9%;" onClick="selectedLine(\''+result[k].Id+'\')">' + result[k].compte__r.telephoneDomicile__c + '</td>';
+                                            } else {
+                                                contenu+= '<td style="width:9%; font-style: italic;" onClick="selectedLine(\''+result[k].Id+'\')">NC</td>';
+                                            }
+                                            if (result[k].compte__r.optinTelephoneMobileKparK__c == true) {
+                                                contenu+= '<td style="width:9%;" onClick="selectedLine(\''+result[k].Id+'\')">' + result[k].compte__r.telephoneMobile__c + '</td>';
+                                            } else {
+                                                contenu+= '<td style="width:9%; font-style: italic;" onClick="selectedLine(\''+result[k].Id+'\')">NC</td>';
+                                            }
+                                            if (result[k].compte__r.optinTelephoneDomicileKparK__c == true) {
+                                                contenu+= '<td style="width:9%;" onClick="selectedLine(\''+result[k].Id+'\')">' + result[k].compte__r.autreTelephone__c + '</td>';
+                                            } else {
+                                                contenu+= '<td style="width:9%; font-style: italic;" onClick="selectedLine(\''+result[k].Id+'\')">NC</td>';
+                                            }
+                                            contenu+= '<td id="nbAppSortant_' + result[k].Id + '" title="Nombre Appels Sortants Vente" style="width:7%;" onClick="selectedLine(\''+result[k].Id+'\')">' + result[k].compte__r.nbPhonings__c + '</td>';
+                                            contenu+= '<td id="dateAppSortant_' + result[k].Id + '" style="width:9%;" onClick="selectedLine(\''+result[k].Id+'\')">' + stringDernielAppel + '</td>';
+    /* Insertion partie editable si non-annulée */
+                                            if(result[k].liste__r.statut__c != 'Annulée'){
+                                                if (result[k].appelEffectue__c == true){
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" id="appel_' + result[k].Id + '" type="checkbox" checked></td>';
+                                                } else {
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" id="appel_' + result[k].Id + '" type="checkbox"></td>';
+                                                }
+                                                if (result[k].argumentationEffectuee__c == true){
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" id="argu_' + result[k].Id + '" type="checkbox" checked></td>';
+                                                } else {
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" id="argu_' + result[k].Id + '" type="checkbox"></td>';
+                                                }
+                                                contenu+= '<td class="caseEditable" id="rdv_' + result[k].Id + '" style="width:9%;">';
+                                                if(result[k].dateHeureRDV__c != null){
+                                                    if(isIE || (isFirefox)) contenu+= '     <div><input id="rdv_date_' + result[k].Id + '" value="'+moment(displayDateRDV).format( 'DD/MM/YYYY' )+'" type="text" style="display:inline; float:left; height:26px; padding:0px 6px; font-size:11px; line-height:1;" class="dateTimeRdvField" onChange="checkRDVDate(\''+result[k].Id+'\',this.value);" placeholder="01/01/2017"  onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                    else                                    contenu+= '     <div><input id="rdv_date_' + result[k].Id + '" value="'+displayDateRDV+'" type="date" style="display:inline; float:left; height:26px; padding:0px 6px; font-size:11px; line-height:1;" class="dateTimeRdvField" onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                    if(isIE || (isFirefox)) contenu+= '     <div>à <input id="rdv_time_start_' + result[k].Id + '" value="'+displayStartTimeRDV+'" type="text" style="display:inline;" class="dateTimeRdvField" onChange="checkRDVTimeStart(\''+result[k].Id+'\',this.value);" placeholder="00:00" onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                    else                                    contenu+= '     <div>à <input id="rdv_time_start_' + result[k].Id + '" value="'+displayStartTimeRDV+'" type="time" style="display:inline;" class="dateTimeRdvField" onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                } else {
+                                                    if(isIE || (isFirefox)) contenu+= '     <div><input id="rdv_date_' + result[k].Id + '" type="text" style="display:inline; float:left; height:26px; padding:0px 6px; font-size:11px; line-height:1;" class="dateTimeRdvField" onChange="checkRDVDate(\''+result[k].Id+'\',this.value);" placeholder="01/01/2017" onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                    else                                    contenu+= '     <div><input id="rdv_date_' + result[k].Id + '" type="date" style="display:inline; float:left; height:26px; padding:0px 6px; font-size:11px; line-height:1;" class="dateTimeRdvField" onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                    if(isIE || (isFirefox)) contenu+= '     <div>à <input id="rdv_time_start_' + result[k].Id + '" type="text" style="display:inline;" class="dateTimeRdvField" onChange="checkRDVTimeStart(\''+result[k].Id+'\',this.value);" placeholder="00:00" onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                    else                                    contenu+= '     <div>à <input id="rdv_time_start_' + result[k].Id + '" type="time" style="display:inline;" class="dateTimeRdvField" onClick="updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');" onBlur="errorLiseret(\''+result[k].Id+'\')"></div>';
+                                                }
+                                                contenu+= '</td>';
+                                                contenu+= '<td class="caseEditable" id="duree_' + result[k].Id + '">';
+                                                if(result[k].dureeRDV__c != null) {
+                                                    contenu+= '<input id="rdv_duree_' + result[k].Id + '" value="'+result[k].dureeRDV__c+'" type="number" style="display:inline;" class="integerField" onChange="checkDureeRDVValue(\''+result[k].Id+'\'); updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');">';
+                                                } else {
+                                                    contenu+= '<input id="rdv_duree_' + result[k].Id + '" type="number" style="display:inline;" class="integerField" onChange="checkDureeRDVValue(\''+result[k].Id+'\'); updateActionPhoneButtons(\''+result[k].Id+'\',\'update\');">';
+                                                }
+    /* Insertion partie editable si annulée */
+                                            } else {
+                                                if (result[k].appelEffectue__c == true){
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input id="appel_' + result[k].Id + '" type="checkbox" checked disabled></td>';
+                                                } else {
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input id="appel_' + result[k].Id + '" type="checkbox" disabled></td>';
+                                                }
+                                                if (result[k].argumentationEffectuee__c == true){
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input id="argu_' + result[k].Id + '" type="checkbox" checked disabled></td>';
+                                                } else {
+                                                    contenu+= '<td class="caseEditable" style="width:4%;"><input id="argu_' + result[k].Id + '" type="checkbox" disabled></td>';
+                                                }
+                                                contenu+= '<td class="caseEditable" id="rdv_' + result[k].Id + '" style="width:9%;">';
+                                                if(result[k].dateHeureRDV__c != null){
+                                                    contenu+= '<div>Le '+moment(result[k].dateHeureRDV__c).format('DD/MM/YYYY')+' à '+displayStartTimeRDV+'</div>';
+                                                }
+                                                contenu+= '</td>';
+                                                contenu+= '<td class="caseEditable" id="duree_' + result[k].Id + '">';
+                                                if(result[k].dureeRDV__c != null) {
+                                                    contenu+= result[k].dureeRDV__c;
+                                                }
+                                            }
+                                            contenu+= '</td>';
+                                            contenu+= '<td class="caseEditable" id="actions_' + result[k].Id + '" style="width:9%;">'+setIcons(result[k])+'</td>';
+                                            contenu+= '</tr>';
+                                        }
+                                    }
+                                }
+                                contenu+= '</table><br/>';
+                                $j("#affichage").html(contenu);
+                            } else {
+                                var contenu= noResults;
+                                $j("#affichage").html(contenu);
+                            }
+                            // Mise à jour des indicateurs
+                            processIndicatorsObjectifs(result);
+                            getCAGenere();
+
+                            getRemoteComptes();
+                            loading(false);
+
+                            // Active le tri et désactive pour la première colonne
+                            $("[id$=resultTable]").dataTable(datatableOptions);
+
+                        } else if (event.type === 'exception') {
+                            loading(false);
+                            alert(event.message);
+                        } else {
+                            loading(false);
+                            alert(event.message);
+                        }
+                    },
+                { buffer: false, escape: true, timeout: 30000 }
+            );
+        }
+
+        /* Fonction d'initialisation des variables et de la carte                       */
+        /*------------------------------------------------------------------------------*/
+        function initializeMap() {
+            // Initialise les coordonnées d'affichage
+            var latlng = L.latLng('{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}');
+
+            // Initialise le tableau des markers et des points visible
+            init = true;
+            for(var key in dotType) {
+                markersArray[dotType[key]] = [];
+                poinVisibleList[dotType[key]] = false;
+            }
+
+            // Charge la carte
+            map = initializeLeafletMap('map','{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}', 13);
+            drawSectorAndMarkers();
+
+            // Ajout de la searchbox comme contrôle
+            L.Control.SearchBox = L.Control.extend({
+                onAdd: function(map) {
+                    // Ajout de l'action lors du choix d'un place (avec la souris, pas en utilisant la touche entrée)
+                    var searchBoxDiv = L.DomUtil.get('search-content-id');
+                    // Autocompletion par DQE en mode single (une barre de recherche)
+                    dqe.license_name = "{!licenceDQE}";
+                    options = {
+                        country : 'FRA',
+                        single  : '#search-content-input-id',
+                        zip     : '#search-content-input-id_zip',
+                        city    : '#search-content-input-id_city',
+                        street  : '#search-content-input-id_street',
+                        neighbourhood : 2
+                    };
+                    var dqeForm = $('#id_form').dqe(options); // Activation DQE Adresse
+                    // Ecoute l'evenement de sélection de l'adresse
+                    dqeForm.on('single', function(ui, data) {
+                        $j('#search-content-input-id').val(data.value); // Récupération de l'adresse
+
+                        // 21/07/2021 - JMU - RQM-286 : Update de SINGLE à SINGLEV2 
+                        // Récupération des coordonnées de l'adresse via LATLNG de DQE
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.Ctrl_ConsultationListeDePhones.DQELongLat}', data.id, data.num, 'FRA',
+                            function(result, event) {
+                                if (event.status) {
+                                    // Si les points existent, calcul et affichage du secteur, sinon rien
+                                    if (result != null) {
+                                        var latlng = L.latLng(result.Latitude, result.Longitude);
+                                        deleteAll(map);    // Suppression de tous les markers et secteurs
+                                        // Ajout des markers
+                                        addMarkerSearchBox(dotType.SEARCH, data, latlng);
+                                        // Centrage de la carte
+                                        map.panTo(latlng);
+                                    }
+                                    
+                                } else if (event.type === 'exception') {
+                                    alert(event.message);
+                                } else {
+                                    alert(event.message);
+                                }
+                            },
+                            { buffer: false, escape: true, timeout: 30000 }
+                        );
+                    });
+                    L.DomEvent.disableClickPropagation(searchBoxDiv);
+                    L.DomEvent.on(searchBoxDiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return searchBoxDiv;
+                }
+            });
+            L.control.searchBox = function(opts) {
+                return new L.Control.SearchBox(opts);
+            }
+            L.control.searchBox({ position: 'topleft' }).addTo(map);
+
+             // Ajout du sélecteur de secteur et des points comme contrôle
+            L.Control.SectorSelector = L.Control.extend({
+                onAdd: function(map) {
+                    var sectorSelectorDiv = L.DomUtil.get('legend-content-id');
+                    L.DomEvent.disableClickPropagation(sectorSelectorDiv);
+                    L.DomEvent.on(sectorSelectorDiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return sectorSelectorDiv;
+                }
+            });
+            L.control.sectorSelector = function(opts) {
+                return new L.Control.SectorSelector(opts);
+            }
+            L.control.sectorSelector({ position: 'topleft' }).addTo(map);
+        }
+
+        /* Fonction permettant de changer de secteur (changement)                       */
+        /*------------------------------------------------------------------------------*/
+        function showSector (i) {
+            // Si "Aucun", on supprime le secteur affiché et les markers
+            if (0 === i) {
+                deleteAll(map);
+            } else {
+                sectorName = $j("[id$=magasin]").children(':selected').text();
+                deleteAll(map);
+                drawSectorAndMarkers();
+            }
+        }
+
+        /* Fonction permettant de dessiner le secteur sur la carte                      */
+        /*------------------------------------------------------------------------------*/
+        function drawSectorAndMarkers() {
+            sectorName = $j("[id$=magasin]").children(':selected').text();
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ConsultationListeDePhones.getSectorCoord}',
+                sectorName,
+                function(result, event) {
+                    if (event.status) {
+                        // Init
+                        sectorCode = $j("[id$=magasin]").val();
+                        latitude_min = 90; longitude_max = -180; latitude_max  = -90; longitude_min = 180;
+                        // Si les points existent, calcul et affichage du secteur, sinon rien
+                        if (result != null && result.WKT != null) {
+                            var optionSector = {
+                                color: '{!googleMapsSettings.Couleur_du_contour_secteur__c}',
+                                opacity: 0.8,
+                                weight: 3,
+                                fillColor: '{!googleMapsSettings.Couleur_du_fond_secteur__c}',
+                                fillOpacity: 0.2
+                            };
+                            // Creation du secteur
+                            sectorPolygon = constructSectorPolygon(result.WKT, optionSector);
+                            if(sectorPolygon != null) {
+                                sectorPolygon.addTo(map);                                
+                                // Centre la carte sur le secteur
+                                map.fitBounds(sectorPolygon.getBounds()); 
+                                // Calcul des limites du secteurs
+                                latitude_min = sectorPolygon.getBounds().getSouth();
+                                latitude_max = sectorPolygon.getBounds().getNorth();
+                                longitude_min = sectorPolygon.getBounds().getWest();
+                                longitude_max = sectorPolygon.getBounds().getEast();
+                            }
+                        }
+                        // Initialisation ou affichage des points visible
+                        if(init) {
+                            // Initialise par défaut l'affichage des points ci dessous
+                            changeVisibility(dotType.Debriefe, true);
+                            changeVisibility(dotType.ADebriefer, true);
+                            init = false;
+                            getRemoteComptes();
+                        } else {
+                            for(var key in poinVisibleList) {
+                                if (poinVisibleList[key] == true) {
+                                    changeVisibility(key, true);
+                                }
+                            }
+                        }
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                { buffer: false, escape: true, timeout: 30000 }
+            );
+        }
+
+        /* Fonction permettant de dessiner un marqueur sur la carte                     */
+        /*------------------------------------------------------------------------------*/
+        function addMarkerSearchBox(dot, place, location) {
+            // Construction de la présentation du point
+            var dotPresentation = place.value;
+            // Construction du marker
+            var marker = L.marker(location, {id: dot}).addTo(map);
+            // Ajout du marker sur la carte et ajout de la présentation
+            marker.bindPopup(dotPresentation).openPopup();
+            // Ajout du marker dans le tableau global
+            markersArray[dot].push(marker);
+
+            return marker;
+        }
+
+        /* Fonction permettant de changer la visibilite des points */
+        /*---------------------------------------------------------*/
+        function changeVisibility(elementId, show) {
+            if (!elementId) {
+                alert('Point non connu');
+                return;
+            }
+
+            show = (typeof show === 'undefined') ? true : (!!show);
+            var htmlE = document.getElementById(elementId); // Récupération du bouton
+            var loadingbox = document.getElementById(elementId + '-loader'); // Récupération pour affichage de l'image de chargement
+
+            if (show) {
+                // Affichage de l'icone de chargement
+                $j(loadingbox).addClass('loader');
+                sessionStorage.setItem(elementId, "selected");
+
+                // Affichage du bouton en actif
+                $j(htmlE).addClass('legend-active-dot');
+                poinVisibleList[elementId] = true;
+            } else {
+                deleteMarkers(map, elementId);
+                // Affichage du bouton en inactif
+                $j(htmlE).removeClass('legend-active-dot');
+                poinVisibleList[elementId] = false;
+                sessionStorage.setItem(elementId, "nselected");
+            }
+        }
+
+        /* Fonction permettant de récupérer tous les comptes des filtres sélectionnés */
+        /*----------------------------------------------------------------------------*/
+        function getRemoteComptes() {
+            var types = getFiltresSelectionnes();
+            sectorCode = $j("[id$=magasin]").val();
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_ConsultationListeDePhones.recuperePhonesAvecCoordonnees}', sectorCode, compteIdListe,
+                function(result, event) {
+                    if (event.status) {
+                       remoteActionProcess(result, event, types);
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                { buffer: false, escape: true, timeout: 30000 }
+            );
+        }
+
+        /* Fonction permettant de traiter le résultat des Remote Action */
+        /*--------------------------------------------------------------*/
+        function remoteActionProcess(result, event, types) {
+            var coords;
+            var latlngTable = [];
+            if (event.status) {
+                // Boucle sur les différents types
+                for(var i = 0; i < types.length; ++i) {
+                    if(types[i] != null) {
+                        // Suppression du marker
+                        deleteMarkers(map, types[i]);
+                        // Boucle sur la liste des comptes de chaque type
+                        for(var y = 0; y < result.length; y++) {
+
+                            var address = checkField(result[y].AddressComplete);
+                            address = $j.trim(address);
+
+                            // Récupère les coordonées
+                            if(result[y].Latitude != null && result[y].Longitude != null) coords = getPointCoords(address, result[y].Latitude, result[y].Longitude, result[y].X, result[y].Y);
+                            // Ajout du marker sur la carte
+                            if(coords) {
+                                if(result[y].Debriefe && types[i] == FILTRES_PHONES.DEBRIEFE){
+                                    var marker = addMarker(types[i], coords, result[y], address);
+                                    latlngTable.push(coords);
+                                } else if(!result[y].Debriefe  && types[i] == FILTRES_PHONES.ADEBRIEFER){
+                                    var marker = addMarker(types[i], coords, result[y], address);
+                                    latlngTable.push(coords);
+                                } 
+                            } else {
+                                console.log('Erreur position: ' + result[y].Name);
+                            }
+                        }
+                    }
+                    // Suppression de l'icone de chargement
+                    var loadingbox = document.getElementById(dotType[types[i]] + '-loader');
+                    $j(loadingbox).removeClass('loader');
+                }
+                if(latlngTable != null && latlngTable.length != 0){
+                //    map.fitBounds(latlngTable);
+                }
+            } else if (event.type === 'exception') {
+                alert(event.message);
+            } else {
+                alert(event.message);
+            }
+        }
+
+        /* Fonction permettant de dessiner un marqueur sur la carte                     */
+        /* Présentation des points (Ne pas utiliser pour la SearchBox)                  */
+        /*------------------------------------------------------------------------------*/
+        function addMarker(type, location, object, address) {
+            // Ajout du marker sur la carte et ajout de la présentation
+            var compteId = checkField(object.Id);
+            var marker = addMarkerLeaflet(map, type, location, dotTypeColor[type], [32,37], [16,37], [0, -37]);
+            marqueursList[object.Id] = marker;
+            // Ajout de la présentation sur marker
+            if(type == dotType.Debriefe || type == dotType.ADebriefer) {
+                var dotPresentation = createInfowindow(null, object, dotTypeColor[type], marker);
+            }
+            /*L.DomEvent.on(marker, 'click', function (ev) {
+                marker.openPopup();
+                L.DomEvent.stopPropagation(ev);
+            });*/
+            return marker;
+        }
+
+        /* Fonction permettant de changer la visibilite du menu */
+        /*------------------------------------------------------*/
+        function changeMenuVisibility() {
+            var legendMenu = $j('#legend-content-id');
+            var buttonMenu = $j('#search-content-button-id');
+            if(legendMenu.hasClass('show')) {
+                // Si le menu est visible, on cache
+                legendMenu.removeClass('show').addClass('hidden');
+                buttonMenu.removeClass('active');
+            } else {
+                // Si le menu est caché, on affiche
+                legendMenu.addClass('show').removeClass('hidden');
+                buttonMenu.addClass('active');
+            }
+        }
+
+        /* Fonction qui retourne les filtres géo selectionnés */
+        /*----------------------------------------------------*/
+        function getFiltresSelectionnes() {
+            var types = [];
+            if(sessionStorage.getItem(FILTRES_PHONES.DEBRIEFE) == "selected") 
+                types.push(dotType.Debriefe);
+            if(sessionStorage.getItem(FILTRES_PHONES.ADEBRIEFER) == "selected") 
+                types.push(dotType.ADebriefer);
+            return types;
+        }
+
+        /* Contruction de l'infowindow                                                  */
+        /*------------------------------------------------------------------------------*/
+        function createInfowindow(contrat, compte, dotype, marker) {
+            // Champs du compte
+            var compteId = checkField(compte.Id);
+            var compteRue = checkField(compte.Address);
+            var compteCodePostal = checkField(compte.PostalCode);
+            var compteVille = checkField(compte.City);
+            var compteName = checkField(compte.Name);
+            var compteType  = checkField(compte.TypeCompte);
+            var compteEmail = checkField(compte.Email);
+            var compteTeldom = checkField(compte.TelDomicile);
+            var compteTelpor  = checkField(compte.TelMobile);
+            var compteTelautre  = checkField(compte.AutreTel);
+
+            // Construction de la présentation du point
+            var dotPresentation = ' <div id="dotPresentation" style="  min-width: 200px;" class="col-md-12">'
+                                +'      <div class="col-md-2">'
+                                +'          <image src="'+ dotype +'" />'
+                                +'      </div>'
+                                +'  <div class="col-md-10">'
+                                +'      <div class="dotPresentatioName">'
+            if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one)) {
+                dotPresentation +='         <a href="javascript:sforce.one.navigateToSObject(\'' + compteId + '\')'+'">'+ compteName +'</a>';
+            } else {
+                dotPresentation +='         <a target="_blank" href="/'+ compteId +'">'+ compteName +'</a>';
+            }
+            dotPresentation     +='     </div>'
+                                +'      <div class="dotPresentatioAddress">'
+                                +           compteRue + '<br />'
+                                +           compteCodePostal + ' ' + compteVille
+                                +'      </div>';
+                                +'      <div id="dotPresentatioJoign">'
+                                +'          <div class="line_info">Type : '+ compteType +'</div>'
+                                +'          <div class="line_info">Domicile : '+ compteTeldom +'</div>'
+                                +'          <div class="line_info">Portable : '+ compteTelpor +'</div>'
+                                +'          <div class="line_info">Autre : '+ compteTelautre +'</div>'
+                                +'          <div class="line_info">Email : ' + compteEmail + '</div>'
+                                +'      </div>';
+                                +'  </div>'
+                                +'</div>';
+
+            var customOptions = {
+                'maxWidth': '500',
+                'className' : 'custom-popup'
+            };
+            marker.bindPopup(dotPresentation, customOptions);
+        }
+
+        /* Création de la structure des filtres de recherche        */
+        /*----------------------------------------------------------*/
+        function argumentConstruction() {
+            var argument = new Object();
+
+            // récupération des filtres
+            var dr              = $j("[id$=region]").val();
+            var dv              = $j("[id$=dv]").val();
+            var magasin         = $j("[id$=magasin]").val();
+            var drName          = $j("[id$=region]").children(':selected').text();
+            var dvName          = $j("[id$=dv]").children(':selected').text();
+            var magasinName     = $j("[id$=magasin]").children(':selected').text();
+            var vendeur         = $j("[id$=vendeur]").val();
+            var vendeurName     = $j("[id$=vendeur]").children(':selected').text();
+            var statut          = $j("[id$=statut]").val();
+            var dateDebut       = dateDebutActuelle
+            var dateFin         = dateFinActuelle
+            var ldp             = $j("[id$=listeDePhoneSelection]").val();
+
+            argument['dr']=dr;
+            argument['dv']=dv;
+            argument['magasin']=magasin;
+            argument['drName']=drName;
+            argument['dvName']=dvName;
+            argument['magasinName']=magasinName;
+            argument['vendeur']=vendeur;
+            argument['vendeurName']=vendeurName;
+            argument['statut']=statut;
+            argument['dateDebut']=dateDebut;
+            argument['dateFin']=dateFin;
+            argument['ldp']=ldp;
+
+            // Gestion de la date (IE différent formatage)
+            if(dateDebut.indexOf("/") > -1) argument['dateDebut'] = formatDate(dateDebut);
+            if(dateFin.indexOf("/") > -1) argument['dateDebut'] = formatDate(dateFin);
+
+            return argument;
+        }
+
+        /* Fonction pour l'affichage des icones                     */
+        /*----------------------------------------------------------*/
+        function setIcons(record){
+            var contenu ='';
+            contenu += '<div id="actionsLoader' + record.Id + '" class="section hidden">';
+            contenu += '    <span class="loader loader-quart"></span>';
+            contenu += '</div>';
+            contenu += '<div id="actionsDetails' + record.Id + '">';
+            contenu += '    <a href="/' + record.Id + '" class="btn btn-default btn-xsm" target="_blank"><span class="glyphicon glyphicon-pencil" aria-hidden="true" /></a>';
+            if(record.projet__c != null && record.projet__c != '' && record.projet__c != undefined) 
+                contenu += '<a href="/' + record.projet__c + '" class="btn btn-default btn-xsm" target="_blank"><span class="glyphicon glyphicon-briefcase" /></a>';
+            if(record.RDV__c != null && record.RDV__c != '' && record.RDV__c != undefined)  
+                contenu += '<a href="/' + record.RDV__c + '" class="btn btn-default btn-xsm" target="_blank"><span class="glyphicon glyphicon-calendar" /></a>';
+            contenu += '</div>';
+            contenu += '<div id="actionsUpdates' + record.Id + '" class="hidden">';
+            contenu += '    <button id ="debrif' + record.Id + '" class="btn btn-default btn-xsm" onClick="updatePhone(\''+record.Id+'\', \'update\')"><span class="glyphicon glyphicon-ok" style="color:green;"/></button>';
+            contenu += '    <button id ="debrif' + record.Id + '" class="btn btn-default btn-xsm" onClick="updatePhone(\''+record.Id+'\', \'remove\')"><span class="glyphicon glyphicon-remove" style="color:red;"/></button>';
+            contenu += '</div>';
+            return contenu;
+        }
+
+        function setupAllFields(phone){
+            if(phone.compte__r.Name == null){phone.compte__r.Name = ' ';}
+            if(phone.compte__r.Type == null){phone.compte__r.Type = ' ';}
+            if(phone.compte__r.telephoneDomicile__c == null){phone.compte__r.telephoneDomicile__c = ' ';}
+            if(phone.compte__r.telephoneMobile__c == null){phone.compte__r.telephoneMobile__c = ' ';}
+            if(phone.compte__r.autreTelephone__c == null){phone.compte__r.autreTelephone__c = ' ';}
+            if(phone.compte__r.nbPhonings__c == null){phone.compte__r.nbPhonings__c = '0';}
+            if(phone.compte__r.nbAppelsSortants__c == null){phone.compte__r.nbAppelsSortants__c = '0';}
+            if(phone.compte__r.rue__c == null){phone.compte__r.rue__c = ' ';}
+            if(phone.compte__r.complementAdresse__c == null){phone.compte__r.complementAdresse__c = ' ';}
+            if(phone.compte__r.codePostal__c == null){phone.compte__r.codePostal__c = ' ';}
+            if(phone.compte__r.ville__c == null){phone.compte__r.ville__c = ' ';}
+            if(phone.commentaires__c == null){phone.commentaires__c = ' ';}
+            return phone;
+        }
+
+        /* Fonction pour formater la date sur IE                    */
+        /*----------------------------------------------------------*/
+        function formatDate(date) {
+            var stringDateFormated = '';
+            var dateTmp = date.split('/');
+            dateTmp = new Date(dateTmp[2], dateTmp[1], dateTmp[0]);
+
+            if(!isNaN(dateTmp)) {
+                // Formatage Date
+                stringDateFormated = dateTmp.getFullYear() + '-';
+                if(dateTmp.getMonth() < 10) stringDateFormated += '0' + dateTmp.getMonth() + '-'; else stringDateFormated += dateTmp.getMonth() + '-';
+                if(dateTmp.getDate() < 10) stringDateFormated += '0' + dateTmp.getDate(); else stringDateFormated += dateTmp.getDate();
+            }
+            return stringDateFormated;
+        }
+
+        /* Check if the browser agent in Mobile  */
+        /*----------------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                || ((typeof sforce != 'undefined') && (sforce != null) )
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function refreshSector(){
+            $j("[id$=magasin]").children(':selected').text();
+        }
+
+        /* Fonction pour simuler un click sur un objet              */
+        /*----------------------------------------------------------*/
+        function eventFire(el, etype){
+            if (el.fireEvent) {
+                el.fireEvent('on' + etype);
+            } else {
+                var evObj = document.createEvent('Events');
+                evObj.initEvent(etype, true, false);
+                el.dispatchEvent(evObj);
+            }
+        }
+
+        /* Fonction pour stocker une valeur de champ en session     */
+        /* si le paramètre value est null, la clé est supprimée     */
+        /*----------------------------------------------------------*/
+        function remindField(fieldName, value)
+        {
+            switch(fieldName){
+                case 'DR':
+                    if(sessionStorage.getItem('field_DR') != value) {
+                        //mise à jour de la valeur de session
+                        if(value == null) sessionStorage.removeItem('field_DR');
+                        else sessionStorage.setItem('field_DR', value);
+                    }
+                    //si la valeur passée en paramètre est la même que la valeur actuelle, on ne fait rien
+                    break;
+
+                case 'DV':
+                    if(sessionStorage.getItem('field_DV') != value) {
+                        if(value == null) sessionStorage.removeItem('field_DV');
+                        else sessionStorage.setItem('field_DV', value);
+                    }
+                    break;
+
+                case 'magasin':
+                    if(sessionStorage.getItem('field_magasin') != value) {
+                        if(value == null) sessionStorage.removeItem('field_magasin');
+                        else sessionStorage.setItem('field_magasin', value);
+                    }
+                    break;
+
+                case 'vendeur':
+                    if(sessionStorage.getItem('field_vendeur') != value) {
+                        if(value == null) sessionStorage.removeItem('field_vendeur');
+                        else sessionStorage.setItem('field_vendeur', value);
+                    }
+                    break;
+
+                case 'statut':
+                    if(sessionStorage.getItem('field_statut') != value) {
+                        if(value == null) sessionStorage.removeItem('field_statut');
+                        else sessionStorage.setItem('field_statut', value);
+                    }
+                    break;
+
+                case 'dateDebut':
+                    if(sessionStorage.getItem('field_dateDebut') != value) {
+                        if(value == null) sessionStorage.removeItem('field_dateDebut');
+                        else sessionStorage.setItem('field_dateDebut', value);
+                    }
+                    break;
+
+                case 'dateFin':
+                    if(sessionStorage.getItem('field_dateFin') != value) {
+                        if(value == null) sessionStorage.removeItem('field_dateFin');
+                        else sessionStorage.setItem('field_dateFin', value);
+                    }
+                    break;
+
+                case 'LDP':
+                    if(sessionStorage.getItem('field_LDP') != value) {
+                        if(value == null) sessionStorage.removeItem('field_LDP');
+                        else sessionStorage.setItem('field_LDP', value);
+                    }
+                    break;
+            }
+        }
+    </script>
+    <c:importvisualstrap theme="default" />
+    <c:visualstrapblock >
+        <center>
+            <c:pageheader title="Consultation de listes de Phones" icon="phone-alt"/>
+        </center>
+        
+        <apex:form >
+                <div class="text-center" style="margin-bottom:20px;">
+                     <a class="btn btn-primary" onClick="nouvelleRecherche();">Nouvelle recherche</a>
+                </div>
+        </apex:form>
+        
+        <div class="panel panel-primary">
+            <apex:outputPanel layout="block" styleClass="panel-heading" onclick="showOrHidePanelCollapse('selection');">
+                <h3 class="panel-title">
+                    <!--<a id="selectionTitle" class="collapse" style="cursor: pointer;" onclick="showOrHidePanelCollapse('selection');"> Sélection </a>-->
+                    <a id="selectionTitle"> Sélection </a>
+                </h3>
+            </apex:outputPanel>
+            <div id="selection" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <div id="container" style="position:relative;">
+                    <!--<div id="legendeBlocker" style="position: absolute; width: 100%;height:100%;z-index:20;opacity:0.4;filter: alpha(opacity = 50)">
+                        <span class="loader loader-quart"></span>
+                    </div>-->
+                    <div id="div2" style="">
+                    <c:formblock alignment="horizontal">
+                        <apex:form > 
+                            <input style="height:0px; top:-1000px; position:absolute" type="text" value=""/><br/>
+                            <c:formgroup >
+                                
+                                <apex:actionFunction action="{!updateFields}" name="updateControllerFields" rerender="region,dv,magasin,vendeur,debut,fin,listeDePhoneSelection" oncomplete="drawSectorAndMarkers(); searchPhones(); showCancelLDP();">
+                                    <apex:param name="paramDR" assignTo="{!fieldParamDR}" value="" />
+                                    <apex:param name="paramDV" assignTo="{!fieldParamDV}" value="" />
+                                    <apex:param name="paramMagasin" assignTo="{!fieldParamMagasin}" value="" />
+                                    <apex:param name="paramVendeur" assignTo="{!fieldParamVendeur}" value="" />
+                                    <apex:param name="paramDebut" assignTo="{!fieldParamDebut}" value="" />
+                                    <apex:param name="paramFin" assignTo="{!fieldParamFin}" value="" />
+                                    <apex:param name="paramLDP" assignTo="{!fieldParamLDP}" value="" />
+                                </apex:actionFunction>
+                                
+                                <apex:actionFunction name="rerenderdv" rerender="dv" oncomplete="rerendermagasin(this.value);">
+                                    <apex:param name="firstParam" assignTo="{!codeRegion}" value="" />  
+                                </apex:actionFunction>
+                                <apex:actionFunction name="rerendermagasin" rerender="magasin" oncomplete="rerenderLDP(); rerenderVendeur();">
+                                    <apex:param name="firstParam" assignTo="{!codeDV}" value="" />
+                                </apex:actionFunction>
+                                <apex:actionFunction name="rerenderDateDebut" rerender="dateDebut" oncomplete="rerenderLDP();"/>
+                                <apex:actionFunction name="rerenderDateFin" rerender="dateFin" oncomplete="rerenderLDP();"/>
+                                <apex:actionFunction name="rerendermagasinDV" rerender="magasin" oncomplete="rerenderLDP(); rerenderVendeur();"/>
+                                <apex:actionFunction name="rerenderLDP" rerender="listeDePhoneSelection" onComplete="showCancelLDP();"/>
+                                <apex:actionFunction name="rerenderVendeur" rerender="vendeur"/>
+                                <apex:actionFunction name="confirmCancel" action="{!cancelListeDePhone}"/>
+                                <apex:actionFunction name="nouvelleRecherche" action="{!nouvelleRecherche}"/>
+                                    
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.region}">DR</apex:outputlabel>
+                                    <span style="color:red"> </span>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:selectlist disabled="{!CONTAINS($Profile.Name, "Vendeur") || CONTAINS($Profile.Name, "DV") || CONTAINS($Profile.Name, "DR") || CONTAINS($Profile.Name, "RVJ") || CONTAINS($Profile.Name, "RV")}" 
+                                                     styleClass="form-control input-sm" id="region" size="1" value="{!codeRegion}" onChange="searchPhones(); rerenderdv(this.value);">
+                                        <apex:selectOptions value="{!optionsRegion}" />
+                                    </apex:selectlist>
+                                </div>
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.dv}">DV</apex:outputlabel>
+                                    </div>
+                                <div class="col-md-2">
+                                    <apex:actionRegion >
+                                    <apex:selectlist disabled="{!CONTAINS($Profile.Name, "Vendeur") || CONTAINS($Profile.Name, "DV") || CONTAINS($Profile.Name, "RVJ") || CONTAINS($Profile.Name, "RV")}" 
+                                                     title="DV" styleClass="form-control input-sm" id="dv" size="1" value="{!codeDV}" onChange="searchPhones(); rerendermagasin(this.value);">
+                                        <apex:selectOptions value="{!optionsDV}" />
+                                    </apex:selectlist>
+                                    </apex:actionRegion>
+                                </div>
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.magasin}">Magasin</apex:outputlabel>
+                                </div>
+                                <div class="col-md-2">
+                                        <apex:selectlist disabled="{!(CONTAINS($Profile.Name, "Vendeur") || CONTAINS($Profile.Name, "RVJ") || CONTAINS($Profile.Name, "RV")) && !unlockMagasin}" 
+                                                         styleClass="form-control input-sm" id="magasin" size="1" value="{!codeMag}" onChange="searchPhones(); rerenderVendeur(this.value); rerenderLDP(this.value); refreshSector(this.value); showSector(1)">
+                                            <apex:selectOptions value="{!optionsMag}" />
+                                        </apex:selectlist>
+                                    </div>
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.vendeur}">Vendeur</apex:outputlabel>
+                                </div> 
+                                <div class="col-md-2">
+                                    <!-- <apex:inputField id="vendeur" value="{!vendeur.OwnerId}" required="false" onChange="searchPhones();"/>  -->
+                                    <apex:selectlist styleClass="form-control input-sm" id="vendeur" size="1" value="{!nomVendeur}" onChange="searchPhones();">
+                                        <apex:selectOptions value="{!optionsVendeurs}" />
+                                    </apex:selectlist>
+                                </div>
+                            </c:formgroup>
+                            <c:formgroup >
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.statut}">Statut</apex:outputlabel>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:inputfield id="statut" styleclass="picklistStyle" value="{!listePhoning.statut__c}" required="false" 
+                                                     onclick="style.boxShadow='0px 0px 8px #81BFFF';" onblur="style.boxShadow='0px 0.5px 1px #CECECE inset';"  onchange="searchPhones(); rerenderLDP(this.value)" />
+                                </div>
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.debut}">Début</apex:outputlabel>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class='input-group date' id='input-datetimepicker'>
+                                        <input type='text' class="form-control" id="debut" autocomplete="off" value="{!dateDebut}"/>
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.fin}">Fin</apex:outputlabel>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class='input-group date' id='input-datetimepicker2'>
+                                        <input type='text' class="form-control" id="fin" autocomplete="off" value="{!dateFin}"/>
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <apex:outputlabel styleclass="control-label" for="{!$Component.listeDePhoneSelection}" style="text-align: left !important;">Liste de phones</apex:outputlabel>
+                                </div>
+                                <div class="col-md-2">
+                                    <apex:selectlist styleClass="form-control input-sm" id="listeDePhoneSelection" size="1" value="{!nomLDP}" onChange="showCancelLDP(); searchPhones();">
+                                        <apex:selectOptions value="{!optionsLDP}" />
+                                    </apex:selectlist>
+                                    <button type="button" id="cancelLDP" class="btn btn-default btn-xsm" data-toggle="modal" data-target="#cancelLDP_modal" style="margin-top:5px;">
+                                        <i class="glyphicon glyphicon-remove" style="color:red;" />
+                                    </button>
+                                </div>
+                            </c:formgroup>
+                            <c:formgroup >
+                                <div class="col-md-3">
+                                    <div id="msgErrorObligatoire" style="color:#FF0000;"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div id="msgErrorDateDebut" style="color:#FF0000;"></div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div id="msgErrorDateFin" style="color:#FF0000;"></div>
+                                </div>
+                                <apex:inputhidden id="dateDebutTemp" value="{!dateDebutTemp}" />
+                                <apex:inputhidden id="dateFinTemp" value="{!dateFinTemp}" />
+                            </c:formgroup>
+                            <div class="modal" id="cancelLDP_modal" tabindex="-1" role="dialog" aria-labelledby="cancelLDP_modalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="cancelLDP_modalLabel">Annulation de la liste de phones sélectionnée</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                <label>Veuillez saisir le motif d'annulation</label>
+                                                <apex:inputtextarea styleclass="form-control" id="motifAnnulation" rows="3" value="{!motifAnnulation}"></apex:inputtextarea>
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Revenir aux phones</button>
+                                            <button type="button" class="btn btn-primary" onclick="confirmCancel(); return false;">Confirmer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  
+                        </apex:form>
+                    </c:formblock>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="panel panel-primary">
+            <apex:outputPanel layout="block" styleClass="panel-heading" onclick="showOrHidePanelCollapse('indicateurs');">
+                <h3 class="panel-title">
+                    <a id="indicateursTitle"> Indicateurs </a>
+                </h3>
+            </apex:outputPanel>
+            <div id="indicateurs" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <div class="col-md-10">
+                        <apex:outputPanel styleClass="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero" layout="block">
+                            <!-- Search Bar -->
+                            <div id="search-content-id" class="search-content" role="search" tabindex="-1">
+                                <div class="row">
+                                    <div class="input-group" id="id_form">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-primary active" onclick="changeMenuVisibility();" id="search-content-button-id">Menu</button>
+                                        </span>
+                                            <input id="search-content-input-id" type="text" class="form-control" placeholder="Saisissez une adresse" />
+                                            <input id="search-content-input-id_zip" type="hidden" class="form-control" />
+                                            <input id="search-content-input-id_city" type="hidden" class="form-control" />
+                                            <input id="search-content-input-id_street" type="hidden" class="form-control" />
+                                            <input id="search-content-input-id_number" type="hidden" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Legende et filtres -->
+                            <div id ="legend-content-id" class="legend-content show" style="z-index: 10;">
+                                <!-- ComboBox Secteur -->
+                                <div id="legend-content-sector-id" style="padding:0px;">
+                                    <div class="legend-content-sector" style="display:none;">
+                                        <div><select id="sectorSelector" onchange="showSector(this.selectedIndex)" class="form-control input-sm">
+                                            <option>{!$Label.Aucun}</option>
+                                            <apex:repeat value="{!sectorNamesList}" var="i">
+                                                <apex:outputText rendered="{! i == sectorName }" escape="false" value="#"><option selected="selected">{!HtmlEncode(i)}</option></apex:outputText>
+                                                <apex:outputText rendered="{! i != sectorName }" escape="false" value="#"><option>{!HtmlEncode(i)}</option></apex:outputText>
+                                            </apex:repeat>
+                                        </select></div>
+                                    </div>
+                                </div>
+                                <div class="tab-content" >
+                                    <!-- Onglet Service -->
+                                    <div class="list-group legend-list-group">
+                                        <a href="#!" class="list-group-item legend-list-group-item" id="Debriefe" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot')); getRemoteComptes();">
+                                            <apex:image url="{!URLFOR($Resource.Cartographie, 'img/listeDePhones/flag-export-green.png')}" styleClass="legend-icons"/>
+                                            Phones débriefés
+                                            <div id="Debriefe-loader" class="pull-right"></div>
+                                        </a>
+                                        <a href="#!" class="list-group-item legend-list-group-item" id="ADebriefer" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot')); getRemoteComptes();">
+                                            <apex:image url="{!URLFOR($Resource.Cartographie, 'img/listeDePhones/flag-export-red.png')}" styleClass="legend-icons"/>
+                                            Phones à débriefer
+                                            <div id="ADebriefer-loader" class="pull-right"></div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="map" style="min-height:740px;"></div> 
+                        </apex:outputPanel>
+                    </div>
+                    <div id="indicateursJauges" class="col-md-2">
+                        <c:well style="text-align:center;">
+                            <input type="text" class="jaugeAppeleDebriefe" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                            <div>
+                                <apex:outputPanel styleClass="glyphicon glyphicon-earphone" style="font-size:24px" id="objectifAppeleDebriefeIc" />&nbsp;
+                                <span id="objectifAppeleDebriefe" style="font-size:28px">0 / 0</span>
+                                <p class="text-muted">% appelés/débriefés</p>
+                            </div>
+                        </c:well>
+                        <br/>
+                        <c:well style="text-align:center;">
+                            <input type="text" class="jaugeArgumentation" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                            <div>
+                                <apex:outputPanel styleClass="glyphicon glyphicon-volume-up" style="font-size:24px" id="objectifArgumentationIc" />&nbsp;
+                                <span id="objectifArgumentation" style="font-size:28px">0 / 0</span>
+                                <p class="text-muted">% argumentations</p>
+                            </div>
+                        </c:well>
+                        <br/>
+                        <c:well style="text-align:center;">
+                            <input type="text" class="jaugeRDVPris" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                            <div>
+                                <apex:outputPanel styleClass="glyphicon glyphicon-time" style="font-size:24px" id="objectifRDVPrisIc" />&nbsp;
+                                <span id="objectifRDVPris" style="font-size:28px">0 / 0</span>
+                                <p class="text-muted">% RDV pris</p>
+                            </div>
+                        </c:well>
+                        <br/>
+                        <c:well style="text-align:center;">
+                            <div id="camembertCAGenere" style="margin-left:auto; margin-right:auto; min-height:149px;"></div>
+                            <p class="text-muted">CA générés (K €)</p>
+                        </c:well>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel panel-primary">
+            <apex:outputPanel layout="block" styleClass="panel-heading" onclick="showOrHidePanelCollapse('liste');">
+                <h3 class="panel-title">
+                    <a id="listeTitle"> Liste </a>
+                </h3>
+            </apex:outputPanel>
+            <div id="liste" class="panel-collapse collapse in">
+                <div class="panel-body" id="panelListe">
+                    <div id="msgErrorListe" style="float:right; color:red;"></div>
+                    <div id="loading" class="section hidden">
+                        <span class="loader loader-quart"></span>
+                        Recherche en cours... Veuillez patienter
+                    </div>
+                    <div id="affichage"></div>
+                </div>
+             </div>
+         </div>
+    </c:visualstrapblock>
+</apex:page>

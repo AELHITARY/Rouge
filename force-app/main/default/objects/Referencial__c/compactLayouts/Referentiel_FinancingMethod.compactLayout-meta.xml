@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Referentiel_FinancingMethod</fullName>
+    <fields>Name</fields>
+    <fields>RecordTypeId</fields>
+    <fields>KparKReference__c</fields>
+    <fields>startDate__c</fields>
+    <fields>endDate__c</fields>
+    <fields>financingType__c</fields>
+    <fields>fundingAgency__c</fields>
+    <label>Référentiel / Mode de financement</label>
+</CompactLayout>

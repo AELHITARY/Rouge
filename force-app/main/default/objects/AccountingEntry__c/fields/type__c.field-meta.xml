@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>type__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE(RecordType.DeveloperName,
+     &quot;BankRemittance&quot;,             &quot;1 - Client&quot;,
+     &quot;OtherRevenue&quot;,               &quot;2 - Autre recette&quot;,
+     &quot;Unpaid&quot;,                     &quot;3 - Impayé&quot;,
+     &quot;BankFees&quot;,                   &quot;4 - Frais bancaire&quot;,
+     &quot;CashWithdrawal&quot;,             &quot;5 - Retrait espèce&quot;,
+     &quot;HeadOfficeTransfer&quot;,         &quot;6 - Virement siège&quot;,
+     &quot;BankRemittanceCancellation&quot;, &quot;7 - Annulation remise&quot;,
+     &quot;VATDifference&quot;,              &quot;8 - Ecart conversion&quot;,
+     &quot;OtherExpence&quot;,               &quot;9 - Autre dépense&quot;,
+     RecordType.Name)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NumeroLookupQuery__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+				OR(TEXT(codeProduit__r.Family) = &quot;Persienne&quot;,TEXT(codeProduit__r.Family) = &quot;PORTAILS&quot;,TEXT(codeProduit__r.Family) = &quot;Volet Battant&quot;,TEXT(codeProduit__r.Family) = &quot;Volet Roulant&quot;),
+				CASE(codeGarantie__r.code__c,&quot;ETANCH&quot;,1,&quot;TENUE&quot;,2,&quot;MOTOR&quot;,3,&quot;MECA&quot;,4,&quot;POIGNEE&quot;,5,&quot;SERR&quot;,6,&quot;TEINTE&quot;,7,&quot;LAQU&quot;,8,&quot;PLAX&quot;,9,&quot;LASURE&quot;,9,&quot;POSE&quot;,10,0),
+				IF(
+								TEXT(codeProduit__r.Family) = &quot;Store&quot;,
+								CASE(codeGarantie__r.code__c,&quot;ETANCH&quot;,1,&quot;TENUE&quot;,2,&quot;MOTOR&quot;,3,&quot;TOILE&quot;,4,&quot;MECA&quot;,5,&quot;LAQU&quot;,6,&quot;POSE&quot;,7,0),
+								IF(
+												codeProduit__r.SousFamille__c = &quot;Porte de garage&quot;,
+												CASE(codeGarantie__r.code__c,&quot;ETANCH&quot;,1,&quot;TENUE&quot;,2,&quot;VITRAGE&quot;,3,&quot;MOTOR&quot;,4,&quot;MECA&quot;,5,&quot;POIGNEE&quot;,6,&quot;SERR&quot;,7,&quot;LAQU&quot;,8,&quot;POSE&quot;,9,0),
+												CASE(codeGarantie__r.code__c,&quot;ETANCH&quot;,1,&quot;TENUE&quot;,2,&quot;VITRAGE&quot;,3,&quot;MECA&quot;,4,&quot;POIGNEE&quot;,5,&quot;SERR&quot;,6,&quot;TEINTE&quot;,7,&quot;LAQU&quot;,8,&quot;PLAX&quot;,9,&quot;LASURE&quot;,9,&quot;POSE&quot;,10,0))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Numéro Lookup Query</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

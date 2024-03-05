@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>default__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Ce champ permet de détecter si la condition existe belle et bien pour cet utilisateur/profil. Elle sera égale à FALSE si il s&apos;agit d&apos;une ligne créée. Si par contre la ligne n&apos;existe pas et que la valeur par défaut de l&apos;objet est récupérée, elle sera à TRUE.</description>
+    <externalId>false</externalId>
+    <label>Valeur par défaut (A décocher pour tous)</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

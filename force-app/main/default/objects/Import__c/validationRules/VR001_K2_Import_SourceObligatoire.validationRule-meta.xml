@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Import_SourceObligatoire</fullName>
+    <active>true</active>
+    <description>Source obligatoire lorsqu&apos;il s&apos;agit d&apos;une fiche contact interne</description>
+    <errorConditionFormula>AND( 
+  $User.ByPassValidationRule__c = false, 
+  RecordType.DeveloperName = &apos;ficheContact&apos;,
+  ISPICKVAL(source__c, &apos;&apos;)
+)</errorConditionFormula>
+    <errorDisplayField>source__c</errorDisplayField>
+    <errorMessage>Source du contact obligatoire!</errorMessage>
+</ValidationRule>

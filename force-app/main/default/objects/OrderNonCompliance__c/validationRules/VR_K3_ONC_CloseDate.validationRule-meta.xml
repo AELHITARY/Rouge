@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_ONC_CloseDate</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+OR(closeDate__c &lt; startDate__c,
+   closeDate__c &gt; TODAY() )</errorConditionFormula>
+    <errorDisplayField>closeDate__c</errorDisplayField>
+    <errorMessage>Date de fermeture invalide (doit être comprise entre la date d&apos;ouverture et l&apos;heure actuelle)!</errorMessage>
+</ValidationRule>

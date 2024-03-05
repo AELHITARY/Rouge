@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MF_MonthlyPayement2</fullName>
+    <active>true</active>
+    <description>Pour les &quot;Mode de financement&quot;, le nombre de mensualités est interdit pour un comptant</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;FinancingMethod&apos; &amp;&amp;
+AND(
+ISPICKVAL(financingType__c, &apos;Cash&apos;),
+NOT(ISBLANK(monthlyPayment__c))
+)</errorConditionFormula>
+    <errorDisplayField>monthlyPayment__c</errorDisplayField>
+    <errorMessage>Nombre de mensualités interdit pour un comptant !</errorMessage>
+</ValidationRule>

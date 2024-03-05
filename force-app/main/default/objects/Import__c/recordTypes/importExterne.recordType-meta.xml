@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>importExterne</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>Import</compactLayoutAssignment>
+    <description>Fichier acheté ou loué, site WEB, etc...</description>
+    <label>Import externe</label>
+    <picklistValues>
+        <picklist>callSource__c</picklist>
+        <values>
+            <fullName>13 - Bouche à oreille</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>13 - NSPP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>13 - PJaune papier</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>13 - Panneaux de chantier</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>13 - ancien client</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>13 - enseigne magasin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Affichage</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Batiweb</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Calculéo A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Calculéo B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Calculéo C</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Calculéo D</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Campagne Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Keltravo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Quotatis</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - Radio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - TV</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - comprendre choisir</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>15 - presse</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>17 - JPO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>20 - passage magasin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>26 - Telepro magasin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>34 - vente personnel</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>35 - vente personnel StGobain</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>36 - Prescription</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>43 - Foire</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Affiliation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Batiweb</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Formulaire site KparK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Formulaire site QTS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Internet Emailing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Internet bannières</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - PJaune web</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Web call back</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - Web configurateur</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>44 - moteur de recherche</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>50 - Bal %28Tap%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>53 - Parrainage</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>54 - Stand</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Maison_Travaux</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>P</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>civiliteCompte__c</picklist>
+        <values>
+            <fullName>M%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mme</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>couplePresent__c</picklist>
+        <values>
+            <fullName>A confirmer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Non</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oui</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seul</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxCarport__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxCoulissant__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois%2FAlu</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxFenetre__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois%2FAlu</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxIsolationCombles__c</picklist>
+        <values>
+            <fullName>Laine de roche</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Laine de verre</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ouate de cellulose</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxMoustiquaire__c</picklist>
+        <values>
+            <fullName>Enroulables</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fixes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Plissées</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPergola__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPersienne__c</picklist>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPortail__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPorteBlindee__c</picklist>
+        <values>
+            <fullName>Palière</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pavillonnaire</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPorteEntree__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPorteFenetre__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois%2FAlu</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPorteGarage__c</picklist>
+        <values>
+            <fullName>Enroulables</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sectionnelles</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPorteInterieur__c</picklist>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxPorteService__c</picklist>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxStoreBanne__c</picklist>
+        <values>
+            <fullName>Aucun</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxVoletBattant__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>materiauxVoletRoulant__c</picklist>
+        <values>
+            <fullName>Aluminium</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PVC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>periodePrevisionnelleInstallation__c</picklist>
+        <values>
+            <fullName>%2B d%27un an</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>0 - 3 mois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>4 - 7 mois</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>8 - 12 mois</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>source__c</picklist>
+        <values>
+            <fullName>BAL VENDEUR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CAMPAGNES MARKETING</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CCM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COLLABORATEUR K PAR K</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COLLABORATEUR%2BRETRAIT S-GOBAIN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COMPLEMENT VENDEUR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FOIRE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>JPO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PARRAINAGE VENDEUR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PASSAGE MAGASIN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PORTE A PORTE VENDEUR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PRESCRIPTION</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>STAND GM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>STAND MARCHE VENDEUR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TELEPHONE VENDEUR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TELEPRO MAGASIN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WEB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WEB CONFIGURATEUR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>typeDotation__c</picklist>
+        <values>
+            <fullName>Carte cadeaux</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Chèque cadeaux papier envoyé en recommandé</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Chèque cadeaux électronique</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>typeFichierSource__c</picklist>
+        <values>
+            <fullName>Achat</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Location</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>typeHabitation__c</picklist>
+        <values>
+            <fullName>Appartement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pavillon</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

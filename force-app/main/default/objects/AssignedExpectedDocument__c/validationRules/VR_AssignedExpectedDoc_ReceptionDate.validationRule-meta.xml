@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_AssignedExpectedDoc_ReceptionDate</fullName>
+    <active>true</active>
+    <description>Date de réception du document attendu ne peut être antérieure à la date de signature de la commande !</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+OR(
+   receptionDate__c &lt; customerOrder__r.companySignedDate__c,
+   receptionDate__c &lt; customerOrder__r.customerSignedDate__c,
+   receptionDate__c &gt; TODAY()
+)</errorConditionFormula>
+    <errorDisplayField>receptionDate__c</errorDisplayField>
+    <errorMessage>Date de réception invalide (doit être comprise entre la date de signature de la commande et la date du jour)!</errorMessage>
+</ValidationRule>

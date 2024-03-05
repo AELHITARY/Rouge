@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>type__c</fullName>
+    <externalId>false</externalId>
+    <label>Type</label>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Non collecté Install</fullName>
+                <default>false</default>
+                <label>39_Non collecté Install</label>
+            </value>
+            <value>
+                <fullName>Non collecté Install RAR</fullName>
+                <default>false</default>
+                <label>39_Non collecté Install RAR</label>
+            </value>
+            <value>
+                <fullName>acompte</fullName>
+                <default>false</default>
+                <label>40_Acompte</label>
+            </value>
+            <value>
+                <fullName>Modification mode financement</fullName>
+                <default>false</default>
+                <label>41_Modification mode financement</label>
+            </value>
+            <value>
+                <fullName>Annulation commande</fullName>
+                <default>false</default>
+                <label>43_Annulation commande</label>
+            </value>
+            <value>
+                <fullName>Refus de financement</fullName>
+                <default>false</default>
+                <label>44_Refus de financement</label>
+            </value>
+            <value>
+                <fullName>NCC</fullName>
+                <default>false</default>
+                <label>48_NCC</label>
+            </value>
+            <value>
+                <fullName>Client absent</fullName>
+                <default>false</default>
+                <label>51_Client absent</label>
+            </value>
+            <value>
+                <fullName>RDV Confirmé</fullName>
+                <default>false</default>
+                <label>60_RDV Confirmé</label>
+            </value>
+            <value>
+                <fullName>A finaliser</fullName>
+                <default>false</default>
+                <label>63_A finaliser</label>
+            </value>
+            <value>
+                <fullName>RDV non planifié Client</fullName>
+                <default>false</default>
+                <label>66_RDV non planifié Client</label>
+            </value>
+            <value>
+                <fullName>RDV d&apos;installation</fullName>
+                <default>false</default>
+                <label>69_RDV d&apos;installation</label>
+            </value>
+            <value>
+                <fullName>Relance subventions</fullName>
+                <default>false</default>
+                <label>100_Relance subventions</label>
+            </value>
+            <value>
+                <fullName>Notification RDV en route</fullName>
+                <default>false</default>
+                <label>Notification RDV en route</label>
+            </value>
+            <value>
+                <fullName>Notification RDV proximité</fullName>
+                <default>false</default>
+                <label>Notification RDV proximité</label>
+            </value>
+            <value>
+                <fullName>Notification RDV J-1</fullName>
+                <default>false</default>
+                <label>Notification RDV J-1</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

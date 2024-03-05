@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>UndeliveredReceiptCancellation</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>AccountingPiece</compactLayoutAssignment>
+    <label>Annulation encaissement non remis</label>
+    <picklistValues>
+        <picklist>currency__c</picklist>
+        <values>
+            <fullName>EUR</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>FRF</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>legacySource__c</picklist>
+        <values>
+            <fullName>GC%2FChaude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GC%2FFroide</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>status__c</picklist>
+        <values>
+            <fullName>Annulé</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comptabilisé</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En attente d%27approbation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En cours</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+</RecordType>

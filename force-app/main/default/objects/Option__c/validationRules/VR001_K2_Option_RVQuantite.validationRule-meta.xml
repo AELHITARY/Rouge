@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Option_RVQuantite</fullName>
+    <active>true</active>
+    <description>Cette règle vérifie qu&apos;il y a bien une quantité positive sur &quot;Devis ligne Option&quot;</description>
+    <errorConditionFormula>AND(Quantite__c &lt;0, $User.ByPassValidationRule__c =False)</errorConditionFormula>
+    <errorMessage>Veuillez saisir une valeur positive pour la quantité</errorMessage>
+</ValidationRule>

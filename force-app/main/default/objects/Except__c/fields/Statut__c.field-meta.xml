@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Statut__c</fullName>
+    <defaultValue>&quot;En cours de création&quot;</defaultValue>
+    <externalId>false</externalId>
+    <label>Statut</label>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>En cours de création</fullName>
+                <default>true</default>
+                <label>En cours de création</label>
+            </value>
+            <value>
+                <fullName>En attente d&apos;approbation</fullName>
+                <default>false</default>
+                <label>En attente d&apos;approbation</label>
+            </value>
+            <value>
+                <fullName>En attente de validation Market</fullName>
+                <default>false</default>
+                <label>En attente de validation Market</label>
+            </value>
+            <value>
+                <fullName>Acceptée</fullName>
+                <default>false</default>
+                <label>Acceptée</label>
+            </value>
+            <value>
+                <fullName>Refusée</fullName>
+                <default>false</default>
+                <label>Refusée</label>
+            </value>
+            <value>
+                <fullName>En attente de validation DV</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>En attente de validation DV</label>
+            </value>
+            <value>
+                <fullName>En attente de validation RS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>En attente de validation RS</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

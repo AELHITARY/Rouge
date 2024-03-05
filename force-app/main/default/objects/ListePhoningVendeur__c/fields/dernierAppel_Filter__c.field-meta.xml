@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>dernierAppel_Filter__c</fullName>
+    <externalId>false</externalId>
+    <label>Critère (Dernier appel)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Aucun</fullName>
+                <default>false</default>
+                <label>Aucun</label>
+            </value>
+            <value>
+                <fullName>3 mois</fullName>
+                <default>false</default>
+                <label>3 mois</label>
+            </value>
+            <value>
+                <fullName>6 mois</fullName>
+                <default>false</default>
+                <label>6 mois</label>
+            </value>
+            <value>
+                <fullName>9 mois</fullName>
+                <default>false</default>
+                <label>9 mois</label>
+            </value>
+            <value>
+                <fullName>1 an</fullName>
+                <default>false</default>
+                <label>1 an</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

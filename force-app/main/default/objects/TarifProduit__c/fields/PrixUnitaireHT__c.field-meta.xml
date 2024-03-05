@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PrixUnitaireHT__c</fullName>
+    <description>Prix pour le produit, la dimension et le nombre de vantaux indiqués.</description>
+    <externalId>false</externalId>
+    <label>Prix unitaire HT</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

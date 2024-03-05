@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>cumulSatisfait__c</fullName>
+    <description>Cocher si la réponse entraîne une satisfaction positive (valeur numéro supérieur ou égal à 7). 
+Utilisé pour les rapports.</description>
+    <externalId>false</externalId>
+    <formula>NOT(ISBLANK(reponseNumero__c)) &amp;&amp; reponseNumero__c &gt;= 7</formula>
+    <label>Cumul Satisfait</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

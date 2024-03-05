@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Operation_SurfaceStandG4</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  $User.ByPassValidationRule__c == FALSE,
+  $Profile.Name != &apos;Administrateur système&apos;,
+  $Profile.Name != &apos;K/K - DAF&apos;,
+  $Profile.Name != &apos;K/K - Contrôle de gestion&apos;,
+  $Profile.Name != &apos;K/K - Marketing opérationnel&apos;,
+  OR(!ISPICKVAL(SurfaceduStand__c, &apos;G4 : Stand GM&apos;),
+     ISPICKVAL(SurfaceduStand__c, &apos;&apos;))
+)</errorConditionFormula>
+    <errorDisplayField>SurfaceduStand__c</errorDisplayField>
+    <errorMessage>Vous n&apos;êtes autorisés pas autorisés à gérer cette surface de stand. Merci de contacter la Direction Administrative et Financière!
+
+(Seule la gestion des stands de galerie marchande est autorisée pour le réseau).</errorMessage>
+</ValidationRule>

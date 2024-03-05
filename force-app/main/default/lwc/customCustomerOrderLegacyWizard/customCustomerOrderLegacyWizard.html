@@ -1,0 +1,251 @@
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:orders" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Assistant reprise historique commande client">Assistant reprise historique commande client</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container slds-scrollable" style="height:39vh">
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+
+            <!-- NON DISPONIBLE -->
+            <template if:false={activeWizard}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>L'assistant de lettrage n'est pas disponible car la commande ne possède pas de ligne de commande non liées à des lignes de devis.</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>            
+
+            <!-- ASSISTANT -->
+            <template if:true={activeWizard}>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+
+                    </lightning-layout-item>
+                </lightning-layout>
+
+
+                <lightning-layout multiple-rows="true">
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <!-- STEP 1 (ORDERITEM) --> 
+                        <template if:true={showStep1Form}>
+                            <h3 class="slds-text-heading_small">
+                                Sélection des lignes de devis
+                            </h3>
+                            
+                            <!-- NON DISPONIBLE -->
+                            <template if:false={orderItemRecords}>
+                                <div class="slds-var-m-top_xx-small slds-var-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de lignes de commandes éligibles.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={orderItemRecords}>
+                                <div class="slds-var-m-bottom_medium">
+                                    <p>
+                                        Veuillez sélectionner la ligne de devis correspondant pour chaque lignes de commande.
+                                    </p>
+                                </div>
+                                <div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Produit">Produit</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Quantité">Quantité</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Dimensions">Dimensions</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Emplacement">Emplacement</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Ligne de devis">Ligne de devis</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={orderItemRecords} for:item="oli">
+                                                <tr class="slds-hint-parent" key={oli.id}>
+                                                    <th data-label="Produit" scope="row">
+                                                        <div class="slds-truncate" title={oli.productCode}>{oli.productCode}</div>
+                                                    </th>
+                                                    <td data-label="Quantité">
+                                                        <div class="slds-truncate">{oli.qty}</div>
+                                                    </td>
+                                                    <td data-label="Dimensions">
+                                                        <div class="slds-truncate">{oli.dimensions}</div>
+                                                    </td>
+                                                    <td data-label="Emplacement">
+                                                        <div class="slds-truncate">{oli.location}</div>
+                                                    </td>
+                                                    <td data-label="Ligne de devis">
+                                                        <lightning-combobox id={oli.id}
+                                                                            name={oli.id}
+                                                                            data-oli-oliid={oli.id}   
+                                                                            placeholder="Sélectionner une ligne de devis"
+                                                                            variant="label-hidden"
+                                                                            options={allQuoteLinesData}
+                                                                            onchange={handleChangeQuoteLineValue}>
+                                                        </lightning-combobox>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 2 (RESUME) -->
+                        <template if:true={showStep2Form}>
+                            <h3 class="slds-text-heading_small">
+                                Résumé des lignes de devis choisis
+                            </h3>
+                            <template if:true={orderItemRecords}>
+                                <div class="slds-var-m-bottom_medium">
+                                    <p>
+                                        Veuillez vérifier que la sélection est correcte avant de valider.
+                                    </p>
+                                </div>
+                                <div>
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Produit">Produit</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Quantité">Quantité</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Dimensions">Dimensions</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Emplacement">Emplacement</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Ligne de devis">Ligne de devis</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={orderItemRecords} for:item="oli">
+                                                <tr class="slds-hint-parent" key={oli.id}>
+                                                    <th data-label="Produit" scope="row">
+                                                        <lightning-formatted-text value={oli.productCode}></lightning-formatted-text>
+                                                    </th>
+                                                    <td data-label="Quantité">
+                                                        <lightning-formatted-number value={oli.qty}></lightning-formatted-number>
+                                                    </td>
+                                                    <td data-label="Dimensions">
+                                                        <lightning-formatted-text value={oli.dimensions}></lightning-formatted-text>
+                                                    </td>
+                                                    <td data-label="Emplacement">
+                                                        <lightning-formatted-text value={oli.location}></lightning-formatted-text>
+                                                    </td>
+                                                    <td data-label="Ligne de devis">
+                                                        <lightning-formatted-text value={oli.qliName}></lightning-formatted-text>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </template>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+        </div>
+
+        <div slot="footer">
+            <template if:true={activeWizard}>
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <template if:true={showPreviousButton}> 
+                    <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+                </template>
+                <template if:true={showNextButton}> 
+                    <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+                </template>
+                <template if:true={showSubmitButton}> 
+                    <lightning-button variant="brand" label="Valider" class="slds-m-around_medium" onclick={handleUpdateOrderItems}></lightning-button>
+                </template>
+            </template>
+        </div>
+
+    </lightning-card>
+    
+</template>

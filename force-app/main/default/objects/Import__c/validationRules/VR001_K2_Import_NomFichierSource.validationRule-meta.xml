@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Import_NomFichierSource</fullName>
+    <active>true</active>
+    <description>Nom du fichier source obligatoire lorsqu&apos;il s&apos;agit d&apos;une fiche contact externe</description>
+    <errorConditionFormula>AND( 
+  $User.ByPassValidationRule__c = false, 
+  RecordType.DeveloperName = &apos;importExterne&apos;,
+  ISNULL(nomFichierSource__c)
+)</errorConditionFormula>
+    <errorDisplayField>nomFichierSource__c</errorDisplayField>
+    <errorMessage>Nom du fichier source obligatoire!</errorMessage>
+</ValidationRule>

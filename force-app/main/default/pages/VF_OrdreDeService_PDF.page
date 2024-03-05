@@ -1,0 +1,598 @@
+<apex:page title="PDF Ordre de Service" standardController="ServiceAppointment" extensions="Ctrl_OrdreDeService_PDF" sidebar="false" showheader="false" renderAs="pdf" standardstylesheets="false" applyhtmltag="false" doctype="html-5.0">
+    <head>
+        <style type="text/css" media="all">
+            a,
+            b,
+            body,
+            div,
+            em,
+            fieldset,
+            font,
+            form,
+            h4,
+            html,
+            i,
+            iframe,
+            label,
+            li,
+            p,
+            small,
+            span,
+            strong,
+            table,
+            tbody,
+            td,
+            tfoot,
+            th, C thead,
+            tr,
+            u,
+            ul {
+                border: 0;
+                margin: 0;
+                padding: 0;
+                font-size: 100%;
+            }
+
+            p {
+                text-align: justify;
+                text-justify: newspaper;
+            }
+
+            html,
+            body {
+                height: 100%;
+            }
+
+            @page {
+                size: auto; /* auto is the initial value */
+                /* this affects the margin in the printer settings */
+                margin: 6.35mm 6.35mm 6.35mm 6.35mm;
+
+                @bottom-center {
+                    content: element(footer_center);
+                }
+            }
+
+            b,
+            strong {
+                font-weight: bold;
+            }
+
+            img {
+                color: transparent;
+                font-size: 0;
+            }
+
+            table {
+                border-collapse: collapse;
+                border-spacing: 0;
+            }
+
+            th,
+            td,
+            caption {
+                font-weight: normal;
+                vertical-align: top;
+                text-align: left;
+            }
+
+            /* `Basic HTML
+            ----------------------------------------------------------------------------------------------------*/
+            body {
+                font: 8pt/1.5 Arial, 'Liberation Sans', FreeSans, sans-serif;
+            }
+
+            hr {
+                border: 0 #ccc solid;
+                border-top-width: 1pt;
+                clear: both;
+                height: 0;
+            }
+
+            /* `Spacing
+            ----------------------------------------------------------------------------------------------------*/
+            p,
+            dl,
+            hr,
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            ol,
+            ul,
+            pre,
+            address,
+            fieldset,
+            figure {
+                margin-bottom: 2pt;
+            }
+
+            /********************** Other ***********************/
+            .line_info {
+                text-align: left;
+                padding: 0.7px;
+                font-size: 10px;
+            }
+
+            .line_text{
+                text-align: left;
+                padding: 3px;
+                font-size: 10px;
+            }
+
+            .label-bold {
+                font-weight: bold;
+            }
+
+            .spacer {
+                clear: both;
+                height: 0;
+            }
+
+            .title-document {
+                color: #CB1944;
+            }
+
+            /********************** PREMIERE PAGE ***********************/
+            .block-title-center {
+                text-align: center;
+                border-left: solid 1px;
+                border-right: solid 1px;
+                min-width:200px;
+                margin: auto;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            #content {
+                width: 100%;
+                height: 100%;
+            }
+
+            .block-left {
+                text-align: center;
+                border: solid 1px;
+                padding: 6px;
+                margin: auto;
+                margin-bottom: 10px;
+                height: 130px;
+                width: 362px;
+                float: left;
+                margin-right: 7px;
+            }
+
+            .block-right {
+                text-align: center;
+                border: solid 1px;
+                padding: 6px;
+                margin-bottom: 10px;
+                width: 362px;
+                float: left;
+                margin-left: 7px;
+            }
+            .block-infos {
+                height: 165px;
+            }
+
+            .block-signature {
+                height: 90px;
+            }
+
+            .block-produit-ncp {
+                text-align: center;
+                margin: auto;
+                float: left;
+                width: 99.7%;
+                margin-left: 3px;
+                margin-top: 10px;
+            }
+
+            .block-titre {
+                text-align: center;
+                border: solid 1px;
+                font-size: 12px;
+                font-weight: bold;
+                line-height: 1.2;
+                margin: auto;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                width: 99.5%;
+                height:14px;
+                color: #CB1944;
+            }
+
+            .table-header {
+                clear: both;
+                margin-bottom: 10px;
+            }
+
+            .title-document {
+                font-size: 16px;
+                text-align: center;
+                font-weight: bold;
+                line-height: 1.1;
+            }
+
+            .calculate-price-row {
+                text-align:right !important;
+                display:inline-block;
+                padding:2px;
+                width:80px !important;
+                font-size: 10px;
+            }
+
+            .calculate-price-row-label {
+                text-align:right !important;
+                display:inline-block;
+                padding:2px;
+                width:130px !important;
+                font-size: 10px;
+            }
+
+            /********************** TABLEAU PRODUITS ***********************/
+            .block-product-config {
+                font-size: 10px;
+                width: 99.7%;
+                margin-bottom: 5px;
+            }
+
+
+            .product-line-text {
+                text-align: left;
+                padding: 5px;
+                padding-top: 2px;
+                padding-bottom: 2px;
+            }
+
+            .desc_product {
+                text-align: left;
+            }
+
+            .border-lr {
+                border-left: 1px #000000 solid !important;
+                border-right: 1px #000000 solid !important;
+            }
+
+            .border-tb {
+                border-top: 1px #000000 solid !important;
+                border-bottom: 1px #000000 solid !important;
+            }
+
+            .border-l {
+                border-left: 1px #000000 solid !important;
+            }
+
+            .border-r {
+                border-right: 1px #000000 solid !important;
+            }
+
+            .border-b {
+                border-bottom: 1px #000000 solid !important;
+            }
+
+            .border-t {
+                border-top: 1px #000000 solid !important;
+            }
+
+            .designation-text-align {
+                width: 55px;
+                display: inline-block;
+            }
+
+            .dimensions-text-align {
+                width: 65px;
+                display: inline-block;
+            }
+
+            .prix-text-align {
+                width: 65px;
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <c:importvisualstrap theme="pdf" />
+        <c:visualstrapblock >
+            <apex:outputpanel rendered="{!sa == null}">
+                <div style="color:red; font-size:16px; text-align:center; font-weight:bold; margin-top: 350px;">Erreur, l'enregistrement n'existe pas.</div>
+            </apex:outputpanel>
+            <apex:outputpanel rendered="{!arList.size == 0}">
+                <div style="color:red; font-size:16px; text-align:center; font-weight:bold; margin-top: 350px;">
+                    Erreur, le RDV doit avoir au moins une ressource assignée pour pouvoir afficher l'ordre de service.
+                </div>
+            </apex:outputpanel>
+            <apex:variable value="{!1}" var="iter"/>
+            <apex:variable value="{!arList.size}" var="arListSize"/>
+            <apex:variable value="{!productWithPNCList.size}" var="productWithPNCListSize"/>
+            
+            
+            <apex:repeat value="{!arList}" var="ar">
+                <apex:outputpanel id="content" rendered="{!sa != null && arList.size > 0}">
+                    <table class="table-header">
+                        <tr>
+                            <td style=" width: 45%; border-bottom: dotted 1px black;"></td>
+                            <td>
+                                <div class="block-title-center" >
+                                    <apex:image value="{!URLFOR($Resource.Logo_kpark)}" width="100%" />
+                                    <br/>
+                                    <apex:outputpanel layout="block" styleclass="title-document">ORDRE DE SERVICE</apex:outputpanel>
+                                </div>
+                            </td>
+                            <td style=" width: 45%; border-bottom: dotted 1px black;"></td>
+                        </tr>
+                    </table>
+                    <div class="row spacer" style="width: 100%">
+                        <div class="block-left block-infos">
+                            <span>&nbsp;</span>
+                            <span style="float:right;" class="label-bold">INFORMATIONS CLIENT</span>
+                            <table>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:115px; display:inline-block;">Nom du client :</td>
+                                    <td>{!sa.Account.civilite__c} {!sa.Account.Name}</td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:115px; display:inline-block;">Nom du contact :</td>
+                                    <td>{!sa.Contact.Name}</td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:115px; display:inline-block;">Adresse du client :</td>
+                                    <td>
+                                        {!IF(sa.Account.complementAdresse__c == null, 
+                                        IF(sa.Account.rue__c == null, sa.Account.codePostal__c & sa.Account.ville__c, sa.Account.rue__c & ', ' & sa.Account.codePostal__c & ' ' & sa.Account.ville__c),
+                                        IF(sa.Account.rue__c == null, sa.Account.complementAdresse__c & ', ' & sa.Account.codePostal__c & ' ' & sa.Account.ville__c, sa.Account.rue__c &', '& sa.Account.complementAdresse__c & ', ' & sa.Account.codePostal__c & ' ' & sa.Account.ville__c)
+                                        )}                            
+                                     </td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:115px; display:inline-block;">Adresse du chantier :</td>
+                                    <td>
+                                        {!IF(sa.Chantier__r.rue__c == null,
+                                        IF(sa.Chantier__r.complementAdresse__c == null, sa.Chantier__r.codePostal__c &' '& sa.Chantier__r.ville__c, sa.Chantier__r.complementAdresse__c&', '& sa.Chantier__r.codePostal__c &' '& sa.Chantier__r.ville__c),
+                                        IF(sa.Chantier__r.complementAdresse__c == null, sa.Chantier__r.rue__c &', '& sa.Chantier__r.codePostal__c &' '& sa.Chantier__r.ville__c, sa.Chantier__r.rue__c &', '& sa.Chantier__r.complementAdresse__c&', '& sa.Chantier__r.codePostal__c &' '& sa.Chantier__r.ville__c)  
+                                        )}
+                                    </td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:115px; display:inline-block;">Numéro de compte :</td>
+                                    <td>{!sa.Account.AccountNumber}</td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:115px; display:inline-block;">Numéro de commande :</td>
+                                    <td>{!IF(customerOrder.size!=0, customerOrder[0].OrderNumber,' ')}</td>
+                                </tr> 
+                            </table>
+                        </div> 
+                        <div class="block-right block-infos">
+                            <span>&nbsp;</span>
+                            <span style="float:right;" class="label-bold">INFORMATIONS RENDEZ-VOUS</span>
+                            <table>      
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:120px; display:inline-block;">Intervenant :</td>
+                                    <td>{!ar.ServiceResource.Name}</td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:120px; display:inline-block;">Type d'activité :</td>
+                                    <td>{!sa.WorkType.Name}</td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:120px; display:inline-block;">Dépôt :</td>
+                                    <td>{!sa.ServiceTerritory.Name} ({!sa.ServiceTerritory.City})</td>
+                                </tr>
+                                <tr class="line_info">
+                                    <td class="label-bold" style="width:120px; display:inline-block;">Adresse du dépôt :</td>
+                                    <td>
+                                        {!IF(sa.ServiceTerritory.Street == null,
+                                        sa.ServiceTerritory.PostalCode & ' ' & sa.ServiceTerritory.City,
+                                        sa.ServiceTerritory.Street & ', ' & sa.ServiceTerritory.PostalCode & ' ' & sa.ServiceTerritory.City
+                                        )}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row spacer" style="width: 100%">
+                        <div class="block-titre">
+                            MONTANT PREVISIONNEL
+                        </div>
+                        <div class="col-md-12" style="margin-left: 15px; line-height:1;">
+                            <div class="line_text">
+                                KPARK confie à l'entreprise ci-dessus dénommée, la réalisation de l'installation de ses menuiseries pour son client {!sa.Account.civilite__c} {!sa.Account.Name} à la date
+                                prévue.
+                            </div>
+                            <div class="line_text">
+                                Suite à la remise du dossier technique, le montant prévisionnel des travaux, s'ils sont effectués dans leur intégralité et conformément aux
+                                exigences de KPARK, a été fixé d'un commun accord à la somme forfaitaire de : 
+                            </div>
+                            <div style="float:right; text-align:right !important;">
+                                <div>
+                                    <span class="label-bold calculate-price-row-label">Somme forfaitaire :</span>
+                                    <span class="calculate-price-row">{!ar.estimatedStandardCost__c}<b> EUR HT</b></span>
+                                </div>
+                                <div>
+                                    <span class="label-bold calculate-price-row-label">Remise au dépôt :</span>
+                                    <span class="calculate-price-row">{!ar.estimatedAdditionalCost__c}<b> EUR HT</b></span>
+                                </div>
+                                <div>
+                                    <span class="label-bold calculate-price-row-label">TOTAL :</span>
+                                    <span class="calculate-price-row">{!ar.estimatedCost__c}<b> EUR HT</b></span>
+                                </div>
+                            </div>
+                            <div class="line_text" style="width:100%; margin-bottom:30px;"> </div>
+                            <div class="line_text">
+                                La facture correspondant à la prestation est à adresser au dépôt KPARK de {!sa.ServiceTerritory.City} en fin de mois.
+                            </div>
+                            <div class="line_text">
+                                KPARK ne règlera pas le montant de la prestation en cas de non-signature de la feuille de préparation et de prise en charge.
+                            </div>
+                            <div class="line_text">
+                                Fait à _______________________ le ___/___/______
+                            </div>
+                            <div class="line_text">
+                                <i>À signer lors du départ du métreur</i>
+                            </div><br/>
+                        </div>
+                    </div>
+                    <div class="row spacer" style="width: 100%">
+                        <div class="block-left block-signature">
+                            <span>&nbsp;</span>
+                            <span style="float:left;" class="label-bold">Pour KPARK</span>
+                            <div class="line_info">
+                                <span>Le responsable technique</span>
+                            </div>
+                        </div> 
+                        <div class="block-right block-signature">
+                            <span>&nbsp;</span>
+                            <span style="float:left;" class="label-bold">Pour l'entreprise</span>
+                            <div class="line_info">
+                                <span>(bon pour accord)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row spacer" style="width: 100%">
+                        <div class="block-titre">
+                            MONTANT REEL
+                        </div>
+                        <div class="col-md-12" style="margin-left: 15px; line-height:1;">
+                            <div class="line_text">
+                                Lors du retour de l'intervenant, sur la foi du rapport de service signé par le client et sous réserve d'une éventuelle malfaçon constatée
+                                ultérieurement, le montant définitif de la prestation a été fixé à : 
+                            </div>
+                            <div style="float:right; text-align:right !important;">
+                                <div>
+                                    <span class="label-bold calculate-price-row-label">Somme forfaitaire :</span>
+                                    <span class="calculate-price-row">{!ar.standardCost__c}<b> EUR HT</b></span>
+                                </div>
+                                <div>
+                                    <span class="label-bold calculate-price-row-label">Remise au dépôt :</span>
+                                    <span class="calculate-price-row">{!ar.additionalCost__c}<b> EUR HT</b></span>
+                                </div>
+                                <div>
+                                    <span class="label-bold calculate-price-row-label">TOTAL :</span>
+                                    <span class="calculate-price-row">{!ar.cost__c}<b> EUR HT</b></span>
+                                </div>
+                            </div>
+                            <div class="line_text" style="width:100%; margin-bottom:30px;"> </div>
+                            <div class="line_text">
+                                Fait à _______________________ le ___/___/______
+                            </div>
+                            <div class="line_text">
+                                <i>À signer lors du retour de l'intervenant</i>
+                            </div><br/>
+                        </div>
+                    </div>
+                    <div class="row spacer" style="width: 100%">
+                        <div class="block-left block-signature">
+                            <span>&nbsp;</span>
+                            <span style="float:left;" class="label-bold">Pour KPARK</span>
+                            <div class="line_info">
+                                <span>Le responsable technique</span>
+                            </div>
+                        </div> 
+                        <div class="block-right block-signature">
+                            <span>&nbsp;</span>
+                            <span style="float:left;" class="label-bold">Pour l'entreprise</span>
+                            <div class="line_info">
+                                <span>(bon pour accord)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="break"></div>
+                    
+                    <!-- LISTE DES PRODUITS -->
+                    <apex:outputpanel layout="block" rendered="{!assetList.size > 0}">
+                        <div class="row spacer" style="width: 100%;">
+                            <div class="block-produit-ncp">
+                                <table style="page-break-inside:avoid" class="block-product-config">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="9" class="block-titre">PRODUITS</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="9" style="height:10px;"> </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="product-line-text border-t border-b border-l">Produit</td>
+                                            <td colspan="1" class="product-line-text border-t border-b">Hauteur</td>
+                                            <td colspan="1" class="product-line-text border-t border-b">Largeur</td>
+                                            <td colspan="1" class="product-line-text border-t border-b">Nb Vantaux</td>
+                                            <td colspan="3" class="product-line-text border-t border-b border-r">Emplacement</td>
+                                        </tr>
+                                        <apex:repeat value="{!assetList}" var="asset">
+                                            <tr>
+                                                <td colspan="3" class="product-line-text border-l"><apex:outputfield value="{!asset.Product2.Name}" /></td>
+                                                <td colspan="1" class="product-line-text"><apex:outputfield value="{!asset.height__c}" /></td>
+                                                <td colspan="1" class="product-line-text"><apex:outputfield value="{!asset.width__c}" /></td>
+                                                <td colspan="1" class="product-line-text"><apex:outputfield value="{!asset.leaf__c}" /></td>
+                                                <td colspan="3" class="product-line-text border-r"><apex:outputfield value="{!asset.location__c}" /></td>
+                                            </tr>
+                                        </apex:repeat>
+                                        <tr>
+                                            <td colspan="9" class="product-line-text border-t"></td>
+                                        </tr>
+                                        
+                                        <div style="{!IF((productWithPNCListSize==0 && iter!=arListSize),
+                                                'page-break-after:always',
+                                                'page-break-after:avoid')}"> 
+                                        </div>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </apex:outputpanel>
+
+                    <!-- LISTE DES NCP -->
+                    <apex:outputpanel layout="block" rendered="{!productWithPNCList.size > 0}">
+                        <div class="row spacer" style="width: 100%;">
+                            <div class="block-produit-ncp">
+                                <table style="page-break-inside:avoid;" class="block-product-config">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="15" class="block-titre">NON-CONFORMITES PRODUIT</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="15" style="height:10px;"> </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="product-line-text border-t border-b border-l">Produit</td>
+                                            <td colspan="1" class="product-line-text border-t border-b">Hauteur</td>
+                                            <td colspan="1" class="product-line-text border-t border-b">Largeur</td>
+                                            <td colspan="1" class="product-line-text border-t border-b">Nb Vantaux</td>
+                                            <td colspan="3" class="product-line-text border-t border-b">Emplacement</td>
+                                            <td colspan="6" class="product-line-text border-t border-b border-r">Description</td>
+                                        </tr>
+                                        <apex:repeat value="{!productWithPNCList}" var="pnc">
+                                            <tr>
+                                                <td colspan="3" class="product-line-text border-l">{!pnc.libelle}</td>
+                                                <td colspan="1" class="product-line-text">{!pnc.height}</td>
+                                                <td colspan="1" class="product-line-text">{!pnc.width}</td>
+                                                <td colspan="1" class="product-line-text">{!pnc.leaf}</td>
+                                                <td colspan="3" class="product-line-text">{!pnc.location}</td>
+                                                <td colspan="6" class="product-line-text border-r">
+                                                    <apex:repeat value="{!pnc.description}" var="description">
+                                                        {!description}<br/>
+                                                    </apex:repeat>
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                        <tr>
+                                            <td colspan="15" class=" border-t"></td>
+                                        </tr>
+                                    <div style="{!IF((iter!=arListSize && productWithPNCListSize!=0),
+                                                'page-break-after:always',
+                                                'page-break-after:avoid')}"> 
+                                    </div>
+                                    </tbody>     
+                                </table>
+                            </div>
+                        </div>
+                    </apex:outputpanel>
+                </apex:outputpanel>  <!-- Fin content -->
+                
+            <apex:variable var="iter" value="{!iter + 1}"/>                   
+            </apex:repeat>
+        </c:visualstrapblock>
+    </body>
+</apex:page>

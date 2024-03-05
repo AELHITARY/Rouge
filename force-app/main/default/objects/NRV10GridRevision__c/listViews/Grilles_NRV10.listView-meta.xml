@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Grilles_NRV10</fullName>
+    <columns>NAME</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>NRV10GridRevision__c.workingContract</value>
+    </filters>
+    <label>00 - Regroupement des grilles NRV10</label>
+</ListView>

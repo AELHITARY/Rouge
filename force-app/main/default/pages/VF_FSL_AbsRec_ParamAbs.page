@@ -1,0 +1,200 @@
+<apex:page tabStyle="Absences_r_currentes__tab" controller="CTRL_FSL_AbsRec_ParamAbs"  showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0">
+    <html>
+        <head>
+            <title>Formulaire Paramétrage Absence</title>
+            <apex:stylesheet value="{!URLFOR($Resource.CSS_Form, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        </head>
+        
+        <body>
+            
+            <div class="slds">
+                <apex:form id="fdrForm">
+                    <div class="slds-card">
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 10px; ">
+                            <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                    <h1 class="slds-text-heading--small slds-truncate" style="font-weight: bold; font-size : 1.5em;">Absences récurrentes</h1><br/>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 15px; font-weight: bold;">
+                            <div class="slds-media__body">
+                                <h2 class="slds-text-heading--small slds-truncate">Saisie des paramètres (2/4)</h2><br/>
+                                <div style=" overflow: auto; width: 95vw;">
+                                    <h2 class="slds-text-heading--small slds-truncate">
+                                        Territoire(s) : <apex:outputText value="{!UPPER(nameTerritory)}" style="white-space:pre;"></apex:outputText>
+                                    </h2>
+                                </div>
+                                <h2 class="slds-text-heading--small slds-truncate">
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}">Date du début d'édition : </apex:outputText>
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}" value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!debutPlanning}" /></apex:outputText> 
+                                </h2>
+                                <h2 class="slds-text-heading--small slds-truncate">
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}">Date de fin d'édition : </apex:outputText>
+                                    <apex:outputText rendered="{!sameDate <> 'hidden'}" value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!finPlanning}" /></apex:outputText>
+                                </h2>
+                                <h2 class="slds-text-heading--small slds-truncate">
+                                    <apex:outputText rendered="{!sameDate = 'hidden'}">Date d'édition : </apex:outputText>
+                                    <apex:outputText rendered="{!sameDate = 'hidden'}" value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!debutPlanning}" /></apex:outputText> 
+                                </h2>
+                            </div>
+                        </div>
+                                                
+                        <div id="resourceSection" >
+                            <!-- Choix du création ou suppression -->
+                            <!--<apex:pageBlock id="pb1" >
+                                <apex:outputLabel style="margin-left: 5.5%; font-weight: bold; font-size:1.05em; margin-bottom: 5%;">
+                                    Sélectionner l'action : 
+                                </apex:outputLabel> 
+                                <apex:selectRadio style="margin-left: 20%;" value="{!radioSelected}">
+                                    <apex:selectOption itemLabel="CREATION" itemValue="C"></apex:selectOption>
+                                    <apex:selectOption itemLabel="SUPPRESSION" itemValue="D"></apex:selectOption>
+                                </apex:selectRadio>
+                            </apex:pageBlock>-->
+                            
+                            <apex:pageBlock id="pb2" rendered="{!sameDate <> 'hidden'}" >
+                                <apex:outputLabel style="margin-left: 5.5%; font-weight: bold; font-size:1.05em; margin-bottom: 5%;">
+                                    Sélectionner les jours : 
+                                </apex:outputLabel> 
+                                <apex:selectCheckboxes value="{!lDays}" style="margin-left: 5.5%; margin-top:10px;">
+                                    <apex:selectOptions value="{!Days}"></apex:selectOptions>
+                                </apex:selectCheckboxes>
+                            </apex:pageBlock>
+                            
+                            <apex:pageBlock id="pb3" rendered="{!diffDebFin >= 7}">
+                                    <apex:outputLabel style="margin-left: 5.5%; font-weight: bold; font-size:1.05em; margin-bottom: 5%;">
+                                        Sélectionner la fréquence : 
+                                    </apex:outputLabel> 
+                                    
+                                    <apex:selectList value="{!frequenceSelected}" style="margin-left: 5.5%; margin-top:10px; width: 85%;" size="1">
+                                        <apex:selectOption itemLabel="" itemValue="none"></apex:selectOption>
+                                        <apex:selectOption rendered="{!diffDebFin >= 7}" itemLabel="Toutes les semaines" itemValue="ts"></apex:selectOption>
+                                        <apex:selectOption rendered="{!diffDebFin >= 14}" itemLabel="Toutes les deux semaines" itemValue="tss"></apex:selectOption>
+                                        <apex:selectOption rendered="{!diffDebFin >= 21}" itemLabel="Toutes les trois semaines" itemValue="tsss"></apex:selectOption>
+                                        <apex:selectOption rendered="{!diffDebFin >= 28}" itemLabel="Toutes les quatre semaines" itemValue="tm"></apex:selectOption>
+                                    </apex:selectList>
+                            </apex:pageBlock>
+
+                            <apex:pageBlock id="pb4">
+                                <apex:outputLabel style="margin-left: 5.5%; font-weight: bold; font-size:1.05em; margin-bottom: 5%;">
+                                    Sélectionner le type d'absence : 
+                                </apex:outputLabel> 
+                                
+                                <apex:selectList value="{!typeAbsSelected}" style="margin-left: 5.5%; margin-top:10px; width: 85%;" size="1">
+                                    <apex:selectOption itemLabel="Férié" itemValue="ta1"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Présence dépôt" itemValue="ta2"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Saisie de commandes" itemValue="ta10"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Rendez-vous société" itemValue="ta3"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Indisponibilité poseur" itemValue="ta4"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Réunion" itemValue="ta5"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Formation" itemValue="ta6"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Enregistrement contrat" itemValue="ta7"></apex:selectOption>
+                                    <apex:selectOption itemLabel="RTT" itemValue="ta8"></apex:selectOption>
+                                    <apex:selectOption itemLabel="Autre" itemValue="ta9"></apex:selectOption>
+                                </apex:selectList> 
+                            </apex:pageBlock>
+
+                            
+                            <!-- Insertion des horaires -->
+                            <apex:pageBlock id="pb5" >
+                                <apex:outputText id="jdeb" style="display: none;" value="{!debutPlanning}"></apex:outputText>
+                                <apex:outputText id="jfin" style="display: none;" value="{!finPlanning}"></apex:outputText>
+
+                                <apex:outputLabel style="margin-left: 5.5%; font-weight: bold; font-size:1.05em; margin-bottom: 5%;">
+                                    Sélectionner l'heure de début et de fin : <br/>
+                                </apex:outputLabel> 
+                                
+                                <div class="slds-form--horizontal" style="width: 30%; display: inline-block; margin-left: 15%;  font-size:1.1em;">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="date1">Heure de début :</label>
+                                        <div class="slds-form-element__control">
+                                            <apex:input id="heureDebut" type="time" value="{!heureDebut}" />
+                                        </div>
+                                    </div>
+                                </div>   
+                                
+                                <div class="slds-form--horizontal" style="width: 40%; display: inline-block;  font-size:1.1em;">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="date2">Heure de fin :</label>
+                                        <div class="slds-form-element__control">
+                                            <apex:input id="heureFin" type="time" value="{!heureFin}" />
+                                        </div>
+                                    </div>
+                                </div>   
+                            </apex:pageBlock>
+                            
+                            
+                            <apex:pageBlock id="pb6">
+                                <apex:outputLabel style="margin-left: 5.5%; font-weight: bold; font-size:1.05em; margin-bottom: 5%;">
+                                    Commentaire : 
+                                </apex:outputLabel> 
+                                
+                               <apex:inputText value="{!commentaire}" maxlength="255" style="margin-left: 5.5%; margin-top:10px; width: 85%;" html-placeholder="ex : Saisie commandes, Férié, Présence dépôt ..." />
+                            </apex:pageBlock>
+                            
+                            
+                            <!-- Commandes -->
+                            <div class="slds-card__footer" style="text-align: right;">
+                                <apex:outputPanel layout="none">
+                                    <input type ="button" value="Précédent" onclick="history.go(-1)" class="slds-button slds-button--brand slds-button--small"/>
+                                </apex:outputPanel>
+
+                                <apex:commandButton style="display: none;" value="Suivant" action="{!displayPage}" id="ParamAbs" reRender="none"/>
+                                <apex:outputPanel layout="none">
+                                    <input type ="button" value="Suivant" onclick="checkBeforeSubmit();" class="slds-button slds-button--brand slds-button--small"/>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <script language="javascript">    
+                    /*Script pour vérifier qu'une case est bien cochée*/
+                    function checkBeforeSubmit()
+                    {
+                        var debut = document.getElementById('{!$Component.fdrForm.pb5.heureDebut}');
+                        var fin = document.getElementById('{!$Component.fdrForm.pb5.heureFin}');
+                        var jdeb = document.getElementById('{!$Component.fdrForm.pb5.jdeb}');
+                        var jfin = document.getElementById('{!$Component.fdrForm.pb5.jfin}');
+
+                        var isValid = false;
+                        var i=0;
+                        
+                        if(jdeb.innerHTML == jfin.innerHTML)
+                        {
+                            isValid = true;
+                        } 
+                        else {
+                            var table = document.getElementById('{!$Component.fdrForm.pb2}');
+                            var checkboxes = table.getElementsByTagName('input');
+                            
+                            while(i < checkboxes.length)
+                            {
+                                if(checkboxes[i].checked){
+                                    isValid = true;
+                                }
+                                i++;
+                            } 
+                        }
+                        
+                        if(!isValid)
+                        {
+                            alert('Merci de sélectionner au moins un jour.');
+                        }
+                        else
+                        {
+                            if(debut.value < fin.value)
+                            {
+                                document.getElementById('{!$Component.fdrForm.ParamAbs}').click();
+                            }
+                            else
+                            {
+                                alert('Merci de vérifier la cohérence des heures.');
+                            }
+                        }
+                    }
+                    </script>
+                </apex:form>  
+            </div>
+        </body>
+    </html>
+</apex:page>

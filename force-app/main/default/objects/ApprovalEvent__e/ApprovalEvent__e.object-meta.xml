@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>InDevelopment</deploymentStatus>
+    <description>Objet &quot;Plateform Event&quot; afin de récupérer les événements des processus d&apos;approbation afin de les approuver/désactiver en mode Admin</description>
+    <eventType>HighVolume</eventType>
+    <label>Évènement processus approbation</label>
+    <pluralLabel>Évènements processus approbation</pluralLabel>
+    <publishBehavior>PublishAfterCommit</publishBehavior>
+</CustomObject>

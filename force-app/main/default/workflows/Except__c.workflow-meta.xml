@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>Confirmation_de_soumission_pour_approbation</fullName>
+        <description>Confirmation de soumission pour approbation</description>
+        <protected>false</protected>
+        <recipients>
+            <type>creator</type>
+        </recipients>
+        <senderAddress>support@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>ModelesKparK/Nouvelle_demande_Except_Demandeur</template>
+    </alerts>
+    <alerts>
+        <fullName>Nouvelle_demande_except_traitee</fullName>
+        <description>Nouvelle demande except traitée</description>
+        <protected>false</protected>
+        <recipients>
+            <type>creator</type>
+        </recipients>
+        <senderAddress>support@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>ModelesKparK/Nouvelle_demande_Except_Demande_traitee</template>
+    </alerts>
+    <alerts>
+        <fullName>Nouvelle_demande_market</fullName>
+        <description>Nouvelle demande except transmise au Marketing</description>
+        <protected>false</protected>
+        <recipients>
+            <recipient>douglas.calixte@kpark.fr</recipient>
+            <type>user</type>
+        </recipients>
+        <recipients>
+            <recipient>mickael.mesle@kpark.fr</recipient>
+            <type>user</type>
+        </recipients>
+        <senderAddress>support@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>ModelesKparK/Nouvelle_demande_Except_Approbateurs</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>MAJ_statut_1</fullName>
+        <field>Statut__c</field>
+        <literalValue>En attente de validation Market</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJ_statut_2</fullName>
+        <field>Statut__c</field>
+        <literalValue>En attente de validation DV</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJ_statut_3</fullName>
+        <field>Statut__c</field>
+        <literalValue>Acceptée</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJ_statut_4</fullName>
+        <field>Statut__c</field>
+        <literalValue>En attente de validation Market</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJ_statut_rappel</fullName>
+        <field>Statut__c</field>
+        <literalValue>En cours de création</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJ_statut_refus1</fullName>
+        <field>Statut__c</field>
+        <literalValue>Refusée</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJ_statut_refus2</fullName>
+        <field>Statut__c</field>
+        <literalValue>Refusée</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>MAJ_statut_refus3</fullName>
+        <field>Statut__c</field>
+        <literalValue>Refusée</literalValue>
+        <name>Mise à jour du statut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Validation_technique</fullName>
+        <field>AccordTech__c</field>
+        <literalValue>1</literalValue>
+        <name>Validation technique</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>Validation_vente</fullName>
+        <field>AccordVente__c</field>
+        <literalValue>1</literalValue>
+        <name>Validation vente</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>true</reevaluateOnChange>
+    </fieldUpdates>
+</Workflow>

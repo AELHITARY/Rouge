@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>serviceEntityDistance__c</fullName>
+    <description>Distance (km) calculée à vol d&apos;oiseau entre le chantier et l&apos;entité service.</description>
+    <externalId>false</externalId>
+    <formula>DISTANCE(GEOLOCATION(Localisation__Latitude__s, Localisation__Longitude__s),
+GEOLOCATION( serviceEntity__r.Localisation__Latitude__s , serviceEntity__r.Localisation__Longitude__s), &apos;km&apos;)</formula>
+    <label>Distance de l&apos;entité service</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

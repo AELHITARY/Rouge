@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MontantSUP__c</fullName>
+    <description>Ce champ est utilisé pour l&apos;application automatique de la remise Bonus Projet.</description>
+    <externalId>false</externalId>
+    <label>Montant supérieur</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

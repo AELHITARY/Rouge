@@ -1,0 +1,107 @@
+<apex:page tabStyle="D_Figer_en_masse__tab" controller="CTRL_FSL_FigerRDV_Recap"  showHeader="true" standardStylesheets="false" sidebar="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0">
+    <html>
+        <head>
+            <title>Récapitulatif</title>
+            <apex:stylesheet value="{!URLFOR($Resource.CSS_Form, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        </head>
+        
+        <body>
+            <div class="slds">
+                <apex:form id="fdrForm">
+                    <div class="slds-card">
+                        
+                        <div class="slds-card__header slds-grid" style="margin-bottom : 0px; ">
+                            <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                                    <h1 class="slds-text-heading--small slds-truncate" style="font-weight: bold; font-size : 1.5em; margin-bottom: 1%;">
+                                        <apex:outputText rendered="{!typeTraitement == 'FIGER'}">Figer</apex:outputText>
+                                        <apex:outputText rendered="{!typeTraitement == 'DEFIGER'}">Défiger</apex:outputText> des rendez-vous en masse
+                                    </h1><br/>
+                            </div>
+                        </div>
+                        
+                        <div id="rdvSection" >
+                            <!-- Liste des RDV -->
+                            <apex:pageBlock id="pb2" rendered="{!nbSa != 0}" >
+                                <div  style="font-size: 1.1em; margin-bottom: 1%; margin-top:1%;">
+                                    <apex:outputText >
+                                        Vous êtes sur le point de 
+                                        <apex:outputText rendered="{!typeTraitement == 'FIGER'}"><span style="font-weight: bold;" > figer</span></apex:outputText>
+                                        <apex:outputText rendered="{!typeTraitement == 'DEFIGER'}"><span style="font-weight: bold;" > défiger</span></apex:outputText> {!nbSa} rendez-vous pour la période allant du 
+                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy}">
+                                            <apex:param value="{!debutPlanning}" /> 
+                                        </apex:outputText> au 
+                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy}">
+                                            <apex:param value="{!finPlanning}" /> 
+                                        </apex:outputText>.
+                                    </apex:outputText>
+                                </div>                                
+                                
+                                <apex:pageBlockTable value="{!lServiceAppointment}" var="item" id="pbt" style="font-size : 1.1em;">
+                                    <apex:column style="width: 12%;">
+                                        <apex:facet name="header">
+                                            N° Contrat
+                                        </apex:facet>
+                                        <apex:outputText value="{!item.ContratK__r.numeroContrat__c}" style="margin-left: 15px; font-size: 0.9em;"></apex:outputText>
+                                    </apex:column>
+                                    
+                                    <apex:column style="width: 12%;">
+                                        <apex:facet name="header">
+                                            Type 
+                                        </apex:facet>
+                                        <apex:outputText value="{!item.Worktype.Name}" style="margin-left: 15px; font-size: 0.9em;"></apex:outputText>
+                                    </apex:column>
+                                    
+                                    <apex:column style="width: 14%;">
+                                        <apex:facet name="header">
+                                            Client 
+                                        </apex:facet>
+                                        <apex:outputText value="{!item.Subject}" style="margin-left: 15px; font-size: 0.9em;"></apex:outputText>
+                                    </apex:column>
+                                    
+                                    <apex:column >
+                                        <apex:facet name="header">
+                                            Début 
+                                        </apex:facet>
+                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy   HH'h'mm}" style="margin-left: 15px; white-space:pre;">
+                                            <apex:param value="{!item.SchedStartTime+(2/24)}" /> 
+                                        </apex:outputText>
+                                    </apex:column>
+                                    
+                                    <apex:column >
+                                        <apex:facet name="header">
+                                            Fin 
+                                        </apex:facet>
+                                        <apex:outputText value="{0, date, dd'/'MM'/'yyyy   HH'h'mm}" style="margin-left: 15px; white-space:pre;">
+                                            <apex:param value="{!item.SchedEndTime+(2/24)}" /> 
+                                        </apex:outputText>
+                                    </apex:column>
+                                    
+                                </apex:pageBlockTable>
+                            </apex:pageBlock>
+                            
+                            <apex:pageBlock rendered="{!nbSa == 0}">
+                                <div style="font-size: 1.1em; margin-bottom: 1%; margin-top:1%;" >                    
+                                    <apex:outputText rendered="{!typeTraitement == 'FIGER'}" >
+                                        Il n'y a aucun rendez-vous à figer durant cette période. 
+                                    </apex:outputText>
+                                    <apex:outputText rendered="{!typeTraitement == 'DEFIGER'}" >
+                                        Il n'y a aucun rendez-vous à défiger durant cette période. 
+                                    </apex:outputText>
+                                </div>
+                            </apex:pageBlock>
+                            
+                            <!-- Commandes -->
+                            <div class="slds-card__footer" style="text-align: right;" >
+                                <apex:outputPanel layout="none">
+                                    <input type ="button" value="Précédent" onclick="history.go(-1)" class="slds-button slds-button--brand slds-button--small"/>
+                                </apex:outputPanel>
+
+                                <apex:commandButton styleClass="slds-button slds-button--brand slds-button--small" value="Confirmer" action="{!confirmerUpdate}" id="Recap" rendered="{!nbSa != 0}" />
+                            </div>
+                        </div>
+                    </div>
+                </apex:form>  
+            </div>
+        </body>
+    </html>
+</apex:page>

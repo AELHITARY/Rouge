@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_AnneeAchat</fullName>
+        <description>L&apos;année d&apos;achat est contextuelle au propriétaire. En conséquence, si le propriétaire est supprimé, l&apos;année d&apos;achat doit être effacée.</description>
+        <field>anneeAchat__c</field>
+        <formula>IF(proprietaire__c == null,  null, anneeAchat__c)</formula>
+        <name>UR001_K2_Chantier_AnneeAchat</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_City</fullName>
+        <field>ville__c</field>
+        <formula>LOWER (ville__c )</formula>
+        <name>UR001_K2_Chantier_City</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_CodeAcces</fullName>
+        <field>codeAcces__c</field>
+        <name>UR001_K2_Chantier_CodeAcces</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Null</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_CodeMagasinTechnique</fullName>
+        <description>CRM-377 : Copie la valeur de la formule codeMagasinActuel__c dans codeMagasinTechnique__c</description>
+        <field>codeMagasinTechnique__c</field>
+        <formula>codeMagasinActuel__c</formula>
+        <name>UR001_K2_Chantier_CodeMagasinTechnique</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_Country</fullName>
+        <field>pays__c</field>
+        <formula>IF(AND(!ISBLANK(codePostal__c), OR(ISBLANK(pays__c), UPPER(pays__c) == &apos;F&apos;, UPPER(pays__c) == &apos;FR&apos;, UPPER(pays__c) == &apos;FRA&apos;)), &apos;FRANCE&apos;, UPPER(pays__c))</formula>
+        <name>UR001_K2_Chantier_Country</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_DerniereAffectCall</fullName>
+        <field>dateDerniereAffectationCall__c</field>
+        <formula>TODAY()</formula>
+        <name>UR001_K2_Chantier_DerniereAffectCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_DerniereAffectVendeur</fullName>
+        <field>dateDerniereAffectationVendeur__c</field>
+        <formula>TODAY()</formula>
+        <name>UR001_K2_Chantier_DerniereAffectVendeur</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_Etage</fullName>
+        <field>etage__c</field>
+        <name>UR001_K2_Chantier_Etage</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Null</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_Interphone</fullName>
+        <field>interphone__c</field>
+        <name>UR001_K2_Chantier_Interphone</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Null</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_LastModifiedDateByCall</fullName>
+        <field>lastModifiedDateByCall__c</field>
+        <formula>IF(OR($Profile.Name = &apos;K/K - DC&apos;, $Profile.Name = &apos;K/K - TA&apos;, $Profile.Name = &apos;K/K - TA/Entrant&apos;, $Profile.Name = &apos;K/K - TA/Sortant&apos;, $Profile.Name = &apos;K/K - Superviseur&apos;, $Profile.Name = &apos;K/K - Assistante Call&apos;, $UserRole.Name = &apos;Directeur Call&apos;, $UserRole.Name = &apos;Superviseur&apos;, $UserRole.Name = &apos;TA&apos;), LastModifiedDate , lastModifiedDateByCall__c)</formula>
+        <name>UR001_K2_Chantier_LastModifiedDateByCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_LastModifiedDateBySale</fullName>
+        <field>lastModifiedDateBySale__c</field>
+        <formula>IF(OR(CONTAINS(&apos;K/K - DR,K/K - DV,K/K - En charge de magasin,K/K - Foire,K/K - Formateur,K/K - RV,K/K - RVJ,K/K - Vendeur&apos;, $Profile.Name),
+      $Profile.Name = &apos;K/K - TP&apos;,       
+      $UserRole.Name = &apos;Foire&apos;,
+      $UserRole.Name = &apos;Formateur&apos;),  
+   LastModifiedDate,
+   lastModifiedDateBySale__c)</formula>
+        <name>UR001_K2_Chantier_LastModifiedDateBySale</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbAffectationsCall</fullName>
+        <field>nbAffectationsCall__c</field>
+        <formula>NULLVALUE(nbAffectationsCall__c, 0) + 1</formula>
+        <name>UR001_K2_Chantier_NbAffectationsCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbAffectationsVendeur</fullName>
+        <field>nbAffectationsVendeur__c</field>
+        <formula>NULLVALUE(nbAffectationsVendeur__c, 0) + 1</formula>
+        <name>UR001_K2_Chantier_NbAffectationsVendeur</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbModifications</fullName>
+        <field>nbModifications__c</field>
+        <formula>NULLVALUE(nbModifications__c, 0) + 1</formula>
+        <name>UR001_K2_Chantier_NbModifications</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbModificationsByCall</fullName>
+        <field>nbModificationsByCall__c</field>
+        <formula>IF(OR($Profile.Name = &apos;K/K - DC&apos;, $Profile.Name = &apos;K/K - TA&apos;, $Profile.Name = &apos;K/K - TA/Entrant&apos;, $Profile.Name = &apos;K/K - TA/Sortant&apos;, $Profile.Name = &apos;K/K - Superviseur&apos;, $Profile.Name = &apos;K/K - Assistante Call&apos;, $UserRole.Name = &apos;Directeur Call&apos;, $UserRole.Name = &apos;Superviseur&apos;, $UserRole.Name = &apos;TA&apos;), NULLVALUE(nbModificationsByCall__c, 0) + 1, nbModificationsByCall__c)</formula>
+        <name>UR001_K2_Chantier_NbModificationsByCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbModificationsBySale</fullName>
+        <field>nbModificationsBySale__c</field>
+        <formula>IF(OR(CONTAINS(&apos;K/K - DR,K/K - DV,K/K - En charge de magasin,K/K - Foire,K/K - Formateur,K/K - RV,K/K - RVJ,K/K - Vendeur&apos;, $Profile.Name),
+      $Profile.Name = &apos;K/K - TP&apos;,       
+      $UserRole.Name = &apos;Foire&apos;,
+      $UserRole.Name = &apos;Formateur&apos;),    
+   NULLVALUE(nbModificationsBySale__c, 0) + 1, 
+   nbModificationsBySale__c)</formula>
+        <name>UR001_K2_Chantier_NbModificationsBySale</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbTotalLocataires</fullName>
+        <field>nbTotalLocataires__c</field>
+        <formula>NULLVALUE(nbTotalLocataires__c, 0) +
+   IF(OR(ISNEW(), ISCHANGED(locataire__c)) &amp;&amp; locataire__c != null &amp;&amp; OR(ISNEW(), ISCHANGED(autreLocataire__c)) &amp;&amp; autreLocataire__c != null, 2,
+   IF(OR(ISNEW(), ISCHANGED(locataire__c)) &amp;&amp; locataire__c != null, 1,
+   IF(OR(ISNEW(), ISCHANGED(autreLocataire__c)) &amp;&amp; autreLocataire__c != null, 1, 0)))</formula>
+        <name>UR001_K2_Chantier_NbTotalLocataires</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbTotalOccupants</fullName>
+        <field>nbTotalOccupants__c</field>
+        <formula>NULLVALUE(nbTotalOccupants__c, 0) +
+   IF(OR(ISNEW(), ISCHANGED(occupant__c)) &amp;&amp; occupant__c != null &amp;&amp; OR(ISNEW(), ISCHANGED(autreOccupant__c)) &amp;&amp; autreOccupant__c != null, 2,
+   IF(OR(ISNEW(), ISCHANGED(occupant__c)) &amp;&amp; occupant__c != null, 1,
+   IF(OR(ISNEW(), ISCHANGED(autreOccupant__c)) &amp;&amp; autreOccupant__c != null, 1, 0)))</formula>
+        <name>UR001_K2_Chantier_NbTotalOccupants</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_NbTotalProprietaire</fullName>
+        <field>nbTotalProprietaires__c</field>
+        <formula>NULLVALUE(nbTotalProprietaires__c, 0) +
+   IF(OR(ISNEW(), ISCHANGED(proprietaire__c)) &amp;&amp; proprietaire__c != null &amp;&amp; OR(ISNEW(), ISCHANGED(autreProprietaire__c)) &amp;&amp; autreProprietaire__c != null, 2,
+   IF(OR(ISNEW(), ISCHANGED(proprietaire__c)) &amp;&amp; proprietaire__c != null, 1,
+   IF(OR(ISNEW(), ISCHANGED(autreProprietaire__c)) &amp;&amp; autreProprietaire__c != null, 1, 0)))</formula>
+        <name>UR001_K2_Chantier_NbTotalProprietaires</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_PostalCode</fullName>
+        <field>codePostal__c</field>
+        <formula>IF(OR(UPPER(pays__c) == &apos;F&apos;, UPPER(pays__c) == &apos;FR&apos;, UPPER(pays__c) == &apos;FRA&apos;, UPPER(pays__c) == &apos;FRANCE&apos;), LPAD(codePostal__c, 5, &apos;0&apos;), UPPER(codePostal__c))</formula>
+        <name>UR001_K2_Chantier_PostalCode</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_PremiereAffectCall</fullName>
+        <field>datePremiereAffectationCall__c</field>
+        <formula>IF(ISNULL(datePremiereAffectationCall__c), TODAY(), datePremiereAffectationCall__c)</formula>
+        <name>UR001_K2_Chantier_PremiereAffectCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_PremiereAffectVendeur</fullName>
+        <field>datePremiereAffectationVendeur__c</field>
+        <formula>IF(ISNULL(datePremiereAffectationVendeur__c), TODAY(), datePremiereAffectationVendeur__c)</formula>
+        <name>UR001_K2_Chantier_PremiereAffectVendeur</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_CodeDS</fullName>
+        <field>codeDSInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleDSInitial__c)),
+sectorisation__r.codeDS__c,
+codeDSInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_CodeDS</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_CodeDV</fullName>
+        <field>codeDVInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleDVInitial__c)),
+sectorisation__r.codeDV__c,
+codeDVInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_CodeDV</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_CodeDepot</fullName>
+        <field>codeDepotInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleDepotInitial__c)),
+sectorisation__r.codeDepot__c,
+codeDepotInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_CodeDepot</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_CodeMagasin</fullName>
+        <field>codeMagasinInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleMagasinInitial__c)),
+sectorisation__r.codeMagasin__c,
+codeMagasinInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_CodeMagasin</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_CodeRegion</fullName>
+        <field>codeRegionInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleRegionInitial__c)),
+sectorisation__r.codeRegion__c,
+codeRegionInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_CodeRegion</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_LibDS</fullName>
+        <field>libelleDSInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleDSInitial__c)),
+sectorisation__r.libelleDS__c,
+libelleDSInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_LibDS</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_LibDV</fullName>
+        <field>libelleDVInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleDVInitial__c)),
+sectorisation__r.libelleDV__c,
+libelleDVInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_LibDV</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_LibDepot</fullName>
+        <field>libelleDepotInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleDepotInitial__c)),
+sectorisation__r.libelleDepot__c,
+libelleDepotInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_LibDepot</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_LibMagasin</fullName>
+        <field>libelleMagasinInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleMagasinInitial__c)),
+sectorisation__r.libelleMagasin__c,
+libelleMagasinInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_LibMagasin</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectInit_LibRegion</fullName>
+        <field>libelleRegionInitial__c</field>
+        <formula>IF(AND(NOT(ISNULL(sectorisation__c)), ISBLANK(libelleRegionInitial__c)),
+sectorisation__r.libelleRegion__c,
+libelleRegionInitial__c
+)</formula>
+        <name>UR001_K2_Chantier_SectInit_LibRegion</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_CodeDS</fullName>
+        <field>codeDSReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleDSReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.codeDS__c, 
+  codeDSReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_CodeDS</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_CodeDV</fullName>
+        <field>codeDVReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleDVReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.codeDV__c,
+  codeDVReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_CodeDV</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_CodeDepot</fullName>
+        <field>codeDepotReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleDepotReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.codeDepot__c, 
+  codeDepotReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_CodeDepot</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_CodeMagasin</fullName>
+        <field>codeMagasinReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleMagasinReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.codeMagasin__c, 
+  codeMagasinReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_CodeMagasin</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_CodeRegion</fullName>
+        <field>codeRegionReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleRegionReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.codeRegion__c, 
+  codeRegionReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_CodeRegion</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_LibDS</fullName>
+        <field>libelleDSReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleDSReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.libelleDS__c, 
+  libelleDSReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_LibDS</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_LibDV</fullName>
+        <field>libelleDVReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleDVReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.libelleDV__c, 
+  libelleDVReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_LibDV</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_LibDepot</fullName>
+        <field>libelleDepotReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleDepotReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.libelleDepot__c, 
+  libelleDepotReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_LibDepot</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_LibMagasin</fullName>
+        <field>libelleMagasinReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleMagasinReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.libelleMagasin__c, 
+  libelleMagasinReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_LibMagasin</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_SectRef_LibRegion</fullName>
+        <field>libelleRegionReference__c</field>
+        <formula>IF(
+  AND(
+    NOT(ISNULL(sectorisation__c)),
+    OR(ISBLANK(libelleRegionReference__c),
+       ISCHANGED(iris__c))),
+  sectorisation__r.libelleRegion__c, 
+  libelleRegionReference__c 
+)</formula>
+        <name>UR001_K2_Chantier_SectRef_LibRegion</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Chantier_Street</fullName>
+        <field>rue__c</field>
+        <formula>LOWER( rue__c )</formula>
+        <name>UR001_K2_Chantier_Street</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <rules>
+        <fullName>WF001_K2_Chantier_AffectationCall</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_DerniereAffectCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_NbAffectationsCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_PremiereAffectCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <formula>AND(NOT($User.ByPassWorkflowRule__c),
+    OR(owner__r.Profile.Name = &apos;K/K - DC&apos;,
+       owner__r.Profile.Name = &apos;K/K - TA&apos;,
+       owner__r.Profile.Name = &apos;K/K - TA/Entrant&apos;,
+       owner__r.Profile.Name = &apos;K/K - TA/Sortant&apos;,
+       owner__r.Profile.Name = &apos;K/K - Superviseur&apos;,
+       owner__r.Profile.Name = &apos;K/K - Assistante Call&apos;,
+       owner__r.UserRole.Name = &apos;Directeur Call&apos;,
+       owner__r.UserRole.Name = &apos;Superviseur&apos;,
+       owner__r.UserRole.Name = &apos;TA&apos;))</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Chantier_AffectationVendeur</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_DerniereAffectVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_NbAffectationsVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_PremiereAffectVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <formula>AND(NOT($User.ByPassWorkflowRule__c),    
+    OR(CONTAINS(&apos;K/K - DR,K/K - DV,K/K - En charge de magasin,K/K - Foire,K/K - Formateur,K/K - RV,K/K - RVJ,K/K - Vendeur&apos;, owner__r.Profile.Name),
+       owner__r.Profile.Name = &apos;K/K - TP&apos;,       
+       owner__r.UserRole.Name = &apos;Foire&apos;,
+       owner__r.UserRole.Name = &apos;Formateur&apos;))</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Chantier_CodeMagasinTechnique</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_CodeMagasinTechnique</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <description>CRM-377 : Copie la valeur de la formule codeMagasinActuel__c dans codeMagasinTechnique__c</description>
+        <formula>$User.ByPassWorkflowRule__c == false &amp;&amp;
+((ISNEW() &amp;&amp; codeMagasinTechnique__c == null) ||
+(NOT(ISNEW()) &amp;&amp; PRIORVALUE(codeMagasinActuel__c) != codeMagasinActuel__c))</formula>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Chantier_InsertOrUpdate</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_AnneeAchat</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_Country</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_LastModifiedDateByCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_LastModifiedDateBySale</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_NbModifications</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_NbModificationsByCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_NbModificationsBySale</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_PostalCode</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_Street</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Chantier_InsertOrUpdate2</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_NbTotalLocataires</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_NbTotalOccupants</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_NbTotalProprietaire</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Chantier_PasAdresse</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_CodeAcces</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_Etage</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_Interphone</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Chantier__c.codePostal__c</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Chantier_SectorisationInitial</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_CodeDS</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_CodeDV</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_CodeDepot</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_CodeMagasin</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_CodeRegion</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_LibDS</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_LibDV</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_LibDepot</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_LibMagasin</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectInit_LibRegion</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <description>Mise à jour de la sectorisation initiale</description>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WK001_K2_Chantier_SectorisationReference</fullName>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_CodeDS</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_CodeDV</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_CodeDepot</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_CodeMagasin</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_CodeRegion</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_LibDS</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_LibDV</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_LibDepot</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_LibMagasin</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Chantier_SectRef_LibRegion</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <description>Mise à jour de la sectorisation de référence</description>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+</Workflow>

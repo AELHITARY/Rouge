@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Source_All</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <columns>category__c</columns>
+    <columns>subCategory__c</columns>
+    <columns>usableForSales__c</columns>
+    <columns>usableForAfterSalesService__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.Source</value>
+    </filters>
+    <label>Source (Tous)</label>
+    <language>en_US</language>
+</ListView>

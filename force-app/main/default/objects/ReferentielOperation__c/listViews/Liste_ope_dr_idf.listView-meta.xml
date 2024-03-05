@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Liste_ope_dr_idf</fullName>
+    <columns>Ville__c</columns>
+    <columns>Datedebut__c</columns>
+    <columns>Datefin__c</columns>
+    <columns>NAME</columns>
+    <columns>Code__c</columns>
+    <columns>SurfaceduStand__c</columns>
+    <columns>Magasins_DR_IDF__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>OWNER.LAST_NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Magasins_DR_IDF__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <label>1IDF - opérations</label>
+    <language>fr</language>
+    <sharedTo>
+        <role>ContrleurdExploitation</role>
+        <role>ContrleurdeGestion</role>
+        <role>DirecteurAdminetFinancier</role>
+        <role>DirecteurExcutif</role>
+        <role>ResponsableContrledeGestion</role>
+        <role>ResponsableMthodeetContrleInterne</role>
+    </sharedTo>
+</ListView>

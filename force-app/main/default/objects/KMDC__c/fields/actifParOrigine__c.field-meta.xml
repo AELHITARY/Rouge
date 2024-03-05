@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>actifParOrigine__c</fullName>
+    <externalId>false</externalId>
+    <formula>OR(
+origine__c = &apos;BAL VENDEUR&apos;,
+origine__c = &apos;PORTE A PORTE VENDEUR&apos;,
+origine__c = &apos;TELEPHONE VENDEUR&apos;,
+origine__c = &apos;RELANCE KUBE&apos;,
+origine__c = &apos;COMPLEMENT VENDEUR&apos;,
+origine__c = &apos;PARRAINAGE VENDEUR&apos;,
+origine__c = &apos;STAND GM&apos;,
+origine__c = &apos;FOIRE&apos;,
+origine__c = &apos;STAND MARCHE VENDEUR&apos;
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Actif par origine</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

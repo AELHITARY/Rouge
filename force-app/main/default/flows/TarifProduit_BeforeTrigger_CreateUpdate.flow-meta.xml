@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>55.0</apiVersion>
+    <assignments>
+        <name>Update_Key</name>
+        <label>Update Key</label>
+        <locationX>777</locationX>
+        <locationY>298</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.uniqueKey__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>KeyFormula</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Tarif Produit - Actions à la création/modification avant l&apos;insertion.</description>
+    <formulas>
+        <name>KeyFormula</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK({!$Record.Produit__c}),&apos;&apos;,{!$Record.Produit__r.reference__c}) &amp; &quot;-&quot; &amp;
+{!$Record.productOption__r.CPQId__c} &amp; &quot;-&quot; &amp;
+TEXT({!$Record.DateDebutValidite__c}) &amp; &quot;-&quot; &amp;
+TEXT({!$Record.DateFinValidite__c}) &amp; &quot;-&quot; &amp;
+TEXT({!$Record.NombreVantaux__c}) &amp; &quot;-&quot; &amp;
+TEXT({!$Record.DimensionHL__c}) &amp; &quot;-&quot; &amp;
+TEXT({!$Record.DimensionHLMAX__c})</expression>
+    </formulas>
+    <interviewLabel>TarifProduit - Before Trigger - Actions à la création/Modification {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>TarifProduit - Before Trigger - Actions à la création/modification</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>650</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Update_Key</targetReference>
+        </connector>
+        <object>TarifProduit__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+    <triggerOrder>1</triggerOrder>
+</Flow>

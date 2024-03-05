@@ -1,0 +1,126 @@
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="Ctrl_Site_Demande_de_Devis" action="{!initVerifParameters}" applyHtmlTag="false" standardStylesheets="false" cache="false">
+    <html>
+        <head>
+            <title>Demande de devis gratuit | Etape 3 | K par K</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="robots" content="noindex, follow" />
+            <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+            <script type="text/javascript" src="//try.abtasty.com/16d36d066bc474b3d95da9dadef85481.js"></script>
+            <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+            <script type="text/javascript">
+                j$ = jQuery.noConflict();
+                j$(document).ready(function(){
+                    // Process étape 3
+                    if("{!boolValideEtape3}" == "false") {
+                        processValidationEtape3();
+                    }
+                });
+            </script>
+            <script type="text/javascript"> (function() { var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src =
+                ('https:' == document.location.protocol ? 'https://' : 'http://' )+'js-project-eu.s3.amazonaws.com/AS-2313604.js';
+                var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); })();
+            </script>
+            <c:importvisualstrap theme="default" />
+            <apex:stylesheet value="{!URLFOR($Resource.Site_Demande_de_Devis, 'css/demande_devis.min.css')}"/>
+        </head>
+        <body class="body-quote">
+            <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+            <div class="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero">
+                <div class="container" id="container">
+                    <div class="row">
+                        <div id="col-md-12">
+                            <h2>Votre demande de devis a été envoyée !</h2>
+                            <p>Merci d’avoir effectué une demande de devis !<br /> Nous vous contacterons dans les plus brefs délais.</p>
+                        </div>
+                    </div>
+                </div>
+                <apex:form >
+                    <apex:actionFunction name="processValidationEtape3" action="{!validationEtape3}" oncomplete="return false;"/>
+                </apex:form>
+            </div>
+
+            <!-- Tag partenaire -->
+            <script type="text/javascript">
+                var tip = tip || [];
+                tip.push(["_setLead","2704","259063","77f4b58bb0e09cb322bc992d506387e1",'{!emailHash}', '']);
+                (function(e){function t(){var e=document.createElement("script");e.type="text/javascript";e.async=true;e.src=(document.location.protocol=="https:"?"https":"http")+"://tracking.publicidees.com/p/tip/";
+                    var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)}if(document.readyState=="complete"){t()}else{if(e.addEventListener){e.addEventListener("load",t,false)}else if(e.attachEvent){e.attachEvent("onload",t)}}})(window)
+            </script>
+            <script type="text/javascript">
+                var tip = tip || [];
+                tip.push(['_setSegment', '2704', '7262', 'Thank you Page']);
+                (function(e){function t(){var e=document.createElement("script");e.type="text/javascript";e.async=true;e.src=(document.location.protocol=="https:"?"https":"http")+"://tracking.publicidees.com/p/tip/";
+                var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)}if(document.readyState=="complete"){t()}else{if(e.addEventListener){e.addEventListener("load",t,false)}else if(e.attachEvent){e.attachEvent("onload",t)}}})(window)
+            </script>
+            <!-- Start : Google Analytics -->
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                dataLayer.push({
+                    'PageTypeCriteo': 'Transactionpage',
+                    'email': '{!emailHash}',
+                    'PI_email': '{!email}',
+                    'CriteoTransactionID': '{!idImport}',
+                    'KwankoEventId': '{!idImport}',
+                    'clientId': '{!IdEul}',
+                    'isClient': '0',  //0 si nouveau,1 si connu
+                    'civilite': '{!civilite}',
+                    'nom': '{!nom}',
+                    'prenom': '{!prenom}',
+                    'adresse': '{!rue}',
+                    'codePostal': '{!cp}',
+                    'ville': '{!ville}',
+                    'pays': '{!pays}',
+                    'telFixe': '{!tel}',    //selon numero en 06/07
+                    'telPort': '{!tel}',    //selon numero en 06/07
+                    'email': '{!email}'
+                });
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                    ga('create', 'UA-4421249-13', 'auto');
+                    ga('send', 'pageview');
+            </script>            
+            <!-- End : Google Analytics -->
+            <!-- FASTO WEBORAMA -->
+            <script type="text/javascript" src="http://cstatic.weborama.fr/js/advertiserv2/adperf_conversion.js"></script>
+            <script type="text/javascript">
+                var adperftrackobj = {
+                    client : "{!IdEul}"      /* set your client id here - fourni par KparK */
+                    ,amount : "0.0"  /* set the total price here */
+                    ,invoice_id : "" /* set your invoice id here */
+                    ,quantity : 0    /* set the number of items purchased */
+                    ,is_client : 0   /* set to 1 if the client is a new client */
+                    ,optional_parameters : {
+                        "civ" : "{!civilite}",
+                        "nom" : "{!nom}",
+                        "prenom" : "{!prenom}",
+                        "adresse" : "{!rue}",
+                        "codepostal" : "{!cp}",
+                        "ville" : "{!ville}",
+                        "pays" : "{!pays}",
+                        "telfixe" : "{!tel}",
+                        "telport" : "{!tel}",
+                        "email" : "{!email}"
+                    }
+                    /* don't edit below this point */
+                    ,fullhost : 'outilstatistiquefr.solution.weborama.fr'
+                    ,site : 3861
+                    ,conversion_page : 5
+                };
+
+                try{adperfTracker.track( adperftrackobj );}catch(err){}
+            </script>
+
+            <!-- Start : Google Tag Manager -->
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MBF8W2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                        })(window,document,'script','dataLayer','GTM-MBF8W2');</script>
+            <!-- End : Google Tag Manager -->
+            <!-- Start : Iframe resizer -->
+            <script src="{!URLFOR($Resource.Site_Demande_de_Devis, 'js/iframeResizer.contentWindow.min.js')}" type="text/javascript"></script>
+            <!-- End : Iframe resizer -->
+        </body>
+    </html>
+</apex:page>

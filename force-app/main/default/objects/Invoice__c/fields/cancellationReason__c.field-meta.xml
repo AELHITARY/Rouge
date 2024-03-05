@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>cancellationReason__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Motif d&apos;annulation</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Referencial__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Motif d&apos;annulation client</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Referencial__c</referenceTo>
+    <relationshipLabel>Factures</relationshipLabel>
+    <relationshipName>Invoices</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

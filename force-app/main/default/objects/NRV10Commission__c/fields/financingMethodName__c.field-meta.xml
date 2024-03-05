@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>financingMethodName__c</fullName>
+    <description>Nom du moyen de financement (provient du nom du référentiel si la commission porte sur un devis CPQ, sinon provient de la picklist du devis sales)</description>
+    <externalId>false</externalId>
+    <label>Mode de financement</label>
+    <length>128</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

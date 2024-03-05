@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>teamRate__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Taux d&apos;équipe</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Le taux de rémunération n&apos;est pas de type &apos;Commission d&apos;équipe&apos;</errorMessage>
+        <filterItems>
+            <field>NRV10RemunerationRate__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>teamCommission</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>NRV10RemunerationRate__c</referenceTo>
+    <relationshipName>Equipes</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

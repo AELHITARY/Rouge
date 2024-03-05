@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_EntityVersion_CheckCity</fullName>
+    <active>false</active>
+    <description>Lorsqu&apos;un élément de l&apos;adresse est saisie, le champ city__c devient obligatoire
+/* FGO le 04/01/2023, certains magasins n&apos;ont aucune adresse physique (ex: LANGON). De même, certains types d&apos;entité n&apos;en ont pas non plus (ex: DV) */</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+ISBLANK(city__c) &amp;&amp;
+(NOT(ISBLANK(country__c)) ||
+NOT(ISBLANK(street__c)) ||
+NOT(ISBLANK(postalCode__c)))</errorConditionFormula>
+    <errorDisplayField>city__c</errorDisplayField>
+    <errorMessage>La ville de l&apos;entité est obligatoire.</errorMessage>
+</ValidationRule>

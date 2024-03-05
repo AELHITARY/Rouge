@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Formulaire_K2_Web</fullName>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OBJECT_ID</field>
+        <operation>equals</operation>
+        <value>a082p00001o624A</value>
+    </filters>
+    <label>Formulaire K2 Web</label>
+    <language>fr</language>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

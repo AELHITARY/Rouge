@@ -1,0 +1,1193 @@
+<apex:page Title="Cartographie" controller="Ctrl002_GoogleMaps" readOnly="true" sidebar="false" action="{!insertUserStats}" cache="true" expires="600">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'css/cartographie.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.Cartographie, 'lib/leaflet-control-geocoder/Control.Geocoder.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/custom-theme/jquery-ui-1.12.1.min.css')}" />
+
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui.1.12.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet/1.3.4/leaflet.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'lib/leaflet-control-geocoder/Control.Geocoder.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Cartographie, 'js/cartographie.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.vis_js, 'lib/moment-with-locales-2.8.4.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'classes/dqe.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.dqe_js, 'jquery.dqe.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.GoogleMaps, 'proj4s/proj4js-combined.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.GoogleMaps, 'proj4s/EPSG27572.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.GoogleMaps, 'proj4s/EPSG4326.js')}" />
+
+    <apex:remoteObjects >
+        <apex:remoteObjectModel name="Chantier__c" jsShorthand="Chantier" fields="Name,Id,rue__c,codePostal__c,ville__c,proprietaire__c,autreProprietaire__c,civiliteProprietaires__c,prenomProprietaires__c,nomProprietaires__c,locataire__c,autreLocataire__c,civiliteLocataires__c,prenomLocataires__c,nomLocataires__c,occupant__c,autreOccupant__c,civiliteOccupants__c,prenomOccupants__c,nomOccupants__c,telephoneDomicileProprietaires__c,telephoneMobileProprietaires__c,autreTelephoneProprietaires__c,telephoneDomicileLocataires__c,telephoneMobileLocataires__c,autreTelephoneLocataires__c,telephoneDomicileOccupants__c,telephoneMobileOccupants__c,autreTelephoneOccupants__c,emailProprietaires__c,emailLocataires__c,emailOccupants__c" />
+        <apex:remoteObjectModel name="KContrat__c" jsShorthand="Contrat" fields="Id,chantier__c,numeroContrat__c,dateSignature__c" />
+        <apex:remoteObjectModel name="Account" fields="Name,Id,rue__c,codePostal__c,ville__c,Salutation,email__c,autreTelephone__c,telephoneDomicile__c,telephoneMobile__c,phone" />
+    </apex:remoteObjects>
+
+    <script type="text/javascript">
+        $j = jQuery.noConflict();
+
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+
+        // Initialisation des messages d'erreur
+        labels = window.labels || {};
+        labels.NOT_FOUND                   = "{!JSENCODE($Label.NOT_FOUND)}";
+        labels.MERCI_DE_CHOISIR_UN_SECTEUR = "{!JSENCODE($Label.MERCI_DE_CHOISIR_UN_SECTEUR)}";
+        labels.GEOCODING_ERROR             = "{!JSENCODE($Label.GEOCODING_ERROR)}";
+        labels.UNABLE_GET_POSITION         = "{!JSENCODE($Label.UNABLE_GET_POSITION)}";
+
+        // Initialisation des types de point
+        dotType = window.dotType || {};
+        dotType.CHANTIERAVECCONTRATS       = "ChantierAvecContrats";
+        dotType.CHANTIERSANSCONTRATS       = "ChantierSansContrats";
+        dotType.POSEDUJOUR                 = "PoseDuJour";
+        dotType.POSEDEDEMAIN               = "PoseDeDemain";
+        dotType.SAV                        = "SAV";
+        dotType.METRAGEDUJOUR              = "MetrageDuJour";
+        dotType.METRAGEDEDEMAIN            = "MetrageDeDemain";
+        dotType.INTERVENTIONDUJOUR         = "Intervention_SAVDuJour";
+        dotType.INTERVENTIONDEDEMAIN       = "Intervention_SAVDeDemain";
+        dotType.INTERDITDEPROSPECTION      = "InterditDeProspection";
+        dotType.VENDEURS                   = "Vendeurs";
+        dotType.R1DUJOUR                   = "R1DuJour";
+        dotType.R2DUJOUR                   = "R2DuJour";
+        dotType.RPLUSDUJOUR                = "RPlusDuJour";
+        dotType.R1PROCHAIN                 = "R1Prochain";
+        dotType.R2PROCHAIN                 = "R2Prochain";
+        dotType.RPLUSPROCHAIN              = "RPlusProchain";
+        dotType.PROSPECTIONDUJOUR          = "ProspectionsDuJour";
+        dotType.PROSPECTIONPROCHAINE       = "ProspectionsProchaine";
+        dotType.SEARCH                     = "Search"; //Pour la search box
+
+        // Initialisation des types de point
+        var cartoLibPath = "{!URLFOR($Resource.Cartographie)}";
+        dotTypeColor = window.dotTypeColor || {};
+        dotTypeColor.CHANTIERAVECCONTRATS       = cartoLibPath+"/img/chantier.png";
+        dotTypeColor.CHANTIERSANSCONTRATS       = cartoLibPath+"/img/chantier_2.png";
+        dotTypeColor.POSEDUJOUR                 = cartoLibPath+"/img/pose.png";
+        dotTypeColor.POSEDEDEMAIN               = cartoLibPath+"/img/pose_2.png";
+        dotTypeColor.SAV                        = cartoLibPath+"/img/sav.png";
+        dotTypeColor.METRAGEDUJOUR              = cartoLibPath+"/img/metrage.png";
+        dotTypeColor.METRAGEDEDEMAIN            = cartoLibPath+"/img/metrage_2.png";
+        dotTypeColor.INTERVENTIONDUJOUR         = cartoLibPath+"/img/intervention.png";
+        dotTypeColor.INTERVENTIONDEDEMAIN       = cartoLibPath+"/img/intervention_2.png";
+        dotTypeColor.INTERDITDEPROSPECTION      = cartoLibPath+"/img/interdit.png";
+        dotTypeColor.VENDEURS                   = cartoLibPath+"/img/vendeur.png";
+        dotTypeColor.R1DUJOUR                   = cartoLibPath+"/img/r1.png";
+        dotTypeColor.R2DUJOUR                   = cartoLibPath+"/img/r2.png";
+        dotTypeColor.RPLUSDUJOUR                = cartoLibPath+"/img/rplus.png";
+        dotTypeColor.R1PROCHAIN                 = cartoLibPath+"/img/r1_2.png";
+        dotTypeColor.R2PROCHAIN                 = cartoLibPath+"/img/r2_2.png";
+        dotTypeColor.RPLUSPROCHAIN              = cartoLibPath+"/img/rplus_2.png";
+        dotTypeColor.PROSPECTIONDUJOUR          = cartoLibPath+"/img/prospection.png";
+        dotTypeColor.PROSPECTIONPROCHAINE       = cartoLibPath+"/img/prospection_2.png";
+
+        // Geocodage
+        // Creation des objets source (LE2) et destination (Lat/Long)
+        var source = new Proj4js.Proj('EPSG:27572');
+        var dest = new Proj4js.Proj('EPSG:4326');
+        var map, searchBox, sectorPolygon;
+        var sectorName, sectorCode;
+        var latitude_min = 90; 
+        var longitude_max = -180; 
+        var latitude_max  = -90; 
+        var longitude_min = 180;
+        var init = false;
+        var userId = '{!actualUser}';
+        var userProfile = '{!actualUser.profile.Name}';
+
+        var sectorCoordsArray = []; // Tableau des coordonées Lat/Long après convertions
+        var markersArray = {}; // Tableau des markers
+        var poinVisibleList = {}; // Tableau des points visible sur la carte
+        var browserSupportFlag = false;
+        var markerGeoloc = null; // Marqueur de la position de géolocalisation
+
+        // Initialisation
+        $(document).ready(function () {
+            initialize();
+        });
+
+        /* Fonction d'initialisation des variables et de la carte                       */
+        /*------------------------------------------------------------------------------*/
+        function initialize() {
+            // Verification si application mobile
+            if(isMobile()) {
+                // Si mobile, affiche carte en plein écran
+                $j("html").css("height","100%");
+                $j("body").css({"height":"100%", "padding":"0", "margin":"0"});
+                $j("#map").css({"min-height":"100%", "width":"100%", "padding":"0"});
+                if(isLightning() != true) {
+                    $j("#feuilleDeRoute").css({"visibility":"hidden","z-index":"10", "right":"115px", "margin-top":"8px"});
+                }
+            }
+
+            // Initialise les coordonnées d'affichage
+            var latlng = L.latLng('{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}');
+            // Récupère le premier secteur de la liste
+            sectorName = '{!JSENCODE(sectorName)}';
+
+            // Initialise le tableau des markers et des points visible
+            init = true;
+            for(var key in dotType) {
+                markersArray[dotType[key]] = [];
+                poinVisibleList[dotType[key]] = false;
+            }
+            
+            // Charge la carte
+            map = initializeLeafletMap('map','{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}', 13);
+            // Affiche les polygones du secteur sur la carte et les marqueurs
+            drawSectorAndMarkers();
+
+            // Active la géolocation (seulement pour mobile)
+            if(navigator.geolocation && isMobile() && !isLightning()) {
+                browserSupportFlag = true;
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var watchId = navigator.geolocation.watchPosition(addMarkerUserPosition, null, {enableHighAccuracy:true, maximumAge:30000, timeout:27000});
+                    latlng = L.latLng(parseFloat(position.coords.latitude), parseFloat(position.coords.longitude));
+                    map.setView(latlng, 13);
+                }, function() {
+                    latlng = L.latLng('{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}');
+                });
+            } else {
+                browserSupportFlag = false;
+                latlng = L.latLng('{!googleMapsSettings.Latitude_initiale__c}', '{!googleMapsSettings.Longitude_initiale__c}');
+            }
+
+            // Ajout de la searchbox comme contrôle
+            L.Control.SearchBox = L.Control.extend({
+                onAdd: function(map) {
+                    // Ajout de l'action lors du choix d'un place (avec la souris, pas en utilisant la touche entrée)
+                    var searchBoxDiv = L.DomUtil.get('search-content-id');
+                    // Autocompletion par DQE en mode single (une barre de recherche)
+                    dqe.license_name = "{!licenceDQE}";
+                    options = {
+                        country : 'FRA',
+                        single  : '#search-content-input-id',
+                        zip     : '#search-content-input-id_zip',
+                        city    : '#search-content-input-id_city',
+                        street  : '#search-content-input-id_street',
+                        neighbourhood : 2
+                    };
+                    var dqeForm = $('#id_form').dqe(options); // Activation DQE Adresse
+
+                    // Ecoute l'evenement de sélection de l'adresse
+                    dqeForm.on('single', function(ui, data) {
+                        $j('#search-content-input-id').val(data.value); // Récupération de l'adresse
+
+                        // 21/07/2021 - JMU - RQM-286 : Update de SINGLE à SINGLEV2 
+                        // Récupération des coordonnées de l'adresse via LATLNG de DQE
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.Ctrl002_GoogleMaps.DQELongLat}', data.id, data.num, 'FRA',
+                            function(result, event) {
+                                if (event.status) {
+                                    // Si les points existent, calcul et affichage du secteur, sinon rien
+                                    if (result != null) {
+                                        var latlng = L.latLng(result.Latitude, result.Longitude);
+                                        //deleteAll(map);    // Suppression de tous les markers et secteurs
+                                        deleteMarkers(map, dotType.SEARCH); // Suppression markers de recherche
+                                        // Ajout des markers
+                                        addMarkerSearchBox(dotType.SEARCH, data, latlng);
+                                        map.setView(latlng, 13);  // Centrage de la carte
+                                    }
+                                    
+                                } else if (event.type === 'exception') {
+                                    alert(event.message);
+                                } else {
+                                    alert(event.message);
+                                }
+                            },
+                            { buffer: false, escape: true, timeout: 30000 }
+                        );
+                    });
+                    L.DomEvent.disableClickPropagation(searchBoxDiv);
+                    L.DomEvent.on(searchBoxDiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return searchBoxDiv;
+                }
+            });
+            L.control.searchBox = function(opts) {
+                return new L.Control.SearchBox(opts);
+            }
+            L.control.searchBox({ position: 'topleft' }).addTo(map);
+
+             // Ajout du sélecteur de secteur et des points comme contrôle
+            L.Control.SectorSelector = L.Control.extend({
+                onAdd: function(map) {
+                    var sectorSelectorDiv = L.DomUtil.get('legend-content-id');
+                    L.DomEvent.disableClickPropagation(sectorSelectorDiv);
+                    L.DomEvent.on(sectorSelectorDiv, 'mousewheel', L.DomEvent.stopPropagation);
+                    return sectorSelectorDiv;
+                }
+            });
+            L.control.sectorSelector = function(opts) {
+                return new L.Control.SectorSelector(opts);
+            }
+            L.control.sectorSelector({ position: 'topleft' }).addTo(map);
+
+            // Ajout du bouton Impression Feuille de Route comme contrôle (Seulement non mobile)
+            if(!isMobile() || isLightning()) {
+                L.Control.FeuilledeRoute = L.Control.extend({
+                    onAdd: function(map) {
+                        var feuilledeRouteDiv = L.DomUtil.get('feuilleDeRoute');
+                        // Ajout de la fonction d'affichage de la feuille de route
+                        L.DomEvent.on(feuilledeRouteDiv, 'click', function() {
+                            imprimerFeuilleDeRoute(map);
+                        });
+                        return feuilledeRouteDiv;
+                    }
+                });
+
+                L.control.feuilledeRoute = function(opts) {
+                    return new L.Control.FeuilledeRoute(opts);
+                }
+                L.control.feuilledeRoute({ position: 'topright' }).addTo(map);
+            }
+        }
+
+        /* Fonction permettant de dessiner le secteur sur la carte                      */
+        /*------------------------------------------------------------------------------*/
+        function drawSectorAndMarkers() {
+            sectorName = $j('#sectorSelector').val();
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getSectorCoord}',
+                sectorName,
+                function(result, event) {
+                    if (event.status) {
+                        // Init
+                        sectorCode = result.Code;
+                        latitude_min = 90; longitude_max = -180; latitude_max  = -90; longitude_min = 180;
+
+                        // Si les points existent, calcul et affichage du secteur, sinon rien
+                        if (result.WKT != null) {
+                            var optionSector = {
+                                color: '{!googleMapsSettings.Couleur_du_contour_secteur__c}',
+                                opacity: 0.8,
+                                weight: 3,
+                                fillColor: '{!googleMapsSettings.Couleur_du_fond_secteur__c}',
+                                fillOpacity: 0.2
+                            };
+
+                            // Creation du secteur
+                            sectorPolygon = constructSectorPolygon(result.WKT, optionSector);
+                            if(sectorPolygon != null) {
+                                sectorPolygon.addTo(map);                                
+                                // Centre la carte sur le secteur
+                                map.fitBounds(sectorPolygon.getBounds()); 
+                                // Calcul des limites du secteurs
+                                latitude_min = sectorPolygon.getBounds().getSouth();
+                                latitude_max = sectorPolygon.getBounds().getNorth();
+                                longitude_min = sectorPolygon.getBounds().getWest();
+                                longitude_max = sectorPolygon.getBounds().getEast();
+                            }
+
+                            // Initialisation ou affichage des points visible
+                            if(init) {
+                                // Initialise par défaut l'affichage des points ci dessous
+                                changeVisibility(dotType.POSEDUJOUR, true);
+                                changeVisibility(dotType.METRAGEDUJOUR, true);
+                                changeVisibility(dotType.INTERVENTIONDUJOUR, true);
+                                changeVisibility(dotType.R1DUJOUR, true);
+                                changeVisibility(dotType.R2DUJOUR, true);
+                                changeVisibility(dotType.RPLUSDUJOUR, true);
+                                init = false;
+                            } else {
+                                for(var key in poinVisibleList) {
+                                    if (poinVisibleList[key] == true) {
+                                        changeVisibility(key, true);
+                                    }
+                                }
+                            }
+                        }
+                    } else if (event.type === 'exception') {
+                        alert(event.message);
+                    } else {
+                        alert(event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les chantiers avec contrats et les afficher */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteChantiersAvecContrats() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getChantierAvecContratsList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.CHANTIERAVECCONTRATS, dotTypeColor.CHANTIERAVECCONTRATS);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les chantiers sans contrats et les afficher */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteChantiersSansContrats() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getChantierSansContratsList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.CHANTIERSANSCONTRATS, dotTypeColor.CHANTIERSANSCONTRATS);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les poses du jour et les afficher           */
+        /*------------------------------------------------------------------------------*/
+        function getRemotePosesDuJour() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getPoseDuJourList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.POSEDUJOUR, dotTypeColor.POSEDUJOUR);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les poses de demain et les afficher         */
+        /*------------------------------------------------------------------------------*/
+        function getRemotePosesDeDemain() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getPoseDeDemainList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.POSEDEDEMAIN, dotTypeColor.POSEDEDEMAIN);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les SAV et les afficher                     */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteSAV() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getSAVList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.SAV, dotTypeColor.SAV);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les métrages du jour et les afficher        */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteMetrageDuJour() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getMetrageDuJourList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    console.log('latitude_min : '+latitude_min);
+                    console.log('latitude_max : '+latitude_max);
+                    console.log('longitude_max : '+longitude_max);
+                    console.log('longitude_min : '+longitude_min);
+                    for(j=0;j<result.length;j++){
+                        console.log('result[].Id : '+result[j].Id);
+                        console.log('result[].ObjectType : '+result[j].ObjectType);
+                        console.log('result[].Name : '+result[j].Name);
+                        console.log('result[].AddressComplete : '+result[j].AddressComplete);
+                        console.log('result[].ActivityDate : '+result[j].ActivityDate);
+                        console.log('result[].RdvType : '+result[j].RdvType);
+                    }
+                    remoteActionProcess(result, event, dotType.METRAGEDUJOUR, dotTypeColor.METRAGEDUJOUR);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les métrages du demain et les afficher      */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteMetrageDeDemain() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getMetrageDeDemainList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.METRAGEDEDEMAIN, dotTypeColor.METRAGEDEDEMAIN);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les interventions du jour et les afficher   */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteInterventionDuJour() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getInterventionDuJourList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.INTERVENTIONDUJOUR, dotTypeColor.INTERVENTIONDUJOUR);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les interventions de demain et les afficher */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteInterventionDeDemain() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getInterventionDeDemainList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.INTERVENTIONDEDEMAIN, dotTypeColor.INTERVENTIONDEDEMAIN);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les interdits de prospection et les afficher */
+        /*-------------------------------------------------------------------------------*/
+        function getRemoteInterditDeProspection() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getInterditDeProspectionList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.INTERDITDEPROSPECTION, dotTypeColor.INTERDITDEPROSPECTION);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les vendeurs et les afficher                */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteVendeurs() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getVendeursList}', sectorCode,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.VENDEURS, dotTypeColor.VENDEURS);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les R1 du jour et les afficher              */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteR1DuJour() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getRDVDuJourList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, 'R1', userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.R1DUJOUR, dotTypeColor.R1DUJOUR);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les R2 du jour et les afficher              */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteR2DuJour() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getRDVDuJourList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, 'R2', userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.R2DUJOUR, dotTypeColor.R2DUJOUR);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les R+ du jour et les afficher              */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteRPlusDuJour() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getRDVDuJourList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, 'R+', userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.RPLUSDUJOUR, dotTypeColor.RPLUSDUJOUR);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les prochains R1 et les afficher            */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteR1Prochain() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getRDVProchainList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, 'R1', userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.R1PROCHAIN, dotTypeColor.R1PROCHAIN);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les prochains R2 et les afficher            */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteR2Prochain() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getRDVProchainList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, 'R2', userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.R2PROCHAIN, dotTypeColor.R2PROCHAIN);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les prochains R+ et les afficher            */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteRPlusProchain() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getRDVProchainList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, 'R+', userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.RPLUSPROCHAIN, dotTypeColor.RPLUSPROCHAIN);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les prospections du jour et les afficher    */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteProspectionsDuJour() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getProspectionsDuJourList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.PROSPECTIONDUJOUR, dotTypeColor.PROSPECTIONDUJOUR);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant de récupérer les prochaines prospections et les afficher */
+        /*------------------------------------------------------------------------------*/
+        function getRemoteProspectionsProchaine() {
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl002_GoogleMaps.getProspectionsProchaineList}', sectorCode, latitude_min, latitude_max, longitude_max, longitude_min, userId, userProfile,
+                function(result, event) {
+                    remoteActionProcess(result, event, dotType.PROSPECTIONPROCHAINE, dotTypeColor.PROSPECTIONPROCHAINE);
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction permettant traiter le résultat des Remote Action                    */
+        /*------------------------------------------------------------------------------*/
+        function remoteActionProcess(result, event, dotTypeName, dotTypeColorName) {
+            var coords;
+            if (event.status) {
+                // Boucle sur les différents chantiers
+                for(var i = 0; i < result.length; ++i) {
+                    var address = checkField(result[i].AddressComplete);
+                    address = $j.trim(address);
+
+                    // Récupère les coordonées
+                    coords = getPointCoords(address, result[i].Latitude, result[i].Longitude, result[i].X, result[i].Y);
+
+                    // Ajout du marker sur la carte
+                    if(coords) {
+                        addMarker(dotTypeName, dotTypeColorName, coords, result[i], address);
+                    } /*else {
+                        alert(labels.UNABLE_GET_POSITION + result[i].Name);
+                    }*/
+                }
+            } else if (event.type === 'exception') {
+                alert(event.message);
+            } else {
+                alert(event.message);
+            }
+            // Suppression de l'icone de chargement
+            var loadingbox = document.getElementById(dotTypeName + '-loader');
+            $j(loadingbox).removeClass('loader');
+        }
+
+        /* Fonction permettant de dessiner un marqueur sur la carte                     */
+        /* Présentation des points (Ne pas utiliser pour la SearchBox)                  */
+        /*------------------------------------------------------------------------------*/
+        function addMarker(dot, dotype, location, object, address) {
+            // Construction du marker
+            var marker = addMarkerLeaflet(map, dot, location, dotype, [32,37], [16,37], [0, -37]);
+
+            // Ajout du marker sur la carte et ajout de la présentation
+            L.DomEvent.on(marker, 'click', function (ev) {
+                // Vendeur
+                if(dot == dotType.VENDEURS) {
+                    createInfowindow('vendeur', object, null, null, dotype, marker);
+                // Prospection
+                } else if(dot == dotType.PROSPECTIONDUJOUR || dot == dotType.PROSPECTIONPROCHAINE) {
+                    if(object.ObjectType == 'chantier') {
+                        var chantier = new SObjectModel.Chantier();
+                        chantier.retrieve({ where: { Id: { eq: object.Id } }
+                        }, function(err, records) {
+                            if (err) alert(err);
+                            else {
+                                createInfowindow('prospection', records[0], null, object, dotype, marker);
+                            }
+                        });
+                    }
+                    if(object.ObjectType == 'account') {
+                        var account = new SObjectModel.Account();
+                        account.retrieve({ where: { Id: { eq: object.Id } }
+                        }, function(err, records) {
+                            if (err) alert(err);
+                            else {
+                                createInfowindow('prospection', records[0], null, object, dotype, marker);
+                            }
+                        });
+                    }
+                    if(object.ObjectType == 'event') {
+                        createInfowindow('prospection', object, null, object, dotype, marker);
+                    }
+                // Poses, Métrages, Interventions et SAV - Récupération des contrats
+                } else {
+                    if(dot == dotType.POSEDUJOUR || dot == dotType.POSEDEDEMAIN || dot == dotType.SAV ||
+                        dot == dotType.METRAGEDUJOUR || dot == dotType.METRAGEDEDEMAIN ||
+                        dot == dotType.INTERVENTIONDUJOUR || dot == dotType.INTERVENTIONDEDEMAIN
+                    ) {
+                        var chantier = new SObjectModel.Chantier();
+                        chantier.retrieve({ where: { Id: { eq: object.Id } }
+                        }, function(err, records) {
+                            if (err) alert(err);
+                            else {
+                                var chantierRetrieve = records[0];
+                                // Contrats
+                                var contrat = new SObjectModel.Contrat();
+                                contrat.retrieve( { where: { chantier__c: { eq: object.Id } }, orderby: [ {dateSignature__c: 'DESC'} ] }, function(err, records) {
+                                    if (err) alert(err);
+                                    else {
+                                        createInfowindow('chantier', chantierRetrieve, records[0], null, dotype, marker);
+                                    }
+                                });
+                            }
+                        });
+                    // R1, R2 et R+
+                    } else if(dot == dotType.R1DUJOUR || dot == dotType.R2DUJOUR || dot == dotType.RPLUSDUJOUR  ||
+                                dot == dotType.R1PROCHAIN || dot == dotType.R2PROCHAIN || dot == dotType.RPLUSPROCHAIN
+                    ) {
+                        var chantier = new SObjectModel.Chantier();
+                        chantier.retrieve({ where: { Id: { eq: object.Id } }
+                        }, function(err, records) {
+                            if (err) alert(err);
+                            else {
+                                createInfowindow('chantier&event', records[0], null, object, dotype, marker);
+                            }
+                        });
+                    // Chantiers
+                    } else {
+                        var chantier = new SObjectModel.Chantier();
+                        chantier.retrieve({ where: { Id: { eq: object.Id } }
+                        }, function(err, records) {
+                            if (err) alert(err);
+                            else {
+                                createInfowindow('chantier', records[0], null, null, dotype, marker);
+                            }
+                        });
+                    }
+                }
+                L.DomEvent.stopPropagation(ev);
+            });
+            return marker;
+        }
+
+        /* Contruction de l'infowindow pour les marqueurs sur la carte                  */
+        /*------------------------------------------------------------------------------*/
+        function createInfowindow(objectType, object, contrat, event, dotype, marker) {
+            // Traitement champs pour chantier
+            if(objectType == 'chantier' || objectType == 'chantier&event') {
+                var objectId = object.get("Id");
+                var objectRue = checkField(object.get("rue__c"));
+                var objectCodePostal = checkField(object.get("codePostal__c"));
+                var objectVille = checkField(object.get("ville__c"));
+                var objectName = getNameChantier(object);
+                var objectEmail = getEmailChantier(object);
+                var objetTeldom = '';
+                var objetTelpor  = '';
+                var objetTelautre  = '';
+                if(object.get("proprietaire__c") != null || object.get("autreProprietaire__c") != null) {
+                    objetTeldom = checkField(object.get("telephoneDomicileProprietaires__c"));
+                    objetTelpor = checkField(object.get("telephoneMobileProprietaires__c"));
+                    objetTelautre = checkField(object.get("autreTelephoneProprietaires__c"));
+                } else if (object.get("locataire__c") != null || object.get("autreLocataire__c") != null) {
+                    objetTeldom = checkField(object.get("telephoneDomicileLocataires__c"));
+                    objetTelpor = checkField(object.get("telephoneMobileLocataires__c"));
+                    objetTelautre = checkField(object.get("autreTelephoneLocataires__c"));
+                } else if (object.get("occupant__c") != null || object.get("autreOccupant__c") != null) {
+                    objetTeldom = checkField(object.get("telephoneDomicileOccupants__c"));
+                    objetTelpor = checkField(object.get("telephoneMobileOccupants__c"));
+                    objetTelautre = checkField(object.get("autreTelephoneOccupants__c"));
+                }
+                // Traitement contrat
+                if(contrat != null) {
+                    var contratId = contrat.get("Id");
+                    var contratName = checkField(contrat.get("numeroContrat__c"));
+                    var contratDate = checkField(moment(contrat.get("dateSignature__c")).format("DD/MM/YYYY"));
+                }
+                // Traitement R1, R2 et R+
+                if(objectType == 'chantier&event') {
+                    var eventRdvType = checkField(event.RdvType);
+                    var eventOwnerName = checkField(event.OwnerName);
+                    var eventActivityDate = checkField(event.ActivityDate);
+                    var eventProjectOrigin = checkField(event.ProjectOrigin);
+                }
+            // Traitement champs pour prospection
+            } else if(objectType == 'prospection') {
+                if(event.ObjectType == 'account') {
+                    var objectId = object.get("Id");
+                    var objectRue = checkField(object.get("rue__c"));
+                    var objectCodePostal = checkField(object.get("codePostal__c"));
+                    var objectVille = checkField(object.get("ville__c"));
+                    var objectName = checkField(object.get("Name"));
+                    var objectEmail = checkField(object.get("email__c"));
+                    var objetTeldom = checkField(object.get("telephoneDomicile__c"));
+                    var objetTelpor  = checkField(object.get("telephoneMobile__c"));
+                    var objetTelautre  = checkField(object.get("autreTelephone__c"));
+                } else if(event.ObjectType == 'chantier') {
+                    var objectId = object.get("Id");
+                    var objectRue = checkField(object.get("rue__c"));
+                    var objectCodePostal = checkField(object.get("codePostal__c"));
+                    var objectVille = checkField(object.get("ville__c"));
+                    var objectName = getNameChantier(object);
+                    var objectEmail = getEmailChantier(object);
+                    var objetTeldom = '';
+                    var objetTelpor  = '';
+                    var objetTelautre  = '';
+                    if(object.get("proprietaire__c") != null || object.get("autreProprietaire__c") != null) {
+                        objetTeldom = checkField(object.get("telephoneDomicileProprietaires__c"));
+                        objetTelpor = checkField(object.get("telephoneMobileProprietaires__c"));
+                        objetTelautre = checkField(object.get("autreTelephoneProprietaires__c"));
+                    } else if (object.get("locataire__c") != null || object.get("autreLocataire__c") != null) {
+                        objetTeldom = checkField(object.get("telephoneDomicileLocataires__c"));
+                        objetTelpor = checkField(object.get("telephoneMobileLocataires__c"));
+                        objetTelautre = checkField(object.get("autreTelephoneLocataires__c"));
+                    } else if (object.get("occupant__c") != null || object.get("autreOccupant__c") != null) {
+                        objetTeldom = checkField(object.get("telephoneDomicileOccupants__c"));
+                        objetTelpor = checkField(object.get("telephoneMobileOccupants__c"));
+                        objetTelautre = checkField(object.get("autreTelephoneOccupants__c"));
+                    }
+                } else {
+                    var objectId = object.Id;
+                    var objectRue = checkField(object.Address);
+                    var objectCodePostal = checkField(object.PostalCode);
+                    var objectVille = checkField(object.City);
+                    var objectName = checkField(object.Name);
+                }
+                var eventRdvType = checkField(event.RdvType);
+                var eventOwnerName = checkField(event.OwnerName);
+                var eventActivityDate = checkField(event.ActivityDate);
+                var eventProjectOrigin = checkField(event.ProjectOrigin);
+            // Traitement champs pour autre
+            } else {
+                var objectId = object.Id;
+                var objectRue = checkField(object.Address);
+                var objectCodePostal = checkField(object.PostalCode);
+                var objectVille = checkField(object.City);
+                var objectName = checkField(object.Name);
+            }
+
+            // Construction de la présentation du point
+            var dotPresentation = '<div id="dotPresentation" style="  min-width: 250px;" class="col-md-12">'
+                                +'<div class="col-md-2">'
+                                +'  <image src="'+ dotype +'" />'
+                                +'</div>'
+                                +'<div class="col-md-10">'
+                                +'      <div class="dotPresentatioName">'
+            if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one)) {
+                dotPresentation +='         <a href="javascript:sforce.one.navigateToSObject(\'' + objectId + '\')'+'">'+ objectName +'</a>';
+            } else {
+                dotPresentation +='         <a target="_blank" href="/'+ objectId +'">'+ objectName +'</a>';
+            }
+            dotPresentation     +='     </div>'
+                                +'      <div class="dotPresentatioAddress">'
+                                +           objectRue + '<br />'
+                                +           objectCodePostal + ' ' + objectVille
+                                +'      </div>';
+            if(objectType == 'chantier') {
+                dotPresentation +='     <div id="dotPresentatioJoign">'
+                                +'          <div class="line_info">Domicile : '+ objetTeldom +'</div>'
+                                +'          <div class="line_info">Portable : '+ objetTelpor +'</div>'
+                                +'          <div class="line_info">Autre : '+ objetTelautre +'</div>'
+                                +'          <div class="line_info">Email : ' + objectEmail + '</div>'
+                                +'      </div>';
+            }
+            if(contrat != null) {
+                dotPresentation +='     <div class="dotPresentatioAddress">'
+                if( (typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one)) {
+                    dotPresentation +='         <div class="line_info">Contrat : <a href="javascript:sforce.one.navigateToSObject(\'' + contratId + '\')'+'">'+ contratName +'</a> (' + contratDate + ')</div>'
+                } else {
+                    dotPresentation +='         <div class="line_info">Contrat : <a target="_blank" href="/'+ contratId +'">'+ contratName +'</a> (' + contratDate + ')</div>'
+                }
+                dotPresentation +='     </div>';
+            }
+            if(objectType == 'chantier&event' || objectType == 'prospection') {
+                dotPresentation +='     <div class="dotPresentatioAddress">'
+                dotPresentation +='         <div class="line_info">Type : '+ eventRdvType +'</div>'
+                dotPresentation +='         <div class="line_info">Vendeur : '+ eventOwnerName +'</div>'
+                dotPresentation +='         <div class="line_info">Date : '+ eventActivityDate +'</div>'
+                dotPresentation +='         <div class="line_info">Origine : '+ eventProjectOrigin +'</div>'
+                dotPresentation +='     </div>';
+            }
+            dotPresentation     +=' </div>'
+                                +'</div>';
+
+            var customOptions = {
+                'maxWidth': '500',
+                'className' : 'custom-popup'
+            };
+            marker.bindPopup(dotPresentation, customOptions);
+        }
+
+        /* Récupération du nom de l'interlocuteur du Chantier                           */
+        /*------------------------------------------------------------------------------*/
+        function getNameChantier(chantier) {
+            var name = '';
+            if(chantier.get("proprietaire__c") != null || chantier.get("autreProprietaire__c") != null) {
+                name = checkField(chantier.get("civiliteProprietaires__c")) + ' ';
+                name += checkField(chantier.get("prenomProprietaires__c")) + ' ' + checkField(chantier.get("nomProprietaires__c")).toUpperCase();
+            } else if (chantier.get("locataire__c") != null || chantier.get("autreLocataire__c") != null) {
+                name = checkField(chantier.get("civiliteLocataires__c")) + ' ';
+                name += checkField(chantier.get("prenomLocataires__c")) + ' ' + checkField(chantier.get("nomLocataires__c")).toUpperCase();
+            } else if (chantier.get("occupant__c") != null || chantier.get("autreOccupant__c") != null) {
+                name = checkField(chantier.get("civiliteOccupants__c")) + ' ';
+                name += checkField(chantier.get("prenomOccupants__c")) + ' ' + checkField(chantier.get("nomOccupants__c")).toUpperCase();
+            } else
+                name = '';
+            return name;
+        }
+
+        /* Récupération de l'email du Chantier                                          */
+        /*------------------------------------------------------------------------------*/
+        function getEmailChantier(chantier) {
+            var email = '';
+            if(chantier.get("proprietaire__c") != null || chantier.get("autreProprietaire__c") != null)
+                email = checkField(chantier.emailProprietaires__c);
+            else if (chantier.get("locataire__c") != null || chantier.get("autreLocataire__c") != null)
+                email = checkField(chantier.get("emailLocataires__c"));
+            else if (chantier.get("occupant__c") != null || chantier.get("autreOccupant__c") != null)
+                email = checkField(chantier.get("emailOccupants__c"));
+            else
+                email = '';
+            return email;
+        }
+
+        /* Fonction permettant de dessiner un marqueur sur la carte                     */
+        /*------------------------------------------------------------------------------*/
+        function addMarkerSearchBox(dot, place, location) {
+            // Construction de la présentation du point
+            var dotPresentation = place.value;
+            // Construction du marker
+            var marker = L.marker(location).addTo(map);
+            // Ajout du marker sur la carte et ajout de la présentation
+            marker.bindPopup(dotPresentation);
+            // Ajout du marker dans le tableau global
+            markersArray[dot].push(marker);
+            return marker;
+        }
+
+        /* Fonction permettant de changer de secteur (changement)                       */
+        /*------------------------------------------------------------------------------*/
+        function showSector (i) {
+            // Si "Aucun", on supprime le secteur affiché et les markers
+            if (0 === i) {
+                deleteAll(map);
+            } else {
+                sectorName = $j('#sectorSelector').val();
+                deleteAll(map);
+                drawSectorAndMarkers();
+            }
+        }
+
+        /* Fonction permettant de changer la visibilite des points                      */
+        /*------------------------------------------------------------------------------*/
+        function changeVisibility(elementId, show) {
+            if (!elementId) {
+                alert('Point non connu');
+                return;
+            }
+
+            show = (typeof show === 'undefined') ? true : (!!show);
+            var sectorIndex = $j('#sectorSelector')[0].selectedIndex;
+            var htmlE = document.getElementById(elementId); // Récupération du bouton
+            var loadingbox = document.getElementById(elementId + '-loader'); // Récupération pour affichage de l'image de chargement
+
+            if (sectorIndex != 0) {
+                if (show) {
+                    // Affichage de l'icone de chargement
+                    $j(loadingbox).addClass('loader');
+                    // Affichage des points service
+                    if(elementId == dotType.CHANTIERAVECCONTRATS) getRemoteChantiersAvecContrats();
+                    if(elementId == dotType.CHANTIERSANSCONTRATS) getRemoteChantiersSansContrats();
+                    if(elementId == dotType.POSEDUJOUR) getRemotePosesDuJour();
+                    if(elementId == dotType.POSEDEDEMAIN) getRemotePosesDeDemain();
+                    if(elementId == dotType.SAV) getRemoteSAV();
+                    if(elementId == dotType.METRAGEDUJOUR) getRemoteMetrageDuJour();
+                    if(elementId == dotType.METRAGEDEDEMAIN) getRemoteMetrageDeDemain();
+                    if(elementId == dotType.INTERVENTIONDUJOUR) getRemoteInterventionDuJour();
+                    if(elementId == dotType.INTERVENTIONDEDEMAIN) getRemoteInterventionDeDemain();
+                    if(elementId == dotType.INTERDITDEPROSPECTION) getRemoteInterditDeProspection();
+                    if(elementId == dotType.VENDEURS) getRemoteVendeurs();
+                    // Affichage des points commerce
+                    if(elementId == dotType.R1DUJOUR) getRemoteR1DuJour();
+                    if(elementId == dotType.R2DUJOUR) getRemoteR2DuJour();
+                    if(elementId == dotType.RPLUSDUJOUR) getRemoteRPlusDuJour();
+                    if(elementId == dotType.R1PROCHAIN) getRemoteR1Prochain();
+                    if(elementId == dotType.R2PROCHAIN) getRemoteR2Prochain();
+                    if(elementId == dotType.RPLUSPROCHAIN) getRemoteRPlusProchain();
+                    if(elementId == dotType.PROSPECTIONDUJOUR) getRemoteProspectionsDuJour();
+                    if(elementId == dotType.PROSPECTIONPROCHAINE) getRemoteProspectionsProchaine();
+
+                    // Affichage du bouton en actif
+                    $j(htmlE).addClass('legend-active-dot');
+                    poinVisibleList[elementId] = true;
+                } else {
+                    deleteMarkers(map, elementId);
+                    // Affichage du bouton en inaactif
+                    $j(htmlE).removeClass('legend-active-dot');
+                    poinVisibleList[elementId] = false;
+                }
+            }
+        }
+
+        /* Check if the browser agent is Mobile                                         */
+        /*------------------------------------------------------------------------------*/
+        function isMobile() {
+            if( L.Browser.android
+                || L.Browser.mobile
+                || ((typeof sforce != 'undefined') && (sforce != null) && (!!sforce.one))
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        /* Check if the browser agent is Lightning                                      */
+        /*------------------------------------------------------------------------------*/
+        function isLightning() {
+            if( (sforce !== undefined && sforce.one !== undefined) 
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        /* Fonction permettant de changer la visibilite du menu                         */
+        /*------------------------------------------------------------------------------*/
+        function changeMenuVisibility() {
+            var legendMenu = $j('#legend-content-id');
+            var buttonMenu = $j('#search-content-button-id');
+            if(legendMenu.hasClass('show')) {
+                // Si le menu est visible, on cache
+                legendMenu.removeClass('show').addClass('hidden');
+                buttonMenu.removeClass('active');
+            } else {
+                // Si le menu est caché, on affiche
+                legendMenu.addClass('show').removeClass('hidden');
+                buttonMenu.addClass('active');
+            }
+        }
+    </script>
+    <c:importvisualstrap theme="default" />
+    <style>
+        .ui-autocomplete {
+            text-align: left; cursor: default; border: 1px solid #ccc; border-top: 0; background: #fff; box-shadow: -1px 1px 3px rgba(0,0,0,.1);
+            position: absolute; display: none; z-index: 9999; max-height: 800px; max-width: 350px; overflow: hidden; overflow-y: auto; box-sizing: border-box;
+        }
+        .ui-autocomplete { position: relative; padding: 0 .6em; line-height: 23px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.02em; color: #333; }
+        .ui-autocomplete b { font-weight: normal; color: #1f8dd6; }
+        .ui-autocomplete.selected { background: #f0f0f0; }
+        .noSidebarCell {
+            padding: 0px;
+        }
+
+        .custom-popup .leaflet-popup-content {
+            height: 160px;
+        }
+
+        .loader {
+            width: 15px;
+            height: 15px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            border-radius: 15px;
+            border: 3px solid rgba(0, 0, 0, 0.4);
+            margin-top: 2px; }
+
+        .loader:after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            bottom: -3px;
+            right: -3px;
+            border-radius: 15px;
+            border: 3px solid transparent;
+            border-top-color: #000;
+            -webkit-animation: spin 1s linear infinite;
+            -moz-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite; }
+
+            #j_id0:account-detail{
+            height: 100%;
+            }
+
+        /* Animations */
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg); } }
+        @-moz-keyframes spin {
+            from {
+                -moz-transform: rotate(0deg); }
+
+            to {
+                -moz-transform: rotate(360deg); } }
+        @keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg); }
+
+            to {
+                -webkit-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -ms-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg); } }
+    </style>
+    <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+    <apex:outputPanel styleClass="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero" layout="block" style="height:100%">
+        <!-- Search Bar -->
+        <div id="search-content-id" class="search-content" role="search" tabindex="-1">
+            <div class="row">
+                <div class="input-group" id="id_form">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary active" onclick="changeMenuVisibility();" id="search-content-button-id">Menu</button>
+                    </span>
+                        <input id="search-content-input-id" type="text" class="form-control" placeholder="Saisissez une adresse" />
+                        <input id="search-content-input-id_zip" type="hidden" class="form-control" />
+                        <input id="search-content-input-id_city" type="hidden" class="form-control" />
+                        <input id="search-content-input-id_street" type="hidden" class="form-control" />
+                        <input id="search-content-input-id_number" type="hidden" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Legende et filtres -->
+        <div id ="legend-content-id" class="legend-content show">
+            <!-- ComboBox Secteur -->
+            <div id="legend-content-sector-id">
+                <div class="legend-content-sector">
+                    <div><select id="sectorSelector" onchange="showSector(this.selectedIndex)" class="form-control input-sm">
+                        <option>{!$Label.Aucun}</option>
+                        <apex:repeat value="{!sectorNamesList}" var="i">
+                            <apex:outputText rendered="{! i == sectorName }" escape="false"><option selected="selected">{!HtmlEncode(i)}</option></apex:outputText>
+                            <apex:outputText rendered="{! i != sectorName }" escape="false"><option>{!HtmlEncode(i)}</option></apex:outputText>
+                        </apex:repeat>
+                    </select></div>
+                </div>
+            </div>
+            <ul class="nav nav-tabs" role="tablist" id="tabElement">
+                <li class="active"><a href="#service" role="tab" data-toggle="tab">Service</a></li>
+                <li id="chantiersTab"><a href="#commercial" role="tab" data-toggle="tab">Commercial</a></li>
+            </ul>
+            <div class="tab-content" >
+                <!-- Onglet Service -->
+                <div class="tab-pane active" id="service">
+                    <div class="list-group legend-list-group">
+                        <a href="#" class="list-group-item legend-list-group-item" id="ChantierAvecContrats" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/chantier.png')}" styleClass="legend-icons"/>
+                            Chantiers avec contrats
+                            <div id="ChantierAvecContrats-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="ChantierSansContrats" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/chantier_2.png')}" styleClass="legend-icons"/>
+                            Chantiers sans contrats
+                            <div id="ChantierSansContrats-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="PoseDuJour" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/pose.png')}" styleClass="legend-icons"/>
+                            Poses du jour
+                            <div id="PoseDuJour-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="PoseDeDemain" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/pose_2.png')}" styleClass="legend-icons"/>
+                            Poses de demain
+                            <div id="PoseDeDemain-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="SAV" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/sav.png')}" styleClass="legend-icons"/>
+                            S.A.V. en cours
+                            <div id="SAV-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="MetrageDuJour" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/metrage.png')}" styleClass="legend-icons"/>
+                            Métrages du jour
+                            <div id="MetrageDuJour-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="MetrageDeDemain" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/metrage_2.png')}" styleClass="legend-icons"/>
+                            Métrages de demain
+                            <div id="MetrageDeDemain-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="Intervention_SAVDuJour" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/intervention.png')}" styleClass="legend-icons"/>
+                            Interventions SAV du jour
+                            <div id="Intervention_SAVDuJour-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="Intervention_SAVDeDemain" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/intervention_2.png')}" styleClass="legend-icons"/>
+                            Interventions SAV de demain
+                            <div id="Intervention_SAVDeDemain-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="InterditDeProspection" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/interdit.png')}" styleClass="legend-icons"/>
+                            Interdits de prospection
+                            <div id="InterditDeProspection-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="Vendeurs" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/vendeur.png')}" styleClass="legend-icons"/>
+                            Vendeurs
+                            <div id="Vendeurs-loader" class="pull-right"></div>
+                        </a>
+                    </div>
+                </div>
+                <!-- Onglet Commercial -->
+                <div class="tab-pane" id="commercial">
+                    <div class="list-group legend-list-group">
+                        <a href="#" class="list-group-item legend-list-group-item" id="ProspectionsDuJour" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/prospection.png')}" styleClass="legend-icons"/>
+                            Prospection du jour
+                            <div id="ProspectionsDuJour-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="ProspectionsProchaine" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/prospection_2.png')}" styleClass="legend-icons"/>
+                             <apex:outputText value=" Prochaines prospections (<= J+{!futurEventDays})" />
+                            <div id="ProspectionsProchaine-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="R1DuJour" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/r1.png')}" styleClass="legend-icons"/>
+                            R1 du jour
+                            <div id="R1DuJour-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="R1Prochain" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/r1_2.png')}" styleClass="legend-icons"/>
+                             <apex:outputText value=" Prochains R1 (<= J+{!futurEventDays})" />
+                            <div id="R1Prochain-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="R2DuJour" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/r2.png')}" styleClass="legend-icons"/>
+                            R2 du jour
+                            <div id="R2DuJour-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="R2Prochain" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/r2_2.png')}" styleClass="legend-icons"/>
+                             <apex:outputText value=" Prochains R2 (<= J+{!futurEventDays})" />
+                            <div id="R2Prochain-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="RPlusDuJour" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/rplus.png')}" styleClass="legend-icons"/>
+                            R+ du jour
+                            <div id="RPlusDuJour-loader" class="pull-right"></div>
+                        </a>
+                        <a href="#" class="list-group-item legend-list-group-item" id="RPlusProchain" onclick="changeVisibility($j(this).attr('id'), !$j(this).hasClass('legend-active-dot'));">
+                            <apex:image url="{!URLFOR($Resource.GoogleMaps, 'img/rplus_2.png')}" styleClass="legend-icons"/>
+                            <apex:outputText value=" Prochains R+ (<= J+{!futurEventDays})" />
+                            <div id="RPlusProchain-loader" class="pull-right"></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton afficher feuille de route -->
+        <div id="feuilleDeRoute" draggable="false" title="Imprimer la feuille de route">
+            Feuille de route
+        </div>
+
+        <div id="map"></div>
+    </apex:outputPanel>
+</apex:page>

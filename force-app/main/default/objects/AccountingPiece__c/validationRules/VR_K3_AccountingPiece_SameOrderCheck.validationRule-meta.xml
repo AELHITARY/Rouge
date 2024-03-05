@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_SameOrderCheck</fullName>
+    <active>true</active>
+    <description>Sur une pièce comptable, vérifier que la commande client de la pièce est identique à celle de :
+1 - la facture (si ce champ est renseigné)
+2 - l&apos;avoir (si ce champ est renseigné)</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+(
+    (
+        NOT(ISBLANK(invoice__r.customerOrder__c)) &amp;&amp; 
+        invoice__r.customerOrder__c != order__c
+				)
+				|| 
+				(
+								NOT(ISBLANK(creditMemo__r.customerOrder__c)) &amp;&amp;
+								creditMemo__r.customerOrder__c != order__c
+				)
+)</errorConditionFormula>
+    <errorDisplayField>order__c</errorDisplayField>
+    <errorMessage>La commande client de la pièce doit être identique à celle de la facture et/ou de l&apos;avoir (si renseignées)</errorMessage>
+</ValidationRule>

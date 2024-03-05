@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>zone__c</fullName>
+    <externalId>false</externalId>
+    <label>Zone géographique</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>H1_IDF</fullName>
+                <default>false</default>
+                <label>H1 (IDF)</label>
+            </value>
+            <value>
+                <fullName>H1</fullName>
+                <default>false</default>
+                <label>H1 (Autre)</label>
+            </value>
+            <value>
+                <fullName>H2</fullName>
+                <default>false</default>
+                <label>H2</label>
+            </value>
+            <value>
+                <fullName>H3</fullName>
+                <default>false</default>
+                <label>H3</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

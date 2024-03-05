@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chantier</fullName>
+    <fields>Name</fields>
+    <fields>numeroChantier__c</fields>
+    <fields>address__c</fields>
+    <fields>salesEntity__c</fields>
+    <fields>serviceEntity__c</fields>
+    <fields>typeHabitation__c</fields>
+    <fields>anneeConstruction__c</fields>
+    <label>Chantier</label>
+</CompactLayout>

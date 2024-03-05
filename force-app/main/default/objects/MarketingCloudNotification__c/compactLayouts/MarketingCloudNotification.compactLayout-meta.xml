@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MarketingCloudNotification</fullName>
+    <fields>Name</fields>
+    <fields>type__c</fields>
+    <fields>CreatedById</fields>
+    <label>Notification Marketing Cloud</label>
+</CompactLayout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>serviceEntity__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Entité de service (dépôt)</description>
+    <externalId>false</externalId>
+    <label>Entité de service</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Entité</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Fournitures de produit (Entité de service)</relationshipLabel>
+    <relationshipName>productProviders</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

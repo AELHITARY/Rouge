@@ -1,0 +1,178 @@
+<apex:page controller="Ctrl_RefundRequestPDF" renderAs="pdf" docType="html-5.0" showHeader="false" applyhtmltag="false" sidebar="false" standardStylesheets="false">
+    <head>
+        <style type="text/css" media="all" >
+            @page {
+                size:auto;
+                margin-left:0.25in;
+                margin-right:0.25in;
+                @bottom-right {
+                    content: "Page " counter(page);
+                    font-size:10px;
+                }
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+            body {
+                font: 8pt/1.5 Arial, 'Liberation Sans', FreeSans, sans-serif;
+            }
+            div.footer {
+                display: block;
+                padding: 5px;
+                position: running(footer);
+            }
+            .titre{
+                font-weight: lighter;
+                font-size:30px;
+                margin-bottom:20px;
+            }
+            .pb {
+                page-break-after: always;
+            }
+            table {
+                text-align:center;
+                border-spacing: 0;
+            }
+            td, th {
+                padding-right:5px;
+            }
+            tr {
+                text-align:left;
+            }
+            thead {
+                display: table-header-group;
+                background-color: #a1c8ef;
+            }
+            tfoot {
+                background-color: #f9f9f9;
+                font-weight: bold;
+            }
+            .logo{
+                display:block;
+                margin-left:auto;
+            }
+            .even{
+                background-color: white;
+            }
+            .odd{
+                background-color: #F6F6F6;
+            }
+            .even .caseEditable {
+                background-color:#F6E7CE;
+            }
+            .odd .caseEditable {
+                background-color:#E6D7BE;
+            }
+        </style>
+    </head>
+
+    <div class="header_center KparK_listeCompte" id="header_center">
+        <apex:image value="{!URLFOR($Resource.Logo_kpark)}" width="150" style="float:right;"/>
+        <div class="titre">Demande de remboursement</div>      
+    </div>
+
+    <div style="font-size:12px;">
+        <div style="margin-bottom: 15px;">
+            <table >
+                <tr>
+                    <td><strong>Commande :</strong></td>
+                    <td>{!refundPiece.order__r.OrderNumber}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                            <apex:param value="{!refundPiece.order__r.amount__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <table >
+                <tr>
+                    <td><strong>Client :</strong></td>
+                    <td>{!refundPiece.account__r.Name}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        {!adresseClient}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <table >
+                <tr>
+                    <td><strong>Chantier :</strong></td>
+                    <td>{!adresseChantier}</td>
+                </tr>
+            </table>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <table >
+                <tr>
+                    <td><strong>Avoir :</strong></td>
+                    <td>{!refundPiece.creditMemo__r.creditMemoReference__c}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <apex:outputText value="{0,date,dd/MM/yyyy}">
+                            <apex:param value="{!refundPiece.creditMemo__r.creditMemoDate__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                            <apex:param value="{!refundPiece.creditMemo__r.amount__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <table >
+                <tr>
+                    <td><strong>Remboursement :</strong></td>
+                    <td><apex:outputText value="{0, number, ###,###,##0.00 €}">
+                            <apex:param value="{!refundPiece.amount__c}" />
+                        </apex:outputText> par {!refundPiece.paymentMethod__r.Name}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        {!refundPiece.refundReason__r.Name}
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        {!refundPiece.inputEntity__r.Name}
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        par {!refundPiece.CreatedBy.Name}, le&nbsp;<apex:outputText value="{0,date,dd/MM/yyyy}">
+                                                                <apex:param value="{!refundPiece.CreatedDate}" />
+                                                            </apex:outputText>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="footer">
+          <div style="font-size:10px;">
+            <apex:outputText value="Créé par {1} {2} le {0,date,dd/MM/yyyy 'à' HH:mm:ss}">
+                <apex:param value="{!NOW()+offset}" />
+                <apex:param value="{!$User.FirstName}"/>
+                <apex:param value="{!$User.LastName}"/>
+            </apex:outputText>
+        </div>
+    </div>
+</apex:page>

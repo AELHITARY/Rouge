@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <apiVersion>49.0</apiVersion>
+    <assignments>
+        <description>Mise à jour des champs</description>
+        <name>Update_fields</name>
+        <label>Update fields</label>
+        <locationX>840</locationX>
+        <locationY>199</locationY>
+        <assignmentItems>
+            <assignToReference>Get_PC.ServiceDate</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Date_de_debut</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>Get_PC.EndDate</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Date_de_fin</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Update_PC</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Check_Order_RecordType</name>
+        <label>Check Order RecordType</label>
+        <locationX>448</locationX>
+        <locationY>203</locationY>
+        <defaultConnector>
+            <targetReference>CF_Screen_Edit</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>ProviderOrder</defaultConnectorLabel>
+        <rules>
+            <name>isCustomerOrder</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_PC.Order.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>CustomerOrder</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>CC_Screen_ReadOnly</targetReference>
+            </connector>
+            <label>CustomerOrder</label>
+        </rules>
+    </decisions>
+    <description>Ligne commande - Flux d&apos;écran pour les LC de type service</description>
+    <dynamicChoiceSets>
+        <name>ListeEmplacement</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>location__c</picklistField>
+        <picklistObject>OrderItem</picklistObject>
+    </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>ListeNombreVantaux</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>leaf__c</picklistField>
+        <picklistObject>OrderItem</picklistObject>
+    </dynamicChoiceSets>
+    <interviewLabel>Ligne de commande - Type service {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Ligne de commande - Type service</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordLookups>
+        <name>Get_PC</name>
+        <label>Get PC</label>
+        <locationX>213</locationX>
+        <locationY>289</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_Order_RecordType</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Error</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>OrderItem</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Update_PC</name>
+        <label>Update PC</label>
+        <locationX>837</locationX>
+        <locationY>348</locationY>
+        <connector>
+            <targetReference>Get_PC</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Error</targetReference>
+        </faultConnector>
+        <inputReference>Get_PC</inputReference>
+    </recordUpdates>
+    <screens>
+        <name>CC_Screen_ReadOnly</name>
+        <label>CC - Screen ReadOnly</label>
+        <locationX>563</locationX>
+        <locationY>50</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>false</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>ServiceDate_RO</name>
+            <fieldText>&lt;p&gt;Date de début&lt;/p&gt;&lt;p&gt;{!Get_PC.ServiceDate}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>EndDate_RO</name>
+            <fieldText>&lt;p&gt;Date de fin&lt;/p&gt;&lt;p&gt;{!Get_PC.EndDate}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>CF_Screen_Edit</name>
+        <label>CF - Screen Edit</label>
+        <locationX>666</locationX>
+        <locationY>239</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Update_fields</targetReference>
+        </connector>
+        <fields>
+            <name>Date_de_debut</name>
+            <dataType>Date</dataType>
+            <defaultValue>
+                <elementReference>Get_PC.ServiceDate</elementReference>
+            </defaultValue>
+            <fieldText>Date de début</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>Date_de_fin</name>
+            <dataType>Date</dataType>
+            <defaultValue>
+                <elementReference>Get_PC.EndDate</elementReference>
+            </defaultValue>
+            <fieldText>Date de fin</fieldText>
+            <fieldType>InputField</fieldType>
+            <isRequired>false</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Error</name>
+        <label>Error</label>
+        <locationX>483</locationX>
+        <locationY>616</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>false</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>ErrorMessage</name>
+            <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 12px; font-family: sans-serif; color: rgb(255, 0, 0); background-color: rgb(255, 255, 255);&quot;&gt;{!$Flow.FaultMessage}&lt;/b&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <start>
+        <locationX>50</locationX>
+        <locationY>289</locationY>
+        <connector>
+            <targetReference>Get_PC</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>recordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

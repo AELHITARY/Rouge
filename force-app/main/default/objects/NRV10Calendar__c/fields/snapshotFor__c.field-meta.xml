@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>snapshotFor__c</fullName>
+    <description>Fournit une représentation AAAA/MM de la période de couverture du cliché. Est également utilisé lors du cliché pour la sortie dans les fichiers nibelis et autres.</description>
+    <externalId>false</externalId>
+    <formula>TEXT(YEAR(ADDMONTHS(commDate__c,-1))) + &apos;/&apos; + TEXT(MONTH(ADDMONTHS(commDate__c,-1)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Période de cliché</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

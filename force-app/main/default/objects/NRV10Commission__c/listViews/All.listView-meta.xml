@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>calculationDate__c</columns>
+    <columns>quoteCPQ__c</columns>
+    <columns>quote__c</columns>
+    <columns>remuneration__c</columns>
+    <columns>status__c</columns>
+    <columns>comType__c</columns>
+    <columns>user__c</columns>
+    <columns>customerOrder__c</columns>
+    <columns>salesRem__c</columns>
+    <columns>ecPercentFormula__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>user__c</field>
+        <operation>contains</operation>
+        <value>Namur</value>
+    </filters>
+    <label>Tout</label>
+</ListView>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tout</fullName>
+    <columns>SETUP_OWNER_NAME</columns>
+    <columns>SETUP_TYPE</columns>
+    <columns>affectationProximite__c</columns>
+    <columns>calendrier_draganddrop__c</columns>
+    <columns>signea_circuit_acces__c</columns>
+    <columns>signea_circuit_details_acces__c</columns>
+    <columns>reinitialiserMotDePasseClient__c</columns>
+    <columns>deduplicationDesChantiers__c</columns>
+    <columns>deduplicationDesComptes__c</columns>
+    <columns>fonctionnaliteDeFusionAutomatique__c</columns>
+    <columns>fonctionnaliteDeFusionManuelle__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Tout</label>
+    <language>fr</language>
+</ListView>

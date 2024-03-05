@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SFDCLevel__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>Type et niveau d&apos;utilisation de Salesforce (vide si pas utilisateur de cette solution)</inlineHelpText>
+    <label>Niveau Salesforce</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Administration - Fonctionnel</fullName>
+                <default>false</default>
+                <label>Administration - Fonctionnel</label>
+            </value>
+            <value>
+                <fullName>Administration - Système</fullName>
+                <default>false</default>
+                <label>Administration - Système</label>
+            </value>
+            <value>
+                <fullName>Données - Consultation</fullName>
+                <default>false</default>
+                <label>Données - Consultation</label>
+            </value>
+            <value>
+                <fullName>Données - Gestion</fullName>
+                <default>false</default>
+                <label>Données - Gestion</label>
+            </value>
+            <value>
+                <fullName>Référentiels</fullName>
+                <default>false</default>
+                <label>Référentiels</label>
+            </value>
+            <value>
+                <fullName>Référentiels + Données</fullName>
+                <default>false</default>
+                <label>Référentiels + Données</label>
+            </value>
+            <value>
+                <fullName>RH</fullName>
+                <default>false</default>
+                <label>RH</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,138 @@
+<apex:page standardController="Quote" extensions="Ctrl012_ClonerDevis" action="{!init}" sidebar="false" showHeader="false">
+	<apex:stylesheet value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/css/custom-theme/jquery-ui-1.12.1.min.css')}" />
+	<apex:includeScript value="/support/console/49.0/integration.js" />
+	<apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+	<apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery_UI/js/jquery-ui.1.12.1.min.js')}" />
+	<script type="text/javascript">
+		var isLightningEx = ("{!$User.UIThemeDisplayed}" == "Theme3") ? false : true; // Detect if Classic or LEX
+		var tabId;
+		// Fonction pour cloturer l'onglet dans Lightning
+		function getTabId(result) {
+			tabId = result.id;
+			console.log("tabId " + tabId);
+		}
+		// Fonction pour cloturer l'onglet dans Lightning
+		function callCloseTab() {
+			sforce.console.closeTab(tabId);
+		}
+
+		function confirmErroner() {
+			//$( "#dialog:ui-dialog" ).dialog( "destroy" );
+
+			$("#dialog-confirm").dialog({
+				resizable: false,
+				height: 200,
+				width: 450,
+				modal: false,
+				buttons: {
+					"Clonage": function () {
+						disableButtons();
+						clonage();
+					},
+					"Devis erroné": function () {
+						$('.confirmation')[0].checked = true;
+						disableButtons();
+						updateStatutErrone();
+					},
+					"Devis TMC": function () {
+						$('.devisTMC')[0].checked = true;
+						disableButtons();
+						clonage();
+					}
+				},
+				close: function (event, ui) {
+					// Ferme la page sans rien faire
+					if (isLightningEx) {
+						callCloseTab();
+					} else {
+						redirectURL();
+					}
+				}
+			});
+		}
+
+		function clonerFunc() {
+			disableButtons();
+			if ($('.confirmation')[0].checked) {
+				updateStatutErrone();
+			} else {
+				clonage();
+			}
+		}
+
+		function disableButtons() {
+			var btn = $(".ui-button").val("Veuillez patientier...");
+			btn.prop("disabled", true);
+		}
+
+		function enableButtons() {
+			var btn = $(".ui-button").prop("disabled", false);
+		}
+
+		function redirectURL() {
+			if (isLightningEx && sforce.one) {
+				callCloseTab();
+				sforce.one.navigateToSObject("{!BackUrl}");
+			} else {
+				var uRL = '/{!BackUrl}';
+				window.location.href = uRL;
+			}
+		}
+
+		$(document).ready(function () {
+			enableButtons();
+			// Si LEX, on récupère l'ID de l'onglet 
+			if (isLightningEx && sforce.console) {
+				sforce.console.getEnclosingTabId(getTabId);
+			}
+			if ({!mustConfirm }){
+				confirmErroner();
+			}
+            else if ({!mustPrevent}) {
+				var isOk = confirm("{!msgWarningDevisErrone}");
+				if (isOk == false) {
+					redirectURL();
+				}
+				else {
+					$('.confirmation')[0].checked = true;
+					clonerFunc();
+				}
+			}
+            else if ({!mustClone}) {
+				disableButtons();
+				clonage();
+			}
+            else {
+				if ('{!msgError}' != "") {
+					alert("{!msgError}");
+				}
+				redirectURL();
+			}
+        });
+	</script>
+	<style>
+		.datePicker {
+			display: none
+		}
+	</style>
+	<div>
+		<div id="dialog-confirm" title="Clonage du devis" style="display: none">
+			<p>Quelle action souhaitez faire ?
+				<ul>
+					<li>Cloner le devis sans modifier le devis initial</li>
+					<li>Cloner le devis et modifier le devis initial au statut erroné</li>
+					<li>Cloner le devis en devis TMC (Toute Modification Comprise)</li>
+				</ul>
+			</p>
+		</div>
+	</div>
+	<apex:pageMessages />
+	<apex:form >
+		<apex:actionstatus id="updateStatutErrone" onstop="clonage(); enableButtons();" onstart="disableButtons()" />
+		<apex:actionfunction name="clonage" action="{!cloner}" />
+		<apex:actionfunction name="updateStatutErrone" action="{!updateStatutErrone}" />
+
+		<apex:inputCheckbox id="btn-confirmation" value="{!isConfirm}" style="display:none" styleClass="confirmation" />
+		<apex:inputCheckbox id="btn-devisTMC" value="{!isDevisTMC}" style="display:none" styleClass="devisTMC" />
+	</apex:form>
+</apex:page>

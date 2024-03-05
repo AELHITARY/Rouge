@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_ProductAccCoef_RW</fullName>
+    <active>true</active>
+    <description>Rw obligatoire</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;ProductAcousticCoefficient&apos; &amp;&amp;
+ISBLANK(valueRW__c)</errorConditionFormula>
+    <errorDisplayField>valueRW__c</errorDisplayField>
+    <errorMessage>Rw obligatoire</errorMessage>
+</ValidationRule>

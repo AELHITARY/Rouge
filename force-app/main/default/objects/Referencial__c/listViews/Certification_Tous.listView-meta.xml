@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Certification_Tous</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.Certification</value>
+    </filters>
+    <label>Certification (Tous)</label>
+    <language>fr</language>
+</ListView>

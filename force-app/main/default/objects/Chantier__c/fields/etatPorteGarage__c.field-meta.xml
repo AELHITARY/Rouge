@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>etatPorteGarage__c</fullName>
+    <externalId>false</externalId>
+    <label>Etat de la porte de garage</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>presenceGarage__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Neuf</fullName>
+                <default>false</default>
+                <label>Neuf</label>
+            </value>
+            <value>
+                <fullName>A rénover</fullName>
+                <default>false</default>
+                <label>A rénover</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>checked</controllingFieldValue>
+            <valueName>Neuf</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>checked</controllingFieldValue>
+            <valueName>A rénover</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GDPR_dateExpiration__c</fullName>
+    <description>Date (excluse) à partir de laquelle l’enregistrement doit être supprimé</description>
+    <externalId>false</externalId>
+    <formula>IF(user__r.IsActive, ADDMONTHS(CreatedDate, 3), NOW()-1)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Date expiration (GDPR)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

@@ -1,0 +1,315 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" controller="MaFeuilleRoute" cache="false"  docType="html-5.0">
+    <html>
+        <head>
+            <title>Feuille de route</title>
+            
+            <script type = "text/javascript">
+            /*Vérification des RDV à l'ouverture de la page*/
+            function checkSA()
+            {
+                var l = document.getElementById("longueur");
+                var lrdv = document.getElementById("lrdv");
+                var noSA = document.getElementById("noSA");
+                
+                var debut = document.getElementById("debut");
+                var fin = document.getElementById("fin");
+                var doubleDate = document.getElementById("doubleDate");
+                
+                /*Mise en page de la feuille de route*/
+                if(debut.innerText === fin.innerText) {
+                    doubleDate.style.display="none";
+                }
+                
+                /*if(l.innerText == "0 rendez-vous.")
+                {
+                    lrdv.style.display="none";
+                    noSA.style.display="block";
+                }*/
+                
+            }
+            
+            /*Impression - Sauvegarde*/
+            function savePage()
+            {   
+                var s = document.getElementById("bSave");
+                s.style.display="none";
+                window.print();
+            }
+            
+            </script>
+        
+            <style type="text/css" media="all">
+                @page 
+                {
+                    size:portrait;
+                    font-family: 'Segoe UI', 'Verdana', sans-serif;
+                    margin-left: 3%;
+                    margin-top: 5%;
+                    margin-right: 3%;
+                    margin-bottom: 5%;
+                    @bottom-right 
+                    {
+                        content: "Page " counter(page) " / " counter(pages);
+                    }
+                    @top-right 
+                    {
+                        content: element(header_right);
+                    }
+                    @top-center 
+                    {
+                        content: element(header_center);
+                    }
+                    @top-left 
+                    {
+                        content: element(header_left);
+                    }
+                }
+                
+                html
+                {
+                    font-family: 'Segoe UI';            
+                }
+                
+                .logo 
+                {
+                    display:block;
+                    margin-left:auto;
+                }
+                
+                img 
+                {
+                    float: right;
+                }
+                
+                .title1
+                {
+                    font-size : 25px;
+                    font-weight: bold;
+                }
+                
+                p
+                {
+                    font-size : 20px;
+                }
+                
+                table
+                {
+                    border: 1px solid black;
+                    border-collapse: collapse;
+                    table-layout: fixed;
+                    width: 100%;  
+                    margin-bottom : 10px;
+                }
+                
+                thead 
+                {
+                    background-color: #C5003D;
+                    font-weight: bold;
+                    color: #FFFFFF;
+                    margin-bottom: 3px;
+                }
+                
+                td
+                {
+                    vertical-align: top;
+                }
+                
+                .td1
+                {
+                    width:18%;
+                    padding-left: 5px;
+                }
+                .td2
+                {
+                    width:32%;
+                }
+                
+                .info
+                {
+                    font-weight : bold;
+                }
+                .ficheRes 
+                {
+                    page-break-before: always;
+                }
+                
+                .button{
+                    display: inline-block;
+                    font-size: 20px;
+                    tex-align:center;
+                    color:#FFFFFF;
+                    background-color:#0070D2;
+                    border-radius: 13px;
+                    text-decoration : none; 
+                    font-family: 'Segoe UI', 'Verdana', sans-serif;
+                    outline: none;
+                    padding: 10px 20px;
+                }
+                .button:hover
+                {
+                    background-color:#005FB2;
+                }
+        </style>
+        
+        </head>
+        
+        <div id="bSave" style="display: block; text-align:center;">
+            <apex:form >
+                <apex:commandLink id="save"  value="Enregistrer / Imprimer" onclick="savePage();" styleClass="button" />
+            </apex:form>
+        </div>
+        
+        <apex:pageBlock id="block">
+        <body onload="checkSA()">
+            <apex:repeat value="{!ListServiceResource}" var="key" id="repeat1">
+                <apex:repeat value="{!mapSrNbSA[key]}" var="nb" id="repeat2">
+                    <div class="ficheRes">
+                        <h1 class="title1">
+                            <img class="logo" src="/servlet/servlet.FileDownload?file={!LogoKparKId}" width="200" height="80" align="middle"/>
+                            Feuille de route de {!key.Name} <br/>
+                            Du <apex:outputText value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!debutPlanning}" /></apex:outputText> 
+                            <span id="doubleDate" style="display: inline-block;">au <apex:outputText value="{0, date, dd'/'MM'/'yyyy}"><apex:param value="{!finPlanning}" /></apex:outputText></span>
+                            <span id="debut" style="display:none;" >{!debutPlanning}</span>
+                            <span id="fin" style="display:none;" >{!finPlanning}</span>
+                        </h1>
+                        
+                        <p id="longueur">
+                            {!nb} rendez-vous. 
+                        </p>
+                        
+                        <div id="lrdv" style="display: block;">
+                            <h2 class="title2">
+                                Détails des rendez-vous
+                            </h2>
+                            
+                            <apex:repeat value="{!mapSrSA[key]}" var="map">
+                                <apex:pageBlock id="pbRDV" >
+                                    <!-- LISTE DES RDV -->
+                                    <table>
+                                        <thead>
+                                            <td class="td1">Rendez-vous : </td>
+                                            <td class="td2">{!map.AppointmentNumber} </td>
+                                            <td class="td1">Code GC :</td>
+                                            <td class="td2">{!map.fsl_externalId__c}</td>
+                                        </thead>
+                                        
+                                        <tr>
+                                            <td rowspan="2" class="td1">Client : </td>
+                                            <td rowspan="2" class="td2 info">{!map.Subject}</td>
+                                            <td class="td1"></td>
+                                            <td class="td2"></td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Type : </td>
+                                            <td class="td2">{!map.WorkType.Name}</td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Adresse :</td>
+                                            <td class="td2 info">{!map.Street}</td>
+                                            <td class="td1">Durée : </td>
+                                            <td class="td2">{!map.fsl_libelleDuree__c}</td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Code postal : </td>
+                                            <td colspan="3" class="td2 info">{!map.PostalCode}</td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Ville : </td>
+                                            <td class="td2 info">{!map.City}</td>
+                                            <td class="td1">Début d'arrivée : </td>
+                                            <td class="td2">
+                                                <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                    <apex:param value="{!map.fsl_techDebutFenetre__c+(2/24)}" /> 
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Contact : </td>
+                                            <td class="td2">{!map.Contact.HomePhone} / {!map.Contact.MobilePhone}</td>
+                                            <td class="td1">Début du rendez-vous :</td>                       
+                                            <td class="td2">
+                                                <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                    <apex:param value="{!map.SchedStartTime+(2/24)}" /> 
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Statut : </td>
+                                            <td colspan="3" class="td2">{!map.Status}</td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1"></td>
+                                            <td class="td2"></td>
+                                            <td class="td1">Fin d'arrivée :</td>                          
+                                            <td class="td2">
+                                                <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                    <apex:param value="{!map.fsl_techFinFenetre__c+(2/24)}" /> 
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Chiffre d'affaire : </td>
+                                            <td class="td2">{!map.fsl_chiffreAffaire__c} €</td>
+                                            <td class="td1">Fin du rendez-vous : </td>                           
+                                            <td class="td2">
+                                                <apex:outputText value="{0, date, dd'/'MM'/'yyyy HH'h'mm}">
+                                                    <apex:param value="{!map.SchedEndTime+(2/24)}" /> 
+                                                </apex:outputText>
+                                            </td>
+                                        </tr> 
+                                        
+                                        <tr>
+                                            <td class="td1">Solde client : </td>
+                                            <td colspan="3" class="td2">{!map.fsl_SoldeClient__c} €</td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td colspan="4" style="background-color: #ffffff; opacity: 0;" class="dateJour" >
+                                                <apex:outputText value="{0, date, dd'/'MM'/'yyyy}" >
+                                                    <apex:param value="{!map.SchedStartTime+(2/24)}" /> 
+                                                </apex:outputText>
+                                            </td>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td class="td1">Description : </td>
+                                            <td colspan="3" class="td2">{!map.Description}</td>
+                                        </tr> 
+                                        
+                                        <tr>
+                                            <td class="td1">Note de service : </td>
+                                            <td colspan="3" class="td2">{!map.ServiceNote}</td>
+                                        </tr> 
+                                        
+                                    </table>
+                                </apex:pageBlock>
+                            </apex:repeat>
+                        </div>
+                        
+                        <!--<p id="noSA" style="display: none;">
+                            Il n'y a aucun rendez-vous à afficher.
+                        </p>-->
+                        
+                        <div style="font-size:16px;">
+                            <apex:outputText value="Créée par {1} {2} le {0, date, dd/MM/yyyy 'à' HH:mm:ss}">
+                                <apex:param value="{!NOW()+(2/24)}" />
+                                <apex:param value="{!$User.FirstName}"/>
+                                <apex:param value="{!$User.LastName}"/>
+                            </apex:outputText>
+                        </div>
+                        
+                    </div>
+                </apex:repeat>
+            </apex:repeat>
+        </body>
+            </apex:pageBlock>
+    </html>
+</apex:page>

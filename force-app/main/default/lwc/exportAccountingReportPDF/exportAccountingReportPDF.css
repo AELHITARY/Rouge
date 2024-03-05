@@ -1,0 +1,16 @@
+.spins::after{
+    position: absolute;
+    content: 'Génération des données (1/2)';
+    width: 100%;
+    text-align: center;
+    top: calc(50% + 3em);
+    font-weight: bold;
+}
+.spinsStep2::after{
+    position: absolute;
+    content: 'Création du document PDF (2/2)';
+    width: 100%;
+    text-align: center;
+    top: calc(50% + 3em);
+    font-weight: bold;
+}

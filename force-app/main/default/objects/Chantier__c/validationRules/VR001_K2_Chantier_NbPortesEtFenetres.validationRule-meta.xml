@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_NbPortesEtFenetres</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c == FALSE &amp;&amp; !ISNULL( nbPortesEtFenetres__c ) &amp;&amp; nbPortesEtFenetres__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>nbPortesEtFenetres__c</errorDisplayField>
+    <errorMessage>Nombre de portes et fenêtres présentes sur le chantier invalide! (La quantité doit être supérieure ou égale à 0)</errorMessage>
+</ValidationRule>

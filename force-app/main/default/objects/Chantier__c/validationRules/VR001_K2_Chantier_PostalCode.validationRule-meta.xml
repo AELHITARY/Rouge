@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_PostalCode</fullName>
+    <active>false</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c == FALSE &amp;&amp;
+ISBLANK(codePostal__c)</errorConditionFormula>
+    <errorDisplayField>codePostal__c</errorDisplayField>
+    <errorMessage>Code postal du chantier obligatoire !</errorMessage>
+</ValidationRule>

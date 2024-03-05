@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>telephoneSATCLI__c</fullName>
+    <externalId>false</externalId>
+    <formula>if (isBlank(compte__r.telephoneMobile__c), compte__r.telephoneDomicile__c, compte__r.telephoneMobile__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Téléphone SATCLI</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

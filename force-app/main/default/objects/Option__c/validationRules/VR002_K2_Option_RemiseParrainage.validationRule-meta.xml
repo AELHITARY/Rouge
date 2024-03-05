@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR002_K2_Option_RemiseParrainage</fullName>
+    <active>true</active>
+    <description>CRM-473 : Le total de la remise parrainage ne peut pas dépasser 150 euros</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = False &amp;&amp; 
+Codeoption__c == &apos;PARRAINAGE&apos; &amp;&amp; 
+ABS(PrixHT__c) &gt; 150</errorConditionFormula>
+    <errorMessage>Le total de la remise parrainage ne peut pas dépasser 150 euros</errorMessage>
+</ValidationRule>

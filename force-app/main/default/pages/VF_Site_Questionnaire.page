@@ -1,0 +1,581 @@
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="Ctrl_Site_Questionnaire" applyHtmlTag="false" standardStylesheets="false" cache="false">
+    <html>
+        <head>
+            <title>Questionnaire de satisfaction</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="robots" content="noindex, follow" />
+            <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+            <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+            <apex:includescript value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/js/bootstrap.min.js')}" />
+            <script type='text/javascript' src='https://widgets.custplace.com/reviewbox/v1/static/js/bundle.js'></script>
+            <script type="text/javascript">
+                j$ = jQuery.noConflict();
+                var questionnaireId = "{!questionnaireId}";
+                var objectId = "{!objectId}";
+                var newQues = "{!newQues}";
+                var questionnaireExistant = "{!questionnaireExistant}";
+                var template = "{!template}";
+                var questions = JSON.parse('{!questionsJSONMap}');
+                var options = JSON.parse('{!JSENCODE(optionsJSONMap)}');
+                var reponses = JSON.parse('{!JSENCODE(reponsesJSONMap)}');
+                var questionSatisfactionId = "{!questionSatisfactionId}";
+                var actualPage = 1;
+                var maxPage = 1;
+                var maxOrdreQuestions = 1;
+                var maxOrdreOptions = 1;
+                var errorDetected = false;
+
+                // Initialisation des codes couleur de circuit
+                var TYPE_QUESTIONS = {TITRE: 'Titre', ETIQUETTE: 'Etiquette', TEXTE: 'Texte', NUMERO: 'Numéro', RADIO: 'Radio', 
+                                        CASEACOCHER: 'Case à cocher', MATRICE: 'Matrice'};
+
+                j$(document).ready(function(){
+                    if(questionnaireExistant == 'true'){
+                        // Affiche message remerciement
+                        j$('#content-end').removeClass("hidden").addClass("show");
+                        // Désactive bouton save
+                        j$("#saveButton").attr ('disabled', true);
+                        // Affiche contenu
+                        initNbPages(questions, options);
+                        initQuestions();
+                        selectPage(actualPage);
+                    } else if(!template){
+                        //console.log('problème avec le template : '+template);
+                    } else {
+                        // Désactive bouton save
+                        j$("#saveButton").attr ('disabled', true);
+                        // Affiche contenu
+                        initNbPages(questions, options);
+                        initQuestions();
+                        selectPage(actualPage);
+                    }
+                });
+
+                // Détermine le nombre de page et la valeur maximal que l'ordre peut atteindre sur une page
+                function initNbPages(qList, opList){
+                    for(var q=0;q<qList.length;q++){
+                        if(qList[q].page__c > maxPage)
+                            maxPage = qList[q].page__c;
+                        if(qList[q].ordre__c > maxOrdreQuestions)
+                            maxOrdreQuestions = qList[q].ordre__c;
+                    }
+                    if(questionnaireExistant != 'true'){
+                        for(var op=0;op<opList.length;op++){
+                            if(opList[op].position__c > maxOrdreOptions)
+                                maxOrdreOptions = opList[op].position__c;
+                        }
+                    }
+                }
+
+                // Récupération des questions du formulaire (en base)
+                function initQuestions(){
+                    var textToAppend = '';
+                    for(var page=1;page<=maxPage;page++){
+                        textToAppend += '<div id="page'+page+'">';
+
+                        for(var ordre=1;ordre<=maxOrdreQuestions;ordre++){
+                            for(var q=0;q<questions.length;q++){
+                                if(questions[q].page__c == page && questions[q].ordre__c == ordre){
+                                    if(questions[q].typeReponse__c == TYPE_QUESTIONS.TITRE){
+                                        textToAppend += generateTitre(questions[q]);
+                                    } else if(questions[q].typeReponse__c == TYPE_QUESTIONS.ETIQUETTE){
+                                        textToAppend += generateLabel(questions[q]);
+                                    } else {
+                                        textToAppend += generateQuestions(questions[q]);
+                                    }
+                                }
+                            }
+                        }
+                        textToAppend += '</div>';
+                    }
+                    j$('#content-questionnaire').append(textToAppend);
+                }
+
+                // Gestion des pages avec affichage des questions et des boutons de manière dynamique
+                function selectPage(pageNb){
+                    actualPage = pageNb;
+                    j$('button').blur();
+
+                    // Cacher toutes les pages sauf celle sélectionnée
+                    for(var i=1;i<=maxPage;i++){
+                        j$("#page"+i).css("display", "none");
+                    }
+                    j$("#page"+pageNb).css("display", "block");
+
+                    if(questionnaireExistant == 'true')
+                       j$("#saveButton").css("display", "none"); 
+
+                    // Adaptation des boutons de changement de page selon la page actuelle
+                    if(actualPage == 1){
+                        j$("#prevPage").css("display", "none");
+                        if(maxPage != 1) 
+                            j$("#nextPage").css("display", "inline-block");
+                        else
+                            j$("#saveButton").attr ('disabled', false);
+                    } else if(actualPage == maxPage){
+                        j$("#prevPage").css("display", "inline-block");
+                        j$("#nextPage").css("display", "none");
+                        j$("#saveButton").attr ('disabled', false);
+                    } else {
+                        j$("#prevPage").css("display", "inline-block");
+                        j$("#nextPage").css("display", "inline-block");
+                    }
+
+                    j$("#enregistrer").css("display", "inline-block");
+                }
+
+                // Génération d'un titre sur le formulaire
+                function generateTitre(questionInfos){
+                    var textToAppend = '';
+                    textToAppend += '<div class="form-group">';
+                    textToAppend +=     '<div class="col-md-12 text-center">';
+                    textToAppend +=         '<label class=""><h3>'+questionInfos.question__c+'</h3></label>';
+                    textToAppend +=     '</div>';
+                    textToAppend += '</div>';
+                    return textToAppend;
+                }
+
+                // Génération d'une étiquette sur le formulaire
+                function generateLabel(questionInfos){
+                    var textToAppend = '';
+                    textToAppend += '<div class="form-group" id="'+questionInfos.Id+'"';
+                    if(questionInfos.familleChampEnfant__c != null) textToAppend += 'style="display:none;"';
+                    textToAppend += '>';
+                    textToAppend +=     '<div class="col-md-12">';
+                    textToAppend +=         '<label class="">';
+                    textToAppend +=             questionInfos.question__c; // Ajoute le texte de question
+                    textToAppend +=         '</label>';
+                    if(questionInfos.commentaire__c != null) textToAppend += '<div class="col-md-12"><i>'+questionInfos.commentaire__c+'</i></div>';
+                    textToAppend +=     '</div>';
+                    textToAppend += '</div>';
+                    return textToAppend;
+                }
+
+                // Génération d'une question (avec ces réponses possibles) sur le formulaire
+                function generateQuestions(questionInfos){
+                    var textToAppend = '';
+                    textToAppend += '<div class="form-group" id="'+questionInfos.Id+'"';
+                    if(questionInfos.familleChampEnfant__c != null) textToAppend += 'style="display:none;"';
+                    textToAppend += '>';
+                    textToAppend +=     '<div class="col-md-12" id="erreur_'+questionInfos.Id+'"></div>';
+                    textToAppend +=     '<div class="col-md-12">';
+                    textToAppend +=         '<label class="">';
+                    textToAppend +=             questionInfos.question__c; // Ajoute le texte de question
+                    textToAppend +=             generateMandatoryField(questionInfos); // Ajoute l'étoile rouge pour les champs obligatoire
+                    textToAppend +=         '</label>';
+                    if(questionInfos.commentaire__c != null) textToAppend += '<div class="col-md-12"><i>'+questionInfos.commentaire__c+'</i></div>';
+                    textToAppend +=     '</div>';
+                    textToAppend +=     '<div class="col-md-12">';
+                    if(questionnaireExistant == 'true')      textToAppend += generateReponses(questionInfos); // Ajoute les réponses en mode lecture 
+                    else                                     textToAppend += generateOptions(questionInfos); // Ajoute les options associées à la question
+                    textToAppend +=     '</div>';
+                    textToAppend += '</div>';
+                    return textToAppend;
+                }
+
+                // Génération des options d'une question
+                function generateOptions(questionInfos){
+                    var textToAppend = '';
+                    var optionsParQuestion = [];
+
+                    // Cas d'un input text ou d'un input number
+                    if(questionInfos.typeReponse__c == TYPE_QUESTIONS.TEXTE){ 
+                        textToAppend += generateOptionsText(questionInfos);
+                    } else if(questionInfos.typeReponse__c == TYPE_QUESTIONS.NUMERO){ 
+                        textToAppend += generateOptionsNumber(questionInfos);
+                    } else if(questionInfos.typeReponse__c == TYPE_QUESTIONS.MATRICE){ 
+                        textToAppend += generateQuestionsMatrice(questionInfos);
+                    } 
+                    // Cas de multiples réponses (radio ou checkbox)
+                    else {
+                        for(var op=0;op<options.length;op++){
+                            if(options[op].questionQuestionnaire__c == questionInfos.Id){
+                                optionsParQuestion.push(options[op]);
+                            }
+                        }
+                        if(questionInfos.typeReponse__c == TYPE_QUESTIONS.CASEACOCHER){
+                            textToAppend += generateOptionsCheckbox(questionInfos, optionsParQuestion);
+                        } else if(questionInfos.typeReponse__c == TYPE_QUESTIONS.RADIO){
+                            textToAppend += generateOptionsRadio(questionInfos, optionsParQuestion);
+                        }
+                    }
+                    return textToAppend;
+                }
+
+                // Affichage d'un textearea
+                function generateOptionsText(questionInfos){
+                    var textToAppend = '';
+                    textToAppend += '<div class="col-md-12">';
+                    textToAppend +=     '<textarea class="form-control" name="'+questionInfos.Id+'" id="'+questionInfos.Id+'" rows="3" />';
+                    textToAppend += '</div>';
+                    return textToAppend;
+                }
+
+                // Affichage d'un input number
+                function generateOptionsNumber(questionInfos){
+                    var textToAppend = '';
+                    textToAppend += '<div class="col-md-12">';
+                    textToAppend +=     '<input type="number" step="1" min="0" max="10" class="form-control" name="'+questionInfos.Id+'" id="'+questionInfos.Id+'" style="width:5%;"';
+                    if(questionInfos.familleChampParent__c != null)
+                        textToAppend += 'onchange="displayChildQuestionFromNumber(\''+questionInfos.familleChampParent__c+'\',\''+questionInfos.Id+'\')" ';
+                    textToAppend += '/>';
+                    textToAppend += '</div>';
+                    return textToAppend;
+                }
+
+                // Affichage d'une matrice de questions (avec options)
+                function generateQuestionsMatrice(questionInfos){
+                    sousQuestionsList = [];
+                    optionsParQuestion = [];
+
+                    for(var q=0;q<questions.length;q++){
+                        if(questions[q].questionParent__c != null && questions[q].questionParent__c == questionInfos.Id){
+                            sousQuestionsList.push(questions[q]);
+                        }
+                    }
+                    if(questionnaireExistant != 'true'){
+                        for(var op=0;op<options.length;op++){
+                            if(options[op].questionQuestionnaire__c == questionInfos.Id){
+                                optionsParQuestion.push(options[op]);
+                            }
+                        }   
+                    }
+
+                    var textToAppend = '';
+                    textToAppend += '<div class="col-md-12">';
+                    textToAppend +=     '<table class="table table-striped table-condensed">';
+                    for(var ordre=1;ordre<=maxOrdreQuestions;ordre++){
+                        for(var q=0;q<sousQuestionsList.length;q++){
+                            if(sousQuestionsList[q].ordre__c == ordre){
+                                if(sousQuestionsList[q].questionParent__c != null && sousQuestionsList[q].questionParent__c == questionInfos.Id){
+                                    textToAppend += '<tr>';
+                                    textToAppend +=     '<td>';
+                                    textToAppend +=         sousQuestionsList[q].question__c; // Ajoute le texte de question
+                                    textToAppend +=         generateMandatoryField(sousQuestionsList[q]); // Ajoute l'étoile rouge pour les champs obligatoire
+                                    textToAppend +=     '</td>';
+                                    if(questionnaireExistant == 'true')      textToAppend += generateReponsesMatrice(sousQuestionsList[q]); // Ajoute les réponses en mode lecture 
+                                    else                                     textToAppend += generateOptionsMatrice(sousQuestionsList[q], optionsParQuestion); // Ajoute les options associées à la question   
+                                    textToAppend += '</tr>';
+                                }
+                            }
+                        }
+                    }
+                    textToAppend +=     '</table>';
+                    textToAppend += '</div>';
+                    return textToAppend;
+                }
+
+                // Affichage des options d'une matrice
+                function generateOptionsMatrice(questionInfos, options){
+                    var textToAppend = '';
+                    for(var ordre=1;ordre<=maxOrdreOptions;ordre++){
+                        for(var op=0;op<options.length;op++){
+                            if(options[op].position__c == ordre){
+                                textToAppend += "<td>";
+                                textToAppend +=     "<label class='radio radio-inline'>";
+                                textToAppend +=         '<input type="radio" name="'+questionInfos.Id+'" id="'+options[op].Id+'" value="'+options[op].valeur__c+'" data-poids="'+options[op].poids__c+'" ';
+                                if(options[op].valeur__c == 'Très satisfait(e)') textToAppend += 'checked ';
+                                textToAppend +=         '/>';
+                                textToAppend +=         options[op].valeur__c;
+                                textToAppend +=     '</label>';
+                                textToAppend += '</td>';
+                            }
+                        }
+                    }
+                    return textToAppend;
+                }
+
+                // Affichage d'un input checkbox
+                function generateOptionsCheckbox(questionInfos, options){
+                    var textToAppend = '';
+                    for(var ordre=1;ordre<=maxOrdreOptions;ordre++){
+                        for(var op=0;op<options.length;op++){
+                            if(options[op].position__c == ordre){
+                                textToAppend += '<div class="col-md-12">';
+                                textToAppend +=     '<label class="checkbox checkbox-inline">';
+                                textToAppend +=         '<input type="checkbox" name="'+questionInfos.Id+'" class="'+questionInfos.Id+'" id="'+options[op].Id+'" value="'+options[op].valeur__c+'" data-poids="'+options[op].poids__c+'"/>';
+                                textToAppend +=         options[op].valeur__c;
+                                textToAppend +=     '</label>';
+                                textToAppend += '</div>';
+                            }
+                        }
+                    }
+                    return textToAppend;
+                }
+
+                // Affichage d'un input radio
+                function generateOptionsRadio(questionInfos, options){
+                    var textToAppend = '';
+                    for(var ordre=1;ordre<=maxOrdreOptions;ordre++){
+                        for(var op=0;op<options.length;op++){
+                            if(options[op].position__c == ordre){
+                                textToAppend += '<div class="col-md-12">';
+                                textToAppend +=     '<label class="radio radio-inline">';
+                                textToAppend +=         '<input type="radio" name="'+questionInfos.Id+'" class="'+questionInfos.Id+'" id="'+options[op].Id+'" value="'+options[op].valeur__c+'" data-poids="'+options[op].poids__c+'" ';
+                                if(options[op].valeur__c == 'Très satisfait(e)') 
+                                    textToAppend += 'checked ';
+                                if(options[op].questionQuestionnaire__r.familleChampParent__c != null)
+                                    textToAppend += 'onClick="displayChildQuestion(\''+options[op].questionQuestionnaire__r.familleChampParent__c+'\',\''+options[op].valeur__c+'\')" ';
+                                textToAppend +=         '/>';
+                                textToAppend +=         options[op].valeur__c;
+                                textToAppend +=     '</label>';
+                                textToAppend += '</div>';
+                            }
+                        }
+                    }
+                    return textToAppend;
+                }
+
+                // Affichage de l'étoile rouge pour désigner un champ obligatoire
+                function generateMandatoryField(questionInfos){
+                    var textToAppend = '';
+                    if(questionInfos.obligatoire__c){
+                        textToAppend += '<span class="required-field">*</span>';
+                    }
+                    return textToAppend;
+                }
+
+                // Génération des réponses
+                function generateReponses(questionInfos){
+                    var textToAppend = '';
+                    var optionsParQuestion = [];
+
+                    // Cas d'un input text ou d'un input number
+                    if(questionInfos.typeReponse__c == TYPE_QUESTIONS.MATRICE){ 
+                        textToAppend += generateQuestionsMatrice(questionInfos)
+                    } else if(questionInfos.typeReponse__c == TYPE_QUESTIONS.NUMERO){ 
+                        for(var rep=0;rep<reponses.length;rep++){
+                            if(reponses[rep].question__c == questionInfos.Id){
+                                textToAppend += '<div class="col-md-12">';
+                                textToAppend +=     removeNull(reponses[rep].reponseNumero__c) + '.';
+                                textToAppend += '</div>';
+                            }
+                        }
+                    } else {
+                        for(var rep=0;rep<reponses.length;rep++){
+                            if(reponses[rep].question__c == questionInfos.Id){
+                                textToAppend += '<div class="col-md-12">';
+                                textToAppend +=     removeNull(reponses[rep].reponseTexte__c) + '.';
+                                textToAppend += '</div>';
+                            }
+                        }
+                    }
+                    return textToAppend;
+                }
+
+                // Affichage des options d'une matrice
+                function generateReponsesMatrice(questionInfos){
+                    var textToAppend = '';              
+                    for(var rep=0;rep<reponses.length;rep++){
+                        if(reponses[rep].question__c == questionInfos.Id){
+                            textToAppend += '<td>';
+                            textToAppend +=     removeNull(reponses[rep].reponseTexte__c);
+                            textToAppend += '</td>';
+                        }
+                    }
+                    return textToAppend;
+                }
+
+                // Affiche / cache les questions découlant d'une autre question en fonction de la réponse actuelle
+                function displayChildQuestion(familleChamp, valeurActive){
+                    for(var quest=0;quest<questions.length;quest++){
+                        if(questions[quest].familleChampEnfant__c == familleChamp && (questions[quest].reponseAffichage__c == valeurActive || (questions[quest].reponseAffichage__c).includes(';'+valeurActive+';'))){
+                            // Réponse associée à l'affichage de la question, celle ci est donc affichée
+                            j$("#"+questions[quest].Id).css("display", "block");
+                        } else if(questions[quest].familleChampEnfant__c == familleChamp && questions[quest].reponseAffichage__c != valeurActive){
+                            // Réponse non-associée à l'affichage de la question, celle ci est donc cachée
+                            j$("#"+questions[quest].Id).css("display", "none");
+                            // Dans le cas d'association de questions en escalier, cacher une question va cacher toutes les questions découlant de celle ci
+                            if(questions[quest].familleChampParent__c != null){
+                                // Les réponses aux questions cachées sont réinitialisées
+                                j$("."+questions[quest].Id).prop('checked', false);
+                                displayChildQuestion(questions[quest].familleChampParent__c, null);
+                            }
+                        }
+                    }
+                }
+
+                // Affiche / cache les questions découlant d'une autre question en fonction de la réponse actuelle
+                function displayChildQuestionFromNumber(familleChamp, questionId){
+                    var valeurActive = document.getElementsByName(questionId)[0].value;
+                    displayChildQuestion(familleChamp, valeurActive);
+                }
+
+                // Sauvegarde des réponses au formulaire
+                function saveQuestionnaire(){                
+                    j$('#saveButton').blur();
+                    if(questionnaireExistant != 'true'){
+                        // Désactive les boutons pendant le traitement
+                        j$("button").button('loading');
+                        var questionsDetailsList = [];
+                        resetError(questions);
+                        for(var q=0;q<questions.length;q++){
+                            var answerDetails = Object();
+                            var answer = ''; 
+                            var poids = null;
+
+                            if(questions[q].typeReponse__c == TYPE_QUESTIONS.RADIO){
+                                answer = j$("input[name="+questions[q].Id+"]:checked").val();
+                                if(j$("input[name="+questions[q].Id+"]:checked")[0] != undefined)
+                                    poids = j$("input[name="+questions[q].Id+"]:checked")[0].dataset.poids;
+                                answerDetails = saveSingleAnswer(questions[q].Id, questions[q].typeReponse__c, answer, poids);
+                                questionsDetailsList.push(answerDetails);
+                            } else if(questions[q].typeReponse__c == TYPE_QUESTIONS.CASEACOCHER){
+                                var checkedValues = j$('input[name='+questions[q].Id+']:checked').map(function() {
+                                    return this.value;
+                                }).get();
+                                answer = checkedValues;
+                                answerDetails = saveSingleAnswer(questions[q].Id, questions[q].typeReponse__c, answer, poids);
+                                questionsDetailsList.push(answerDetails);
+                            } else if(questions[q].typeReponse__c == TYPE_QUESTIONS.TEXTE){
+                                answer = j$("textarea#"+questions[q].Id).val(); 
+                                answerDetails = saveSingleAnswer(questions[q].Id, questions[q].typeReponse__c, answer, null);
+                                questionsDetailsList.push(answerDetails);
+                            } else if(questions[q].typeReponse__c == TYPE_QUESTIONS.NUMERO){
+                                answer = j$("input[name="+questions[q].Id+"").val();
+                                if (answer >= 0 && answer <= 10) {
+                                    answerDetails = saveSingleAnswer(questions[q].Id, questions[q].typeReponse__c, answer, null);
+                                    questionsDetailsList.push(answerDetails);
+                                } else {
+                                    errorDetected = true;
+                                    j$("[id$=erreur_"+questions[q].Id+"]").html("<span style='color:red;'>{!$Label.questionnaire_erreur_numeroErrone}</span>");
+                                }
+                            } 
+
+                            var questionErrorCheck = errorCheck(questions[q], answer);
+                            if(questionErrorCheck)
+                                errorDetected = true;
+                        }
+                        console.log('newQues : '+newQues);
+
+                        if(errorDetected){
+                            displayError("{!$Label.questionnaire_erreur_questionsManquantes}");
+                        } else {
+                            Visualforce.remoting.Manager.invokeAction(
+                                '{!$RemoteAction.Ctrl_Site_Questionnaire.saveQuestionnaire}', questionsDetailsList, questionnaireId, objectId, '{!accountId}', newQues, 
+                                function(result, event) {
+                                    if (event.status) {
+                                        if(newQues == 'yes'){
+                                            j$("#saveButton").css("display", "none"); 
+                                            j$('#content-end').removeClass("hidden").addClass("show");
+                                        } else {
+                                            location.reload();
+                                            var answer = j$("input[name="+questionSatisfactionId+"]").val();
+                                            if(answer == '8' || answer == '9' || answer == '10'){
+                                                goToCustplaceReviewBox();
+                                            }
+                                        }
+                                    } else if (event.type === 'exception') {
+                                        displayError(event.message);
+                                    } else {
+                                        displayError(event.message);
+                                    }
+                                },
+                                {escape: true}
+                            );
+                        }
+                    }
+                }
+
+                // Construction de l'objet "réponse" à envoyer au controlleur
+                function errorCheck(question, answer){
+                    if(question.obligatoire__c && (answer == "" || answer == null || answer == undefined)){
+                        j$("[id$=erreur_"+question.Id+"]").html('<span style="color:red;">{!$Label.questionnaire_erreur_questionObligatoire}</span>');
+                        return true;
+                    }
+                    return false;
+                }
+
+                // Fonction pour détecter une erreur de saisie dans le formulaire
+                function saveSingleAnswer(questionId, typeAnswer, answer, poids){
+                    var questionDetails = Object();
+                    questionDetails.questionId = questionId;
+                    questionDetails.type = typeAnswer;
+                    questionDetails.reponse = answer;
+                    if(poids == "" || poids == null || poids == "undefined")
+                        questionDetails.poids = null;
+                    else 
+                        questionDetails.poids = poids;
+                    return questionDetails;
+                }
+
+                /* Fonction pour afficher une erreur                                               */
+                /*---------------------------------------------------------------------------------*/
+                function displayError(message){                    
+                    var content = '<div class="alert alert-danger"><apex:outputtext escape="false" value="'+message+'"/></div>';
+                    j$("[id$=content-errors]").html(content);
+                    scroll(0,0);                    
+                    // Réactive les boutons
+                    j$("button").button('reset');
+                }
+
+                /* Fonction qui remet à jour les champs en erreur                                  */
+                /*---------------------------------------------------------------------------------*/
+                function resetError(questions){
+                    errorDetected = false;
+                    j$("[id$=content-errors]").html('');
+                    for(var q=0;q<questions.length;q++){
+                        j$("[id$=erreur_"+questions[q].Id+"]").html('');
+                    }
+                }
+
+                function removeNull(text){
+                    if(text != 0 && (text == null || text == undefined || text == "" || text == 'undefined' || text == 'null')) {
+                        text = 'Non répondu';
+                    }
+                    return text;
+                }
+
+            </script>
+            <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+            <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}"/>
+        </head>
+        <body>
+            <div class="container" id="container">
+                <div class="row">
+                    <form class="form-horizontal">
+                        <img alt="Logo K par K" class="img-responsive center-block logo" src="{!URLFOR($Resource.Logo_kpark)}" style="max-width: 190px;"/>
+                        <!--<div class="hidden-xs col-md-12 text-center">
+                            <img src="{!URLFOR($Resource.Site_Demande_de_Devis, 'img/etape01.png')}" />
+                        </div>
+                        <div class="hidden-sm hidden-md hidden-lg text-center">
+                            <img src="{!URLFOR($Resource.Site_Demande_de_Devis, 'img/etape01_light_circle.png')}" />
+                        </div>-->
+                        <div id="content-errors" class="col-md-12" style="margin-top: 20px;">
+                            <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                                <div class="alert {!IF(message.SeverityStr=='confirm','alert-success',
+                                                    IF(message.SeverityStr=='info','alert-info',
+                                                    IF(message.SeverityStr=='warning','alert-warning','alert-danger')))}">
+                                    <apex:outputtext escape="false" value="{!message.Message}"/>
+                                </div>
+                            </apex:repeat>
+                        </div>
+
+                        <div id="content-end" class="hidden">
+                            <div class="col-md-12 text-center alert alert-success">
+                                {!$Label.questionnaire_msg_merci}
+                            </div>
+                        </div>
+
+                        <div id="content-questionnaire"></div>
+
+                        <div class="col-md-12 text-center" style="margin-bottom: 20px; margin-top: 10px;">
+                            <div id="prevPage" style="display:none;">
+                                <button id="button-prevPage" type="button" class="btn-lg btn-custom btn-custom-red" onclick="selectPage(actualPage-1);" data-loading-text="{!$Label.espaceclient_msg_Loading}">Page précédente</button>
+                            </div>
+                            <div id="enregistrer" style="display:none;">
+                                <button id="saveButton" type="button" class="btn-lg btn-custom btn-custom-red" onclick="saveQuestionnaire()" data-loading-text="{!$Label.espaceclient_msg_Loading}">Envoyer le questionnaire</button>
+                            </div>
+                            <div id="nextPage" style="display:none;">
+                                <button id="button-nextPage" type="button" class="btn-lg btn-custom btn-custom-red" onclick="selectPage(actualPage+1);" data-loading-text="{!$Label.espaceclient_msg_Loading}">Page suivante</button>
+                            </div>
+                        </div>
+                    </form>
+                    <apex:form >
+                        <apex:actionFunction name="goToCustplaceReviewBox" action="{!reviewBoxCustplace}" />
+                    </apex:form>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>

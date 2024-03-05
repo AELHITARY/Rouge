@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_NRV10Calendar_DateCommissionnement</fullName>
+    <active>true</active>
+    <description>Varifie que la date de commissionnement est renseignée</description>
+    <errorConditionFormula>AND(!$User.ByPassValidationRule__c, ISBLANK(commDate__c))</errorConditionFormula>
+    <errorDisplayField>commDate__c</errorDisplayField>
+    <errorMessage>La date de commissionnement doit être renseignée.</errorMessage>
+</ValidationRule>

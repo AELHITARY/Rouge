@@ -1,0 +1,9 @@
+<apex:page >
+  <script>
+        window.addEventListener('load', function(){
+            window.open('/apex/VF_Calendrier');
+            
+            window.history.back();
+        });
+    </script>
+</apex:page>

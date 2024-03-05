@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>subCategory__c</fullName>
+    <externalId>false</externalId>
+    <label>Sous-catégorie</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>category__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>SourceSubcategory</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>AUTRE</controllingFieldValue>
+            <valueName>PARRAINAGES &amp; AUTRES</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>ENTRANT CALL</controllingFieldValue>
+            <valueName>ENTRANT CALL</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PROSPECTION RESEAU</controllingFieldValue>
+            <valueName>FOIRES</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PROSPECTION RESEAU</controllingFieldValue>
+            <valueName>PROSPECTION VENDEUR</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PROSPECTION RESEAU</controllingFieldValue>
+            <valueName>STANDS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PROSPECTION RESEAU</controllingFieldValue>
+            <valueName>TELEPHONE VENDEUR</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SORTANT CALL</controllingFieldValue>
+            <valueName>SORTANT CALL</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OPCLI2017_OPFOIRES17</fullName>
+    <booleanFilter>1 OR 2</booleanFilter>
+    <columns>NAME</columns>
+    <columns>LibelleOption__c</columns>
+    <columns>Debutvalidite__c</columns>
+    <columns>FinValidite__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>contains</operation>
+        <value>OPCLI2017</value>
+    </filters>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>contains</operation>
+        <value>FOIR</value>
+    </filters>
+    <label>OPCLI2017_OPFOIRES17</label>
+    <language>fr</language>
+</ListView>

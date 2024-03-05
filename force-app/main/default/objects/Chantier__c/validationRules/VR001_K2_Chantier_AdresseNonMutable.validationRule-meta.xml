@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_AdresseNonMutable</fullName>
+    <active>true</active>
+    <description>Afin d&apos;éviter toute fraude (fausse adresse) sur le hors-secteur (interdiction de création de projet en hors-secteur, mais autorisés en zone blanche), l&apos;adresse est en lecture seule dès qu&apos;il existe un devis vendu.</description>
+    <errorConditionFormula>AND(
+   $User.ByPassValidationRule__c == FALSE,
+   $Profile.Name != &apos;Administrateur système&apos;,
+   $Profile.Name != &apos;K/K - Marketing&apos;,
+   $Profile.Name != &apos;K/K - Import Lead&apos;,
+   $Profile.Name != &apos;K/K - Interface&apos;,
+   $Profile.Name != &apos;K/K - DC&apos;,
+   $Profile.Name != &apos;K/K - Superviseur&apos;,
+   $Profile.Name != &apos;K/K - TA&apos;,
+   $Profile.Name != &apos;K/K - TA/Entrant&apos;,
+   $Profile.Name != &apos;K/K - TA/Sortant&apos;,
+   OR(
+      nbDevisVendusEnregistres__c &gt; 0,
+      nbContratsResilies__c &gt; 0,
+						cpqQuoteSoldNumber__c &gt; 0,
+						customerOrderCount__c &gt; 0,
+      nbContratsVendus__c &gt; 0),
+   OR(ISCHANGED(rue__c),
+      ISCHANGED(codePostal__c),
+      ISCHANGED(ville__c),
+      ISCHANGED(departement__c),
+      ISCHANGED(pays__c))
+)</errorConditionFormula>
+    <errorDisplayField>rue__c</errorDisplayField>
+    <errorMessage>Adresse du chantier non modifiable !</errorMessage>
+</ValidationRule>

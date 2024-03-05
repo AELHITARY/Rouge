@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>InputField__c</fullName>
+    <description>Champ technique concaténant les valeurs du produit utilisé pour le calcul du coefficient.
+Utilisé dans la Price Rule Price016Cal</description>
+    <externalId>false</externalId>
+    <formula>CodeProduit__c&amp;&quot;-&quot;&amp; Niveau1CodeBis__c&amp;&quot;-&quot;&amp;  Niveau2CodeBis__c&amp;&quot;-&quot;&amp;  Niveau3CodeBis__c&amp;&quot;-&quot;&amp;  Niveau4CodeBis__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>[#] Valeurs d&apos;entrée</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

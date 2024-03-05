@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>productRateCompact</fullName>
+    <fields>Name</fields>
+    <fields>name__c</fields>
+    <fields>product__c</fields>
+    <fields>salesrate__c</fields>
+    <label>Taux de produit compact</label>
+</CompactLayout>

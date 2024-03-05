@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <decisions>
+        <name>BankAccountSinglEntity</name>
+        <label>BankAccountSinglEntity</label>
+        <locationX>429</locationX>
+        <locationY>323</locationY>
+        <defaultConnectorLabel>Résultat par défaut</defaultConnectorLabel>
+        <rules>
+            <name>Is_Single_Entity</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.entityBankAccount__r.singleEntity__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>isInputEntityDiffentThanOrderEntity</targetReference>
+            </connector>
+            <label>Is Single Entity</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Has_parent</name>
+        <label>Has parent</label>
+        <locationX>347</locationX>
+        <locationY>539</locationY>
+        <defaultConnectorLabel>False</defaultConnectorLabel>
+        <rules>
+            <name>True</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.parent__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Parent_entity_different_than_record</targetReference>
+            </connector>
+            <label>True</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>isInputEntityDiffentThanOrderEntity</name>
+        <label>isInputEntityDiffentThanOrderEntity</label>
+        <locationX>50</locationX>
+        <locationY>431</locationY>
+        <defaultConnector>
+            <targetReference>Has_parent</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Résultat par défaut</defaultConnectorLabel>
+        <rules>
+            <name>It_is_different</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.inputEntity__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record.orderEntity__c</elementReference>
+                </rightValue>
+            </conditions>
+            <label>It is different</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Parent_entity_different_than_record</name>
+        <label>Parent entity different than record</label>
+        <locationX>149</locationX>
+        <locationY>647</locationY>
+        <defaultConnectorLabel>Résultat par défaut</defaultConnectorLabel>
+        <rules>
+            <name>It_is_different_than_record</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.parent__r.inputEntity__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record.inputEntity__c</elementReference>
+                </rightValue>
+            </conditions>
+            <label>It is different than record</label>
+        </rules>
+    </decisions>
+    <interviewLabel>Accoun - Before Trigger - Règles de validations {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>AccountingPiece - After Trigger - Règles de validations</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>303</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>BankAccountSinglEntity</targetReference>
+        </connector>
+        <object>AccountingPiece__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>RecordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

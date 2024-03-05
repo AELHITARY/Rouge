@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TEST_Autre_compacte</fullName>
+    <fields>Name</fields>
+    <fields>startDate__c</fields>
+    <fields>endDate__c</fields>
+    <fields>active__c</fields>
+    <label>#TEST# Autre compacte</label>
+</CompactLayout>

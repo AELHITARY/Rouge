@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>B2C_Manuel</fullName>
+    <columns>MasterLabel</columns>
+    <columns>champ__c</columns>
+    <columns>regleAuto__c</columns>
+    <columns>regleManuelle__c</columns>
+    <columns>champDependant__c</columns>
+    <columns>profile__c</columns>
+    <columns>object__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>object__c</field>
+        <operation>equals</operation>
+        <value>Compte B2C</value>
+    </filters>
+    <filters>
+        <field>regleManuelle__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <label>Champs B2C Manuel</label>
+    <language>fr</language>
+</ListView>

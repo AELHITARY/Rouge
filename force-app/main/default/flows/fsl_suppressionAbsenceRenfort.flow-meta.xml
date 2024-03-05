@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>49.0</apiVersion>
+    <decisions>
+        <name>IdAbsenceNotNull</name>
+        <label>Id Absence Not Null</label>
+        <locationX>167</locationX>
+        <locationY>26</locationY>
+        <defaultConnectorLabel>[Résultat par défaut]</defaultConnectorLabel>
+        <rules>
+            <name>is_not_null</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>var_idAbsence</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>suppressionAbsenceRenfort</targetReference>
+            </connector>
+            <label>is not null</label>
+        </rules>
+    </decisions>
+    <interviewLabel>Suppression Absence Renfort {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Suppression Absence Renfort</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordDeletes>
+        <name>suppressionAbsenceRenfort</name>
+        <label>Supprimer l&apos;absence Renfort</label>
+        <locationX>166</locationX>
+        <locationY>188</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>var_idAbsence</elementReference>
+            </value>
+        </filters>
+        <object>ResourceAbsence</object>
+    </recordDeletes>
+    <startElementReference>IdAbsenceNotNull</startElementReference>
+    <status>Active</status>
+    <variables>
+        <description>Id de l&apos;absence à supprimer</description>
+        <name>var_idAbsence</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+        <value>
+            <stringValue></stringValue>
+        </value>
+    </variables>
+</Flow>

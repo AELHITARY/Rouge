@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>nbTotalDevis__c</fullName>
+    <externalId>false</externalId>
+    <formula>nbDevisNonTransmis__c + nbDevisTransmis__c + nbDevisAConfigurer__c + nbDevisErrones__c + nbDevisVendusEnAttente__c + nbDevisVendusEnregistres__c + nbDevisVendusIncontournables__c + nbDevisResilies__c + nbDevisExpires__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Nombre total de devis</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

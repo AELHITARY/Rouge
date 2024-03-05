@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Calendrier_des_cl_tures</fullName>
+    <columns>NAME</columns>
+    <columns>year__c</columns>
+    <columns>month__c</columns>
+    <columns>weekOfYear__c</columns>
+    <columns>weekOfMonth__c</columns>
+    <columns>businessStartDate__c</columns>
+    <columns>businessEndDate__c</columns>
+    <columns>serviceStartDate__c</columns>
+    <columns>serviceEndDate__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Calendrier des clôtures</label>
+</ListView>

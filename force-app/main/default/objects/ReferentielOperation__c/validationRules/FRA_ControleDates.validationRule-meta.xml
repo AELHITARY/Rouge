@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_ControleDates</fullName>
+    <active>true</active>
+    <errorConditionFormula>Datedebut__c &gt; Datefin__c</errorConditionFormula>
+    <errorMessage>La date de début doit être antérieure ou égale à la date de fin de l&apos;opération!</errorMessage>
+</ValidationRule>

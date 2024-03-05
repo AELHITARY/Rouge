@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_Job_GanttName</fullName>
+    <active>true</active>
+    <description>Nom Gantt (FSL) obligatoire</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;Job&apos; &amp;&amp;
+!ISPICKVAL(FSLLevel__c, &apos;&apos;) &amp;&amp;
+ISBLANK(ganttName__c)</errorConditionFormula>
+    <errorDisplayField>ganttName__c</errorDisplayField>
+    <errorMessage>Nom Gantt (FSL) obligatoire</errorMessage>
+</ValidationRule>

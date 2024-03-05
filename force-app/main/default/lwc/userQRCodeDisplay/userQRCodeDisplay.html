@@ -1,0 +1,134 @@
+<template>
+    <lightning-card title="" variant="base">
+        <!-- Spinner -->
+		<template if:true={showLoadingSpinner}>
+            <div class="slds-p-top_large">
+			    <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </div>
+        </template>
+        <!--
+        <template if:false={showLoadingSpinner}>
+            -->        
+        <template if:true={error}>
+            <div class="slds-m-top_xx-small slds-m-bottom_x-small">
+                <div class="slds-box slds-theme_error">
+                    <div class="slds-media slds-media_center">
+                        <div class="slds-media__figure">
+                            <span class="slds-avatar slds-avatar_small">
+                                <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <p>{error}</p>
+                        </div>
+                    </div>                            
+                </div>
+            </div>
+        </template>
+        <lightning-tabset>
+            <!-- Premier onglet -->
+            <lightning-tab label="Demande devis" value="Demande devis" title="Demande devis">
+                <template if:true={hasUserData}>
+                    <div class="slds-p-top_medium slds-form" role="list">
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <!-- Titre -->
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small slds-align_absolute-center">
+                                    <label class="slds-form-element__label">Image QR Code à scanner par le client</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">                   
+                                <div class="slds-form-element__control slds-m-top_xx-small slds-align_absolute-center"  style="display:flex;align-items: center;">
+                                    <img src={userData.autoQuoteRequestQRCodeURL__c}  style="height: 300px;width: 300px" alt="QR Code Custplace">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small slds-m-top_medium slds-align_absolute-center">
+                                    <lightning-formatted-url value={userData.autoQuoteRequestURL__c} tooltip="Lien QR Code" label="Lien QR Code" target="_blank" ></lightning-formatted-url>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <!-- Page vierge si l'utilisateur n'a pas de QR Code-->
+                <template if:false={hasUserData}>
+                </template>
+            </lightning-tab>
+
+            <!-- Second onglet -->
+            <lightning-tab label="Satisfaction" value="Satisfaction" title="Satisfaction">
+
+                <lightning-combobox
+                    class="slds-m-left_x-small"
+                    name="magasin"
+                    label="Magasin"
+                    value={selectedMagasin}
+                    options={picklistNomMagasins}
+                    onchange={handleMagasinList} >
+                </lightning-combobox>
+
+                <!-- DEBUT Pack Logo / Nom / Qr code / Lien QR Code-->
+                <template if:true={hasCustplaceData}>
+                    <div class="slds-p-top_medium slds-form" role="list">
+                        <!-- Logo -->  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">                 
+                                <div class="slds-form-element__control slds-m-top_xx-small slds-align_absolute-center" style="display:flex;align-items: center;">
+                                    <img src="https://kpark--test--c.documentforce.com/servlet/servlet.ImageServer?id=0157a000001Cso1&oid=00D6E0000004oZT" 
+                                        style="height: 75px;width:75px;" alt="Logo Custplace">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Nom du magasin -->  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">                 
+                                <div class="slds-form-element__control slds-align_absolute-center">
+                                    <label class="slds-form-element__label">Custplace</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- QR Code Custplace -->  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">                   
+                                <div class="slds-form-element__control slds-m-top_xx-small slds-align_absolute-center"  style="display:flex;align-items: center;">
+                                    <img src={magasinData.CustplaceSatisfactionQRCodeURL__c} style="height: 300px;width: 300px" alt="QR Code Custplace">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Lien QR Code Custplace -->  
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small slds-m-top_medium slds-align_absolute-center">
+                                    <lightning-formatted-url value={magasinData.CustplaceSatisfactionURL__c} tooltip="Lien QR Code" label="Lien QR Code" target="_blank" ></lightning-formatted-url>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:false={hasCustplaceData}>
+                    <label class="slds-form-element__label slds-p-top_medium slds-m-left_medium slds-p-top_medium">Aucun QR Code Custplace affecté au magasin sélectionné</label>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                    <div>&nbsp;</div>
+                </template>
+                <!-- FIN Pack Logo / Nom / Qr code / Lien QR Code-->
+            </lightning-tab>
+        </lightning-tabset> 
+        <!--  
+        </template>
+        -->
+    </lightning-card>
+</template>

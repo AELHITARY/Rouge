@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ongoing__c</fullName>
+    <externalId>false</externalId>
+    <formula>AND(LOWER(libelleStatutContrat__c) != &apos;contrats en sav&apos;,
+    LOWER(libelleStatutContrat__c) != &apos;contrats resilies&apos;,
+    LOWER(libelleStatutContrat__c) != &apos;contrats soldes&apos;,
+    LOWER(libelleStatutContrat__c) != &apos;etat inconnu&apos;,
+    LOWER(libelleStatutContrat__c) != &apos;solde&apos;,
+    LOWER(libelleStatutContrat__c) != &apos;soldé&apos;,
+    LOWER(libelleStatutContrat__c) != &apos;&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>[#] En cours</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

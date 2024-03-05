@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MaxPayableAmount</fullName>
+    <active>true</active>
+    <description>Le montant max doit être supérieur ou égal au montant min payable (sinon 0 si min payable non renseigné)</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+maxPayableAmount__c &lt; NULLVALUE(minPayableAmount__c, 0)</errorConditionFormula>
+    <errorDisplayField>maxPayableAmount__c</errorDisplayField>
+    <errorMessage>Le montant max doit être supérieur ou égal au montant min payable (sinon 0 si min payable non renseigné)</errorMessage>
+</ValidationRule>

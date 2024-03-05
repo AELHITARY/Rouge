@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RemiseVendeur__c</fullName>
+    <description>Ce champ est utilisé pour l&apos;application automatique de la remise vendeur cible. Il désigne le % max possible de la remise vendeur.</description>
+    <externalId>false</externalId>
+    <label>Remise Vendeur</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

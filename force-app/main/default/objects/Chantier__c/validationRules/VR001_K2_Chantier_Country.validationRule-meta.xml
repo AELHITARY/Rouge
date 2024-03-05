@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_Country</fullName>
+    <active>false</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c == FALSE &amp;&amp; ISBLANK(pays__c)</errorConditionFormula>
+    <errorDisplayField>pays__c</errorDisplayField>
+    <errorMessage>Pays du chantier obligatoire !</errorMessage>
+</ValidationRule>

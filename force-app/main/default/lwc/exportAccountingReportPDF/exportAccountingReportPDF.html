@@ -1,0 +1,200 @@
+<template>
+    <div>
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="doctype:pdf" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Exports PDF">Exports PDF</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container">
+            <!-- Spinner -->
+            
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto" padding="around-small">
+
+                    <!-- Path assistant -->                    
+                    <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                        <template for:each={steps} for:item="step">
+                            <template if:true={step.display}>
+                                <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                            </template>
+                        </template>
+                    </lightning-progress-indicator>
+
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <template if:true={showStep1Form}>
+                <template if:true={serviceEntitiesLoaded}>
+                    <lightning-layout multiple-rows="true">
+                        <lightning-layout-item flexibility="auto" padding="around-small">
+
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-combobox
+                                                name="exportType"
+                                                label="Type d'export"
+                                                placeholder="Sélectionnez le type d'export à effectuer"
+                                                options={exportTypes}
+                                                value={exportType}
+                                                required
+                                                onchange={handleExportTypeChange}>
+                                        </lightning-combobox>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input 
+                                            type="date" 
+                                            label="Date de début d'observation" 
+                                            name="input-startDate" 
+                                            value={startDate}
+                                            required
+                                            onchange={handleStartDateChange}>
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input 
+                                            type="date" 
+                                            label="Date de fin d'observation" 
+                                            name="input-endDate" 
+                                            value={endDate}
+                                            onchange={handleEndDateChange}>
+                                        </lightning-input>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">                                       
+                                        <lightning-radio-group
+                                                name="serviceEntity"
+                                                label= "Dépôt"                                        
+                                                options={serviceEntities}
+                                                value={serviceEntity}
+                                                onchange={handleServiceEntityChange}
+                                                required>
+                                        </lightning-radio-group>                                   
+                                    </div>
+                                </div>
+                            </div>
+
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </template>
+            </template>
+
+            <template if:true={showStep2Form}>
+                <template if:true={bankAccountsLoaded}>
+                    <lightning-layout multiple-rows="true">
+                        <lightning-layout-item flexibility="auto" padding="around-small">
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-checkbox-group name="bankAccountCheckBox"
+                                            label="Comptes bancaires"
+                                            options={bankAccounts}
+                                            value={bankAccountsSelected} 
+                                            onchange={handleChangeBankAccount}
+                                            required>
+                                        </lightning-checkbox-group>
+                                    </div>
+                                </div>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </template>
+            </template>
+
+            <lightning-layout>
+                <template if:true={showLoadingSpinner}>
+                    <lightning-spinner class="spins" variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+                </template>
+            </lightning-layout>
+            <lightning-layout>
+                <template if:true={showLoadingSpinnerStep2}>
+                    <lightning-spinner class="spinsStep2" variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+                </template>
+            </lightning-layout>
+        </div> 
+
+
+        <div slot="footer" class="slds-card__footer">
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-m-vertical_xx-small">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            <!-- BUTTONS -->
+            <template if:true={showStep2Form}>
+                <template if:true={isBankReport}>
+                    <lightning-button class="slds-m-around_medium" label="Précédent" title="Précédent" onclick={handlePrevious}></lightning-button>
+                </template>
+            </template>
+            <template if:true={showStep1Form}>
+                <template if:false={isBankReport}>
+                    <template if:true={serviceEntitiesLoaded}> 
+                        <lightning-button class="slds-m-around_medium" variant="brand" label="Générer le document" title="Générer le document" onclick={handleSave}></lightning-button>
+                    </template>
+                </template>
+            </template>
+            <template if:true={showStep1Form}>
+                <template if:true={isBankReport}>
+                    <template if:true={serviceEntitiesLoaded}> 
+                        <lightning-button class="slds-m-around_medium" variant="brand" label="Suivant" title="Suivant" onclick={handleSave}></lightning-button>
+                    </template>
+                </template>
+            </template>
+            <template if:true={showStep2Form}>
+                <template if:true={bankAccountsLoaded}> 
+                    <lightning-button class="slds-m-around_medium" variant="brand" label="Générer le document" title="Générer le document" onclick={handleSave}></lightning-button>                    
+                </template>
+            </template>
+            
+            <template if:true={showStepFinalForm}>
+                <template if:false={isBankReport}>
+                    <lightning-button class="slds-m-around_medium" variant="brand" label="Nouvel export" title="Nouvel export" onclick={handleNewExport}></lightning-button>
+                </template>
+            </template>
+        </div>
+    </div>
+</template>

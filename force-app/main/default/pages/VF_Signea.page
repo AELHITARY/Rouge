@@ -1,0 +1,1202 @@
+<apex:page controller="Ctrl_Signea" sidebar="false" showheader="false" title="Kube - Signature Electronique">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <apex:includescript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/numeral.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/languages.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.FullCalendar, 'lib/moment.min.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.KparK_Page_JS)}" />
+
+    <script type="text/javascript">
+        j$ = jQuery.noConflict();
+
+        // moment.js init
+        moment.locale('fr', {
+            relativeTime : {
+                future: "dans %s",
+                past:   "il y a %s",
+                s:  "secondes",
+                m:  "une minute",
+                mm: "%d minutes",
+                h:  "an heure",
+                hh: "%d heures",
+                d:  "un jour",
+                dd: "%d jours",
+                M:  "un mois",
+                MM: "%d mois",
+                y:  "un an",
+                yy: "%d ans"
+            }
+        });
+
+        // numeral init
+        numeral.language('fr', {
+            delimiters: {
+                thousands: ' ',
+                decimal: ','
+            },
+            abbreviations: {
+                thousand: 'k',
+                million: 'm',
+                billion: 'b',
+                trillion: 't'
+            },
+            ordinal : function (number) {
+                return number === 1 ? 'er' : 'ème';
+            },
+            currency: {
+                symbol: '€'
+            }
+        });
+        numeral.language('fr');
+
+        var decimalFormat = "'0.00";
+
+        // Initialisation des variables Signea
+        var circuitDevis = "{!quote.circuitSignatureDevis__c}";
+        var circuitContrat = "{!quote.circuitSignatureContrat__c}";
+        //var circuitActuel = (circuitContrat == null) ? circuitContrat : ((circuitDevis == null) ? circuitDevis : null);
+        var dateAcceptation = "{!quote.dateAcceptationClient__c}";
+        var dateTransmission = "{!quote.dateTransmissionClient__c}";
+        var devisStatus = "{!storedCircuitDIPC.Signea__Status__c}";
+        var contratStatus = "{!storedCircuitContrat.Signea__Status__c}";
+        var typeResidence = "{!quote.opportunity.chantier__r.typeResidence__c}";
+        var typeContrat = "{!quote.typeContrat__c}";
+        var nbPersonnes = "{!quote.nbPersonnes__c}";
+        var revenuxFiscaux = "{!quote.revenusFiscaux__c}";
+        var zoneCEE = "{!quote.zone__c}";
+        var categorieCEE = "{!quote.categorie__c}";
+
+        // Initialisation des codes couleur de circuit
+        var STATUS_COLOR = {CURRENT: 'etape-orange', OK: 'etape-green', KO: 'etape-red', FUTUR: 'etape-grey'};
+
+        // Initialisation du nom des étapes de circuit
+        var SIGNEA_STATUS = {DRAFT: 'Draft', FILLING: 'Filling', FILLED: 'Filled', LAUNCHING: 'Launching', LAUNCHFAILED: 'Launch Failed',
+                                LAUNCHSUCCESS: 'Launch Success', CANCELLING: 'Cancelling', CANCELLED: 'Cancelled', ONGOING: 'Ongoing',
+                                COMPLETED: 'Completed',COMPLETED_CONTRALIA: 'Completed Contralia', EXPIRED: 'Expired', REFUSED: 'Refused', SIGNED: 'Signed', INITIALIZATION_FAILED: 'Initialization Failed',
+                                WAITING: 'Waiting', DELAYED: 'Delayed', SEND_REFUSAL_EMAIL: 'Send Refusal Email',
+                                COMPLETED_SIGNEA: 'Completed Signea', EXPIRED_SIGNEA: 'Expired Signea', REFUSED_SIGNEA: 'Refused Signea', CANCELLED_SIGNEA: 'Cancelled Signea'};
+        var LABEL_ETAPES = {CREE: 'Créé', ENVOI: 'Envoyé', SIGNATURE: 'Signature', LANCE: 'Lancé' , EXPIRE: 'Signature expirée', REFUSE: 'Refusé', ACCEPTE: 'Accepté',
+                                NOT_ENVOI: 'Envoi échoué'};
+
+        // Initialisation des informations du circuit Devis
+        var devisLabelEtapeActuelle = '';
+        // Initialisation des informations du circuit Contrat
+        var contratLabelEtapeActuelle = '';
+        var forbiddenAcces = "{!forbiddenAcces}";
+
+        // Objet Signataire
+        var DIPCSigner1; var DIPCSigner2; var DIPCVendeur; var contratSigner1; var contratSigner2; var contratVendeur;
+
+        /* Chargement de la page                                                            */
+        /*----------------------------------------------------------------------------------*/
+        j$(document).ready(function() {
+            if(forbiddenAcces == 'true'){
+                // Affiche message d'erreur
+                j$('#content-start').removeClass("show").addClass("hidden");
+                j$('#content-end').removeClass("hidden").addClass("show");
+            } 
+            // Init
+            j$('[id=montantTTC]').html(numeral("{!quote.Total_TTC_devis__c}").format(decimalFormat) + ' €');
+            j$('[id=montantCEE]').html(numeral("{!quote.montantPrimeCEE__c}").format(decimalFormat) + ' €');
+            if('{!LEN(DIPCSigner1)}' != '0') DIPCSigner1 = JSON.parse('{!JSENCODE(DIPCSigner1)}');
+            if('{!LEN(DIPCSigner2)}' != '0') DIPCSigner2 = JSON.parse('{!JSENCODE(DIPCSigner2)}');
+            if('{!LEN(DIPCVendeur)}' != '0') DIPCVendeur = JSON.parse('{!JSENCODE(DIPCVendeur)}');
+            if('{!LEN(contratSigner1)}' != '0') contratSigner1 = JSON.parse('{!JSENCODE(contratSigner1)}');
+            if('{!LEN(contratSigner2)}' != '0') contratSigner2 = JSON.parse('{!JSENCODE(contratSigner2)}');
+            if('{!LEN(contratVendeur)}' != '0') contratVendeur = JSON.parse('{!JSENCODE(contratVendeur)}');
+
+            // Traitement des étapes DIPC et Contrat
+            // Utilisation de la fonction TEXT sur les champ de date pour que Salesforce retourne la valeur dans le format standard "YYYY-MM-DD HH:mm:ssZ"
+            if(circuitDevis) {
+                processEtape("devis", "1", devisStatus, "{!TEXT(storedCircuitDIPC.createdDate)}", "{!TEXT(storedCircuitDIPC.Signea__LaunchDate__c)}", "{!TEXT(storedCircuitDIPC.Signea__CompletedDate__c)}", "{!storedCircuitDIPC.lancementAutomatique__c}", "{!storedCircuitDIPC.hasBeenLaunched__c}");
+                insertIcon(devisStatus, 'devis');
+            }
+            if(circuitContrat && checkIsCompleted(devisStatus)) {
+                processEtape("contrat", "2", contratStatus, "{!TEXT(storedCircuitContrat.createdDate)}", "{!TEXT(storedCircuitContrat.Signea__LaunchDate__c)}", "{!TEXT(storedCircuitContrat.Signea__CompletedDate__c)}", "{!storedCircuitContrat.lancementAutomatique__c}", "{!storedCircuitContrat.hasBeenLaunched__c}");
+                insertIcon(contratStatus, 'contrat');
+            }
+
+            // Non affichages des panneaux d'étapes si pas de circuit
+            if(!circuitDevis) {
+                j$("#content-dipc").addClass("hidden");
+                j$("#content-contrat").addClass("hidden");
+            }
+            // Cache le panneau Contrat si pas de Contrat
+            if(!circuitContrat || !checkIsCompleted(devisStatus)) {
+                //j$("#content-contrat").addClass("hidden");
+            }
+            // Initialisation des panneaux
+            initializePanels();
+            //Initialisation des boutons de lancement
+            initializeContratLaunchPanel();
+            j$('[data-toggle="tooltip"]').tooltip({
+                template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner large"></div></div>'
+            });
+        });
+
+        /* Fonction de selection des noms/infos/couleurs de chaque étapes                   */
+        /*----------------------------------------------------------------------------------*/
+        function processEtape(type, stepNumber, etapeStatus, createdDate, launchDate, completedDate, modeLancement, hasBeenLaunched) {
+            // Initialisation des informations de l'étape
+            var nomEtape2 = LABEL_ETAPES.ENVOI; var nomEtape3 = LABEL_ETAPES.SIGNATURE; var nomEtape4 = LABEL_ETAPES.ACCEPTE;
+            var infoEtape1 = ''; var infoEtape2 = ''; var infoEtape4 = '';
+            var colorEtape1 = STATUS_COLOR.FUTUR; var colorEtape2 = STATUS_COLOR.FUTUR; var colorEtape3 = STATUS_COLOR.FUTUR; var colorEtape4 = STATUS_COLOR.FUTUR;
+            var colorHeaderEtape = STATUS_COLOR.FUTUR; var etapeActuelle = ''; var labelEtapeActuelle = '';
+
+            if(etapeStatus){
+                // Infos des étapes 1 et 2 et 4
+                if(createdDate != '') infoEtape1 = 'le ' + moment(createdDate).format('DD/MM/YYYY');
+                if(launchDate != '') infoEtape2 = 'le ' + moment(launchDate).format('DD/MM/YYYY');
+                if(completedDate != '') infoEtape4 = 'le ' + moment(completedDate).format('DD/MM/YYYY');
+                //j$("#"+type+"-etape1-info").html(infoEtape1);
+
+                // Statut des signataires
+                if(type == 'devis') {
+                    signataire1 = DIPCSigner1;
+                    signataire2 = DIPCSigner2;
+                    signataire3 = DIPCVendeur;
+                } else if(type == 'contrat') {
+                    signataire1 = contratSigner1;
+                    signataire2 = contratSigner2;
+                    signataire3 = contratVendeur;
+                }
+                var signataireInitFailed = (signataire1 && signataire1.Signea__Status__c == SIGNEA_STATUS.INITIALIZATION_FAILED || (signataire2 && signataire2.Signea__Status__c == SIGNEA_STATUS.INITIALIZATION_FAILED)
+                                    || (signataire3 && signataire3.Signea__Status__c == SIGNEA_STATUS.INITIALIZATION_FAILED)) ? true : false;
+                var signataireOnGoing = (signataire1 &&signataire1.Signea__Status__c == SIGNEA_STATUS.ONGOING || (signataire2 && signataire2.Signea__Status__c == SIGNEA_STATUS.ONGOING)
+                                    || (signataire3 && signataire3.Signea__Status__c == SIGNEA_STATUS.ONGOING)) ? true : false;
+                var signataireExpired = (signataire1 && signataire1.Signea__Status__c == SIGNEA_STATUS.EXPIRED || (signataire2 && signataire2.Signea__Status__c == SIGNEA_STATUS.EXPIRED)
+                                    || (signataire3 && signataire3.Signea__Status__c == SIGNEA_STATUS.EXPIRED)) ? true : false;
+                var signataireAllRefused = ((signataire1 && (signataire1.Signea__Status__c == SIGNEA_STATUS.REFUSED || signataire1.Signea__Status__c == SIGNEA_STATUS.SEND_REFUSAL_EMAIL))
+                                    && (!signataire2 || (signataire2 && (signataire2.Signea__Status__c == SIGNEA_STATUS.REFUSED || signataire1 && (signataire1.Signea__Status__c == SIGNEA_STATUS.SEND_REFUSAL_EMAIL))))
+                                    && (!signataire3 || (signataire3 && (signataire3.Signea__Status__c == SIGNEA_STATUS.REFUSED || signataire1 && (signataire1.Signea__Status__c == SIGNEA_STATUS.SEND_REFUSAL_EMAIL))))) ? true : false;
+                // Couleurs des étapes
+
+                /*if(stepNumber > circuitStepNumber) {
+                    colorEtape1 = STATUS_COLOR.CURRENT;
+                    j$("#"+type+"-etape1-info").html("");
+                } else {*/
+                    if((etapeStatus == SIGNEA_STATUS.DRAFT || etapeStatus == SIGNEA_STATUS.FILLING || etapeStatus == SIGNEA_STATUS.FILLED) && modeLancement == "false" && hasBeenLaunched == "false"){
+                        colorEtape1 = STATUS_COLOR.CURRENT;
+                        colorHeaderEtape = STATUS_COLOR.CURRENT;
+                        var innerManualLaunch = document.getElementById(type+"-etape1").innerHTML;
+                        innerManualLaunch = innerManualLaunch+'<button class="btn btn-success btn-xs" type="button" onClick="confirmLancementContratManuel();" style="margin-top:4px"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span><b> Lancer le contrat</b></button>';
+                        document.getElementById(type+"-etape1").innerHTML = innerManualLaunch;
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                    } else if(etapeStatus == SIGNEA_STATUS.DRAFT || etapeStatus == SIGNEA_STATUS.FILLING || etapeStatus == SIGNEA_STATUS.FILLED) {
+                        colorEtape1 = STATUS_COLOR.CURRENT;
+                        colorHeaderEtape = STATUS_COLOR.CURRENT;
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                    } else if(etapeStatus == SIGNEA_STATUS.LAUNCHING || etapeStatus == SIGNEA_STATUS.LAUNCHSUCCESS) {
+                        colorEtape1 = STATUS_COLOR.OK;
+                        colorEtape2 = STATUS_COLOR.CURRENT;
+                        colorHeaderEtape = STATUS_COLOR.CURRENT;
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                    } else if(etapeStatus == SIGNEA_STATUS.LAUNCHFAILED || etapeStatus == SIGNEA_STATUS.CANCELLING || etapeStatus == SIGNEA_STATUS.CANCELLED || etapeStatus == SIGNEA_STATUS.CANCELLED_SIGNEA || signataireInitFailed) {
+                        colorEtape1 = STATUS_COLOR.KO;
+                        colorHeaderEtape = STATUS_COLOR.KO;
+                    } else if(etapeStatus == SIGNEA_STATUS.ONGOING && signataireOnGoing) {
+                        colorEtape1 = STATUS_COLOR.OK;
+                        colorEtape2 = STATUS_COLOR.OK;
+                        colorEtape3 = STATUS_COLOR.CURRENT;
+                        colorHeaderEtape = STATUS_COLOR.CURRENT;
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                        j$("#"+type+"-etape2-info").html(infoEtape2); // info étape 2
+                    } else if((etapeStatus == SIGNEA_STATUS.EXPIRED || etapeStatus == SIGNEA_STATUS.EXPIRED_SIGNEA) && signataireExpired) {
+                        colorEtape1 = STATUS_COLOR.OK;
+                        colorEtape2 = STATUS_COLOR.OK;
+                        colorEtape3 = STATUS_COLOR.KO;
+                        colorHeaderEtape = STATUS_COLOR.KO;
+                        nomEtape3 = LABEL_ETAPES.EXPIRE;
+                        j$("#"+type+"-etape3-nom").html(nomEtape3); // Nom de l'étape 3
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                        j$("#"+type+"-etape2-info").html(infoEtape2); // info étape 2
+                    } else if(etapeStatus == SIGNEA_STATUS.REFUSED || etapeStatus == SIGNEA_STATUS.REFUSED_SIGNEA || signataireAllRefused) {
+                        colorEtape1 = STATUS_COLOR.OK;
+                        colorEtape2 = STATUS_COLOR.OK;
+                        colorEtape3 = STATUS_COLOR.OK;
+                        colorEtape4 = STATUS_COLOR.KO;
+                        colorHeaderEtape = STATUS_COLOR.KO;
+                        nomEtape4 = LABEL_ETAPES.REFUSE;
+                        j$("#"+type+"-etape4-nom").html(nomEtape4); // Nom de l'étape 4
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                        j$("#"+type+"-etape2-info").html(infoEtape2); // info étape 2
+                    } else if(etapeStatus == SIGNEA_STATUS.ONGOING && (!signataireExpired && !signataireOnGoing)) {
+                        colorEtape1 = STATUS_COLOR.OK;
+                        colorEtape2 = STATUS_COLOR.OK;
+                        colorEtape3 = STATUS_COLOR.OK;
+                        colorEtape4 = STATUS_COLOR.CURRENT;
+                        colorHeaderEtape = STATUS_COLOR.CURRENT;
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                        j$("#"+type+"-etape2-info").html(infoEtape2); // info étape 2
+                    } else if(etapeStatus == SIGNEA_STATUS.COMPLETED_SIGNEA) {
+                        colorEtape1 = STATUS_COLOR.OK;
+                        colorEtape2 = STATUS_COLOR.OK;
+                        colorEtape3 = STATUS_COLOR.OK;
+                        colorEtape4 = STATUS_COLOR.CURRENT;
+                        colorHeaderEtape = STATUS_COLOR.CURRENT
+                        //nomEtape4 = LABEL_ETAPES.ACCEPTE;
+                        //j$("#"+type+"-etape4-nom").html(nomEtape4); // Nom de l'étape 4
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                        j$("#"+type+"-etape2-info").html(infoEtape2); // info étape 2
+                        j$("#"+type+"-etape4-info").html(infoEtape4); // info étape 4
+                        document.getElementById(type+"-header-etape").innerHTML = '<a href="javascript: void(0)" onClick="ouvrirDocSignataire(\'' + type + '\');" class="noVisitedColor">' + document.getElementById(type+"-header-etape").innerHTML + '</a>';
+                    } else if(etapeStatus == SIGNEA_STATUS.COMPLETED || etapeStatus == SIGNEA_STATUS.COMPLETED_CONTRALIA){
+                        colorEtape1 = STATUS_COLOR.OK;
+                        colorEtape2 = STATUS_COLOR.OK;
+                        colorEtape3 = STATUS_COLOR.OK;
+                        colorEtape4 = STATUS_COLOR.OK;
+                        colorHeaderEtape = STATUS_COLOR.OK;
+                        j$("#"+type+"-etape1-info").html(infoEtape1); // info étape 1
+                        j$("#"+type+"-etape2-info").html(infoEtape2); // info étape 2
+                        j$("#"+type+"-etape4-info").html(infoEtape4); // info étape 4
+                        document.getElementById(type+"-header-etape").innerHTML = '<a href="javascript: void(0)" onClick="ouvrirDocSignataire(\'' + type + '\');" class="noVisitedColor">' + document.getElementById(type+"-header-etape").innerHTML + '</a>';
+                    }
+                //}
+
+                // Applique les couleurs au code HTML
+                j$("#"+type+"-etape1").addClass(colorEtape1);
+                j$("#"+type+"-etape2").addClass(colorEtape2);
+                j$("#"+type+"-etape3").addClass(colorEtape3);
+                j$("#"+type+"-etape4").addClass(colorEtape4);
+                j$("#"+type+"-header-etape").addClass(colorHeaderEtape);
+
+                // Agrandissement de l'étape en cours
+                if(colorEtape1 == STATUS_COLOR.CURRENT) {
+                    etapeActuelle = type+'-etape1';
+                    labelEtapeActuelle = LABEL_ETAPES.CREE;
+                } else if(colorEtape2 == STATUS_COLOR.CURRENT) {
+                    etapeActuelle = type+'-etape2';
+                    labelEtapeActuelle = nomEtape2;
+                } else if(colorEtape3 == STATUS_COLOR.CURRENT) {
+                    etapeActuelle = type+'-etape3';
+                    labelEtapeActuelle = nomEtape3;
+                } else if(colorEtape4 == STATUS_COLOR.CURRENT || colorEtape4 == STATUS_COLOR.OK) {
+                    etapeActuelle = type+'-etape4';
+                    labelEtapeActuelle = nomEtape4;
+                }
+                j$("#"+etapeActuelle).addClass("etape-big").removeClass("etape-small");
+                if(type == "devis") devisLabelEtapeActuelle = labelEtapeActuelle;
+                else if(type == "contrat") contratLabelEtapeActuelle = labelEtapeActuelle;
+                else tvaLabelEtapeActuelle = labelEtapeActuelle;
+
+                // Suppression de la ligne d'expiration si l'étape est terminée
+                if(checkIsCompleted(etapeStatus) || signataireAllRefused || signataireExpired){
+                    j$("#"+type+"-expiration").addClass("hidden");
+                }
+            }
+        }
+
+        /* Insertion de l'icone utilisateur dans le circuit                                 */
+        /*----------------------------------------------------------------------------------*/
+        function insertIcon(circuit, type){
+            var icon; var content=''; var signataire1; var signataire2; var signataire3;
+            var iconOK; var iconKO; var iconCurrent;
+            var iconOK2; var iconKO2; var iconCurrent2;
+            var isCompletedCircuit=checkIsCompleted(circuit);
+
+            if("{!quote.compte__r.Salutation}" == 'Mme'){
+                iconOK = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Femme_OK.png')} />";
+                iconKO = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Femme_KO.png')} />";
+                iconCurrent = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Femme_En_cours.png')} />";
+            } else {
+                iconOK = "<img src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Homme_OK.png')} />";
+                iconKO = "<img src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Homme_KO.png')} />";
+                iconCurrent = "<img src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Homme_En_cours.png')} />";
+            }
+            if("{!quote.autreCompte__r.Salutation}" == 'Mme'){
+                iconOK2 = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Femme_OK.png')} />";
+                iconKO2 = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Femme_KO.png')} />";
+                iconCurrent2 = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Femme_En_cours.png')} />";
+            } else {
+                iconOK2 = "<img src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Homme_OK.png')} />";
+                iconKO2 = "<img src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Homme_KO.png')} />";
+                iconCurrent2 = "<img src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Homme_En_cours.png')} />";
+            }
+            var iconVendeurOK = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Vendeur_OK.png')} />";
+            var iconVendeurKO = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Vendeur_KO.png')} />";
+            var iconVendeurCurrent = "<img style='margin-bottom:2px; max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Signature_Vendeur_En_cours.png')} />";
+            var iconDoc = "<img style='max-width:30px; max-height:30px;' src={!URLFOR($Resource.Signea, 'icons/SIGNEA_Voir_Document_Signe.png')} />";
+
+            // Signataire
+            if(type == 'devis') {
+                signataire1 = DIPCSigner1;
+                signataire2 = DIPCSigner2;
+                signataire3 = DIPCVendeur;
+            } else if(type == 'contrat') {
+                signataire1 = contratSigner1;
+                signataire2 = contratSigner2;
+                signataire3 = contratVendeur;
+            } else {
+
+            }
+            // Affichage de l'icone seulement si l'étape Signature (ou plus) est atteinte
+            if(circuit == SIGNEA_STATUS.ONGOING || isCompletedCircuit || circuit == SIGNEA_STATUS.EXPIRED || circuit == SIGNEA_STATUS.REFUSED) {
+                content = (signataire2 || signataire3) ? '1 ' : '';
+                // Signataire 1
+                var statSign1 = signataire1.Signea__Status__c;
+                var isCompleted1 = checkIsCompleted(statSign1);
+                if(isCompleted1 || statSign1 == SIGNEA_STATUS.SIGNED || statSign1 == SIGNEA_STATUS.SEND_REFUSAL_EMAIL)
+                    icon = iconOK;
+                else if(statSign1 == SIGNEA_STATUS.REFUSED || statSign1 == SIGNEA_STATUS.CANCELLED || statSign1 == SIGNEA_STATUS.EXPIRED
+                        || statSign1 == SIGNEA_STATUS.REFUSED_SIGNEA || statSign1 == SIGNEA_STATUS.CANCELLED_SIGNEA || statSign1 == SIGNEA_STATUS.EXPIRED_SIGNEA)
+                    icon = iconKO;
+               else {
+                    if("{!circuitSignatureClientAcces}" == 'true'){
+                        if(signataire1.Signea__URL__c && signataire1.Signea__URL__c != '' && "{!quote.derogationSigneaPrincipal__c}" == 'true'){
+                            icon = '<a href="'+signataire1.Signea__URL__c+'" target="_blank">'+ iconCurrent +'</a>';
+                        }
+                        else
+                            icon = iconCurrent;
+                    }
+                    else {
+                        if(signataire1.Signea__URL__c && signataire1.Signea__URL__c != '')
+                            icon = '<a href="'+signataire1.Signea__URL__c+'" target="_blank">'+ iconCurrent +'</a>';
+                        else
+                            icon = iconCurrent;
+                    }
+                }
+                content += icon;
+                // Signataire 2
+                if(signataire2) {
+                    content += ' 2 ';
+                    var statSign2 = signataire2.Signea__Status__c;
+                    var isCompleted2 = checkIsCompleted(statSign2);
+                    if(isCompleted2 || statSign2 == SIGNEA_STATUS.SIGNED || statSign2 == SIGNEA_STATUS.SEND_REFUSAL_EMAIL)
+                        icon = iconOK2;
+                    else if(statSign2 == SIGNEA_STATUS.REFUSED || statSign2 == SIGNEA_STATUS.CANCELLED || statSign2 == SIGNEA_STATUS.EXPIRED
+                        || statSign2 == SIGNEA_STATUS.REFUSED_SIGNEA || statSign2 == SIGNEA_STATUS.CANCELLED_SIGNEA || statSign2 == SIGNEA_STATUS.EXPIRED_SIGNEA)
+                        icon = iconKO2;
+                    else {
+                        if("{!circuitSignatureClientAcces}" == 'true'){
+                            if(signataire2.Signea__URL__c && signataire2.Signea__URL__c != '' && "{!quote.derogationSigneaSecondaire__c}" == 'true'){
+                                icon = '<a href="'+signataire2.Signea__URL__c+'" target="_blank">'+ iconCurrent2 +'</a>';
+                            }
+                            else
+                                icon = iconCurrent2;
+                        }
+                        else {
+                            if(signataire2.Signea__URL__c && signataire2.Signea__URL__c != '')
+                                icon = '<a href="'+signataire2.Signea__URL__c+'" target="_blank">'+ iconCurrent2 +'</a>';
+                            else
+                                icon = iconCurrent2;
+                        }
+                    }
+                    content += icon;
+                }
+                // Vendeur
+                if(signataire3) {
+                    content += (signataire2) ? ' 3 ' : ' 2 ';
+                    var statSign3 = signataire3.Signea__Status__c;
+                    var isCompleted3 = checkIsCompleted(statSign3);
+                    if(isCompleted3 || statSign3 == SIGNEA_STATUS.SIGNED  || statSign3 == SIGNEA_STATUS.SEND_REFUSAL_EMAIL)
+                        icon = iconVendeurOK;
+                    else if(statSign3 == SIGNEA_STATUS.REFUSED || statSign3 == SIGNEA_STATUS.CANCELLED || statSign3 == SIGNEA_STATUS.EXPIRED
+                        || statSign3 == SIGNEA_STATUS.REFUSED_SIGNEA || statSign3 == SIGNEA_STATUS.CANCELLED_SIGNEA || statSign3 == SIGNEA_STATUS.EXPIRED_SIGNEA)
+                        icon = iconVendeurKO;
+                    else {
+                        if(signataire3.Signea__URL__c && signataire3.Signea__URL__c != '')
+                            icon = '<a href="'+signataire3.Signea__URL__c+'" target="_blank">'+ iconVendeurCurrent +'</a>';
+                        else
+                            icon = iconVendeurCurrent;
+                    }
+                    content += icon;
+                }
+            }
+            document.getElementById(type+"-etape3-info").innerHTML = content;
+
+            if(isCompletedCircuit) {
+                var viewDoc = document.getElementById(type+"-etape4-info").innerHTML;
+                viewDoc = viewDoc + '<br/><a href="javascript: void(0)" onClick="ouvrirDocSignataire(\'' + type + '\');">'+ iconDoc +'</a>';
+                document.getElementById(type+"-etape4-info").innerHTML = viewDoc;
+            }
+        }
+
+        /* Ouverture du lien pour document si signature manuscrite                          */
+        /*----------------------------------------------------------------------------------*/
+        function ouvrirDocSignataire(circuit){
+
+            // Signataire
+            if(circuitDevis) {
+                signataire1 = DIPCSigner1;
+                //signataire2 = DIPCSigner2;
+            } else {
+                signataire1 = contratSigner1;
+                //signataire2 = contratSigner2;
+            }
+/*
+            if(signataire1 && comboBoxValue1.val() == 'PAD'){
+                window.open(signataire1.Signea__URL__c, '_blank');
+            }
+            if(signataire2 && comboBoxValue2 && comboBoxValue2.val() == 'PAD'){
+                window.open(signataire2.Signea__URL__c, '_blank');
+            }*/
+
+            if(circuit == 'devis'){
+                window.open("{!quote.circuitSignatureDevis__r.Signea__Document_URL__c}", "_blank");
+            } else if(circuit == 'contrat') {
+                window.open("{!quote.circuitSignatureContrat__r.Signea__Document_URL__c}", "_blank");
+            }
+
+        }
+
+        /* Fonction pour initialiser l'état des panneaux                                */
+        /*------------------------------------------------------------------------------*/
+        function initializePanels() {
+            // Initialisation des panneaux
+            initializeTextPanel("panel-signataire1", "<strong>Signataire 1</strong> - {!JSENCODE(quote.compte__r.AccountNumber + ' - ' + quote.compte__r.prenom__c + ' ' + quote.compte__r.nom__c)} - {!quote.compte__r.email__c}", "Signataire 1");
+            initializeTextPanel("panel-signataire2", "<strong>Signataire 2</strong> - {!JSENCODE(quote.autreCompte__r.AccountNumber + ' - ' + quote.autreCompte__r.prenom__c + ' ' + quote.autreCompte__r.nom__c)} - {!quote.autreCompte__r.email__c}", "Signataire 2");
+            initializeTextPanel("panel-dipc", "<strong>DIPC</strong> - "+devisLabelEtapeActuelle, "DIPC");
+            initializeTextPanel("panel-contrat", "<strong>Contrat</strong> - "+contratLabelEtapeActuelle, "Contrat");
+        }
+
+        /* Fonction pour vérifier si le statut est "Completed"                          */
+        /*------------------------------------------------------------------------------*/
+        function checkIsCompleted(status) {
+            return (status==SIGNEA_STATUS.COMPLETED || status == SIGNEA_STATUS.COMPLETED_SIGNEA || status==SIGNEA_STATUS.COMPLETED_CONTRALIA) ? true : false;
+        }
+
+        /* Fonction pour afficher les messages de vérification et de confirmation          */
+        /*---------------------------------------------------------------------------------*/
+        function confirmExecuteProcess(field){
+            var circuitAuto = j$("#contratAuto").hasClass("active");
+            if(circuitAuto == true){
+                confirmCircuitAutomatique(field);
+            } else {
+                if(typeResidence != 'Principale'){
+                    confirmResidencePrincipale(field);
+                } else {
+                    confirmLancement(field);
+                }
+            }
+        }
+
+        function confirmCircuitAutomatique(field){
+            var reponse = confirm("{!$Label.signea_msg_ConfirmCircuitLaunchAuto}");
+            if (reponse == true){
+                if(typeResidence != 'Principale'){
+                    confirmResidencePrincipale(field);
+                } else {
+                    confirmLancement(field);
+                }
+            }
+        }
+
+        function confirmResidencePrincipale(field){
+            var reponse = confirm("{!$Label.signea_msg_ConfirmChantierNotPrimary}");
+            if (reponse == true){
+                confirmLancement(field);
+            }
+        }
+
+        function confirmLancement(field){
+            
+            if((typeContrat == 'Isolation (Standard)' || typeContrat == 'Isolation (Foires et Salons)') && (nbPersonnes == '' || revenuxFiscaux == '' || zoneCEE == '' || categorieCEE == '')){
+                var confirmationIsolation;
+                confirmationIsolation = confirm("{!$Label.signea_msg_ConfirmMessageLancementIsolation}");
+                if (confirmationIsolation == true) {
+                    // Chargement
+                    j$(field).html('<span class="loader loader-quart"></span>');
+                    j$(".btn").attr ('disabled', true);
+                    executeProcess();
+                }
+            } else {
+                var confirmation;
+                confirmation = confirm("{!$Label.signea_msg_ConfirmMessageLancement}");
+                if (confirmation == true) {
+                    // Chargement
+                    j$(field).html('<span class="loader loader-quart"></span>');
+                    j$(".btn").attr ('disabled', true);
+                    executeProcess();
+                }
+            }
+        }
+
+        function confirmLancementContratManuel(){
+            var confirmation;
+            confirmation = confirm("{!$Label.signea_msg_ConfirmMessageLancement}");
+            if (confirmation == true) {
+                launchManualCircuit();
+            }
+        }
+
+        /* Fonction pour sélectionner le lancement de contrat en fonction du montant CEE         */
+        /*---------------------------------------------------------------------------------------*/
+        function initializeContratLaunchPanel(){
+            if("{!quote.montantPrimeCEE__c}" == 'null' || "{!quote.montantPrimeCEE__c}" == '' || "{!quote.montantPrimeCEE__c}" == '0'){
+                enableAutoLaunch(true);
+                j$("#contratManuel").addClass('disabled');
+            } else {
+                enableAutoLaunch(false);
+            }
+        }
+
+        function enableAutoLaunch(trigger){
+            if(!trigger){
+                j$("#contratAuto").removeClass('active');
+                j$("#contratManuel").addClass('active');
+                rerenderAutoLaunchField(false);
+            } else if(trigger){
+                j$("#contratAuto").addClass('active');
+                j$("#contratManuel").removeClass('active');
+                rerenderAutoLaunchField(true);
+            }
+
+
+        }
+
+    </script>
+
+    <style>
+        @media screen and (min-width: 768px) {
+            .visualstrap .jumbotron {
+                padding-top: 30px !important;
+                padding-bottom: 30px !important;
+            }
+        }
+
+        .jumbotron {
+            margin-bottom: 20px !important;
+        }
+
+        #circuit-dipc, #circuit-contrat, #circuit-TVA {
+            text-align: center;
+        }
+
+            #circuit-dipc:before, #circuit-contrat:before, #circuit-TVA:before {
+                content: '';
+                display: inline-block;
+                height: 100%;
+                vertical-align: middle;
+                margin-right: -0.25em; /* space width */
+            }
+
+        .etape {
+            border: 1px solid transparent;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-flow: column;
+        }
+
+        .etape-header {
+            border: 1px solid transparent;
+            border-radius: 4px;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .etape-small {
+            height: 65px;
+        }
+
+        .etape-big {
+            height: 85px;
+        }
+
+        .etape-green {
+            background-color: #3cb63d;
+            border-color: #74cc66;
+            color: #ffffff;
+        }
+
+        .etape-red {
+            color: #ffffff;
+            background-color: #d9534f;
+            border-color: #d43f3a;
+        }
+
+        .etape-orange {
+            color: #000000;
+            background-color: #f0ad4e;
+            border-color: #eea236;
+        }
+
+        .etape-grey {
+            color: #000000;
+            background-color: #999999;
+            border-color: #999999;
+        }
+
+        .etape-green a, .etape-red a {
+            color: #ffffff;
+        }
+
+        .etape-orange a, .etape-grey a {
+            color: #000000;
+        }
+
+        /* Small devices (tablets, 768px and up) */
+        @media (min-width: 768px) {
+            .vertical-align-column {
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: -ms-flexbox;
+                display: flex;
+                -webkit-box-align: center;
+                -webkit-align-items: center;
+                -ms-flex-align: center;
+                align-items: center;
+                -webkit-box-pack: center;
+                -webkit-justify-content: center;
+                -ms-flex-pack: center;
+                justify-content: center;
+                -webkit-box-orient: horizontal;
+                -webkit-box-direction: normal;
+                -webkit-flex-direction: column;
+                -ms-flex-direction: column;
+                flex-direction: column;
+            }
+        }
+
+        /* Small devices (tablets, 768px and up) */
+        @media (min-width: 768px) {
+            .vertical-align {
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: -ms-flexbox;
+                display: flex;
+                -webkit-box-align: center;
+                -webkit-align-items: center;
+                -ms-flex-align: center;
+                align-items: center;
+                -webkit-box-pack: center;
+                -webkit-justify-content: center;
+                -ms-flex-pack: center;
+                justify-content: center;
+                -webkit-box-orient: horizontal;
+                -webkit-box-direction: normal;
+                -webkit-flex-direction: row;
+                -ms-flex-direction: row;
+                flex-direction: row;
+            }
+        }
+
+        .large.tooltip-inner {
+            max-width: 500px;
+            width: 500px;
+        }
+    </style>
+    <body>
+        <apex:stylesheet value="{!URLFOR($Resource.KparK_Page_CSS)}" />
+        <apex:stylesheet value="{!URLFOR($Resource.bootstrapDatepicker_js, 'css/datepicker.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.Font_awesome, 'css/font-awesome.min.css')}" />
+        <c:importvisualstrap theme="default" />
+        <apex:outputpanel styleclass="visualstrap visualstrap-flatly visualstrap-lumen visualstrap-superhero" layout="block">
+            <apex:form styleclass="form-inline">
+                <div id="content-end" class="hidden">
+                    <div class="col-md-12 text-center alert alert-danger">
+                        Erreur : Vous devez être propriétaire du devis pour pouvoir lancer les circuits de signature ou les signer.
+                    </div>
+                </div>
+                <div id="content-start" style="padding:20px 10px 20px 10px;">
+                    <apex:actionfunction name="renrenderComboBoxList1" rerender="signataire1SignType">
+                        <apex:param name="comboBox2" assignto="{!signataire2SignType}" value="" />
+                    </apex:actionfunction>
+                    <apex:actionfunction name="renrenderComboBoxList2" rerender="signataire2SignType">
+                        <apex:param name="comboBox1" assignto="{!signataire1SignType}" value="" />
+                    </apex:actionfunction>
+                    <apex:actionfunction name="rerenderAutoLaunchField" rerender="hiddenFields">
+                        <apex:param name="p1" assignto="{!autoLaunchField}" value="" />
+                    </apex:actionfunction>
+                    <apex:outputpanel id="hiddenFields">
+                        <apex:inputhidden id="autoLaunchField" value="{!autoLaunchField}" />
+                    </apex:outputpanel>
+
+
+                    <apex:actionfunction name="executeProcess" action="{!execute}" />
+                    <apex:actionfunction name="launchManualCircuit" action="{!launchManualCircuit}" />
+
+                    <!-- PANEL TITRE -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="jumbotron">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h2><strong>{!quote.numeroDevis__c}</strong></h2>
+                                        <p>{!quote.name}</p>
+                                        <p style="display:inline; margin-right:40px;">
+                                            <label class="control-label" style="margin-right:10px;">Transmission</label>
+                                            <span style="vertical-align: bottom;">
+                                                <apex:outputtext value="{0,date,dd/MM/yyyy}">
+                                                    <apex:param value="{!quote.dateTransmissionClient__c}" />
+                                                </apex:outputtext>
+                                            </span>
+                                        </p>
+                                        <p style="display:inline;">
+                                            <label class="control-label" style="margin-right:10px;">Acceptation</label>
+                                            <span style="vertical-align: bottom;">
+                                                <apex:outputtext value="{0,date,dd/MM/yyyy}">
+                                                    <apex:param value="{!quote.dateAcceptationClient__c}" />
+                                                </apex:outputtext>
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="col-xs-12 col-md-4" style="text-align:right; padding-top:20px;">
+                                        <apex:outputpanel layout="none" rendered="{!ISNULL(quote.circuitSignatureDevis__c) && (CONTAINS(userProfile.name, 'Administrateur') || circuitAcces)}">
+                                            <!--<apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.moyenTransmissionClient__c)}">-->
+                                            <apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && 
+                                                ( 
+                                                    ( ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.circuitSignatureDevis__c) ) 
+                                                    || (  NOT(ISNULL(quote.dateTransmissionClient__c)) && ISNULL(quote.circuitSignatureDevis__c))
+                                                )}">
+                                                <apex:outputpanel layout="none" rendered="{!NOT(ISNULL(documentType))}">
+                                                    <!-- <apex:commandButton action="{!execute}" styleClass="btn btn-default btn-danger btn-lg" value="{!signButtonValue}"/> -->
+                                                    <button type="button" class="btn btn-default btn-danger btn-lg" style="margin-top:10px; margin-bottom:10px;" value="{!signButtonValue}" onclick="confirmExecuteProcess(this);">{!signButtonValue}</button>
+                                                </apex:outputpanel>
+                                            </apex:outputpanel>
+                                        </apex:outputpanel>
+                                        <apex:outputpanel layout="none" rendered="{!NOT(ISNULL(quote.circuitSignatureDevis__c))}">
+                                            <div style="display: inline-block;">
+                                                <div class="etape-header" id="devis-header-etape">
+                                                    <strong>DIPC</strong>
+                                                </div>
+                                            </div>
+                                            <div style="display: inline-block;">
+                                                <div class="etape-header" id="contrat-header-etape">
+                                                    <strong>Contrat</strong>
+                                                </div>
+                                            </div>
+                                            <!-- <div style="display: inline-block;" id="tva-header">
+                                                <div class="etape-header" id="tva-header-etape">
+                                                    <div style="color:white;"><strong>TVA</strong></div>
+                                                </div>
+                                            </div> -->
+                                        </apex:outputpanel><br/>
+                                        <apex:outputpanel layout="none" rendered="{!ISNULL(quote.circuitSignatureDevis__c) && (CONTAINS(userProfile.name, 'Administrateur') || circuitAcces)}">
+                                            <apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.moyenTransmissionClient__c) && NOT(ISNULL(documentType))}">
+                                                <apex:outputpanel layout="none" rendered="{!quote.montantPrimeCEE__c == null || quote.montantPrimeCEE__c > 0}">
+                                                    <label class="control-label" style="margin-right:10px;">Circuit de signature du contrat automatique</label>
+                                                    <div class="btn-group" role="group" aria-label="...">
+                                                        <button type="button" id="contratAuto" class="btn btn-default" onClick="enableAutoLaunch(true)">Oui</button>
+                                                        <button type="button" id="contratManuel" class="btn btn-default" onClick="enableAutoLaunch(false)">Non</button>
+                                                    </div>
+                                                    <button type="button" class="disabled" style="padding:0 3px 0 3px; border-radius: 40%;" data-toggle="tooltip" data-placement="left" title="Un rendez-vous de contrôle technique est peut être nécessaire avant la signature du circuit du contrat par le client. Dans ce cas, sélectionner Non, le circuit de signature du contrat ne sera alors pas lancé automatiquement lors de la réception de la signature du DIPC. Vous devrez le lancer manuellement lorsque le rendez-vous technique aura été effectué."> ? </button>
+                                                </apex:outputpanel>
+                                            </apex:outputpanel>
+                                        </apex:outputpanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                        <div class="col-md-12 col-sm-12 col-xs-12 alert {!IF(message.SeverityStr=='confirm','alert-success',IF(message.SeverityStr=='info',
+                                    'alert-info',IF(message.SeverityStr=='warn','alert-warning','alert-danger')))}">
+                            <apex:outputtext value="{!message.Message}" escape="false" />
+                        </div>
+                    </apex:repeat>
+
+                    <div class="row">
+                        <!-- PANEL CHANTIER -->
+                        <div class="col-md-6">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h5 style="cursor: pointer;">
+                                        <a id="#panel-chantierTitle" data-toggle="collapse" data-target="#panel-chantier" class="panel-title" aria-expanded="false" aria-controls="panel-chantier">Chantier</a>
+                                    </h5>
+                                </div>
+                                <div class="panel-body collapse in" id="panel-chantier">
+                                    <div class="row">
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Identification</label>
+                                        <div class="col-xs-6 col-sm-7 col-md-8 col-lg-9"><a href="/{!quote.opportunity.chantier__r.Id}">{!quote.opportunity.chantier__r.numeroChantier__c} - {!quote.opportunity.chantier__r.Name}</a></div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Rue</label>
+                                        <div class="col-xs-6 col-sm-7 col-md-8 col-lg-9">{!quote.opportunity.chantier__r.rue__c}</div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Complément d'adresse</label>
+                                        <div class="col-xs-6 col-sm-7 col-md-8 col-lg-9">{!quote.opportunity.chantier__r.complementAdresse__c}</div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Ville</label>
+                                        <div class="col-xs-6 col-sm-7 col-md-8 col-lg-9">{!quote.opportunity.chantier__r.codePostal__c} {!quote.opportunity.chantier__r.ville__c}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PANEL DEVIS -->
+                        <div class="col-md-6">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h5 style="cursor: pointer;">
+                                        <a id="panel-devisTitle" data-toggle="collapse" data-target="#panel-devis" class="panel-title" aria-expanded="false" aria-controls="panel-devis">Devis</a>
+                                    </h5>
+                                </div>
+                                <div class="panel-body collapse in" id="panel-devis">
+                                    <div class="row">
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Date du devis</label>
+                                        <div class="col-xs-6 col-sm-5 col-md-4 col-lg-3">
+                                            <apex:outputtext value="{0,date,dd/MM/yyyy}">
+                                                <apex:param value="{!quote.dateDevis__c}" />
+                                            </apex:outputtext>
+                                        </div>
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Date d'expiration</label>
+                                        <div class="col-xs-6 col-sm-5 col-md-4 col-lg-3">
+                                            <apex:outputtext value="{0,date,dd/MM/yyyy}">
+                                                <apex:param value="{!quote.ExpirationDate}" />
+                                            </apex:outputtext>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Montant TTC</label>
+                                        <div class="col-xs-6 col-sm-5 col-md-4 col-lg-3" id="montantTTC">{!quote.TotalTTCdevis__c}</div>
+                                        <apex:outputpanel layout="none" rendered="{!quote.montantPrimeCEE__c != null && quote.montantPrimeCEE__c > 0}">
+                                            <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Montant CEE</label>
+                                            <div class="col-xs-6 col-sm-5 col-md-4 col-lg-3" id="montantCEE">{!quote.montantPrimeCEE__c}</div>
+                                        </apex:outputpanel>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-6 col-sm-5 col-md-4 col-lg-3 control-label">Mode de financement</label>
+                                        <div class="col-xs-6 col-sm-7 col-md-8 col-lg-9">{!quote.modeFinancement__c}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL DIPC -->
+                    <div class="row" id="content-dipc">
+                        <div class="col-md-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h5 style="cursor: pointer;">
+                                        <a id="panel-dipcTitle" data-toggle="collapse" data-target="#panel-dipc" class="panel-title" aria-expanded="false" aria-controls="panel-dipc">
+                                            DIPC
+                                        </a>
+                                    </h5>
+                                </div>
+                                <div class="panel-body collapse in" id="panel-dipc">
+                                    <div class="row vertical-align" id="circuit-dipc">
+                                        <div class="col-md-2">
+                                            <div id="devis-etape1" class="etape etape-small vertical-align-column">
+                                                <div><strong id="devis-etape1-nom">Créé</strong></div>
+                                                <div id="devis-etape1-info"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left:0px; padding-right:0px; padding-top:10px; padding-bottom:10px;">
+                                            <div style="height:75px;">
+                                                <span aria-hidden="true" class="fa fa-long-arrow-right hidden-xs " style="font-size:75px;"></span>
+                                                <span aria-hidden="true" class="fa fa-long-arrow-down hidden-md hidden-lg hidden-sm" style="font-size:75px;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div id="devis-etape2" class="etape etape-small vertical-align-column">
+                                                <div><strong id="devis-etape2-nom">Envoyé</strong></div>
+                                                <div id="devis-etape2-info"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left:0px; padding-right:0px; padding-top:10px; padding-bottom:10px;">
+                                            <div style="height:75px;">
+                                                <span aria-hidden="true" class="fa fa-long-arrow-right hidden-xs " style="font-size:75px;"></span>
+                                                <span aria-hidden="true" class="fa fa-long-arrow-down hidden-md hidden-lg hidden-sm" style="font-size:75px;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div id="devis-etape3" class="etape etape-small vertical-align-column">
+                                                <div><strong id="devis-etape3-nom">Signature</strong></div>
+                                                <div id="devis-etape3-info"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left:0px; padding-right:0px; padding-top:10px; padding-bottom:10px;">
+                                            <div style="height:75px;">
+                                                <span aria-hidden="true" class="fa fa-long-arrow-right hidden-xs " style="font-size:75px;"></span>
+                                                <span aria-hidden="true" class="fa fa-long-arrow-down hidden-md hidden-lg hidden-sm" style="font-size:75px;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div id="devis-etape4" class="etape etape-small vertical-align-column">
+                                                <div><strong id="devis-etape4-nom">Accepté</strong></div>
+                                                <div id="devis-etape4-info"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-10" id="devis-expiration" style="padding-left:0px; margin-top:10px;">
+                                            <apex:outputpanel layout="none" rendered="{!NOT(ISNULL(storedCircuitDIPC.Signea__Expiration_Date__c)) && devisShowExpire}">
+                                                <label class="col-xs-2 col-sm-3 col-md-2 col-lg-2 control-label">Expiration</label>
+                                                <div class="col-xs-2 col-sm-3 col-md-2 col-lg-2">
+                                                    <apex:outputtext value="{0,date,dd/MM/yyyy}">
+                                                        <apex:param value="{!storedCircuitDIPC.Signea__Expiration_Date__c}" />
+                                                    </apex:outputtext>
+                                                </div>
+                                                <div class="col-xs-8 col-sm-3 col-md-4 col-lg-4" id="expiAutoDevis">
+                                                    Il reste {!storedCircuitDIPC.Signea__Expiration_Date__c - TODAY()} jours avant l'expiration automatique
+                                                </div>
+                                            </apex:outputpanel>
+                                        </div>
+                                        <apex:outputpanel layout="none" rendered="{!circuitDetailAcces}">
+                                            <div class="col-md-2" style="float:right;" id="devis-detail">
+                                                <a style="margin-top: 5px;" class="btn btn-link" href="/{!quote.circuitSignatureDevis__c}?retUrl=/apex/VF_Signea&quoteId={!quote.Id}" target='_blank'>Détails du circuit</a>
+                                            </div>
+                                        </apex:outputpanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL CONTRAT -->
+                    <div class="row" id="content-contrat">
+                        <div class="col-md-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h5 style="cursor: pointer;">
+                                        <a id="panel-contratTitle" data-toggle="collapse" data-target="#panel-contrat" class="panel-title" aria-expanded="false" aria-controls="panel-contrat">
+                                            Contrat
+                                        </a>
+                                    </h5>
+                                </div>
+                                <div class="panel-body collapse in" id="panel-contrat">
+                                    <div class="row vertical-align" id="circuit-contrat">
+                                        <div class="col-md-2">
+                                            <div id="contrat-etape1" class="etape etape-small vertical-align-column">
+                                                <div><strong id="contrat-etape1-nom">Créé</strong></div>
+                                                <div id="contrat-etape1-info"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left:0px; padding-right:0px; padding-top:10px; padding-bottom:10px;">
+                                            <div style="height:75px;">
+                                                <span aria-hidden="true" class="fa fa-long-arrow-right hidden-xs " style="font-size:75px;"></span>
+                                                <span aria-hidden="true" class="fa fa-long-arrow-down hidden-md hidden-lg hidden-sm" style="font-size:75px;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div id="contrat-etape2" class="etape etape-small vertical-align-column">
+                                                <div><strong id="contrat-etape2-nom">Envoyé</strong></div>
+                                                <div id="contrat-etape2-info"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left:0px; padding-right:0px; padding-top:10px; padding-bottom:10px;">
+                                            <div style="height:75px;">
+                                                <span aria-hidden="true" class="fa fa-long-arrow-right hidden-xs " style="font-size:75px;"></span>
+                                                <span aria-hidden="true" class="fa fa-long-arrow-down hidden-md hidden-lg hidden-sm" style="font-size:75px;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div id="contrat-etape3" class="etape etape-small vertical-align-column">
+                                                <div><strong id="contrat-etape3-nom">Signature</strong></div>
+                                                <div id="contrat-etape3-info"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left:0px; padding-right:0px; padding-top:10px; padding-bottom:10px;">
+                                            <div style="height:75px;">
+                                                <span aria-hidden="true" class="fa fa-long-arrow-right hidden-xs " style="font-size:75px;"></span>
+                                                <span aria-hidden="true" class="fa fa-long-arrow-down hidden-md hidden-lg hidden-sm" style="font-size:75px;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div id="contrat-etape4" class="etape etape-small vertical-align-column">
+                                                <div><strong id="contrat-etape4-nom">Accepté</strong></div>
+                                                <div id="contrat-etape4-info"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-9" id="contrat-expiration" style="padding-left:0px; margin-top:10px;">
+                                            <apex:outputpanel layout="none" rendered="{!NOT(ISNULL(storedCircuitContrat.Signea__Expiration_Date__c)) && contratShowExpire}">
+                                                <label class="col-xs-2 col-sm-3 col-md-2 col-lg-2 control-label">Expiration</label>
+                                                <div class="col-xs-2 col-sm-3 col-md-2 col-lg-2">
+                                                    <apex:outputtext value="{0,date,dd/MM/yyyy}">
+                                                        <apex:param value="{!storedCircuitContrat.Signea__Expiration_Date__c}" />
+                                                    </apex:outputtext>
+                                                </div>
+                                                <div class="col-xs-8 col-sm-3 col-md-4 col-lg-4" id="expiAutoContrat">
+                                                    Il reste {!storedCircuitContrat.Signea__Expiration_Date__c - TODAY()} jours avant l'expiration automatique
+                                                </div>
+                                            </apex:outputpanel>
+                                        </div>
+                                        <apex:outputpanel layout="none" rendered="{!circuitDetailAcces}">
+                                            <div class="col-md-2" style="float:right;" id="contrat-detail">
+                                                <a style="margin-top: 5px;" class="btn btn-link" href="/{!quote.circuitSignatureContrat__c}?retUrl=/apex/VF_Signea&quoteId={!quote.Id}" target='_blank'>Détails du circuit</a>
+                                            </div>
+                                        </apex:outputpanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL SIGNATAIRE1 -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h5 style="cursor: pointer;">
+                                        <a id="panel-signataire1Title" data-toggle="collapse" data-target="#panel-signataire1" class="panel-title" aria-expanded="false" aria-controls="panel-signataire1">
+                                            Signataire 1
+                                        </a>
+                                    </h5>
+                                    <!--<apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.moyenTransmissionClient__c)}">-->
+                                    <apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ( 
+                                        ( ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.circuitSignatureDevis__c) ) 
+                                        || (  NOT(ISNULL(quote.dateTransmissionClient__c)) && ISNULL(quote.circuitSignatureDevis__c))
+                                    )}">
+                                        <apex:outputpanel layout="none" rendered="{!NOT(ISNULL(documentType))}">
+                                            <apex:outputpanel layout="none" rendered="{!ISNULL(quote.circuitSignatureDevis__c)}">
+                                                <div style="float:right; position:absolute; top:5px; right:25px;" id="dropdown1">
+                                                    <apex:selectlist styleclass="form-control input-sm btn-warning" size="1" id="signataire1SignType" value="{!signataire1SignType}" onchange="renrenderComboBoxList2(this.value);">
+                                                        <apex:selectoptions value="{!manuscriteList}" />
+                                                    </apex:selectlist>
+                                                </div>
+                                            </apex:outputpanel>
+                                        </apex:outputpanel>
+                                    </apex:outputpanel>
+                                </div>
+                                <div class="panel-body collapse in" id="panel-signataire1">
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Identification</label>
+                                        <div class="col-xs-6 col-sm-6 col-md-7 col-lg-10"><a href="/{!quote.compte__r.Id}">{!quote.compte__r.AccountNumber + ' - ' + quote.compte__r.prenom__c + ' ' + quote.compte__r.nom__c}</a></div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Rue</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.rue__c}</div>
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Email</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.email__c}</div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Complément d'adresse</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.complementAdresse__c}</div>
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Téléphone domicile</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.telephoneDomicile__c}</div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Ville</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.codePostal__c} {!quote.compte__r.ville__c}</div>
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Téléphone mobile</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.telephoneMobile__c}</div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Pays</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.pays__c}</div>
+                                        <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Autre téléphone</label>
+                                        <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.compte__r.autreTelephone__c}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL SIGNATAIRE2 -->
+                    <apex:outputpanel rendered="{!IF( quote.autreCompte__c != null, TRUE, FALSE)}">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h5 style="cursor: pointer;">
+                                            <a id="panel-signataire2Title" data-toggle="collapse" data-target="#panel-signataire2" class="panel-title" aria-expanded="false" aria-controls="panel-signataire2">
+                                                Signataire 2
+                                            </a>
+                                        </h5>
+                                        <!--<apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.moyenTransmissionClient__c)}">-->
+                                        <apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ( 
+                                            ( ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.circuitSignatureDevis__c) ) 
+                                            || (  NOT(ISNULL(quote.dateTransmissionClient__c)) && ISNULL(quote.circuitSignatureDevis__c))
+                                        )}">
+                                            <apex:outputpanel layout="none" rendered="{!NOT(ISNULL(documentType))}">
+                                                <apex:outputpanel layout="none" rendered="{!ISNULL(quote.circuitSignatureDevis__c)}">
+                                                    <div style="float:right; position:absolute; top:5px; right:25px;" id="dropdown2">
+                                                        <apex:selectlist styleclass="form-control input-sm btn-warning" size="1" id="signataire2SignType" value="{!signataire2SignType}" onchange="renrenderComboBoxList1(this.value);">
+                                                            <apex:selectoptions value="{!manuscriteList2}" />
+                                                        </apex:selectlist>
+                                                    </div>
+                                                </apex:outputpanel>
+                                            </apex:outputpanel>
+                                        </apex:outputpanel>
+                                    </div>
+                                    <div class="panel-body collapse in" id="panel-signataire2">
+                                        <div class="row" style="margin-bottom: 20px;">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Identification</label>
+                                            <div class="col-xs-6 col-sm-6 col-md-7 col-lg-10"><a href="/{!quote.autreCompte__r.Id}">{!quote.autreCompte__r.AccountNumber + ' - ' + quote.autreCompte__r.prenom__c + ' ' + quote.autreCompte__r.nom__c}</a></div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Rue</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.rue__c}</div>
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Email</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.email__c}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Complément d'adresse</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.complementAdresse__c}</div>
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Téléphone domicile</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.telephoneDomicile__c}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Ville</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.codePostal__c} {!quote.autreCompte__r.ville__c}</div>
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Téléphone mobile</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.telephoneMobile__c}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Pays</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.pays__c}</div>
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Autre téléphone</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!quote.autreCompte__r.autreTelephone__c}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:outputpanel>
+
+                    <!-- PANEL VENDEUR -->
+                    <apex:outputpanel >
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h5 style="cursor: pointer;">
+                                            <a id="panel-vendeurTitle" data-toggle="collapse" data-target="#panel-vendeur" class="panel-title" aria-expanded="false" aria-controls="panel-vendeur">
+                                                Vendeur
+                                            </a>
+                                        </h5>
+                                        <!--<apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.moyenTransmissionClient__c)}">-->
+                                        <apex:outputpanel layout="none" rendered="{!ISNULL(quote.dateAcceptationClient__c) && ( 
+                                            ( ISNULL(quote.dateTransmissionClient__c) && ISNULL(quote.circuitSignatureDevis__c) ) 
+                                            || (  NOT(ISNULL(quote.dateTransmissionClient__c)) && ISNULL(quote.circuitSignatureDevis__c))
+                                        )}">
+                                            <apex:outputpanel layout="none" rendered="{!NOT(ISNULL(documentType))}">
+                                                <apex:outputpanel layout="none" rendered="{!ISNULL(quote.circuitSignatureDevis__c)}">
+                                                    <div style="float:right; position:absolute; top:5px; right:25px;" id="dropdown2">
+                                                        <apex:selectlist styleclass="form-control input-sm btn-warning" size="1" id="vendeurSignType" value="{!vendeurSignType}">
+                                                            <apex:selectoptions value="{!manuscriteListVendeur}" />
+                                                        </apex:selectlist>
+                                                    </div>
+                                                </apex:outputpanel>
+                                            </apex:outputpanel>
+                                        </apex:outputpanel>
+                                    </div>
+                                    <div class="panel-body collapse in" id="panel-vendeur">
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Nom</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!IF(quote.companySigned__c != null, quote.companySigned__r.FirstName+" "+quote.companySigned__r.LastName, $User.FirstName+" "+$User.LastName)}</div>
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Email</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!IF(quote.companySigned__c != null, quote.companySigned__r.Email, $User.Email)}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Nom du profile</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!IF(quote.companySigned__c != null, quote.companySigned__r.ProfileName__c, $User.ProfileName__c)}</div>
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Téléphone</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!IF(quote.companySigned__c != null, quote.companySigned__r.Phone, $User.Phone)}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">Magasin</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!IF(quote.companySigned__c != null, quote.companySigned__r.CodeMagasin__c+" "+quote.companySigned__r.libelleMagasin__c, $User.CodeMagasin__c+" "+$User.libelleMagasin__c)}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-xs-3 col-sm-3 col-md-2 col-lg-2 control-label">DV</label>
+                                            <div class="col-xs-3 col-sm-3 col-md-4 col-lg-4">{!IF(quote.companySigned__c != null, quote.companySigned__r.CodeDV__c+" "+quote.companySigned__r.LibelleDV__c, $User.CodeDV__c+" "+$User.LibelleDV__c)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:outputpanel>
+                </div>
+            </apex:form>
+        </apex:outputpanel>
+    </body>
+</apex:page>

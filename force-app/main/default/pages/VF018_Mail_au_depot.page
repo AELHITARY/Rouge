@@ -1,0 +1,9 @@
+<apex:page controller="Ctrl018_Mail_au_depot" sidebar="false" showHeader="false" action="{!init}" >
+    <apex:includeScript value="{!$Resource.jquery}"/>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            alert("Le dépôt n'a pu être trouvé.");
+            window.location = '/{!myCase.Id}';
+        });
+    </script>
+</apex:page>

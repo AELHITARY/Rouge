@@ -1,0 +1,198 @@
+<apex:component allowDML="true" >
+<apex:attribute name="filter"  description="filter controller" type="Utils_Filter" />
+
+<apex:includeScript value="{!$Resource.jquery}"/>    
+<apex:includeScript value="{!$Resource.FilterJS}"/>
+
+<style type="text/css">
+
+	#op{
+	  width: 120px;
+	}
+	#mainfilters div{
+	    margin: 5px 5px;  
+	    width: 700px;
+	}
+	
+	#standardLink,#advancedBlock,#saveFilterBloc k{
+	    display: none;
+	}
+	#filterTable{
+	    font-size: 12px;
+	    width/*\**/:50%\9;
+	}
+	.erase-btn {text-align: right;display: block;padding-right: 40px;padding-right/*\**/: 120px\9;}
+	#filterTable th{
+	    font-weight: bold;
+	    margin: 0;
+	    padding: 0;
+	    text-align: left;
+	    white-space: nowrap;
+	   /* width: 10.1%;*/
+	    width:217px;
+	}
+	#filterTable td{
+	    cursor: default;
+	    font-size: 12px;
+	    width:210px;
+	    padding-right:0.5em;
+	    padding-left:0;
+	}
+	#filterTable select{
+	    font-size: 91%;
+	}
+	
+	#filterTable select,#filterTable input,#filterTable option {
+		width: 175px;
+	}
+
+	#filterTable tr { display:block}
+	#advancedBlock input
+	{
+	    width: 300px;
+	}
+	.lookupSPV a{
+	    background-image: url("/img/func_icons/util/lookup20.gif");
+	    background-position: left top;
+	    height: 20px;
+	    width: 20px;
+	    margin: -6px 0;
+	    padding: 0;
+	    display: inline-block;
+	}
+	.lookupSPV a:HOVER {
+	     background-position: right top;
+	}
+	.datePickerIcon{
+		display: inline-block;
+	}
+	.visible{
+	    visibility: visible;
+	}
+	.hidden{
+	   visibility: hidden;* 
+	} 
+	.blue{
+		color: #1797c0;
+	}
+	.erase-fltr { width: 58% !important}
+</style>
+
+<script type="text/javascript">
+var AND_Label= '{!$Label.Filter_And}'; 
+var NOF = {!filter.NOF};
+var SFObjectID='{!filter.ObjectName}';
+var filterNumber = 1;
+</script>
+
+<div style="display: none;">
+    
+  <div id="sfselect">
+    <apex:selectList multiselect="false" size="1" id="SFObjFields" >
+        <apex:selectOption ItemLabel="--Aucun--" Itemvalue=""/>    
+        <apex:selectOptions value="{!filter.ObjFields}"/>
+    </apex:selectList>
+   </div>
+    
+    <select id="filter">
+      <option value="e">égal à</option>
+      <option value="n">différent de</option>
+      <option value="s">commence par</option>
+      <option value="c">contient</option>
+      <option value="k">ne contient pas</option>
+      <option value="l">inférieur à</option>
+      <option value="g">supérieur à</option>
+      <option value="m">inférieur ou égal à</option>
+      <option value="h">supérieur ou égal à</option>
+      <option value="u">inclut</option>
+      <option value="x">exclut</option>       
+    </select>
+    
+
+	<div id="fr">
+		<apex:repeat value="{!filter.FilterRowList}" var="fr" >
+			<apex:inputText value="{!fr.fieldpath}" /> 
+		 </apex:repeat> 
+	 </div> 
+
+	<div id="advanced">
+   		<apex:inputText value="{!filter.advanced}" /> 
+	</div>
+</div>
+	
+
+
+<div>
+
+<!-- <apex:pageMessages id="msgFilter"/> -->  
+
+</div>
+<div id="mainfilters" >
+    <table cellspacing="5" cellpadding="0" border="0" id="filterTable">
+     <tbody> 
+        <tr>
+               
+            <th>{!$label.filter_Field_label}</th>
+            <th>{!$label.filter_Operator_label}</th>
+            <th>{!$label.filter_Value_label}</th>
+            <th>&nbsp;</th>
+        </tr> 
+     </tbody>                                   
+    </table>
+    
+    
+    <table class="erase-fltr" >
+    	<tr> 
+    		<td>
+    			<apex:outputPanel layout="none" rendered="{!filter.showAdancedFilter}">
+					<apex:commandlink value="{!$Label.Filter_Add_Row}" action="{!filter.addRow}" onclick="setSql()"/>&nbsp;&nbsp;
+    				<apex:commandlink value="{!$Label.Filter_Remove_Row}" action="{!filter.removeRow}" onclick="setSql()" />
+    			</apex:outputPanel>
+    		</td>
+    		<td class="erase-btn"><a href="javascript:void(0)" onclick="clearFilter()" >{!$Label.Filter_Clear}</a></td>
+    	</tr>
+    </table>
+    
+	
+	<apex:outputPanel layout="none" rendered="{!filter.showAdancedFilter}">
+    <div >
+        <a href="javascript:void(0)" onclick="advanced()" id="advancedLink">{!$Label.Filter_Advanced}</a>
+        <a href="javascript:void(0)" onclick="standard()" id="standardLink">{!$Label.Filter_Clear_Advanced}</a>
+    </div>
+    </apex:outputPanel>
+    
+    <div id="advancedBlock">
+        <div>{!$Label.Filter_Advanced_Conditions}:</div>
+        <div>
+            <apex:inputText value="{!filter.queryAdvancedOpt}" id="param"/>
+            	         <span id="queryAdvancedOptLabel"  class="help dn">
+	            		 &nbsp;<span class="blue">Help</span>&nbsp; <img title="Advanced Filter Conditions Tooltip TODO" class="helpIcon" src="/img/alohaSkin/help_grey.png"/>
+	            	</span>
+        </div>
+        <div id="BooleanFiltersHelp" style="display: none;"> 
+            <img width="533" height="211" title="Boolean Filters Help" alt="Boolean Filters Help" src="/img/report_boolean_filter.gif"/>
+        </div>
+    </div>
+
+		
+
+    
+    <script type="text/javascript">
+        sortSelect("#sfselect select");
+
+        for (var i=1 ; i < ({!filter.NOF} + 1) ; i++){
+         	$("#filterTable").append(createRow(i));
+         	appendFieldSelect('fields'+i);
+    		appendFilterSelect('filter'+i);
+        }
+        $("#filterTable").append($('<tr> <td id="add_remove_rows" colspan="2"></td>  </tr>'));
+        $("#filterTable [id^='and']:last").html('<span style="display:none" id="MoreFilters4"><a class="MoreFilter" onclick="showHideMoreFilters()" href="javascript:void(0);">Moins de filtres &lt;&lt;</a></span>'); 
+        $("#filterTable [id^='value']:last").addClass('lastInput');
+        
+    	setFilters();
+        showAdvanced();
+        UserContext.dateFormat="dd/MM/yyyy";
+    </script>
+      
+</div>       
+</apex:component>

@@ -1,0 +1,121 @@
+<apex:page standardController="Quote" extensions="Ctrl001_Quote_SelectProduct" action="{!initGrid}">
+
+    <apex:sectionHeader title="Ajouter des lignes de devis à {!Quote.Name}"/>
+    <div class="bOverviewSearch"><div class="view">Ajouter des lignes à ce devis.</div><div class="messages"></div></div>
+    <apex:pageMessages />
+    <apex:form id="myForm">
+
+        <apex:pageBlock >
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Sauvegarder" action="{!save}" />
+                <apex:commandButton value="Sauvegarder et Ajouter" action="{!saveAndAdd}"/>
+                <apex:commandButton value="Annuler" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlocksection title="Code Coupon" columns="1">
+                <apex:pageBlocksectionItem >
+                    <span>Code Coupon : </span>
+                    <apex:selectList value="{!quote.codeCoupon__c}" multiselect="false" size="1">
+                        <apex:selectOption itemValue="" itemLabel="- Aucun -"/>
+                        <apex:selectOptions value="{!CodecouponSelectOption}"/>
+                    </apex:selectList>
+                </apex:pageBlocksectionItem>
+            </apex:pageBlocksection>
+            <br/>
+            <apex:pageBlocksection collapsible="false" title="Lignes de devis"></apex:pageBlocksection>
+            <apex:pageBlockTable value="{!qliDisplayList}" var="qliItem">
+                <apex:column rendered="{!ISNULL(selectedIds)}">
+                    <apex:facet name="header">
+                        <apex:outputText value="Ligne"/>
+                    </apex:facet>
+                    <apex:outputField value="{!qliItem.qli.NumLigneText__c}"  />
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="Produit"/>
+                    </apex:facet>
+                    <a href="/{!qliItem.qli.PricebookEntry.Product2.id}" target="_blank">
+                        <apex:outputField value="{!qliItem.qli.PricebookEntry.Product2.Modele__c}"/>
+                    </a>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="Nb vantaux"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.Nombredevantaux__c}"  required="true"/>
+                </apex:column>
+                <apex:column headerValue="{!$ObjectType.QuoteLineItem.Fields.Quantity.Label}" width="10px">
+                    <apex:facet name="header">
+                        <apex:outputText style="width: 10px" value="{!$ObjectType.QuoteLineItem.Fields.Quantity.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.Quantity}" style="width: 50px" />
+                </apex:column>
+                <apex:column width="20px">
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.Hauteur__c.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.Hauteur__c}" required="true" style="width: 50px" />
+                </apex:column>
+                <apex:column width="20px">
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.Largeur__c.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.Largeur__c}" required="true" style="width: 50px" />
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.Tarifhorsdimension__c.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.Tarifhorsdimension__c}" required="false" style="width: 110px"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.TVA__c.Label}"/>
+                    </apex:facet>
+    <!--            <apex:inputField value="{!qliItem.qli.TVA__c}" required="true"/> -->
+                    <apex:selectList value="{!qliItem.TVA}" size="1">
+                        <apex:selectOptions value="{!qliItem.tvaPicklist}" />
+                    </apex:selectList>
+                </apex:column> 
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.Emplacement__c.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.Emplacement__c}" required="true"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.Etage__c.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.Etage__c}" style="width: 50px"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.cancelledLine__c.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.cancelledLine__c}" style="width: 50px"/>
+                </apex:column>
+                <!--<apex:column >
+                    <apex:facet name="header">
+                        <apex:outputText value="{!$ObjectType.QuoteLineItem.Fields.elligibleCreditImpot__c.Label}"/>
+                    </apex:facet>
+                    <apex:inputField value="{!qliItem.qli.elligibleCreditImpot__c}" />
+                </apex:column>-->
+            </apex:pageBlockTable>
+
+            <!-- champs cachés sur la page pour pouvoir les utiliser dans le contrôleur -->
+            <apex:pageBlockSection >
+                <apex:outputText value="{!Quote.Pricebook2Id}" rendered="false"/>
+                <apex:outputText value="{!Quote.OpportunityId}" rendered="false"/>
+                <apex:outputText value="{!Quote.codeCoupon__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.dateDevis__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.referenceDate__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.source__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.QuoteNumber}" rendered="false"/>
+                <apex:outputText value="{!Quote.Opportunity.Owner.CodeMagasin__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.compte__c}" rendered="false"/>
+                <apex:outputText value="{!Quote.compte__r.PersonContactId}" rendered="false"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,140 @@
+<apex:page showHeader="false" language="{!$CurrentPage.parameters.liveagent.prechat:Language}" cache="false" >
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+        <apex:includescript value=" {!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js' )}" />
+        <apex:includescript value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/js/bootstrap.min.js')}" />
+        <script>
+            $ = jQuery.noConflict();
+            $(document).ready(function () {
+                var width = 520;//$('body').width();
+                var height = 415;//$('body').height();
+                /*
+                var scrollWidth = $('body').width() - width;
+                var scrollHeight = $('body').height() - height;
+                $('body').css('margin-right', scrollWidth + 'px');
+                $('body').css('margin-bottom', scrollHeight + 'px');
+                */
+                window.resizeTo(width,height+40);
+                $('[id$=submitButton] button').addClass("btn-lg btn-custom btn-custom-red");
+                $('[id$=submitButton]').addClass("input-group-btn");
+                $('[id$=endButton] button').addClass("btn-custom btn-custom-white");
+                $('[id$=inputChat] input').addClass('form-control input-custom');
+            });
+        </script>
+        <style>
+            body {
+               /* overflow: hidden;
+                background: #F6F6F6; */
+            }
+
+            .header-title {
+                margin-bottom: 10px;
+            }
+            
+            #chatControls {
+                border: none;
+            }
+            
+            .input-custom {
+                height: 44px !important;
+                margin-top: 1px;
+            }
+
+            .panel-body {
+                padding-bottom: 0px !important;
+            }
+
+            .fancybox-opened .fancybox-skin {
+              -webkit-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+              -moz-box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+              box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            }
+
+            /* CHAT TEXT */
+            #liveAgentChatLog {
+                border: 1px solid #C5C5C5;
+                border-radius:3px;
+                -moz-border-radius:3px;
+                -webkit-border-radius:3px;
+                height: 237px;
+                overflow: auto;
+                padding: 10px;
+                margin: 0 auto 10px;
+                word-wrap: break-word;
+            }
+            .messageText {
+                font-family: arial, sans-serif;
+                padding: 0 0 2px;
+            }
+            .operator {color: #3B9ACE;}
+            .client { color: #666666; }
+
+            /* WAITING STATE */
+            .liveAgentStateWaiting #chat-page{
+                display: none;
+            }
+            .liveAgentState #chat-page{
+                display:block;
+            }
+            .liveAgentState #waitingMessage,.liveAgentStateEnded #waitingMessage, .liveAgentStateStatusMessage #waitingMessage{
+                display:none;
+            }
+
+            .liveAgentStateWaiting #waitingMessage{
+                display:block;
+            }
+            .centered{
+                 margin: 25% auto;
+                 text-align: center;
+                 width: 50%;
+            }
+
+            span.wait_lbl { padding: 0 0 20px 0; font-family: arial,sas-serif;line-height: 17px;}
+        </style>
+        <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/progress_bar.min.css')}" />
+    </head>
+    <body>
+        <div class="container">
+            <liveAgent:clientchat >
+                <div class="row" style="display: none;" >
+                    <liveAgent:clientChatMessages />
+                </div>
+                <div id="waitingMessage" class="centered">
+                    <span class="wait_lbl">Veuillez patienter pendant que vous êtes connecté avec un agent.</span>
+                    <img src="https://1.la2w1cs.salesforceliveagent.com/content/images/html_progress_bar.gif" alt="Progress Bar"/>
+                </div>
+                <div id="chat-page" class="row" style="margin-top: 10px;" >
+                    <div class="col-sm-12 col-xs-12">
+                        <!-- HEADER -->
+                        <div class="container-fluid">
+                            <div style="float: left;">
+                                <img src="{!URLFOR($Resource.Site_Espace_Client, 'img/logo_kpark.png')}" alt="Logo K par K" class="img-responsive header-logo" />
+                            </div>
+                            <div style="text-align: right;">
+                                <liveAgent:clientChatEndButton id="endButton" label="Terminer la discussion" />
+                            </div>
+                        </div>
+                        <div id="chatControls" class="panel panel-default">
+                            <!-- BODY CHAT -->
+                            <div class="panel-body">
+                                <div>
+                                   <liveAgent:clientChatLog combineMessagesText="false"/>
+                                </div>
+                            </div>
+                            <!-- FOOTER CHAT -->
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <liveagent:clientChatInput id="inputChat"/>
+                                    <liveAgent:clientChatSendButton id="submitButton" label="Envoyer"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </liveAgent:clientchat>
+        </div>
+    </body>
+</apex:page>

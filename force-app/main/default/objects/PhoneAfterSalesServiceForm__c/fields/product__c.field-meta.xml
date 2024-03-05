@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>product__c</fullName>
+    <externalId>false</externalId>
+    <label>Produit</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Coulissant</fullName>
+                <default>false</default>
+                <label>Coulissant</label>
+            </value>
+            <value>
+                <fullName>Fenêtres</fullName>
+                <default>false</default>
+                <label>Fenêtres</label>
+            </value>
+            <value>
+                <fullName>Moustiquaire</fullName>
+                <default>false</default>
+                <label>Moustiquaire</label>
+            </value>
+            <value>
+                <fullName>Persienne</fullName>
+                <default>false</default>
+                <label>Persienne</label>
+            </value>
+            <value>
+                <fullName>Portail</fullName>
+                <default>false</default>
+                <label>Portail</label>
+            </value>
+            <value>
+                <fullName>Porte de garage</fullName>
+                <default>false</default>
+                <label>Porte de garage</label>
+            </value>
+            <value>
+                <fullName>Porte de service</fullName>
+                <default>false</default>
+                <label>Porte de service</label>
+            </value>
+            <value>
+                <fullName>Porte d’entrée</fullName>
+                <default>false</default>
+                <label>Porte d’entrée</label>
+            </value>
+            <value>
+                <fullName>Porte d’intérieur</fullName>
+                <default>false</default>
+                <label>Porte d’intérieur</label>
+            </value>
+            <value>
+                <fullName>Porte-fenêtre</fullName>
+                <default>false</default>
+                <label>Porte-fenêtre</label>
+            </value>
+            <value>
+                <fullName>Store banne</fullName>
+                <default>false</default>
+                <label>Store banne</label>
+            </value>
+            <value>
+                <fullName>Volet Battant</fullName>
+                <default>false</default>
+                <label>Volet Battant</label>
+            </value>
+            <value>
+                <fullName>Volet Roulant</fullName>
+                <default>false</default>
+                <label>Volet Roulant</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

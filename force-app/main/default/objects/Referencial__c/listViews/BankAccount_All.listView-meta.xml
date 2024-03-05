@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BankAccount_All</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>stageName__c</columns>
+    <columns>bank__c</columns>
+    <columns>iban__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.BankAccount</value>
+    </filters>
+    <label>Compte bancaire (Tous)</label>
+    <language>fr</language>
+</ListView>

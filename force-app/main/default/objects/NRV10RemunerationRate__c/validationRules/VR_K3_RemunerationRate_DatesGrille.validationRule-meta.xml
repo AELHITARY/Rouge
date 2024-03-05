@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_RemunerationRate_DatesGrille</fullName>
+    <active>true</active>
+    <description>Vérifie que les dates sont compatibles avec les dates de la grille sélectionnée.
+Il doit y avoir au moins une partie de période de validité en commun.</description>
+    <errorConditionFormula>AND(!$User.ByPassValidationRule__c, !ISBLANK(gridRevision__c), OR( AND(!ISBLANK(endDate__c), gridRevision__r.startDate__c &gt; endDate__c), AND(!ISBLANK(gridRevision__r.endDate__c), gridRevision__r.endDate__c &lt; startDate__c)))</errorConditionFormula>
+    <errorDisplayField>gridRevision__c</errorDisplayField>
+    <errorMessage>La grille de révision doit avoir au moins une partie de validité en commun avec le taux de rémunération.</errorMessage>
+</ValidationRule>

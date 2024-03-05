@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>elligibleDotationParrainage__c</fullName>
+    <externalId>false</externalId>
+    <formula>AND(
+  libelleStatutContrat__c != &apos;Contrats non commandables&apos;,
+  libelleStatutContrat__c != &apos;Contrats non commandes&apos;,
+  libelleStatutContrat__c != &apos;Contrats non confirmes&apos;,
+  libelleStatutContrat__c != &apos;Contrats non metrables&apos;,
+  libelleStatutContrat__c != &apos;Contrats non metres non progra.&apos;,
+  libelleStatutContrat__c != &apos;Contrats non metres programme&apos;,
+  libelleStatutContrat__c != &apos;Contrats resilies&apos;
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Elligible dotation parrainage</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

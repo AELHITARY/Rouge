@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MISE_A_JOUR_TVA_LEGENDE_ET_VINCI_VITREE</fullName>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>3/24/2016 12:00 AM</value>
+    </filters>
+    <label>MISE A JOUR TVA LEGENDE ET VINCI VITREE</label>
+    <language>fr</language>
+</ListView>

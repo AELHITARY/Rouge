@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Partage des images via application mobiles</description>
+    <interviewLabel>FSL_SharePicture {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>FSL_SharePicture</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>FieldServiceMobile</processType>
+    <screens>
+        <name>PictureScreen</name>
+        <label>PictureScreen</label>
+        <locationX>287</locationX>
+        <locationY>199</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>PictureFile</name>
+            <extensionName>forceContent:fileUpload</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Chargement des images</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>accept</name>
+                <value>
+                    <stringValue>.pdf, .jpg, .jpeg, .png</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>multiple</name>
+                <value>
+                    <booleanValue>true</booleanValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>recordId</name>
+                <value>
+                    <elementReference>Id</elementReference>
+                </value>
+            </inputParameters>
+            <isRequired>true</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <startElementReference>PictureScreen</startElementReference>
+    <status>Active</status>
+    <variables>
+        <name>Id</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

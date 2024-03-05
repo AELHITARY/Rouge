@@ -1,0 +1,234 @@
+<template>
+    <lightning-card variant="base" >
+            <!-- HEADER -->
+            <div class="slds-page-header">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:orders" size="medium"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1>
+                                            <span class="slds-page-header__title slds-truncate" title="Verrouillage d'une commande">Verrouillage d'une commande</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BODY -->
+            <div class="c-container">
+
+                <!-- Spinner -->
+                <div if:true={showLoadingSpinner}>
+                    <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+                </div>
+    
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+    
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+    
+                    </lightning-layout-item>
+                </lightning-layout>
+            
+                <lightning-messages></lightning-messages>
+                
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <!-- STEP 1 (SELECTION ACTIFS) --> 
+                        <template id="assetsListDiv" if:true={showStep1Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des actifs
+                            </h3>
+                                            
+                            <template if:false={isAssetsData}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas d'actifs éligibles.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={isAssetsData}>
+                                <p class="slds-m-bottom_medium">
+                                    Veuillez sélectionner au minimum un actif à verrouiller.
+                                </p>
+                                <div>
+                                    <lightning-datatable data={assetData}
+                                                        columns={assetColumns}
+                                                        key-field="Id"
+                                                        onrowselection={handleSelectedAssetChange}
+                                                        selected-rows={selectedRecords}>
+                                    </lightning-datatable> 
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 1 (SELECTION COMMANDES)  
+                        <template id="ordersListDiv" if:true={showStep1Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des commandes
+                            </h3>
+                                            
+                            <template if:false={isOrderData}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de commandes éligibles.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={isOrderData}>
+                                <p class="slds-m-bottom_medium">
+                                    Veuillez sélectionner au minimum une commande à verrouiller.
+                                </p>
+                                <div>
+                                    <lightning-datatable data={orderData}
+                                                        columns={orderColumns}
+                                                        key-field="Id"
+                                                        onrowselection={handleSelectedOrderChange}
+                                                        selected-rows={selectedRecords}>
+                                    </lightning-datatable> 
+                                </div>
+                            </template>
+                        </template>--> 
+                        
+                        <!-- STEP 2 (SELECTION RDV) --> 
+                        <template id="actionsListDiv" if:true={showStep2Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des actions pour les RDV
+                            </h3>
+                                            
+                            <template if:false={isServiceAppointmentsData}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_warning">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:warning" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de rendez-vous de service.</p>
+                                                <p>Vous pouvez passer à l'étape suivante.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={isServiceAppointmentsData}>
+                                <p class="slds-m-bottom_medium">
+                                    Veuillez sélectionner l'action à effectuer pour chaque rendez-vous de service.
+                                </p>
+                                <div>
+                                    <c-custom-data-table key-field="Id"
+                                                        data={saSelectedData}
+                                                        columns={serviceAppointmentColumns}
+                                                        onpicklistchanged={handleSAActionPicklistChanged}
+                                                        hide-checkbox-column>
+                                    </c-custom-data-table>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 3 (CONFIRMATION) --> 
+                        <template id="resumeListDiv" if:true={showStep3Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Confirmation
+                            </h3>
+                            <template if:true={selectedRecords}>
+                                <p class="slds-m-bottom_medium">
+                                    Veuillez vérifier que ces informations sont correctes, puis valider le verrouillage des commandes.
+                                </p>
+                                <lightning-accordion allow-multiple-sections-open active-section-name={activeSummarySections}>
+
+                                    <lightning-accordion-section name="orderSummary" label="Actifs">
+                                        <div>
+                                            <lightning-datatable key-field="Id"
+                                                                data={assetConfirmData}
+                                                                columns={assetConfirmColumns}
+                                                                hide-checkbox-column>
+                                            </lightning-datatable>
+                                        </div>
+                                    </lightning-accordion-section>
+                                    <lightning-accordion-section name="saSummary" label="Rendez-vous de service">
+                                        <div>
+                                            <lightning-datatable key-field="Id"
+                                                                data={saConfirmData}
+                                                                columns={serviceConfirmColumns}
+                                                                hide-checkbox-column>
+                                            </lightning-datatable>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </lightning-accordion>
+                            </template>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>    
+    
+            <div slot="footer">
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-m-top_xx-small slds-m-bottom_x-small">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <template if:true={showPreviousButton}> 
+                    <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+                </template>
+                <template if:true={showNextButton}> 
+                    <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+                </template>
+                <template if:true={showSubmitButton}> 
+                    <lightning-button variant="brand" label="Verrouiller" class="slds-m-around_medium" onclick={lockOrder}></lightning-button>
+                </template>
+            </div>
+        </lightning-card>
+    
+</template>

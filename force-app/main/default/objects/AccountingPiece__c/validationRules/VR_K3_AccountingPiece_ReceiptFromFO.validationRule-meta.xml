@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingPiece_ReceiptFromFO</fullName>
+    <active>true</active>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+RecordType.DeveloperName = &apos;Receipt&apos; &amp;&amp;
+isLegacy__c == false &amp;&amp;
+account__r.RecordType.DeveloperName = &apos;FundingOrganization&apos;</errorConditionFormula>
+    <errorDisplayField>account__c</errorDisplayField>
+    <errorMessage>Seuls les encaissements composites sont autorisées sur les organismes de financement!</errorMessage>
+</ValidationRule>

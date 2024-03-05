@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>isParentLine__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Champ alimenté en fonction de parentLine__c et utilisé pour les rollups de l&apos;objet Facture.
+Impossible d&apos;utiliser directement parentLine__c dans le filtre des rollups.</description>
+    <externalId>false</externalId>
+    <label>[#] Est ligne parent</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

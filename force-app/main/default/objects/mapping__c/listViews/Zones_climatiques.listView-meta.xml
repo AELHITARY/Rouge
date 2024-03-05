@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Zones_climatiques</fullName>
+    <columns>NAME</columns>
+    <columns>Repository__c</columns>
+    <columns>PickValue__c</columns>
+    <columns>ConvertedValue__c</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Repository__c</field>
+        <operation>equals</operation>
+        <value>zone_climatique</value>
+    </filters>
+    <label>Zones climatiques</label>
+    <language>fr</language>
+    <sharedTo>
+        <role>Supportutilisateur</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,122 @@
+<apex:page showHeader="false" sidebar="false" docType="html-5.0" controller="Ctrl_Site_EspaceClient" action="{!checkAllowedAccess}" applyHtmlTag="false" standardStylesheets="false" cache="false">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="robots" content="noindex, follow" />
+        <meta name="keywords" content="KparK, K par K, client, espace client, fenêtre, porte, garage, portail" />
+        <title>Espace Client | K par K</title>
+        <link rel="shortcut icon" href="{!URLFOR($Resource.Site_Favicon)}" type="image/x-icon" />
+        <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-3.2.1.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/js.cookie-2.0.4.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.Site_Espace_Client, 'js/cnil_cookie.min.js')}" />
+        <apex:includescript value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/js/bootstrap.min.js')}" />
+        <script type="text/javascript">
+            j$ = jQuery.noConflict();
+
+            j$(document).ready(function(){
+                // Cookie (CNIL)
+                initCNILCookie();
+                if('{!forcedLogin}' == 'true'){
+                    j$('[id$=loaderContainer]').css("display", "block");
+                    testVisualforceLogin();
+                }
+            });
+        </script>
+        <style type="text/css">
+            #loaderContainer {
+                position:absolute;
+                width:100%;
+                height:100%;
+                z-index:99999;
+            }
+
+            .loader {
+              border: 12px solid #a3a3a3; /* Light grey */
+              border-top: 12px solid #ca2046; 
+              border-radius: 50%;
+              width: 80px;
+              height: 80px;
+              animation: spin 2s linear infinite;
+              margin-left: auto;
+              margin-right: auto;
+              margin-top:275px;
+            }
+
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+        </style>
+        <apex:stylesheet value="{!URLFOR($Resource.Bootstrap_Ressources, 'dist/css/bootstrap.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/auth.min.css')}"/>   
+        <apex:stylesheet value="{!URLFOR($Resource.Site_Espace_Client, 'css/espace_client.min.css')}"/>       
+    </head>
+    <body class="auth-body">
+        <!-- NE SURTOUT PAS UTILISER LE COMPOSANT c:VISUALSTRAPBLOCK -->
+        <div class="espaceclient">
+            <div id="loaderContainer" style="display:none;">
+                <div class="loader"></div>
+            </div>
+            <div class="container" id="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 auth-form">
+                        <header class="auth-form-header">
+                            <div>
+                                <a href="{!URLFOR($Site.CurrentSiteUrl)}">
+                                    <img src="{!URLFOR($Resource.Logo_kpark)}" alt="Logo KparK" class="img-responsive center-block logo" style="max-width: 190px;"/>
+                                </a>
+                            </div>
+                            <div class="text-center">
+                                <h3><span class="auth-form-header-title">Bienvenue dans l'espace client K par K</span></h3>
+                            </div>
+                        </header> <!-- /.auth-form-header -->
+
+                        <apex:form id="EspaceClientForm" styleClass="auth-form-container" >
+                            <apex:actionFunction name="testVisualforceLogin" action="{!forceVisualforceLogin}" />
+                            <div id="error">
+                                <apex:repeat value="{!log.StaticMessages}" var="message" id="pageMessageRepeat">
+                                    <div class="alert {!IF(message.SeverityStr=='confirm','alert-success',
+                                                            IF(message.SeverityStr=='info','alert-info',
+                                                                IF(message.SeverityStr=='warning','alert-warning','alert-danger')))}">
+                                        <apex:outputtext escape="false" value="{!message.Message}"/>
+                                    </div>
+                                </apex:repeat>
+                            </div> <!-- /.error -->
+                            <div class="form-group" id="number-group">
+                                <label id="number-label" class="auth-form-label" for="{!$Component.number}">Adresse email / N° de compte</label>
+                                <apex:input id="number" styleClass="auth-form-input" value="{!user}" type="text" title="Adresse email / N° de compte" html-autocorrect="off" html-autofocus="on"/>
+                            </div> 
+                            <div class="form-group">
+                                <label class="auth-form-label" for="{!$Component.password}">Mot de passe</label>
+                                <apex:inputSecret id="password" styleClass="auth-form-input" value="{!password}" title="Mot de passe" html-autocorrect="off"/>
+                            </div>
+                            <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4" style="margin-bottom: 15px; margin-top: 40px;">
+                                <apex:commandbutton action="{!login}" styleclass="btn-block btn-lg btn-custom btn-custom-red" id="connexion" value="CONNEXION" />
+                            </div>
+                            <div class="text-center">
+                                <apex:commandButton action="{!displayGeneratePasswordPage}" styleClass="btn btn-xs btn-link btn-custom-link btn-custom-link-red" value="Mot de passe perdu / première connexion" id="generatePassword"/>
+                            </div>
+                        </apex:form>
+                    </div>
+                    <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 auth-footer">
+                        <div class="">
+                            <p>
+                                Si vous rencontrez des problèmes de connexion, veuillez contacter le service clients au <span class="number-phone">{!TELSUPPORT}</span> ou par e-mail 
+                                <a class="text-grey" href="mailto:{!EMAILSUPPORT}">{!EMAILSUPPORT}</a>
+                            </p>
+                        </div> <!-- /.auth-footer -->
+                    </div>  <!-- /.auth-form -->
+                </div> <!-- /.row -->
+            </div> <!-- /.container -->
+        </div>
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        
+            ga('create', 'UA-4421249-13', 'auto');
+            ga('send', 'pageview');
+        </script>        
+    </body>
+</apex:page>

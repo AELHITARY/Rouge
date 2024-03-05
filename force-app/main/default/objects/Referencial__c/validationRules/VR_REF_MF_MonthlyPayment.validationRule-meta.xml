@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_REF_MF_MonthlyPayment</fullName>
+    <active>true</active>
+    <description>Pour les &quot;Mode de financement&quot;, le nombre de mensualités est obligatoire et supérieur à 0 pour un financement ou une modalité</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+RecordType.DeveloperName = &apos;FinancingMethod&apos; &amp;&amp;
+AND(
+OR(ISPICKVAL(financingType__c, &apos;Modality&apos;),  
+ISPICKVAL(financingType__c, &apos;Funding&apos;)),
+monthlyPayment__c &lt; 1
+)</errorConditionFormula>
+    <errorDisplayField>monthlyPayment__c</errorDisplayField>
+    <errorMessage>Nombre de mensualités obligatoire et supérieur à 0 pour un financement ou une modalité !</errorMessage>
+</ValidationRule>

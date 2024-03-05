@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TMP_isInvoiceCancellationInvalid__c</fullName>
+    <externalId>false</externalId>
+    <formula>!ISNULL(creditMemoDate__c) &amp;&amp;
+!ISBLANK(invoice__c) &amp;&amp;
+(ISNULL(invoice__r.cancellationDate__c) || invoice__r.cancellationDate__c == null) &amp;&amp;
+amount__c &gt;= invoice__r.amount__c</formula>
+    <label>[#] Annulation facture invalide?</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

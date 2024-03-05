@@ -1,0 +1,6 @@
+<apex:page standardController="QuoteLineItem" extensions="Ctrl_ClonerLigneDevis" action="{!cloner}" sidebar="false" showHeader="false">
+    <apex:pageMessages />
+    <apex:form >
+
+    </apex:form>
+</apex:page>

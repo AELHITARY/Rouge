@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>debriefe__c</fullName>
+    <externalId>false</externalId>
+    <formula>OR(IF(appelEffectue__c, TRUE, FALSE), IF(argumentationEffectuee__c, TRUE, FALSE), NOT(ISNULL(dateHeureRDV__c)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Débriefé</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,135 @@
+<apex:page sidebar="false" showHeader="false" id="kb-page">
+  
+    <link href="https://kbmax.kbmax.com/content/sfdc.css" rel="stylesheet"/>
+    <script type="text/javascript" src="{!$Resource.KBMAXSB__q}"></script>
+    <script type="text/javascript" src="/canvas/sdk/js/30.0/controller.js"></script>
+    <script type="text/javascript" src="/soap/ajax/38.0/connection.js"></script>
+    <script type="text/javascript" src="/soap/ajax/38.0/apex.js"></script>
+    <script type="text/javascript" src="{!$Resource.KBMAXSB__easyXDMmin}"/>
+    <script type="text/javascript">
+        
+       debugger; //******** version ITCelerator  
+       console.log("-- -- ITCelerator KBMax External configurator Version  -- --"); //******* log
+       document.addEventListener("DOMContentLoaded", () => {     
+            var xdmDefer = Q.defer();
+            
+            sforce.connection.sessionId = "{!$Api.Session_ID}";
+            var getProduct = function(productId){
+                console.log("-- -- var 'getProduct' start -- --"); //******* log
+           
+                var query = "SELECT Name, KBMAXSB__Product_Id__c FROM Product2 WHERE Id = '" + productId + "'"; 
+                var result = sforce.connection.query(query); 
+                var product = result.getArray('records')[0];
+                return product;
+            };
+            
+            var getFullQuote = function(quoteId){
+                console.log("-- -- var 'getFullQuote' start -- --"); //******* log
+        
+                var d = sforce.connection.describeSObject("SBQQ__Quote__c");
+                var fields = d.fields.map(function(i){return i.name;}).join(",");
+                var query = "SELECT " + fields + " FROM SBQQ__Quote__c WHERE Id = '" + quoteId + "'"; 
+                var result = sforce.connection.query(query); 
+                var quote = result.getArray('records')[0]; 
+                console.log("quoteId : "+quoteId); //******* log
+                return quote;
+            };
+                                  
+            var getProductsByProductCode = function(productCodes){
+                console.log("-- -- var 'getProductsByProductCode' start -- --"); //******* log
+                
+                var query = "select Id, Name, ProductCode from Product2 where ProductCode in (";
+                for(var i = 0; i < productCodes.length; i++){
+                    var productCode = productCodes[i];
+                    query+= "'" + productCode + "'" + (i == productCodes.length - 1? '': ',');                    
+                }
+                query+= ")";
+                var result = sforce.connection.query(query); 
+                var products = result.getArray('records'); 
+                return products;
+            };
+                    
+            var rpc = new easyXDM.Rpc({},{
+                remote: {
+                    postMessage: {}
+                },
+                local: {
+                    postMessage: function(message) {
+                        xdmDefer.resolve(message);
+                    }
+                }
+            });
+    
+            //get the request for the payload from kbmax when it's ready to receive it
+           
+            Sfdc.canvas.controller.subscribe({
+                name: "sfdccpq_payload_request",
+                onData: function(e){
+                    //prepare kbmax payload after easyXdm sends it's payload
+
+                    xdmDefer.promise.then(function(json){
+                        debugger;
+                        console.log("-- -- function '_payload_request' start -- --"); //******* log
+                        
+                        var payload = JSON.parse(json);
+                        console.log(JSON.stringify(payload, null, 2));
+                        var kbmaxPayload = {data: payload};
+                        //if this is a reconfigure, then get the quote product ID from the configuration attribute
+                        if(payload.product.configurationAttributes.KBMAXSB__Id__c){
+                            console.log("if"+payload.product.configurationAttributes.KBMAXSB__Id__c) //******* log
+                            
+                            kbmaxPayload.quoteProductId = Number(payload.product.configurationAttributes.KBMAXSB__Id__c);
+                        }else{//not a reconfigure, so get the product id from the object
+                            console.log("else"+payload.product.configurationAttributes.KBMAXSB__Id__c); //******* log
+                            
+                            var product = getProduct(payload.product.configuredProductId);
+                            kbmaxPayload.productId = Number(product.KBMAXSB__Product_Id__c);
+                        }
+                        kbmaxPayload.fullQuote = getFullQuote(payload.quote.Id);
+                        //send the payload back to kbmax
+                        console.log("productId : "+productId); //******* log
+                        
+                        Sfdc.canvas.controller.publish({name : "sfdccpq_payload_response", payload : kbmaxPayload});
+                    });                    
+                }
+            });
+    
+            Sfdc.canvas.controller.subscribe({
+                name: "sfdccpq_save",
+                onData: function(e){
+                    debugger;
+                    //set the quoteproduct id back into the configuration attribute
+                    console.log("-- -- function '_save' start -- --"); //******* log;
+
+                    e.data.product.configurationAttributes.KBMAXSB__Id__c = e.quoteProductId;
+                    // 2 lines specific integration ITCelerator
+                    e.data.redirect.auto = true;
+                    e.data.redirect.save = true;
+                    var json = JSON.stringify(e.data, null, 2);
+                    console.log(json);
+                    rpc.postMessage(json);
+                                          
+                }
+            });
+    
+            Sfdc.canvas.controller.subscribe({
+                name: "sfdccpq_getproducts",
+                onData: function(e){
+                    debugger;
+                    console.log("-- -- function '_getproducts' start -- --"); //******* log
+
+                    var products = getProductsByProductCode(e.productCodes);
+                    Sfdc.canvas.controller.publish({name: "sfdccpq_getproducts_response", payload: {products: products}});
+                }
+            });
+        }); 
+           
+    </script>
+    <apex:canvasApp id="kb-frame"
+        developerName="kbmax_cpq"
+        height="100%" width="100%" 
+        entityFields="*" 
+        parameters="{path: 'products', sfdccpq: true}"
+    />
+
+</apex:page>

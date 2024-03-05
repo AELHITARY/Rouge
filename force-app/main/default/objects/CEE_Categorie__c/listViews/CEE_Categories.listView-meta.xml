@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CEE_Categories</fullName>
+    <columns>NAME</columns>
+    <columns>debutValidite__c</columns>
+    <columns>finValidite__c</columns>
+    <columns>nbPersonnes__c</columns>
+    <columns>pivotAB__c</columns>
+    <columns>pivotBC__c</columns>
+    <columns>zone__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>CEE Catégories</label>
+    <language>fr</language>
+</ListView>

@@ -1,0 +1,450 @@
+<!-- sldsValidatorIgnore -->
+<!-- sldsValidatorIgnore -->
+<!-- sldsValidatorIgnore -->
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="custom:custom17" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Encaissements composite">Encaissement composite</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container slds-scrollable" style="height:50vh">
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>        
+
+            <!-- ASSISTANT -->
+            <template if:true={activeWizard}>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+
+                    </lightning-layout-item>
+                </lightning-layout>
+
+
+                <lightning-layout multiple-rows="true">
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <!-- STEP 1 (Encaissement) --> 
+                        <template if:true={showStep1Form}>
+                            <div class="slds-form" role="list">
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <c-custom-Lookup label="Entité de saisie" 
+                                                            object-name="Account"
+                                                            object-type-record-name="Entity"
+                                                            field-name="Name" 
+                                                            field-name-search="Name" 
+                                                            required
+                                                            custom-filter="isActive__c=true"
+                                                            subtitle-field="KparKReference__c"
+                                                            icon-name = "standard:account" 
+                                                            select-record-id={pieceInputEntityId}
+                                                            select-record-name={pieceInputEntityName}
+                                                            onselectionchange={handleInputEntityLookupChange} >   
+                                            </c-custom-Lookup>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <c-custom-Lookup label="Compte bancaire" 
+                                                            object-name="Referencial__c"
+                                                            object-type-record-name="BankAccount"
+                                                            field-name="Name" 
+                                                            field-name-search="Name" 
+                                                            custom-filter="active__c=true"
+                                                            subtitle-field="KparKReference__c"
+                                                            icon-name = "custom:custom16" 
+                                                            select-record-id={pieceBankAccountId}
+                                                            select-record-name={pieceBankAccountName}
+                                                            onselectionchange={handleBankAccountLookupChange}                                                         
+                                                            required ={isRequired} >   
+                                            </c-custom-Lookup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="date" date-style="short" label="Date de la pièce" value={pieceDate} required 
+                                                                max={todaysDate} onchange={handlePieceDateChange}></lightning-input>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="date" date-style="short" label="Date comptable" value={pieceAccountingDate} 
+                                                                min={pieceDate} max={todaysDate} onchange={handlePieceAccountingDateChange}></lightning-input>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="number" label="Montant" value={pieceAmount} formatter="currency" 
+                                                                min={pieceAmountMin} max={pieceAmountMax} step=".01" required
+                                                                onchange={handlePieceAmountChange} 
+                                                                message-when-range-underflow="Montant invalide (doit être supérieure à 0€ et compris entre les montants payable du mode de réglement)!" >
+                                            </lightning-input>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <c-custom-Lookup label="Mode de règlement" 
+                                                            object-name="Referencial__c"
+                                                            object-type-record-name="PaymentMethod"
+                                                            field-name="Name" 
+                                                            field-name-search="Name" 
+                                                            required
+                                                            custom-filter="active__c=true"
+                                                            subtitle-field="KparKReference__c"
+                                                            icon-name = "custom:custom41"
+                                                            select-record-id={piecePaymentMethodId}
+                                                            select-record-name={piecePaymentMethodName}
+                                                            onselectionchange={handlePaymentMethodLookupChange} >   
+                                            </c-custom-Lookup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="text" label="Banque externe" value={pieceExternalBank} 
+                                                            onchange={handlePieceExternalBankChange} required ={requiredExternalBank} ></lightning-input>
+                                        </div>  
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="text" label="Référence externe" value={pieceExternalReference} 
+                                                            onchange={handlePieceExternalReferenceChange} required ={requiredExternalBank}></lightning-input>
+                                        </div>  
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 2 (Commande) --> 
+                        <template if:true={showStep2Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Saisie des informations des acomptes sur les commandes
+                            </h3>
+                                            
+                            <template if:false={hasOrders}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_warning">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:warning" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de commandes.</p>
+                                                <p>Vous pouvez passer à l'étape suivante.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={hasOrders}>
+                                <div class="slds-form__row slds-m-bottom_medium">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <p>
+                                                Veuillez définir les valeurs d'acomptes pour les commandes clients souhaitées.
+                                            </p>
+                                            <template if:true={showSaveWarning}>
+                                                <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                                                    <span class="slds-assistive-text">warning</span>
+                                                    <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small" title="Description of icon when needed">
+                                                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                            <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#warning"></use>
+                                                        </svg>
+                                                    </span>
+                                                    <h2>                                                       
+                                                        Veuillez enregistrer le montant que vous avez saisi avant de passer à l'étape suivante.
+                                                    </h2>
+                                                    </div>                                                
+                                            </template> 
+                                        </div> 
+                                    </div>    
+                                </div>
+                                <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                    <lightning-datatable  class="slds-table_bordered slds-table_col-bordered"  
+                                                        data={customerOrderData}
+                                                        columns={orderColumns}
+                                                        onsave={handleOrdersSave}
+                                                        draft-values={draftValues}
+                                                        key-field="Id"
+                                                        selected-rows={selectedOrderRecords}
+                                                        onrowselection={handleSelectedOrdersChange}
+                                                        default-sort-direction={defaultSortDirection}
+                                                        sorted-direction={sortDirection}
+                                                        sorted-by={sortedByOrder}
+                                                        onsort={handleSortOrder}
+                                                        onchange={handleDraftValueChange}
+                                                        oncancel={handleCancel}>
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 3 (Facture) --> 
+                        <template if:true={showStep3Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Saisie des montants perçus pour les factures
+                            </h3>
+                                            
+                            <template if:false={hasInvoices}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_warning">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:warning" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Pas de factures.</p>
+                                                <p>Vous pouvez passer à l'étape suivante.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={hasInvoices}>
+                                <div class="slds-form__row slds-m-bottom_medium">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <p>
+                                                Veuillez définir les montants perçus pour les factures souhaitées.
+                                            </p>
+                                            <template if:true={showSaveWarning}>
+                                                <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                                                    <span class="slds-assistive-text">warning</span>
+                                                    <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small" title="Description of icon when needed">
+                                                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                            <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#warning"></use>
+                                                        </svg>
+                                                    </span>
+                                                    <h2>                                                       
+                                                        Veuillez enregistrer le montant que vous avez saisi avant de passer à l'étape suivante.
+                                                    </h2>
+                                                    </div>                                                
+                                            </template>
+                                        </div>
+                                    </div>    
+                                </div>
+                                <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                    <lightning-datatable class="slds-table_bordered slds-table_col-bordered"
+                                                        data={invoicesData}
+                                                        columns={invoiceColumns}
+                                                        onsave={handleInvoicesSave}
+                                                        draft-values={draftValues}
+                                                        key-field="Id"
+                                                        selected-rows={selectedInvoiceRecords}
+                                                        onrowselection={handleSelectedInvoicesChange}
+                                                        default-sort-direction={defaultSortDirection}
+                                                        sorted-direction={sortDirection}
+                                                        sorted-by={sortedByInvoice}
+                                                        onsort={handleSortInvoice}
+                                                        onchange={handleDraftValueChange}
+                                                        oncancel={handleCancel}>
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 4 (RESUME) -->
+                        <template if:true={showStep4Form}>
+                            <lightning-accordion allow-multiple-sections-open
+                                                active-section-name={activeSummarySections}>
+
+                                <lightning-accordion-section name="pieceSummary" label="Encaissement">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Entité de saisie</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={pieceInputEntityName}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Compte bancaire</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={pieceBankAccountName}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Date de la pièce</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={pieceDate}></lightning-formatted-date-time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Date comptable</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={pieceAccountingDate}></lightning-formatted-date-time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Montant</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-number format-style="currency" currency-code="EUR" value={pieceAmount}></lightning-formatted-number>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Mode de règlement</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={piecePaymentMethodName}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Banque externe</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={pieceExternalBank}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Référence externe</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={pieceExternalReference}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="ordersSummary" label="Commande(s)">
+                                    <lightning-badge slot="actions" label={selectedOrderRecords.length}></lightning-badge>
+                                    <lightning-badge slot="actions" label={totalAdvPaymentAmountSum}></lightning-badge>
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">            
+                                            <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                                <template if:true={hasOrders}>
+                                                    <lightning-datatable class="slds-table_bordered slds-table_col-bordered" 
+                                                        data={selectedOrders}
+                                                        columns={orderColumnsReadOnly}
+                                                        key-field="Id"
+                                                        hide-checkbox-column="true">
+                                                    </lightning-datatable>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <lightning-accordion-section name="invoicesSummary" label="Facture(s)">
+                                    <lightning-badge slot="actions" label={selectedInvoices.length}></lightning-badge>
+                                    <lightning-badge slot="actions" label={totalInvoiceAdvPaymentAmountSum}></lightning-badge>
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">            
+                                            <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                                <template if:true={hasInvoices}>
+                                                    <lightning-datatable class="slds-table_bordered slds-table_col-bordered"
+                                                        data={selectedInvoices}
+                                                        columns={invoiceColumnsReadOnly}
+                                                        key-field="Id"
+                                                        hide-checkbox-column="true">
+                                                    </lightning-datatable>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                            </lightning-accordion>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+
+            
+            </template>
+        </div>
+
+        <div slot="footer">
+            <template if:true={activeWizard}>
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <template if:true={showPreviousButton}> 
+                    <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+                </template>
+                <template if:true={showNextButton}> 
+                    <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+                </template>
+                <template if:true={showSubmitButton}> 
+                    <lightning-button variant="brand" label="Valider" class="slds-m-around_medium" onclick={handleCreateAccountingPieces}></lightning-button>
+                </template>
+            </template>
+        </div>
+
+    </lightning-card>
+    
+</template>

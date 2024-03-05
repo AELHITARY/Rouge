@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Deplacement__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Affiche ou non le contrôle pour le déplacement de la carte</description>
+    <externalId>false</externalId>
+    <label>Déplacement ?</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>perceivedAmount__c</fullName>
+    <description>Dans le cas d&apos;un paiement d&apos;acompte ou d&apos;une attribution de paiement avec un reste du paiement</description>
+    <externalId>false</externalId>
+    <label>Montant perçu</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

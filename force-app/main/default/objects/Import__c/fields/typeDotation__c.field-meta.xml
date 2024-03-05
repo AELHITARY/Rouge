@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>typeDotation__c</fullName>
+    <description>Type de dotation pour un filleul</description>
+    <externalId>false</externalId>
+    <label>Type de dotation</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Carte cadeaux</fullName>
+                <default>false</default>
+                <label>Carte cadeaux</label>
+            </value>
+            <value>
+                <fullName>Chèque cadeaux électronique</fullName>
+                <default>true</default>
+                <label>Chèque cadeaux électronique</label>
+            </value>
+            <value>
+                <fullName>Chèque cadeaux papier envoyé en recommandé</fullName>
+                <default>false</default>
+                <label>Chèque cadeaux papier envoyé en recommandé</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

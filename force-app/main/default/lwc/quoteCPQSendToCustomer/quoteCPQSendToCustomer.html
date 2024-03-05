@@ -1,0 +1,60 @@
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="doctype:pdf" size="medium"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span class="slds-page-header__title slds-truncate" title="Envoi du PDF au client">Envoi du PDF au client</span>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container">
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto" padding="around-small">
+                    <div class="slds-text-color_default">Le PDF du devis sera généré et ensuite envoyée à l'adresse email <strong>{customerEmail}</strong>.</div>
+                    <div class="slds-text-color_default">Le traitement peut prendre plusieurs minutes. Voulez vous envoyer le PDF ?</div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+              
+        <div slot="footer">
+            <!-- ERROR -->   
+            <template if:true={error}>
+                <div class="slds-var-m-vertical_xx-small">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>{error}</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>
+            <!-- BUTTONS -->   
+            <lightning-button variant="brand" label="Envoyer le PDF" title="Envoyer le PDF" onclick={handleSave}></lightning-button>
+        </div>
+    </lightning-card> 
+</template>

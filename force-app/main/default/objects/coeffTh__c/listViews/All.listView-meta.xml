@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>famille__c</columns>
+    <columns>option1__c</columns>
+    <columns>valeurCoef1__c</columns>
+    <columns>unite1__c</columns>
+    <columns>dateDebut__c</columns>
+    <columns>dateFin__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>famille__c</field>
+        <operation>contains</operation>
+        <value>LUMIKA</value>
+    </filters>
+    <label>Tout</label>
+</ListView>

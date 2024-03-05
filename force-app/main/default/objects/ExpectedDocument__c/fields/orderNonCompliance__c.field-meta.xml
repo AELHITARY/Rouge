@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>orderNonCompliance__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <externalId>false</externalId>
+    <inlineHelpText>Fiche de non conformité commande qui sera automatiquement créée si le document attendu n&apos;est pas reçu</inlineHelpText>
+    <label>Type de non-conformité commande</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>La valeur n&apos;existe pas ou ne correspond pas aux critères de filtre!</errorMessage>
+        <filterItems>
+            <field>Referencial__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Type de non-conformité commande</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Referencial__c</referenceTo>
+    <relationshipLabel>Documents attendus (Non conformité commande)</relationshipLabel>
+    <relationshipName>DocumentsAttendus</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

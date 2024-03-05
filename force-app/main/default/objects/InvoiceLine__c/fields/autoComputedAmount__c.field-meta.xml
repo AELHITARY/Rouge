@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>autoComputedAmount__c</fullName>
+    <externalId>false</externalId>
+    <formula>invoice__r.autoComputedAmount__c</formula>
+    <label>[#] Montant auto calculé</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

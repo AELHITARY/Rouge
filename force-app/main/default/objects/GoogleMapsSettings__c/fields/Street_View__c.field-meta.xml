@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Street_View__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Affiche ou non le contrôle pour Street View</description>
+    <externalId>false</externalId>
+    <label>Street View ?</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

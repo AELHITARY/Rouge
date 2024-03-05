@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ContractNonComplianceType_Active</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>orderNonComplianceType__c</columns>
+    <columns>expirationAction__c</columns>
+    <columns>expirationDelay__c</columns>
+    <columns>immediateAction__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.OrderNonComplianceType</value>
+    </filters>
+    <filters>
+        <field>active__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Type de non-conformité commande (Actif)</label>
+    <language>fr</language>
+</ListView>

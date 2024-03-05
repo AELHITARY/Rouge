@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_K3_AccountingEntry_EntryDateRequired</fullName>
+    <active>true</active>
+    <description>Date d&apos;écriture obligatoire et inférieure ou égale à TODAY</description>
+    <errorConditionFormula>$User.ByPassValidationRule__c = false &amp;&amp;
+$Setup.rh2__PS_Settings__c.rh2__Run_Validation_Rule__c &amp;&amp;
+isLegacy__c == false &amp;&amp;
+(
+				ISNULL( entryDate__c ) || entryDate__c &gt; TODAY()
+)</errorConditionFormula>
+    <errorDisplayField>entryDate__c</errorDisplayField>
+    <errorMessage>Date d&apos;écriture obligatoire et doit être inférieure à la date du jour!</errorMessage>
+</ValidationRule>

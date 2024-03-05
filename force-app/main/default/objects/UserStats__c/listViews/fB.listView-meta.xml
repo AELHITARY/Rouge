@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>fB</fullName>
+    <columns>NAME</columns>
+    <columns>date__c</columns>
+    <columns>dvoVersionAppli__c</columns>
+    <columns>dvoVersionRef__c</columns>
+    <columns>dvoNbImportRef__c</columns>
+    <columns>dvoNbExportDevis__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>greaterThan</operation>
+        <value>7/15/2015 12:00 AM</value>
+    </filters>
+    <filters>
+        <field>dvoVersionAppli__c</field>
+        <operation>startsWith</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>user__c</field>
+        <operation>contains</operation>
+    </filters>
+    <label>fB</label>
+    <language>fr</language>
+</ListView>

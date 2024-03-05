@@ -1,0 +1,608 @@
+<apex:page docType="html-5.0" applyBodyTag="false" applyHtmlTag="false" cache="true" showHeader="false" standardStylesheets="false"
+				standardcontroller="Import__c" extensions="Ctrl_Prospection" expires="600" action="{!insertUserStats}" >
+<html>
+<head>
+		<title>Fiche Prospection</title>
+		<meta charset="utf-8" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+		<!-- jQuery Mobile -->
+		<apex:stylesheet value="https://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
+		<apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.10.2.min.js')}" />
+		<apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery.mobile-1.3.0.min.js')}" />
+		<apex:includeScript value="https://maps.googleapis.com/maps/api/js?key={!googleMapsSettings.Cle_API__c}&libraries=places&sensor=false" />
+		<apex:includeScript value="{!URLFOR($Resource.GoogleMaps, 'js/autocompletion_places.js')}" />
+
+
+		<style>
+				table div.ui-slider::before, div.ui-slider::after {
+						display: block;
+				}
+		</style>
+
+		<!-- Salesforce1 -->
+		<apex:includeScript value="/canvas/sdk/js/publisher.js" />
+		<!--apex:includeScript value="/canvas/sdk/js/29.0/publisher.js" /-->
+
+		<!-- My own scripts -->
+		<script>
+				var LAT = null;
+				var LONG = null;
+				var adresse_rue = '';
+				var locality ='';
+				var numero = '';
+
+				j$ = jQuery.noConflict();
+
+
+
+				function SubmitData() {
+						j$('#statusPopupID').popup('open');
+						jsSubmitData();
+						var key = '{!Nom+Rue+Ville}';
+						alert(key);
+						alert('test {!MapId[Nom+Rue+Ville]}');
+						//addLine('{!MapId[Nom+Rue+Ville]}');
+				}
+
+				j$(document).ready(function() {
+						// Disable submit button
+						//  Sfdc.canvas.publisher.publish({name: "publisher.setValidForSubmit", payload:"true"});
+						findLocation();
+						findDay();
+						j$('.search_place').keypress(function(e) {
+								if (e.which == 13) {
+										e.stopPropagation();
+										return false;
+								}
+						});
+
+						// ID des champs definis dans le formulaire pour l'adresse
+				var formFields = ['adresse_rue', 'locality', 'administrative_area_level_1', 'country', 'postal_code'];
+
+				// Nom et type de valeur a recuperer dans l'adresse lors du retour de Google Place
+				var componentForm = {
+						sublocality: 'long_name',
+						street_number: 'short_name',
+						route: 'long_name',
+						locality: 'long_name',
+						administrative_area_level_1: 'long_name',
+						country: 'long_name',
+						postal_code: 'short_name'
+				};
+
+				// Initialise le champ de recherche d'adresse (auto-completion)
+				initializeAutoCompletion('autocomplete', formFields);
+
+				activeAutoCompletionWithLocalisation(componentForm, formFields, 'adresse_latitude', 'adresse_longitude');
+
+						j$('[id$=recherche]').on("click",function(e) {
+								if(!validationField()) {
+										e.stopPropagation();
+										return false;
+								}
+						});
+
+				});
+
+				function findDay() {
+
+						var d = new Date();
+						var month = d.getMonth()+1;
+						var day = d.getDate();
+						var output = d.getFullYear() + '-' + (month<10 ? '0' : '') + month + '-' + (day<10 ? '0' : '') + day;
+						j$("[id$=dateProspection]")[0].value = output;
+						showData2(output);
+
+				}
+
+				// Find GPS Location
+				function findLocation() {
+						if(navigator.geolocation) {
+								navigator.geolocation.getCurrentPosition (
+										// successFunction
+										function(position) {
+												LAT = position.coords.latitude;
+												LONG = position.coords.longitude;
+												if (LAT != null && LONG != null) {
+														setAdresseFromGoogle();
+														j$("[id$=Lat]")[0].value =LAT;
+														j$("[id$=Long]")[0].value =LONG;
+												}
+										},
+										// errorFunction
+										function(position) {
+														alert("La Geolocation n'est pas disponible");
+										}
+								);
+						} else {
+								alert("La geolocation du navigateur n'est pas disponible");
+						}
+				}
+
+				function setAdresseFromGoogle(){
+						var url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+LAT+','+LONG+'&sensor=false';
+						j$.ajax({
+								'async': false,
+								'global': false,
+								'url': url,
+								'dataType': "json",
+								'success': function (data) {
+										//j$("[id$=Numero]")[0].value = data.results[0].address_components[0].long_name;
+										j$("[id$=locality]")[0].value = data.results[0].address_components[2].long_name;
+										j$("[id$=adresse_rue]")[0].value = data.results[0].address_components[0].long_name+' '+data.results[0].address_components[1].long_name;
+										j$("[id$=postal_code]")[0].value = data.results[0].address_components[6].long_name;
+										//j$("[id$=url]")[0].value = url;
+								}
+						});
+				}
+
+				function unsaved(unsavedId){
+
+						document.getElementById(unsavedId).style.backgroundColor = 'red';
+						document.getElementById(unsavedId).style.color = '#FFFFFF';
+						j$('#rouge').css( "display", "inline" );
+
+				}
+
+				function saved(savedId){
+
+						document.getElementById('Nom' + savedId).style.backgroundColor = '#f9f9f9';
+						document.getElementById('Nom' + savedId).style.color = '#000000';
+
+						document.getElementById('adresse_rue' + savedId).style.backgroundColor = '#f9f9f9';
+						document.getElementById('adresse_rue' + savedId).style.color = '#000000';
+
+						document.getElementById('locality' + savedId).style.backgroundColor = '#f9f9f9';
+						document.getElementById('locality' + savedId).style.color = '#000000';
+
+						document.getElementById('postal_code' + savedId).style.backgroundColor = '#f9f9f9';
+						document.getElementById('postal_code' + savedId).style.color = '#000000';
+
+						document.getElementById('Telephone' + savedId).style.backgroundColor = '#f9f9f9';
+						document.getElementById('Telephone' + savedId).style.color = '#000000';
+
+						document.getElementById('Email' + savedId).style.backgroundColor = '#f9f9f9';
+						document.getElementById('Email' + savedId).style.color = '#000000';
+
+						document.getElementById('Observation' + savedId).style.backgroundColor = '#f9f9f9';
+						document.getElementById('Observation' + savedId).style.color = '#000000';
+
+						 j$('#rouge').css( "display", "none" );
+
+				}
+
+				function getDateProspection(){
+						j$('#statusPopupID').popup('open');
+						jsgetDateProspection();
+						//showData();
+				}
+
+				function validateEmail(email) {
+						var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+						return regex.test(email);
+				}
+
+				function validatePhone(tel) {
+						var regex = /^[0-9]{10}$/;
+						return regex.test(tel);
+				}
+
+				function validateCp(cp) {
+						var regex = /^[0-9]{5}$/;
+						return regex.test(cp);
+				}
+
+				function enableInputs(){
+						j$('[id$=adresse_rue]').prop('disabled', false);
+						j$('[id$=locality]').prop('disabled', false);
+						j$('[id$=postal_code]').prop('disabled', false);
+				}
+
+					 function checkDate(date)
+				{
+						var contenu ='';
+						var myDate = (date).split('-');
+						myDate[1] -= 1;
+						var dateTest = new Date();
+						dateTest.setFullYear(myDate[0]);
+						dateTest.setMonth(myDate[1]);
+						dateTest.setDate(myDate[2]);
+
+						if ((dateTest.getFullYear()!=myDate[0]) || (dateTest.getMonth()!=myDate[1]) || (dateTest.getDate()!=myDate[2]))
+						{
+								contenu= 'Veuillez saisir une date valide';
+								j$("#affichage").html(contenu);
+								dateTest.setMonth(myDate[1]+1);
+
+								return false;
+						}
+								return true;
+
+				}
+
+				// Afficheur
+				function showData() {
+						var dateP;
+						dateP = j$("[id$=dateProspection]")[0].value;
+
+						if(checkDate(dateP)== true)
+						{
+
+						// Call APEX function
+						Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.Ctrl_Prospection.getProspection}', dateP,
+						function(result, event) {
+								if (event.status) {
+										var imax = result.length
+
+										// Suppression des champs non renseignés
+										for (i=0; i<imax; i++){
+												var jmax = Object.keys(result[0]).length;
+												for (j=0; j<jmax; j++){
+														if(result[i][j]== null){result[i][j] = '';}
+												}
+										}
+
+										// Ajout des champs dans le div d'affichage
+										if(result.length > 0) {
+												var contenu= '';
+												var k = 0;
+												contenu+='<div id="rouge" style="color:red; display:none;">Pour enregistrer les modifications faites sur vos prospections, utilisez le bouton "Sauv." de la ligne concernée</div>';
+												contenu+= '<div id="error2" style="color:#FF0000;"></div>';
+												contenu+= '<table style="table-layout: fixed; width: 100%;"><tr><td style="width:60px;" >Contact</td><td>Nom</td><td>Rue</td><td>Ville</td><td style="width:5%;">CP</td><td>Téléphone</td><td>Email</td><td>Observations</td><td style="width:40px;">Sauv.</td><td style="width:40px;">Sup.</td></tr>';
+
+												for(k=0; k<jmax; k++){
+														contenu+= '<tr width="100%">';
+														contenu+= '<td><a href="javascript:displayProspection(\''+result[7][k]+'\')"; data-role="button" data-inline="true" data-mini="true" data-theme="b"> <img src="{!URLFOR($Resource.prospection_image, 'prospection_img/contact_image.png')}" alt="" /></a></td>';
+														contenu+= '<td><input type="text" name="Nom' + result[7][k] + '" id="Nom' + result[7][k] + '" data-mini="true" value="'+result[2][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="text" name="Rue' + result[7][k] + '" id="adresse_rue' + result[7][k] + '" data-mini="true" value="'+result[0][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="text" name="Ville' + result[7][k] + '" id="locality' + result[7][k] + '" data-mini="true" value="'+result[1][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; border-spacing: 0px; width:90%;"/></td>';
+														contenu+= '<td style="width:5%;"><input type="text" name="Cp' + result[7][k] + '" id="postal_code' + result[7][k] + '" data-mini="true" value="'+result[3][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; border-spacing: 0px; width:70%;"/></td>';
+														contenu+= '<td><input type="tel" name="Telephone' + result[7][k] + '" id="Telephone' + result[7][k] + '" data-mini="true" value="'+result[4][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="email" name="Email' + result[7][k] + '" id="Email' + result[7][k] + '" data-mini="true" value="'+result[5][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="text" name="Observation' + result[7][k] + '" id="Observation' + result[7][k] + '" data-mini="true" value="'+result[6][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td style="display:none"><input type="text" id="PId' +result[7][k] +'" value="'+result[7][k] +'" style="display:none"/></td>'
+														contenu+= '<td><a href="javascript:updateProspection(\''+result[7][k]+'\')" data-role="button" data-inline="true" data-mini="true" data-theme="b"><img src="{!URLFOR($Resource.prospection_image, 'prospection_img/sauvegarde_image.png')}" alt="" /></a></td>';
+														contenu+= '<td><a href="javascript:deleteProspection(\''+result[7][k]+'\')" data-role="button" data-inline="true" data-mini="true" data-theme="b"><img src="{!URLFOR($Resource.prospection_image, 'prospection_img/supprimer_image.png')}" alt="" /></a></td>';
+														contenu+= '</tr>';
+												}
+
+												contenu+= '</table>';
+												j$("#affichage").html(contenu);
+										} else {
+												var contenu= 'Pas de propections disponibles pour cette date.';
+												j$("#affichage").html(contenu);
+										}
+								}
+						},
+								{escape: true}
+						);
+
+						}
+				}
+
+				function showData2(datenow) {
+						var dateP;
+						dateP = datenow;
+
+						// Call APEX function
+						Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.Ctrl_Prospection.getProspection}', dateP,
+						function(result, event) {
+								if (event.status) {
+										var imax = result.length
+
+										// Suppression des champs non renseignés
+										for (i=0; i<imax; i++){
+												var jmax = Object.keys(result[0]).length;
+												for (j=0; j<jmax; j++){
+														if(result[i][j]== null){result[i][j] = '';}
+												}
+										}
+
+										// Ajout des champs dans le div d'affichage
+										if(result.length > 0) {
+												var contenu= '';
+												var k = 0;
+												var temp = ' ';
+												 contenu+='<div id="rouge" style="color:#FF0000; display:none;">Pour enregistrer les modifications faites sur vos prospections, utilisez le bouton "Sauv." de la ligne concernée</div>';
+												contenu+= '<div id="error2" style="color:#FF0000;"></div>';
+												contenu+= '<table style="table-layout: fixed; width: 100%;"><tr><td style="width:40px;">Contact</td><td  style="padding-left:20px;">Nom</td><td>Rue</td><td>Ville</td><td style="width:5%;">CP</td><td>Téléphone</td><td>Email</td><td>Observations</td><td style="width:40px;">Sauv.</td><td style="width:40px;">Sup.</td></tr>';
+
+												for(k=0; k<jmax; k++){
+														temp = result[7][k];
+														contenu+= '<tr width="100%">';
+														//contenu+= '<td style="width:40px;"><a style="background-image: linear-gradient( #5f9cc5,#396b9e ); border: 1px solid #044062; text-decoration : none; color: #fff; -webkit-border-radius: 2em; border-radius: 2em; background-image: linear-gradient( #5f9cc5,#396b9e ); font-size: 12.5px; padding: .55em 11px .5em;" href="javascript:displayProspection(\''+result[7][k]+'\')" data-role="button" data-inline="true" data-mini="true" data-theme="b" >:)</a></td>';
+														contenu+= '<td><a href="javascript:displayProspection(\''+result[7][k]+'\')"; data-role="button" data-inline="true" data-mini="true" data-theme="b"> <img src="{!URLFOR($Resource.prospection_image, 'prospection_img/contact_image.png')}" alt="" /></a></td>';
+														contenu+= '<td style="padding-left:20px;"><input type="text" name="Nom' + result[7][k] + '" id="Nom' + result[7][k] + '" data-mini="true" value="'+result[2][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="text" name="Rue' + result[7][k] + '" id="adresse_rue' + result[7][k] + '" data-mini="true" value="'+result[0][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="text" name="Ville' + result[7][k] + '" id="locality' + result[7][k] + '" data-mini="true" value="'+result[1][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; border-spacing: 0px; width:90%;"/></td>';
+														contenu+= '<td style="width:5%;"><input type="text" name="Cp' + result[7][k] + '" id="postal_code' + result[7][k] + '" data-mini="true" value="'+result[3][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; border-spacing: 0px; width:70%;"/></td>';
+														contenu+= '<td><input type="tel" name="Telephone' + result[7][k] + '" id="Telephone' + result[7][k] + '" data-mini="true" value="'+result[4][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="email" name="Email' + result[7][k] + '" id="Email' + result[7][k] + '" data-mini="true" value="'+result[5][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td><input type="text" name="Observation' + result[7][k] + '" id="Observation' + result[7][k] + '" data-mini="true" value="'+result[6][k] +'" onChange="unsaved(this.id)" style="padding: .4em .4em; background: transparent none; font-size: 14px; -webkit-border-radius: .375em; border-radius: .5em; width:90%;"/></td>';
+														contenu+= '<td style="display:none"><input type="text" id="PId' +result[7][k] +'" value="'+result[7][k] +'" style="display:none"/></td>'
+														contenu+= '<td><a href="javascript:updateProspection(\''+result[7][k]+'\')" data-role="button" data-inline="true" data-mini="true" data-theme="b"><img src="{!URLFOR($Resource.prospection_image, 'prospection_img/sauvegarde_image.png')}" alt="" /></a></td>';
+														contenu+= '<td><a href="javascript:deleteProspection(\''+result[7][k]+'\')" data-role="button" data-inline="true" data-mini="true" data-theme="b"><img src="{!URLFOR($Resource.prospection_image, 'prospection_img/supprimer_image.png')}" alt="" /></a></td>';
+														contenu+= '</tr>';
+												}
+
+												contenu+= '</table>';
+												j$("#affichage").html(contenu);
+										} else {
+												var contenu= 'Pas de propections disponibles pour cette date.';
+												j$("#affichage").html(contenu);
+										}
+								}
+						},
+								{escape: true}
+						);
+				}
+
+				function displayProspection(k){
+						var pidDisplay = j$("[id$=PId"+k+"]")[0].value;
+									 window.location.href="https://cs8.salesforce.com/"+pidDisplay
+				}
+
+
+				function addProspection(){
+						var nom = j$("[id$=Nom]")[0].value;
+						var rue = j$("[id$=adresse_rue]")[0].value;
+						var ville = j$("[id$=locality]")[0].value;
+						var cp = j$("[id$=postal_code]")[0].value;
+						var telephone = j$("[id$=Telephone]")[0].value;
+						var email = j$("[id$=Email]")[0].value;
+						var observation = j$("[id$=Observation]")[0].value;
+
+						var dateProspection = j$("[id$=dateProspection]")[0].value;
+
+						var argument = new Object();
+						argument['nom']=nom;
+						argument['rue']=rue;
+						argument['ville']=ville;
+						argument['cp']=cp;
+						argument['telephone']=telephone;
+						argument['email']=email;
+						argument['observation']=observation;
+						argument['dateProspection']=dateProspection;
+
+						function validateCp(cp) {
+						var regex = /^[0-9]{5}$/;
+						return regex.test(cp);
+						}
+
+						if((nom == '') || (rue == '') || (ville == '') || ((email != '') && (validateEmail(email)==false)) || ((telephone == '') && (email == '')) || ((telephone != '') && (validatePhone(telephone)==false)) || ((cp != '') && (validateCp(cp)==false)) || (dateProspection== '')){
+								var errorMessage = '';
+								if(ville == '')
+										errorMessage += 'Vous n\'avez pas renseigné de Ville.<br/>';
+								if(rue == '')
+										errorMessage += 'Vous n\'avez pas renseigné de Rue.<br/>';
+								if(nom == '')
+										errorMessage += 'Vous n\'avez pas renseigné de Nom.<br/>';
+								if((email != '') && (validateEmail(email)==false))
+										errorMessage += 'L\'email renseigné n\'est pas valide.<br/>';
+								if((cp != '') && (validateCp(cp)==false))
+										errorMessage += 'Le code postal renseigné n\'est pas valide.<br/>';
+								if((telephone != '') && (validatePhone(telephone)==false))
+										errorMessage += 'Le numéro de téléphone renseigné n\'est pas valide.<br/>';
+								if((telephone == '') && (email == ''))
+										errorMessage += 'Veuillez renseigner au moins un téléphone ou une adresse email.<br/>';
+								if(dateProspection == '')
+										errorMessage += 'Aucune date de prospection renseignée.<br/>';
+								j$("#error").html(errorMessage);
+						} else {
+								// Sert a l'insertion dans la base
+								Visualforce.remoting.Manager.invokeAction(
+								'{!$RemoteAction.Ctrl_Prospection.insertProspection}', argument,
+								function(result, event) {
+										if (event.status) {
+												if(result != null) {
+														// récupération de id
+												}
+										} else if (event.type === 'exception') {
+												alert(event.message);
+										} else {
+												alert(event.message);
+										}
+								},
+										{escape: true}
+								);
+
+								// Refresh de l'affichage des prospections
+								var errorMessage = ' ';
+								j$("#error").html(errorMessage);
+								showData();
+						}
+				}
+
+				function updateProspection(k){
+						var nomUpdate = j$("[id$=Nom"+k+"]")[0].value;
+						var rueUpdate = j$("[id$=adresse_rue"+k+"]")[0].value;
+						var villeUpdate = j$("[id$=locality"+k+"]")[0].value;
+						var cpUpdate = j$("[id$=postal_code"+k+"]")[0].value;
+						var telephoneUpdate = j$("[id$=Telephone"+k+"]")[0].value;
+						var emailUpdate = j$("[id$=Email"+k+"]")[0].value;
+						var observationUpdate = j$("[id$=Observation"+k+"]")[0].value;
+						var pidUpdate = j$("[id$=PId"+k+"]")[0].value;
+						var dateProspectionUpdate = j$("[id$=dateProspection]")[0].value;
+
+						var argument = new Object();
+						argument['nom']=nomUpdate;
+						argument['rue']=rueUpdate;
+						argument['ville']=villeUpdate;
+						argument['cp']=cpUpdate;
+						argument['telephone']=telephoneUpdate;
+						argument['email']=emailUpdate;
+						argument['observation']=observationUpdate;
+						argument['pid']=pidUpdate;
+						argument['dateProspection']=dateProspectionUpdate;
+
+
+						function validateCp(cp) {
+						var regex = /^[0-9]{5}$/;
+						return regex.test(cp);
+						}
+
+					if((nomUpdate == '') || (rueUpdate == '') || (villeUpdate == '') || ((emailUpdate != '') && (validateEmail(emailUpdate)==false)) || ((telephoneUpdate == '') && (emailUpdate == '')) || ((telephoneUpdate != '') && (validatePhone(telephoneUpdate)==false)) || ((cpUpdate != '') && (validateCp(cpUpdate)==false)) || (dateProspectionUpdate== '')){
+								var errorMessage = '';
+								if(villeUpdate == '')
+										errorMessage += 'Vous n\'avez pas renseigné de Ville.<br/>';
+								if(rueUpdate == '')
+										errorMessage += 'Vous n\'avez pas renseigné de Rue.<br/>';
+								if(nomUpdate == '')
+										errorMessage += 'Vous n\'avez pas renseigné de Nom.<br/>';
+								if((emailUpdate != '') && (validateEmail(emailUpdate)==false))
+										errorMessage += 'L\'email renseigné n\'est pas valide.<br/>';
+								if((cpUpdate != '') && (validateCp(cpUpdate)==false))
+										errorMessage += 'Le code postal renseigné n\'est pas valide.<br/>';
+								if((telephoneUpdate != '') && (validatePhone(telephoneUpdate)==false))
+										errorMessage += 'Le numéro de téléphone renseigné n\'est pas valide.<br/>';
+								if((telephoneUpdate == '') && (emailUpdate == ''))
+										errorMessage += 'Veuillez renseigner au moins un téléphone ou une adresse email.<br/>';
+								if(dateProspectionUpdate == '')
+										errorMessage += 'Aucune date de prospection renseignée.<br/>';
+								j$("#error2").html(errorMessage);
+
+						} else {
+
+						// Sert a l'insertion dans la base
+						// Call APEX function
+						Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.Ctrl_Prospection.updateProspection}', argument,
+						function(result, event) {
+								if (event.status) {
+								}
+						},
+								{escape: true}
+						);
+
+						// Refresh de l'affichage des prospections
+						var errorMessage = ' ';
+						j$("#error2").html(errorMessage);
+						saved(k);
+						}
+
+				}
+
+				function deleteProspection(k){
+						var nomDelete = j$("[id$=Nom"+k+"]")[0].value;
+						var rueDelete = j$("[id$=adresse_rue"+k+"]")[0].value;
+						var villeDelete = j$("[id$=locality"+k+"]")[0].value;
+						var cpDelete = j$("[id$=postal_code"+k+"]")[0].value;
+						var telephoneDelete = j$("[id$=Telephone"+k+"]")[0].value;
+						var emailDelete = j$("[id$=Email"+k+"]")[0].value;
+						var observationDelete = j$("[id$=Observation"+k+"]")[0].value;
+						var pidDelete = j$("[id$=PId"+k+"]")[0].value;
+						var dateProspectionDelete = j$("[id$=dateProspection]")[0].value;
+
+
+						var argument = new Object();
+						argument['nom']=nomDelete;
+						argument['rue']=rueDelete;
+						argument['ville']=villeDelete;
+						argument['cp']=cpDelete;
+						argument['telephone']=telephoneDelete;
+						argument['email']=emailDelete;
+						argument['observation']=observationDelete;
+						argument['pid']=pidDelete;
+						argument['dateProspection']=dateProspectionDelete;
+
+						// Sert a l'insertion dans la base
+						// Call APEX function
+						Visualforce.remoting.Manager.invokeAction(
+						'{!$RemoteAction.Ctrl_Prospection.deleteProspection}', argument,
+						function(result, event) {
+								if (event.status) {
+
+								}
+						},
+								{escape: true}
+						);
+
+						// Refresh de l'affichage des prospections
+						showData();
+				}
+		</script>
+</head>
+<body>
+<div data-role="page">
+		<div data-role="content">
+				<div data-role="popup" id="statusPopupID" class="ui-content" data-overlay-theme="a">
+						<p>Chargement en cours...<br />Veuillez patienter.</p>
+				</div>
+
+				<div data-role="collapsible" data-collapsed="false" data-content-theme="c">
+						<h3 style="white-space:normal">Prospection</h3>
+						<table>
+								<tr>
+								 <td> <label for="PurchaseDateTime">Date de prospection :</label></td>
+								 <td style ="padding-left:10px;"> Adresse complète :</td>
+								</tr>
+
+								<tr>
+									<td> <input type="date" id="dateProspection" value="{!DateProspection}" onchange="showData();" />                    </td>
+									<td style ="width:85%; padding-left:10px;">
+												<input label="Adresse complète" id="autocomplete" type="text" style="width:100%;" styleClass="search_place"/>
+												<input type="hidden" id="administrative_area_level_1" value="{!departement2}"/>
+												<input type="hidden" id="country" value="{!pays2}"/>
+												<input type="hidden" value="{!adresse_latitude}" id="adresse_latitude"/>
+												<input type="hidden" value="{!adresse_longitude}" id="adresse_longitude"/>
+									 </td>
+								 </tr>
+						</table>
+
+						<div>
+								<div id="error" style="color:#FF0000;"></div>
+								<table>
+										<tr>
+												<td>Nom</td>
+												<td>Rue</td>
+												<td>Ville</td>
+												<td>CP</td>
+												<td>Téléphone</td>
+												<td>Email</td>
+												<td>Observations</td>
+												<td>Ajouter</td>
+												<td style="display:none">Id</td>
+										</tr>
+										<tr id="saisie">
+												<td><input type="text" name="Nom" id="Nom" data-mini="true" value="{!Nom}" /></td>
+												<td><input type="text" name="Rue" id="adresse_rue" data-mini="true" value="{!Rue}"/></td>
+												<td><input type="text" name="Ville" id="locality" data-mini="true" value="{!Ville}"/></td>
+												<td style="width: 5%;"><input type="text" name="CP" id="postal_code" data-mini="true" value="{!cp}"/></td>
+												<td><input type="tel" name="Telephone" id="Telephone" data-mini="true" value="{!Telephone}" maxlength="22"/></td>
+												<td><input type="email" name="Email" id="Email" data-mini="true" value="{!Email}"/></td>
+												<td><input type="text" name="Observation" id="Observation" data-mini="true" value="{!Observation}" /></td>
+												<td>
+														<a href="javascript:addProspection()" data-role="button" data-inline="true" data-mini="true" data-theme="b">+</a>
+												</td>
+												<td style="display:none">
+														<input type="text" value="{!MapId[null]}" style="display:none"/>
+														<input type="text" id="Lat"  value="{!Lat}" style="display:none" />
+														<input type="text" id="Long"  value="{!Lon}" style="display:none" />
+												</td>
+										</tr>
+
+								</table>
+						</div>
+				</div>
+				<form >
+						<div data-role="collapsible" data-collapsed="false" data-content-theme="c">
+								<h3 style="white-space:normal">Prospections Effectuées</h3>
+								<div id="affichage" style=" -webkit-box-shadow: none !important,
+																						-moz-box-shadow: none !important,
+																						box-shadow: none !important,
+																						-webkit-border-radius: .3125em,
+																						border-radius: .3125em,
+																						-webkit-background-clip: padding,
+																						background-clip: padding-box ;">
+								</div>
+						</div>
+				</form>
+		</div><!-- /content -->
+</div><!-- /page -->
+</body>
+</html>
+</apex:page>

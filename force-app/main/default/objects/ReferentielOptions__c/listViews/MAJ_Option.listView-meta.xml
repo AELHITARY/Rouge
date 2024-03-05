@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MAJ_Option</fullName>
+    <columns>NAME</columns>
+    <columns>LibelleOption__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CodeOption__c</field>
+        <operation>equals</operation>
+        <value>FEBOI00385</value>
+    </filters>
+    <label>MAJ Option</label>
+    <language>fr</language>
+</ListView>

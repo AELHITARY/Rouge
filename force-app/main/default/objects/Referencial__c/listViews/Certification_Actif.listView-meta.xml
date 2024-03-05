@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Certification_Actif</fullName>
+    <columns>NAME</columns>
+    <columns>KparKReference__c</columns>
+    <columns>startDate__c</columns>
+    <columns>endDate__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Referencial__c.Certification</value>
+    </filters>
+    <filters>
+        <field>active__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Certification (Actif)</label>
+    <language>fr</language>
+</ListView>

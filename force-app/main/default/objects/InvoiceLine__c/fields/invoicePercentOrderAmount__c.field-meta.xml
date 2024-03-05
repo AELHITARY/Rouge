@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>invoicePercentOrderAmount__c</fullName>
+    <description>Pourcentage du montant de la facture d&apos;acompte par rapport à au montant de la commande</description>
+    <externalId>false</externalId>
+    <formula>invoice__r.percentOrderAmount__c</formula>
+    <label>[#] Pourcentage montant commande</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>15</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

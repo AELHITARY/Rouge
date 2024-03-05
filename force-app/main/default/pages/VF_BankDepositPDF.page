@@ -1,0 +1,194 @@
+<apex:page controller="Ctrl_BankDepositPDF" renderAs="pdf" docType="html-5.0" showHeader="false" applyhtmltag="false" sidebar="false" standardStylesheets="false">
+    <head>
+        <style type="text/css" media="all" >
+            @page {
+                size:landscape;
+                margin-left:0.25in;
+                margin-right:0.25in;
+                @bottom-right {
+                    content: "Page " counter(page);
+                    font-size:10px;
+                }
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+            body {
+                font: 8pt/1.5 Arial, 'Liberation Sans', FreeSans, sans-serif;
+            }
+            div.footer {
+                display: block;
+                padding: 5px;
+                position: running(footer);
+            }
+            .titre{
+                font-weight: lighter;
+                font-size:30px;
+                margin-bottom:20px;
+            }
+            div.titre:after {
+                background:#B7D5F3;
+                width:57%;
+                content:"";
+                display:inline-block;
+                height:5px;
+                margin-left:10px;
+            }
+            .pb {
+                page-break-after: always;
+            }
+            table {
+                text-align:center;
+                border-spacing: 0;
+                margin-right:auto;
+                margin-left:auto;
+                border-right: 1px solid black;
+                border-top: 1px solid black;
+            }
+            thead {
+                display: table-header-group;
+                background-color: #a1c8ef;
+            }
+            tfoot {
+                background-color: #f9f9f9;
+                font-weight: bold;
+            }
+            td, th {
+                border-left: 1px solid black;
+                border-bottom: 1px solid black;
+            }
+            .logo{
+                display:block;
+                margin-left:auto;
+            }
+            .even{
+                background-color: white;
+            }
+            .odd{
+                background-color: #F6F6F6;
+            }
+            .even .caseEditable {
+                background-color:#F6E7CE;
+            }
+            .odd .caseEditable {
+                background-color:#E6D7BE;
+            }
+        </style>
+    </head>
+
+    <div class="header_center KparK_listeCompte" id="header_center">
+        <apex:image value="{!URLFOR($Resource.Logo_kpark)}" width="150" style="float:right;"/>
+        <div class="titre">Remise en banque</div>      
+    </div>
+
+    <div style="font-size:12px;">
+        <p>Nombre de pièces : {!nbPieces}</p>
+        <p>Montant des pièces :
+            <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                <apex:param value="{!totalPiecesAmount}" />
+            </apex:outputText>
+        </p>
+    </div>
+    
+    <div class="footer">
+          <div style="font-size:10px;">
+            <apex:outputText value="Créé par {1} {2} le {0,date,dd/MM/yyyy 'à' HH:mm:ss}">
+                <apex:param value="{!NOW()+offset}" />
+                <apex:param value="{!$User.FirstName}"/>
+                <apex:param value="{!$User.LastName}"/>
+            </apex:outputText>
+        </div>
+    </div>
+    
+    <!-- PREMIER TABLEAU -->
+    <table style="-fs-table-paginate: paginate;" cellspacing="0">
+        <thead>
+            <tr>
+                <th>N° de commande</th>
+                <th>Nom du client</th>
+                <th>Date de la commande</th>
+                <th>N° remise en banque</th>
+                <th>N° de la pièce</th>
+                <th>Montant</th>
+                <th>Banque externe</th>
+                <th>Référence externes</th>
+            </tr>
+        </thead>                
+        
+        <apex:variable var="index" value="0" />
+        <apex:repeat value="{!listAccPieceExport1}" var="export">
+            <apex:variable var="rowCls" value="{!IF(mod(VALUE(index),2)==0,'even', 'odd')}"/>
+            <tr class="{!rowCls}">
+                <td width="9%">{!export.order__r.OrderNumber}</td>
+                <td width="22%">{!export.account__r.Name}</td>
+                <td width="8%">
+                    <apex:outputText value="{0,date,dd/MM/yyyy}">
+                        <apex:param value="{!export.order__r.EffectiveDate}" />
+                    </apex:outputText>
+                </td>
+                <td width="9%">{!brm}</td>
+                <td width="10%">{!export.Name}</td>
+                <td width="8%">
+                    <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                        <apex:param value="{!export.amount__c}" />
+                    </apex:outputText>                    
+                </td>
+                <td width="17%">{!export.externalBank__c}</td>
+                <td width="17%">{!export.externalReference__c}</td>
+            </tr>
+            <apex:variable var="index" value="{!(VALUE(index)+1)}" />
+        </apex:repeat>
+        
+        <!-- DEUXIEME TABLEAU -->
+        <apex:outputpanel rendered="{!listAccPieceExport2.size != 0}">
+            <apex:repeat value="{!listAccPieceExport2}" var="export">
+                <apex:variable var="rowCls" value="{!IF(mod(VALUE(index),2)==0,'even', 'odd')}" />
+                <tr class="{!rowCls}">
+                    <td width="9%">{!export.order__r.OrderNumber}</td>
+                    <td width="22%">{!export.account__r.Name}</td>
+                    <td width="8%">
+                        <apex:outputText value="{0,date,dd/MM/yyyy}">
+                            <apex:param value="{!export.order__r.EffectiveDate}" />
+                        </apex:outputText>
+                    </td>
+                    <td width="9%">{!brm}</td>
+                    <td width="10%">{!export.Name}</td>
+                    <td width="8%">
+                        <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                            <apex:param value="{!export.amount__c}" />
+                        </apex:outputText>                    
+                    </td>
+                    <td width="17%">{!export.externalBank__c}</td>
+                    <td width="17%">{!export.externalReference__c}</td>
+                </tr>
+                <apex:variable var="index" value="{!(VALUE(index)+1)}" />
+            </apex:repeat>
+        </apex:outputpanel>
+
+        <!-- TROISIEME TABLEAU -->
+        <apex:outputpanel rendered="{!listAccPieceExport3.size != 0}">
+            <apex:repeat value="{!listAccPieceExport3}" var="export">
+                <apex:variable var="rowCls" value="{!IF(mod(VALUE(index),2)==0,'even', 'odd')}" />                
+                <tr class="{!rowCls}">
+                    <td width="9%">{!export.order__r.OrderNumber}</td>
+                    <td width="22%">{!export.account__r.Name}</td>
+                    <td width="8%">
+                        <apex:outputText value="{0,date,dd/MM/yyyy}">
+                            <apex:param value="{!export.order__r.EffectiveDate}" />
+                        </apex:outputText>
+                    </td>
+                    <td width="9%">{!brm}</td>
+                    <td width="10%">{!export.Name}</td>
+                    <td width="8%">
+                        <apex:outputText value="{0, number, ###,###,##0.00 €}">
+                            <apex:param value="{!export.amount__c}" />
+                        </apex:outputText>                    
+                    </td>
+                    <td width="17%">{!export.externalBank__c}</td>
+                    <td width="17%">{!export.externalReference__c}</td>
+                </tr>
+                <apex:variable var="index" value="{!(VALUE(index)+1)}" />
+            </apex:repeat>
+        </apex:outputpanel>
+    </table>
+</apex:page>

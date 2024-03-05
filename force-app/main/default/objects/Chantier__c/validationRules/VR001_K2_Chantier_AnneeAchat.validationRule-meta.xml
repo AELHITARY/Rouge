@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Chantier_AnneeAchat</fullName>
+    <active>true</active>
+    <errorConditionFormula>!$User.ByPassValidationRule__c &amp;&amp; !ISNULL( anneeAchat__c ) &amp;&amp; (anneeAchat__c &gt; Year(TODAY()))</errorConditionFormula>
+    <errorDisplayField>anneeAchat__c</errorDisplayField>
+    <errorMessage>Année d&apos;achat invalide ! (L&apos;année d&apos;achat doit être antérieure ou égale à l&apos;année en cours)</errorMessage>
+</ValidationRule>

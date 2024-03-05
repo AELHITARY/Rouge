@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR001_K2_Semaine_TypeVendeur</fullName>
+    <active>true</active>
+    <description>CRM-514 : Le vendeur est obligatoire si la semaine est de type Vendeur</description>
+    <errorConditionFormula>AND($User.ByPassValidationRule__c = False, ISBLANK(vendeur__c), ISPICKVAL(type__c, &apos;Vendeur&apos;))</errorConditionFormula>
+    <errorDisplayField>vendeur__c</errorDisplayField>
+    <errorMessage>Le vendeur est obligatoire !</errorMessage>
+</ValidationRule>

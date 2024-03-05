@@ -1,0 +1,1627 @@
+<apex:page title="Triptyque" docType="html-5.0" showHeader="true" sidebar="false" controller="Ctrl_Triptyque" expires="600" cache="true" action="{!insertUserStats}">
+    <head><meta name="viewport" content="maximum-scale=1.0, user-scalable=no" /></head>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_js, 'JQuery/jquery-1.11.1.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/numeral.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Numeral_js, 'Numeral-js/min/languages.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery_Knob_js, 'JQuery-Knob/dist/jquery.knob.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.Swiper, 'Swiper-master/src/idangerous.swiper.js')}" />
+    <!-- <script type="text/javascript">(function() {var walkme = document.createElement('script'); walkme.type = 'text/javascript'; walkme.async = true; walkme.src = '{!walkMeURL}'; 
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(walkme, s); window._walkmeConfig = {smartLoad:true}; })();
+    </script> -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <apex:stylesheet value="{!URLFOR($Resource.Swiper, '/Swiper-master/src/idangerous.swiper.css')}"/>
+
+    <style>
+        #page0{
+            width: 170px;
+            height: 400px;
+        }
+
+        .swiper-container .swiper-slide{
+                padding-top:10px;
+                padding-bottom:40px;
+        }
+
+        .swiper-container .case {
+                border-style: solid;
+                border-width:1px;
+                border-color: #dddddd;
+                padding:5px;
+                text-align:center;
+        }
+
+        .arrow-left {
+                position: absolute;
+                left: 20px;
+                top: 500px;
+                margin-top: -15px;
+                width: 60px;
+                height: 60px;
+        }
+
+        .arrow-left img {
+                max-width: 100%;
+                height: auto;
+                width: auto\9; /* ie8 */
+        }
+
+        .arrow-right {
+                position: absolute;
+                right: 20px;
+                top: 500px;
+                margin-top: -15px;
+                width: 60px;
+                height: 60px;
+        }
+
+        .arrow-right img {
+                max-width: 100%;
+                height: auto;
+                width: auto\9; /* ie8 */
+        }
+
+        .pagination {
+                position: absolute;
+                left: 0;
+                text-align: center;
+                bottom:5px;
+                width: 100%;
+        }
+
+        .swiper-pagination-switch {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border-radius: 10px;
+                background: #999;
+                box-shadow: 0px 1px 2px #555 inset;
+                margin: 0 3px;
+                cursor: pointer;
+        }
+
+        .swiper-active-switch {
+                background: #fff;
+        }
+
+        #boutonBlock {
+                margin-left:auto;
+                margin-right:auto;
+                display:block;
+                text-align:center;
+        }
+
+        #boutonExportPdf, #boutonObjVendeurs, #boutonAnalytique {
+                display:inline;
+        }
+
+        #loading {
+                position: absolute;
+                top: 35%;
+                left: 0;
+                width: 100%;
+                margin-top: -10px;
+                line-height: 20px;
+                text-align: center;
+        }
+
+        .section {
+                height: 500px;
+                line-height: 500px; }
+
+        .loader {
+                width: 20px;
+                height: 20px;
+                display: inline-block;
+                vertical-align: middle;
+                position: relative; }
+
+        /* Loaders */
+        .loader-quart {
+                border-radius: 20px;
+                border: 4px solid rgba(0, 0, 0, 0.4); }
+
+        .loader-quart:after {
+                content: '';
+                position: absolute;
+                top: -4px;
+                left: -4px;
+                bottom: -4px;
+                right: -4px;
+                border-radius: 20px;
+                border: 4px solid transparent;
+                border-top-color: #000;
+                -webkit-animation: spin 1s linear infinite;
+                -moz-animation: spin 1s linear infinite;
+                animation: spin 1s linear infinite; }
+
+        /* Animations */
+        @-webkit-keyframes spin {
+                from {
+                        -webkit-transform: rotate(0deg); }
+
+                to {
+                        -webkit-transform: rotate(360deg); } }
+        @-moz-keyframes spin {
+                from {
+                        -moz-transform: rotate(0deg); }
+
+                to {
+                        -moz-transform: rotate(360deg); } }
+        @keyframes spin {
+                from {
+                        -webkit-transform: rotate(0deg);
+                        -moz-transform: rotate(0deg);
+                        -ms-transform: rotate(0deg);
+                        -o-transform: rotate(0deg);
+                        transform: rotate(0deg); }
+
+                to {
+                        -webkit-transform: rotate(360deg);
+                        -moz-transform: rotate(360deg);
+                        -ms-transform: rotate(360deg);
+                        -o-transform: rotate(360deg);
+                        transform: rotate(360deg); } }
+
+        /* Tableau */
+        .triptyque thead {
+                display: table-header-group;
+                background-color: #a1c8ef;
+        }
+        .triptyque > tbody > tr:nth-child(4n+1) > td, .triptyque > tbody > tr:nth-child(4n+1) > th {
+                background-color: #d4e6f8;
+        }
+        .triptyque > tbody > tr:nth-child(4n+2) > td, .triptyque > tbody > tr:nth-child(4n+2) > th {
+                background-color: #d4e6f8;
+        }
+        .triptyque tfoot {
+                background-color: #f9f9f9;
+                font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript">
+        Visualforce.remoting.timeout = 120000; // Timeout (2 minutes) pour VisualForce Remote Action
+        Visualforce.remoting.maxretries = 2; // Set maximum number of retries at page level
+        j$ = jQuery.noConflict();
+
+        // Variables vendeurs
+        var vendeursIDs = new Array();
+        var allVendeursIDs = new Array();
+        var vendeursActive = new Array();
+        var vendeursName = new Array();
+        var vendeursLastLoginDate = new Array();
+        var vendeursNbLogin = new Object();
+
+        // Variable flag
+        var flagActualPage =  "page1";
+        var flagPage1 = false;
+        var flagPage2 = false;
+        var flagPage3 = false;
+        var flagPage4 = false;
+        var flagPage5 = false;
+        var refresh = false;
+        var decimalFormat = "'0.00";
+        var NotDecimalFormat = "0";
+        var currencyFormat = "0,0";
+
+        // Variable HTML
+        var htmlLoading;
+        var htmlExportButton;
+        var jaugeContactActif;
+        var jaugeNbVente;
+        var jaugeCAVente;
+        var jaugeContactActifMagasin;
+        var jaugeNbVenteMagasin;
+        var jaugeCAVenteMagasin;
+        var red = '#d9534f';
+        var orange = '#f0ad4e';
+        var green = '#5cb85c';
+        var blue = '#428bca';
+
+        // Chargement librairie des graphiques Google Chart
+        google.load("visualization", "1", {packages:["corechart"]});
+        google.setOnLoadCallback(getNumberRDVInfos);
+
+        //Initialisation à la page
+        j$(document).ready(function() {
+            numeral.language('fr', {
+                delimiters: {
+                    thousands: ' ',
+                    decimal: ','
+                },
+                abbreviations: {
+                    thousand: 'k',
+                    million: 'm',
+                    billion: 'b',
+                    trillion: 't'
+                },
+                ordinal : function (number) {
+                    return number === 1 ? 'er' : 'ème';
+                },
+                currency: {
+                    symbol: '€'
+                }
+            });
+            numeral.language('fr');
+
+            htmlLoading = j$("#loading");
+            htmlExportButton = j$('#boutonExportPdf');
+
+            if(vendeursIDs.length > 0)
+                htmlExportButton.css('visibility', 'visible');
+            else
+                htmlExportButton.css('visibility', 'hidden');
+
+            // Désactivation de la liste de valeurs Magasin si pas de magasin
+            if(j$("[id$=magasin] option").length == "1")
+                j$("[id$=magasin]").attr ('disabled', 'disabled');
+
+            // Chargement page 1
+            loadPage1();
+
+            // Chargement des objectifs
+            jaugeContactActif = $(".jaugeContactActif");
+            jaugeNbVente = $(".jaugeNbVente");
+            jaugeCAVente = $(".jaugeCAVente");
+            jaugeContactActifMagasin = $(".jaugeContactActifMagasin");
+            jaugeNbVenteMagasin = $(".jaugeNbVenteMagasin");
+            jaugeCAVenteMagasin = $(".jaugeCAVenteMagasin");
+            jaugeContactActif.knob({ 'format' : function (value) { return value + '%'; }});
+            jaugeNbVente.knob({ 'format' : function (value) { return value + '%'; }});
+            jaugeCAVente.knob({ 'format' : function (value) { return value + '%'; }});
+            jaugeContactActifMagasin.knob({ 'format' : function (value) { return value + '%'; }});
+            jaugeNbVenteMagasin.knob({ 'format' : function (value) { return value + '%'; }});
+            jaugeCAVenteMagasin.knob({ 'format' : function (value) { return value + '%'; }});
+            loadObjectifVendeur();
+            loadObjectifMagasin();
+        });
+
+        /* Swiper                                                                       */
+        /*------------------------------------------------------------------------------*/
+        $(function(){
+            var mySwiper = $('.swiper-container').swiper({
+                //Your options here:
+                pagination: '.pagination',
+                mode:'horizontal',
+                grabCursor: true,
+                paginationClickable: true,
+                onSlideChangeEnd : function(swiperHere) {
+                    var swiperPage = mySwiper.activeSlide();
+                    var swiperPageId = mySwiper.activeSlide().id;
+                    changeNav(swiperPageId);
+                }
+            });
+
+            function changeNav(swiperPageId) {
+                if (swiperPageId == 'page1') {
+                    document.getElementById("pageActuelle").innerHTML = "1";
+                    document.getElementById("infos").innerHTML = "Hebdo (Contact et RDV)";
+                    flagActualPage = 'page1';
+                    if(flagPage1 == false){
+                        loadPage1();
+                    }
+                }
+                if (swiperPageId == 'page2') {
+                    document.getElementById("pageActuelle").innerHTML = "2";
+                    document.getElementById("infos").innerHTML = "Hebdo (Contact par origine)";
+                    flagActualPage = 'page2';
+                    if(flagPage2 == false){
+                        loadPage2();
+                    }
+                }
+                if (swiperPageId == 'page3') {
+                    document.getElementById("pageActuelle").innerHTML = "3";
+                    document.getElementById("infos").innerHTML = "Hebdo (Vente)";
+                    flagActualPage = 'page3';
+                    if(flagPage3 == false){
+                        loadPage3();
+                    }
+                }
+                if (swiperPageId == 'page4') {
+                    document.getElementById("pageActuelle").innerHTML = "4";
+                    document.getElementById("infos").innerHTML = "Mensuel (Contact par origine)";
+                    flagActualPage = 'page4';
+                    if(flagPage4 == false){
+                        loadPage4();
+                    }
+                }
+                if (swiperPageId == 'page5') {
+                    document.getElementById("pageActuelle").innerHTML = "5";
+                    document.getElementById("infos").innerHTML = "Mensuel (RDV et Vente)";
+                    flagActualPage = 'page5';
+                    if(flagPage5 == false){
+                        loadPage5();
+                    }
+                }
+            }
+
+            $('.arrow-left').on('click', function(e){
+                e.preventDefault()
+                mySwiper.swipeTo(mySwiper.activeIndex-1);
+            })
+            $('.arrow-right').on('click', function(e){
+                e.preventDefault()
+                mySwiper.swipeTo(mySwiper.activeIndex+1);
+            })
+        })
+
+        function refreshHidden(newmag){
+            j$("[id$=magHidden]")[0].value = newmag;
+        }
+
+        function refreshValues(timeChanged){
+            flagPage1 = false;
+            flagPage2 = false;
+            flagPage3 = false;
+            flagPage4 = false;
+            flagPage5 = false;
+
+            if(vendeursIDs.length > 0)
+                htmlExportButton.css('visibility', 'visible');
+            else
+                htmlExportButton.css('visibility', 'hidden');
+
+            if(flagActualPage == 'page1'){
+                loadPage1();
+            }
+            if(flagActualPage == 'page2'){
+                loadPage2();
+            }
+            if(flagActualPage == 'page3'){
+                loadPage3();
+            }
+            if(flagActualPage == 'page4'){
+                loadPage4();
+            }
+            if(flagActualPage == 'page5'){
+                loadPage5();
+            }
+
+            if(flagActualPage == 'magasin')
+                refresh = false;
+
+            loadObjectifVendeur();
+            loadObjectifMagasin();
+            getNumberRDVInfos();
+        }
+
+        /* Récupère les objectifs de l'utilisateur courant pour la semaine              */
+        /*------------------------------------------------------------------------------*/
+        function loadObjectifVendeur(){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+            var userID = new Array();
+            userID.push('{!actualUser.Id}');
+            var periodId = j$("[id$=periodId]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getObjectifsVendeurs}', anneeAct, moisAct, semaineAct, periodId, userID,
+                function(result, event) {
+                    if (event.status) {
+                        processIndicatorsObjectifs(result, "vendeur");
+                    } else if (event.type === 'exception') {
+                        displayMessage('Erreur lors du chargement des objectifs vendeur : ' + event.message);
+                    } else {
+                        displayMessage('Erreur lors du chargement des objectifs vendeur : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Récupère les objectifs du magasin courant pour la semaine                    */
+        /*------------------------------------------------------------------------------*/
+        function loadObjectifMagasin(){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+            var userID = allVendeursIDs;
+            var periodId = j$("[id$=periodId]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getObjectifsVendeurs}', anneeAct, moisAct, semaineAct, periodId, userID,
+                function(result, event) {
+                    if (event.status) {
+                        processIndicatorsObjectifs(result, "magasin");
+                    } else if (event.type === 'exception') {
+                        displayMessage('Erreur lors du chargement des objectifs magasin : ' + event.message);
+                    } else {
+                        displayMessage('Erreur lors du chargement des objectifs magasin : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Récupère les informations pour les 2 graphiques de type Pie des RDV          */
+        /*------------------------------------------------------------------------------*/
+        function getNumberRDVInfos() {
+            // Fonction pour dessiner les rapports
+            var userID = new Array();
+            userID.push('{!actualUser.Id}');
+            var magAct = j$("[id$=magasin]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getNumberRDVInfo}', userID, magAct,
+                function(result, event) {
+                    if (event.status) {
+                        // Affichage du rapport "Nombre total de RDV commerciaux" pour le vendeur
+                        var dataIndicVendeur = google.visualization.arrayToDataTable([
+                            ['Jour', 'Nombre'],
+                            ['Aujourd\'hui', parseFloat(result.vendeurAjd)],
+                            ['Demain', parseFloat(result.vendeurDemain)],
+                            ['Après-demain', parseFloat(result.vendeurADemain)]]);
+                        // Affichage du rapport "Nombre total de RDV commerciaux" pour le magasin
+                        var dataIndicMagasin = google.visualization.arrayToDataTable([
+                            ['Jour', 'Nombre'],
+                            ['Aujourd\'hui', parseFloat(result.magasinAjd)],
+                            ['Demain', parseFloat(result.magasinDemain)],
+                            ['Après-demain', parseFloat(result.magasinADemain)]]);
+
+                        var optionsIndicRDV = {
+                            backgroundColor: '#f5f5f5',
+                            pieSliceText: 'value',
+                            height: '150',
+                            legend: {
+                                position: 'bottom'
+                            },
+                            chartArea: {
+                                left: '30',
+                                top: '0',
+                                height: '80%',
+                                width: '100%'
+                            }
+                        };
+                        // Initialisation des graphiques
+                        j$("#chartIndicRDV").html('');
+                        var chartIndicVendeur = new google.visualization.PieChart(document.getElementById('chartIndicRDV'));
+                        chartIndicVendeur.draw(dataIndicVendeur, optionsIndicRDV);
+                        j$("#allChartIndicRDV").html('');
+                        var chartIndicMagasin = new google.visualization.PieChart(document.getElementById('allChartIndicRDV'));
+                        chartIndicMagasin.draw(dataIndicMagasin, optionsIndicRDV);
+                    } else if (event.type === 'exception') {
+                        displayMessage('Erreur lors du chargement des indicateurs RDV : ' + event.message);
+                    } else {
+                        displayMessage('Erreur lors du chargement des indicateurs RDV : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Fonction de pour les indicateurs des objectifs                               */
+        /*------------------------------------------------------------------------------*/
+        function processIndicatorsObjectifs(result, type) {
+            // Récupération des éléments HTML
+            if(type == "vendeur") {
+                var objectifContactActif = j$("[id$=objectifContactActif]")[0];
+                var objectifNbVente = j$("[id$=objectifNbVente]")[0];
+                var objectifCA = j$("[id$=objectifCAVente]")[0];
+                var objectifContactActifIc = j$("[id$=objectifContactActifIc]");
+                var objectifNbVenteIc = j$("[id$=objectifNbVenteIc]");
+                var objectifCAVenteIc = j$("[id$=objectifCAVenteIc]");
+            } else if(type == "magasin") {
+                var objectifContactActif = j$("[id$=allObjectifContactActif]")[0];
+                var objectifNbVente = j$("[id$=allObjectifNbVente]")[0];
+                var objectifCA = j$("[id$=allObjectifCAVente]")[0];
+                var objectifContactActifIc = j$("[id$=allObjectifContactActifIc]");
+                var objectifNbVenteIc = j$("[id$=allObjectifNbVenteIc]");
+                var objectifCAVenteIc = j$("[id$=allObjectifCAVenteIc]");
+            }
+
+            // Mise à jour des objectifs
+            var objectifContactActifText = numeral(result.nbContactActif).format(NotDecimalFormat) + ' / ' + numeral(result.objectifContactActif).format(NotDecimalFormat);
+            var objectifNbVenteText = numeral(result.nbDevisVendu).format(NotDecimalFormat) + ' / ' + numeral(result.objectifnbDevisVendu).format(NotDecimalFormat);
+            var objectifCAText = numeral(result.nbCADevisVendu).format(decimalFormat) + ' / ' + numeral(result.objectifCADevisVendu).format(decimalFormat);
+            // Fix pour Firefox
+            if(document.all){
+                objectifContactActif.innerText = objectifContactActifText;
+                objectifNbVente.innerText = objectifNbVenteText;
+                objectifCA.innerText = objectifCAText;
+            } else{
+                objectifContactActif.textContent = objectifContactActifText;
+                objectifNbVente.textContent = objectifNbVenteText;
+                objectifCA.textContent = objectifCAText;
+            }
+
+            var contactActifColor;
+            var contactPassifColor;
+            var nbVenteColor;
+            var CAVenteColor;
+            // Couleur - Contact Actif
+            if(result.realisationContactActif >= 95 && result.realisationContactActif <= 100)
+                contactActifColor = green;
+            else if(result.realisationContactActif > 100)
+                contactActifColor = blue;
+            else if(result.realisationContactActif >= 80 && result.realisationContactActif < 95)
+                contactActifColor = orange;
+            else
+                contactActifColor = red;
+            // Couleur - Nb de vente
+            if(result.realisationNbDevis >= 95 && result.realisationNbDevis <= 100)
+                nbVenteColor = green;
+            else if(result.realisationNbDevis > 100)
+                nbVenteColor = blue;
+            else if(result.realisationNbDevis >= 80 && result.realisationNbDevis < 95)
+                nbVenteColor = orange;
+            else
+                nbVenteColor = red;
+            // Couleur - CA de vente
+            if(result.realisationCADevis >= 95 && result.realisationCADevis <= 100)
+                CAVenteColor = green;
+            else if(result.realisationCADevis > 100)
+                CAVenteColor = blue;
+            else if(result.realisationCADevis >= 80 && result.realisationCADevis < 95)
+                CAVenteColor = orange;
+            else
+                CAVenteColor = red;
+
+            // Paramètrage des jauges
+            if(type == "vendeur") {
+                if(result.realisationContactActif > 100){  jaugeContactActif.trigger('configure', {'max':result.realisationContactActif}); }
+                if(result.realisationNbDevis > 100){  jaugeNbVente.trigger('configure', {'max':result.realisationNbDevis}); }
+                if(result.realisationCADevis > 100){  jaugeCAVente.trigger('configure', {'max':result.realisationCADevis}); }
+                jaugeContactActif.trigger('configure', {  "fgColor":contactActifColor, "inputColor":contactActifColor });
+                jaugeContactActif.val(result.realisationContactActif).trigger('change');
+                objectifContactActifIc.css('color', contactActifColor);
+                jaugeNbVente.trigger('configure', {  "fgColor":nbVenteColor, "inputColor":nbVenteColor });
+                jaugeNbVente.val(result.realisationNbDevis).trigger('change');
+                objectifNbVenteIc.css('color', nbVenteColor);
+                jaugeCAVente.trigger('configure', {  "fgColor":CAVenteColor, "inputColor":CAVenteColor });
+                jaugeCAVente.val(result.realisationCADevis).trigger('change');
+                objectifCAVenteIc.css('color', CAVenteColor);
+            } else if(type == "magasin") {
+                if(result.realisationContactActif > 100){  jaugeContactActifMagasin.trigger('configure', {'max':result.realisationContactActif}); }
+                if(result.realisationNbDevis > 100){  jaugeNbVenteMagasin.trigger('configure', {'max':result.realisationNbDevis}); }
+                if(result.realisationCADevis > 100){  jaugeCAVenteMagasin.trigger('configure', {'max':result.realisationCADevis}); }
+                jaugeContactActifMagasin.trigger('configure', {  "fgColor":contactActifColor, "inputColor":contactActifColor });
+                jaugeContactActifMagasin.val(result.realisationContactActif).trigger('change');
+                objectifContactActifIc.css('color', contactActifColor);
+                jaugeNbVenteMagasin.trigger('configure', {  "fgColor":nbVenteColor, "inputColor":nbVenteColor });
+                jaugeNbVenteMagasin.val(result.realisationNbDevis).trigger('change');
+                objectifNbVenteIc.css('color', nbVenteColor);
+                jaugeCAVenteMagasin.trigger('configure', {  "fgColor":CAVenteColor, "inputColor":CAVenteColor });
+                jaugeCAVenteMagasin.val(result.realisationCADevis).trigger('change');
+                objectifCAVenteIc.css('color', CAVenteColor);
+            }
+        }
+
+        /* Chargement de la page 1 (Hebdo/Contact)                                      */
+        /*------------------------------------------------------------------------------*/
+        function loadPage1(){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+            var vendeursList = vendeursIDs;
+            var i = 0;
+            var j = 0;
+            var Somme_objectifContactActif = 0;
+            var Somme_nbContactActif = 0;
+            var Somme_objectifContactPassif = 0;
+            var Somme_nbContactPassif = 0;
+            var Somme_nbRDVTotal = 0;
+            var Somme_nbDevisVendu = 0;
+            var Somme_nbRDVR1_Pris = 0;
+            var Somme_nbRDVR1_Effec = 0;
+            var Somme_nbRDVR2_Pris = 0;
+            var Somme_nbRDVR2_Effec = 0;
+            var Somme_objectifContactTotal = 0;
+            var Somme_nbContactTotal = 0;
+            var Somme_nbRDVCreatedRdvDate = 0;
+            var Somme_nbRDVDebrief = 0;
+            var contenu='';
+            j$("#tableau1").html(contenu);
+
+            // Chargement
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            var periodId = j$("[id$=periodId]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getHebdomadaireData}', semaineAct, moisAct, anneeAct, periodId, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        if(result.length > 0) {
+                            contenu+= '<table class="table-hover triptyque" style="width:100%;">';
+                            contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="13">Hebdo (Contact & RDV)</th></tr>';
+                            contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J. Trv.</th><th colspan="2" class="case">Total</th>';
+                            contenu+= '<th colspan="2" class="case">Actifs</th> <th class="case">Passifs</th> <th colspan="2" class="case">RDV / Vente</th> <th class="case">Créés à posteriori</th> <th class="case">DREA</th> <th colspan="4" class="case">R1 / R2+</th></tr>';
+                            contenu+= '<tr><th colspan="3" class="case"></th> <th class="case">O</th><th class="case">R</th><th class="case">O</th><th class="case">R</th><th class="case"></th><th colspan="4" class="case"></th>';
+                            contenu+= '<th class="case">Pris</th><th class="case">Eff</th><th class="case">Pris</th><th class="case">Eff</th></tr></thead>';
+
+                            for (i=0;i<vendeursName.length;i++){
+                                contenu+= '<tr>';
+                                if(vendeursActive[i] == "true")
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + '</td> ';
+                                else
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + ' (Inactif)</td> ';
+                                contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeursLastLoginDate[i]))) + '<br/>' + vendeursNbLogin[vendeursIDs[i]] + '</td>';
+                                for(j=0;j<result.length;j++){
+                                        if(result[j].vendeurId == vendeursIDs[i]){
+                                            contenu+= '<td rowspan="2" class="case">' + result[j].joursTravaille + '</td>';
+                                            contenu+= '<td class="case">' + numeral(result[j].objectifContactTotal).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbContactTotal).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].objectifContactActif).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbContactActif).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbContactPassif).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbRDVTotal).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbDevisVendu).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbRDVCreatedRdvDate).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbRDVDebrief).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbRDVR1_Pris).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbRDVR1_Effec).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbRDVR2_Pris).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '<td class="case">' + numeral(result[j].nbRDVR2_Effec).format(NotDecimalFormat) + '</td> ';
+                                            contenu+= '</tr><tr>';
+                                            contenu+= '<td colspan="2" class="case">' + numeral(result[j].realisationContact).format(decimalFormat) + ' %</td>';
+                                            contenu+= '<td colspan="2" class="case">' + numeral(result[j].realisationContactActif).format(decimalFormat) + ' %</td>';
+                                            contenu+= '<td class="case"></td>';
+                                            contenu+= '<td class="case">' + numeral(result[j].tauxTransformationRDV).format(decimalFormat) + ' %</td>';
+                                            contenu+= '<td class="case">' + numeral(result[j].tauxTransformationVentes).format(decimalFormat) + ' %</td>';
+                                            contenu+= '<td class="case"></td><td class="case"></td><td colspan="4" class="case"></td></tr>';
+
+                                            Somme_objectifContactActif += result[j].objectifContactActif;
+                                            Somme_nbContactActif += result[j].nbContactActif;
+                                            Somme_nbContactPassif += result[j].nbContactPassif;
+                                            Somme_nbRDVTotal += result[j].nbRDVTotal;
+                                            Somme_nbDevisVendu += result[j].nbDevisVendu;
+                                            Somme_nbRDVR1_Pris += result[j].nbRDVR1_Pris;
+                                            Somme_nbRDVR1_Effec += result[j].nbRDVR1_Effec;
+                                            Somme_nbRDVR2_Pris += result[j].nbRDVR2_Pris;
+                                            Somme_nbRDVR2_Effec += result[j].nbRDVR2_Effec;
+                                            Somme_objectifContactTotal += result[j].objectifContactTotal;
+                                            Somme_nbContactTotal += result[j].nbContactTotal;
+                                            Somme_nbRDVCreatedRdvDate += result[j].nbRDVCreatedRdvDate;
+                                            Somme_nbRDVDebrief += result[j].nbRDVDebrief;
+                                        }
+                                    }
+                                }
+
+                                // Calcul des sommes de tous les utilisateurs
+                                if(Somme_objectifContactTotal == 0)
+                                    Somme_realisationContact = 0;
+                                else
+                                    Somme_realisationContact = (Somme_nbContactTotal / Somme_objectifContactTotal) * 100;
+                                if(Somme_objectifContactActif == 0)
+                                    Somme_realisationContactActif = 0;
+                                else
+                                    Somme_realisationContactActif = (Somme_nbContactActif / Somme_objectifContactActif) * 100;
+                                contenu+= '<tfoot><tr>';
+                                if(vendeursName.length != 1)
+                                    contenu+= '<td rowspan="2" colspan="3" class="case">Total des ' + i + ' vendeurs</td>';
+                                else
+                                    contenu+= '<td rowspan="2" colspan="3" class="case">Total</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_objectifContactTotal).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbContactTotal).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_objectifContactActif).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbContactActif).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbContactPassif).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbRDVTotal).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbDevisVendu).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbRDVCreatedRdvDate).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbRDVDebrief).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbRDVR1_Pris).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbRDVR1_Effec).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbRDVR2_Pris).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbRDVR2_Effec).format(NotDecimalFormat) + '</td>';
+                                contenu+= '</tr><tr style="font-weight: bold;"><td colspan="2" class="case">' + numeral(Math.round(Somme_realisationContact)).format(decimalFormat) + ' %</td>';
+                                contenu+= '<td colspan="2" class="case">' + numeral(Math.round(Somme_realisationContactActif)).format(decimalFormat) + ' %</td>';
+                                contenu+= '<td class="case"></td>';
+                                contenu+= '<td colspan="2" class="case"></td><td class="case"></td>';
+                                contenu+= '<td class="case"></td><td colspan="4" class="case"></td></tr></tfoot>';
+                                contenu+= '</table>';
+                            }
+                            j$("#tableau1").html(contenu);
+                            flagPage1 = true;
+                            htmlLoading.removeClass("show").addClass("hidden");
+                            j$('.swiper-slide').css( "height", "auto" );
+                        } else if (event.type === 'exception') {
+                            htmlLoading.removeClass("show").addClass("hidden");
+                            displayMessage('Erreur lors du chargement de la page 1 : ' + event.message);
+                        } else {
+                            htmlLoading.removeClass("show").addClass("hidden");
+                            displayMessage('Erreur lors du chargement de la page 1 : ' + event.message);
+                        }
+                    },
+                {escape: true}
+            );
+        }
+
+        /* Chargement de la page 2 (Contacts)                                           */
+        /*------------------------------------------------------------------------------*/
+        function loadPage2(){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+            var vendeursList = vendeursIDs;
+            var Somme_nbRDVBAL50 = 0;
+            var Somme_nbContactBAL = 0;
+            var Somme_nbRDVTAP51 = 0;
+            var Somme_nbContactTAP = 0;
+            var Somme_nbContactComplement = 0;
+            var Somme_nbContactParrainage = 0;
+            var Somme_nbRDVPhone55 = 0;
+            var Somme_nbContactPhone = 0;
+            var Somme_nbRDVGalerieMarchande = 0;
+            var Somme_nbContactGalerieMarchande = 0;
+            var Somme_nbRDVFoire = 0;
+            var Somme_nbContactFoire = 0;
+            var Somme_nbRDVMarche = 0;
+            var Somme_nbContactMarche = 0;
+            var contenu='';
+            j$("#tableau2").html(contenu);
+
+            // Chargement
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            var periodId = j$("[id$=periodId]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getHebdomadaireData}', semaineAct, moisAct, anneeAct, periodId, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        if(result.length > 0) {
+                            contenu+= '<table class="table-hover triptyque">';
+                            contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="20">Hebdo (Contact par origine)</th></tr>';
+                            contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J. Trv.</th><th colspan="3" class="case">50 - BAL</th>';
+                            contenu+= '<th colspan="3" class="case">51 - TAP</th> <th class="case">52 - Comp</th> <th class="case">53 - Parr</th> <th colspan="3" class="case">55 - Phone</th>';
+                            contenu+= '<th colspan="2" class="case">42 - GM</th> <th colspan="2" class="case">43 - Foire</th> <th colspan="2" class="case">54 - Marché</th></tr></thead>';
+
+                            for (i=0;i<vendeursName.length;i++) {
+                                contenu+= '<tr>';
+                                if(vendeursActive[i] == "true")
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + '</td> ';
+                                else
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + ' (Inactif)</td> ';
+                                contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeursLastLoginDate[i]))) + '<br/>' + vendeursNbLogin[vendeursIDs[i]] + '</td>';
+                                for(j=0;j<result.length;j++){
+                                    if(result[j].vendeurId == vendeursIDs[i]){
+                                        contenu+= '<td rowspan="2" class="case">' + result[j].joursTravaille + '</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVBAL50).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].nbContactBAL).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVTAP51).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].nbContactTAP).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactComplement).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactParrainage).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVPhone55).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].nbContactPhone).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVGalerieMarchande).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactGalerieMarchande).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVFoire).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactFoire).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVMarche).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactMarche).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '</tr><tr>';
+                                        contenu+= '<td class="case">' + numeral(result[j].tauxPartContactBAL).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParJourBAL).format(decimalFormat) + ' / j</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParContactBAL).format(decimalFormat) + ' / cts</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].tauxPartContactTAP).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParJourTAP).format(decimalFormat) + ' / j</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParContactTAP).format(decimalFormat) + ' / cts</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].tauxPartContactCOMP).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case"></td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].tauxPartContactPHONE).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParJourPhone).format(decimalFormat) + ' / j</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParContactPhone).format(decimalFormat) + ' / cts</td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].tauxPartContactGM).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].tauxPartContactFOIRE).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].tauxPartContactMARCHE).format(decimalFormat) + ' %</td></tr>';
+
+                                        Somme_nbRDVBAL50 += result[j].nbRDVBAL50;
+                                        Somme_nbContactBAL += result[j].nbContactBAL;
+                                        Somme_nbRDVTAP51 += result[j].nbRDVTAP51;
+                                        Somme_nbContactTAP += result[j].nbContactTAP;
+                                        Somme_nbContactComplement += result[j].nbContactComplement;
+                                        Somme_nbContactParrainage += result[j].nbContactParrainage;
+                                        Somme_nbRDVPhone55 += result[j].nbRDVPhone55;
+                                        Somme_nbContactPhone += result[j].nbContactPhone;
+                                        Somme_nbRDVGalerieMarchande += result[j].nbRDVGalerieMarchande;
+                                        Somme_nbContactGalerieMarchande += result[j].nbContactGalerieMarchande;
+                                        Somme_nbRDVFoire += result[j].nbRDVFoire;
+                                        Somme_nbContactFoire += result[j].nbContactFoire;
+                                        Somme_nbRDVMarche += result[j].nbRDVMarche;
+                                        Somme_nbContactMarche += result[j].nbContactMarche;
+                                    }
+                                }
+                            }
+
+                            // Calcul des sommes de tous les utilisateurs
+                            contenu+= '<tfoot><tr>';
+                            if(vendeursName.length != 1)
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total des ' + i + ' vendeurs</td>';
+                            else
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVBAL50).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactBAL).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVTAP51).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactTAP).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactComplement).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactParrainage).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVPhone55).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactPhone).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVGalerieMarchande).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactGalerieMarchande).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVFoire).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactFoire).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVMarche).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactMarche).format(NotDecimalFormat) + '</td>';
+                            contenu+= '</tr></tfoot>';
+                            contenu+= '</table>';
+                        }
+                        j$("#tableau2").html(contenu);
+                        flagPage2 = true;
+
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        j$('.swiper-slide').css( "height", "auto" );
+                    } else if (event.type === 'exception') {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 2 : ' + event.message);
+                    } else {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 2 : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Chargement de la page 3 (Vente)                                              */
+        /*------------------------------------------------------------------------------*/
+        function loadPage3(){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var semaineAct = j$("[id$=semaine]")[0].value;
+            var vendeursList = vendeursIDs;
+            var Somme_nbRDVaccompagne = 0;
+            var Somme_nbRDVaccompagnant = 0;
+            var Somme_objectifnbDevisVendu = 0;
+            var Somme_objectifCADevisVendu = 0;
+            var Somme_nbDevisVendu = 0;
+            var Somme_nbCADevisVendu = 0;
+            var Somme_panierMoyenObjectifVente = 0;
+            var Somme_panierMoyenRealiseVente = 0;
+            var contenu='';
+            j$("#tableau3").html(contenu);
+
+            // Chargement
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            var periodId = j$("[id$=periodId]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getHebdomadaireData}', semaineAct, moisAct, anneeAct, periodId, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        if(result.length > 0) {
+                            contenu+= '<table class="table-hover triptyque">';
+                            contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="6">Hebdo (Vente)</th></tr>';
+                            contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J. Trv.</th>';
+                            contenu+= '<th colspan="2" class="case">Nb RDV</th> <th colspan="2" class="case">Objectifs (K€)</th> <th colspan="2" class="case">Réalisés (K€)</th></tr></thead>';
+
+                            for (i=0;i<vendeursName.length;i++) {
+                                contenu+= '<tr>';
+                                if(vendeursActive[i] == "true")
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + '</td> ';
+                                else
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + ' (Inactif)</td> ';
+                                contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeursLastLoginDate[i]))) + '<br/>' + vendeursNbLogin[vendeursIDs[i]] + '</td>';
+                                for(j=0;j<result.length;j++){
+                                    if(result[j].vendeurId == vendeursIDs[i]){
+                                        contenu+= '<td rowspan="2" class="case">' + result[j].joursTravaille + '</td>';
+                                        contenu+= '<td class="case">' + result[j].nbRDVAccompagne + '</td>';
+                                        contenu+= '<td class="case">' + result[j].nbRDVAccompagnant + '</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].objectifnbDevisVendu).format(currencyFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].objectifCADevisVendu).format(currencyFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbDevisVendu).format(currencyFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbCADevisVendu).format(currencyFormat) + '</td> ';
+                                        contenu+= '</tr><tr>';
+                                        contenu+= '<td colspan="2" class="case"></td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].panierMoyenObjectifVente).format(currencyFormat) + ' </td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].panierMoyenRealiseVente).format(currencyFormat) + '</td></tr>';
+
+                                        Somme_nbRDVaccompagne += result[j].nbRDVAccompagne;
+                                        Somme_nbRDVaccompagnant += result[j].nbRDVAccompagnant;
+                                        Somme_objectifnbDevisVendu += result[j].objectifnbDevisVendu;
+                                        Somme_objectifCADevisVendu += result[j].objectifCADevisVendu;
+                                        Somme_nbDevisVendu += result[j].nbDevisVendu;
+                                        Somme_nbCADevisVendu += result[j].nbCADevisVendu;
+                                    }
+                                }
+                            }
+
+                            // Calcul des sommes de tous les utilisateurs
+                            if(Somme_objectifnbDevisVendu == 0)
+                                Somme_panierMoyenObjectifVente = 0;
+                            else
+                                Somme_panierMoyenObjectifVente = (Somme_objectifCADevisVendu / Somme_objectifnbDevisVendu);
+                            if(Somme_nbDevisVendu == 0)
+                                Somme_panierMoyenRealiseVente = 0;
+                            else
+                                Somme_panierMoyenRealiseVente = (Somme_nbCADevisVendu / Somme_nbDevisVendu);
+                            contenu+= '<tfoot><tr>';
+                            if(vendeursName.length != 1)
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total des ' + i + ' vendeurs</td>';
+                            else
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total</td>';
+                            contenu+= '<td class="case">' + Somme_nbRDVaccompagne + '</td>';
+                            contenu+= '<td class="case">' + Somme_nbRDVaccompagnant + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_objectifnbDevisVendu).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + arrondi0decimal(Somme_objectifCADevisVendu) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbDevisVendu).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + arrondi0decimal(Somme_nbCADevisVendu) + '</td>';
+                            contenu+= '</tr><tr style="font-weight: bold;"><td colspan="2" class="case"></td>';
+                            contenu+= '<td colspan="2" class="case">' + arrondi0decimal(Somme_panierMoyenObjectifVente) + '</td>';
+                            contenu+= '<td colspan="2" class="case">' + arrondi0decimal(Somme_panierMoyenRealiseVente) + '</td></tr></tfoot>';
+                            contenu+= '</table>';
+                        }
+                        j$("#tableau3").html(contenu);
+                        flagPage3 = true;
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        j$('.swiper-slide').css( "height", "auto" );
+                    } else if (event.type === 'exception') {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 3 : ' + event.message);
+                    } else {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 3 : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Chargement de la page 4 (Mensuel Contact par origine)                        */
+        /*------------------------------------------------------------------------------*/
+        function loadPage4(){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var vendeursList = vendeursIDs;
+            var Somme_nbRDVBAL50 = 0;
+            var Somme_nbContactBAL = 0;
+            var Somme_nbRDVTAP51 = 0;
+            var Somme_nbContactTAP = 0;
+            var Somme_nbContactComplement = 0;
+            var Somme_nbContactParrainage = 0;
+            var Somme_nbRDVPhone55 = 0;
+            var Somme_nbContactPhone = 0;
+            var Somme_nbRDVGalerieMarchande = 0;
+            var Somme_nbContactGalerieMarchande = 0;
+            var Somme_nbRDVFoire = 0;
+            var Somme_nbContactFoire = 0;
+            var Somme_nbRDVMarche = 0;
+            var Somme_nbContactMarche = 0;
+            var contenu='';
+            j$("#tableau4").html(contenu);
+
+            // Chargement
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            var fiscalSettingsId = j$("[id$=fiscalSettingsId]")[0].value;
+            var periodId = j$("[id$=periodId]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getMensuelData}', moisAct, anneeAct, fiscalSettingsId, periodId, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        if(result.length > 0) {
+                            contenu+= '<table class="table-hover triptyque">';
+                            contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="20">Mensuel (Contact par origine)</th></tr>';
+                            contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J. Trv.</th><th colspan="3" class="case">50 - BAL</th>';
+                            contenu+= '<th colspan="3" class="case">51 - TAP</th> <th class="case">52 - Comp</th> <th class="case">53 - Parr</th> <th colspan="3" class="case">55 - Phone</th>';
+                            contenu+= '<th colspan="2" class="case">42 - GM</th> <th colspan="2" class="case">43 - Foire</th> <th colspan="2" class="case">54 - Marché</th></tr></thead>';
+
+                            for (i=0;i<vendeursName.length;i++) {
+                                contenu+= '<tr>';
+                                if(vendeursActive[i] == "true")
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + '</td> ';
+                                else
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + ' (Inactif)</td> ';
+                                contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeursLastLoginDate[i]))) + '<br/>' + vendeursNbLogin[vendeursIDs[i]] + '</td>';
+                                for(j=0;j<result.length;j++){
+                                    if(result[j].vendeurId == vendeursIDs[i]){
+                                        contenu+= '<td rowspan="2" class="case">' + result[j].joursTravaille + '</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVBAL50).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].nbContactBAL).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVTAP51).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].nbContactTAP).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactComplement).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactParrainage).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVPhone55).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].nbContactPhone).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVGalerieMarchande).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactGalerieMarchande).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVFoire).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactFoire).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbRDVMarche).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactMarche).format(NotDecimalFormat) + '</td> ';
+                                        contenu+= '</tr><tr>';
+                                         contenu+= '<td class="case">' + numeral(result[j].tauxPartContactBAL).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParJourBAL).format(decimalFormat) + ' / j</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParContactBAL).format(decimalFormat) + ' / cts</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].tauxPartContactTAP).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParJourTAP).format(decimalFormat) + ' / j</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParContactTAP).format(decimalFormat) + ' / cts</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].tauxPartContactCOMP).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case"></td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].tauxPartContactPHONE).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParJourPhone).format(decimalFormat) + ' / j</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].ratioParContactPhone).format(decimalFormat) + ' / cts</td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].tauxPartContactGM).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].tauxPartContactFOIRE).format(decimalFormat) + ' %</td>';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].tauxPartContactMARCHE).format(decimalFormat) + ' %</td></tr>';
+
+                                        Somme_nbRDVBAL50 += result[j].nbRDVBAL50;
+                                        Somme_nbContactBAL += result[j].nbContactBAL;
+                                        Somme_nbRDVTAP51 += result[j].nbRDVTAP51;
+                                        Somme_nbContactTAP += result[j].nbContactTAP;
+                                        Somme_nbContactComplement += result[j].nbContactComplement;
+                                        Somme_nbContactParrainage += result[j].nbContactParrainage;
+                                        Somme_nbRDVPhone55 += result[j].nbRDVPhone55;
+                                        Somme_nbContactPhone += result[j].nbContactPhone;
+                                        Somme_nbRDVGalerieMarchande += result[j].nbRDVGalerieMarchande;
+                                        Somme_nbContactGalerieMarchande += result[j].nbContactGalerieMarchande;
+                                        Somme_nbRDVFoire += result[j].nbRDVFoire;
+                                        Somme_nbContactFoire += result[j].nbContactFoire;
+                                        Somme_nbRDVMarche += result[j].nbRDVMarche;
+                                        Somme_nbContactMarche += result[j].nbContactMarche;
+                                    }
+                                }
+                            }
+
+                            // Calcul des sommes de tous les utilisateurs
+                            contenu+= '<tfoot><tr>';
+                            if(vendeursName.length != 1)
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total des ' + i + ' vendeurs</td>';
+                            else
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVBAL50).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactBAL).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVTAP51).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactTAP).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactComplement).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactParrainage).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVPhone55).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td colspan="2" class="case">' + numeral(Somme_nbContactPhone).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVGalerieMarchande).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactGalerieMarchande).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVFoire).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactFoire).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbRDVMarche).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactMarche).format(NotDecimalFormat) + '</td>';
+                            contenu+= '</tr></tfoot>';
+                            contenu+= '</table>';
+                        }
+                        j$("#tableau4").html(contenu);
+                        flagPage4 = true;
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        j$('.swiper-slide').css( "height", "auto" );
+                    } else if (event.type === 'exception') {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 4 : ' + event.message);
+                    } else {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 4 : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        /* Chargement de la page 5 (Mensuel RDV et Vente)                               */
+        /*------------------------------------------------------------------------------*/
+        function loadPage5(){
+            var anneeAct = j$("[id$=annee]")[0].value;
+            var moisAct = j$("[id$=mois]")[0].value;
+            var vendeursList = vendeursIDs;
+            var Somme_nbRDVaccompagne = 0;
+            var Somme_nbRDVaccompagnant = 0;
+            var Somme_objectifDevisVendu = 0;
+            var Somme_nbCADevisVendu = 0;
+            var Somme_nbContactActif = 0;
+            var Somme_nbContactPassif = 0;
+            var Somme_objectifDevisVenduS1 = 0;
+            var Somme_nbCADevisVenduS1 = 0;
+            var Somme_nbContactActifS1 = 0;
+            var Somme_nbContactPassifS1 = 0;
+            var Somme_objectifDevisVenduS2 = 0;
+            var Somme_nbCADevisVenduS2 = 0;
+            var Somme_nbContactActifS2 = 0;
+            var Somme_nbContactPassifS2 = 0;
+            var Somme_objectifDevisVenduS3 = 0;
+            var Somme_nbCADevisVenduS3 = 0;
+            var Somme_nbContactActifS3 = 0;
+            var Somme_nbContactPassifS3 = 0;
+            var Somme_objectifDevisVenduS4 = 0;
+            var Somme_nbCADevisVenduS4 = 0;
+            var Somme_nbContactActifS4 = 0;
+            var Somme_nbContactPassifS4 = 0;
+            var Somme_objectifDevisVenduS5 = 0;
+            var Somme_nbCADevisVenduS5 = 0;
+            var Somme_nbContactActifS5 = 0;
+            var Somme_nbContactPassifS5 = 0;
+            var Somme_nbDevisVendu = 0;
+            var panierMoyen = 0;
+            var contenu='';
+            j$("#tableau5").html(contenu);
+
+            // Chargement
+            htmlLoading.removeClass("hidden").addClass("show");
+
+            var fiscalSettingsId = j$("[id$=fiscalSettingsId]")[0].value;
+            var periodId = j$("[id$=periodId]")[0].value;
+
+            // Call APEX function
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.Ctrl_Triptyque.getMensuelData}', moisAct, anneeAct, fiscalSettingsId, periodId, vendeursList,
+                function(result, event) {
+                    if (event.status) {
+                        if(result.length > 0) {
+                            var weekLength = result[0].numberOfWeek;
+                            var mensuelTaille = 6 + (weekLength*4);
+
+                            contenu+= '<table class="table-hover triptyque">';
+                            contenu+= '<thead><tr><th class="case" colspan="3">Vendeur</th> <th class="case" colspan="' + mensuelTaille + '">Mensuel (RDV et Vente)</th></tr>';
+                            contenu+= '<tr><th class="case">Nom</th> <th class="case">Cnx</th> <th class="case">J.<br/>Trv.</th>';
+                            contenu+= '<th colspan="2" class="case">Nb RDV</th>';
+                            contenu+= '<th colspan="4" class="case">Total</th>';
+                            for(k=1;k<=weekLength;k++){
+                                contenu+= '<th colspan="4" class="case">S' + k + '</th>';
+                            }
+                            contenu+= '</tr><tr>';
+                            contenu+= '<tr><th class="case" colspan="3"></th> <th colspan="2" class="case"></th> <th colspan="2" class="case">CA (K€)</th> <th colspan="2" class="case">Cts</th>';
+                            for(k=1;k<=weekLength;k++){
+                                contenu+= '<th colspan="2" class="case">CA</th><th colspan="2" class="case">Cts</th>';
+                            }
+                            contenu+= '</tr>';
+                            contenu+= '<tr><th colspan="3" class="case"></th> <th colspan="2" class="case"></th> <th class="case">O</th><th class="case">R</th><th class="case">A</th><th class="case">P</th>';
+                            for(k=1;k<=weekLength;k++){
+                                contenu+= '<th class="case">O</th><th class="case">R</th><th class="case">A</th><th class="case">P</th>';
+                            }
+                            contenu+= '</tr></thead>';
+
+                            for (i=0;i<vendeursName.length;i++) {
+                                contenu+= '<tr>';
+                                if(vendeursActive[i] == "true")
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + '</td> ';
+                                else
+                                    contenu+= '<td rowspan="2" class="case">' + vendeursName[i] + ' (Inactif)</td> ';
+                                contenu+= '<td rowspan="2" class="case">' + formatDate(new Date(Date.parse(vendeursLastLoginDate[i]))) + '<br/>' + vendeursNbLogin[vendeursIDs[i]] + '</td>';
+                                for(j=0;j<result.length;j++){
+                                    if(result[j].vendeurId == vendeursIDs[i]){
+                                        contenu+= '<td rowspan="2" class="case">' + result[j].joursTravaille + '</td>';
+                                        contenu+= '<td class="case">' + result[j].nbRDVAccompagne + '</td>';
+                                        contenu+= '<td class="case">' + result[j].nbRDVAccompagnant + '</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].objectifDevisVendu).format(currencyFormat) + '</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbCADevisVendu).format(currencyFormat) + '</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactActif).format(NotDecimalFormat) + '</td>';
+                                        contenu+= '<td class="case">' + numeral(result[j].nbContactPassif).format(NotDecimalFormat) + '</td>';
+                                        for(k=1;k<=weekLength;k++){
+                                            contenu+= '<td class="case">' + numeral(result[j].valeursMensuelByWeek[k][0]).format(currencyFormat) + '</td>';
+                                            contenu+= '<td class="case">' + numeral(result[j].valeursMensuelByWeek[k][1]).format(currencyFormat) + '</td>';
+                                            contenu+= '<td class="case">' + numeral(result[j].valeursMensuelByWeek[k][2]).format(NotDecimalFormat) + '</td>';
+                                            contenu+= '<td class="case">' + numeral(result[j].valeursMensuelByWeek[k][3]).format(NotDecimalFormat) + '</td>';
+                                        }
+                                        contenu+= '</tr><tr><td colspan="2" class="case"></td> ';
+                                        contenu+= '<td colspan="2" class="case">' + numeral(result[j].realisationCADevis).format(decimalFormat) + ' %</td> ';
+                                        contenu+= '<td colspan="2" class="case"></td>';
+                                        for(k=1;k<=weekLength;k++){
+                                            contenu+= '<td colspan="2" class="case"></td><td colspan="2" class="case"></td>';
+                                        }
+                                        contenu+= '</tr>';
+
+                                        Somme_nbDevisVendu += result[j].nbDevisVendu;
+
+                                        // Somme total
+                                        Somme_nbRDVaccompagne += result[j].nbRDVAccompagne;
+                                        Somme_nbRDVaccompagnant += result[j].nbRDVAccompagnant;
+                                        Somme_objectifDevisVendu += result[j].objectifDevisVendu;
+                                        Somme_nbCADevisVendu += result[j].nbCADevisVendu;
+                                        Somme_nbContactActif += result[j].nbContactActif;
+                                        Somme_nbContactPassif += result[j].nbContactPassif;
+
+                                        // Somme par semaine
+                                        Somme_objectifDevisVenduS1 += result[j].valeursMensuelByWeek[1][0];
+                                        Somme_nbCADevisVenduS1 += result[j].valeursMensuelByWeek[1][1];
+                                        Somme_nbContactActifS1 += result[j].valeursMensuelByWeek[1][2];
+                                        Somme_nbContactPassifS1 += result[j].valeursMensuelByWeek[1][3];
+                                        Somme_objectifDevisVenduS2 += result[j].valeursMensuelByWeek[2][0];
+                                        Somme_nbCADevisVenduS2 += result[j].valeursMensuelByWeek[2][1];
+                                        Somme_nbContactActifS2 += result[j].valeursMensuelByWeek[2][2];
+                                        Somme_nbContactPassifS2 += result[j].valeursMensuelByWeek[2][3];
+                                        Somme_objectifDevisVenduS3 += result[j].valeursMensuelByWeek[3][0];
+                                        Somme_nbCADevisVenduS3 += result[j].valeursMensuelByWeek[3][1];
+                                        Somme_nbContactActifS3 += result[j].valeursMensuelByWeek[3][2];
+                                        Somme_nbContactPassifS3 += result[j].valeursMensuelByWeek[3][3];
+                                        Somme_objectifDevisVenduS4 += result[j].valeursMensuelByWeek[4][0];
+                                        Somme_nbCADevisVenduS4 += result[j].valeursMensuelByWeek[4][1];
+                                        Somme_nbContactActifS4 += result[j].valeursMensuelByWeek[4][2];
+                                        Somme_nbContactPassifS4 += result[j].valeursMensuelByWeek[4][3];
+                                        Somme_objectifDevisVenduS5 += result[j].valeursMensuelByWeek[5][0];
+                                        Somme_nbCADevisVenduS5 += result[j].valeursMensuelByWeek[5][1];
+                                        Somme_nbContactActifS5 += result[j].valeursMensuelByWeek[5][2];
+                                        Somme_nbContactPassifS5 += result[j].valeursMensuelByWeek[5][3];
+                                    }
+                                }
+                            }
+
+                            // Calcul des sommes de tous les utilisateurs
+                            if(Somme_nbDevisVendu != 0)
+                                panierMoyen = Somme_nbCADevisVendu / Somme_nbDevisVendu;
+
+                            contenu+= '<tfoot><tr>';
+                            if(vendeursName.length != 1)
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total des ' + i + ' vendeurs</td>';
+                            else
+                                contenu+= '<td rowspan="2" colspan="3" class="case">Total</td>';
+                            contenu+= '<td class="case">' + Somme_nbRDVaccompagne + '</td>';
+                            contenu+= '<td class="case">' + Somme_nbRDVaccompagnant + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_objectifDevisVendu).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbCADevisVendu).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactActif).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactPassif).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_objectifDevisVenduS1).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbCADevisVenduS1).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactActifS1).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactPassifS1).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_objectifDevisVenduS2).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbCADevisVenduS2).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactActifS2).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactPassifS2).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_objectifDevisVenduS3).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbCADevisVenduS3).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactActifS3).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactPassifS3).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_objectifDevisVenduS4).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbCADevisVenduS4).format(currencyFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactActifS4).format(NotDecimalFormat) + '</td>';
+                            contenu+= '<td class="case">' + numeral(Somme_nbContactPassifS4).format(NotDecimalFormat) + '</td>';
+                            if(weekLength == 5){
+                                contenu+= '<td class="case">' + numeral(Somme_objectifDevisVenduS5).format(currencyFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbCADevisVenduS5).format(currencyFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbContactActifS5).format(NotDecimalFormat) + '</td>';
+                                contenu+= '<td class="case">' + numeral(Somme_nbContactPassifS5).format(NotDecimalFormat) + '</td>';
+                            }
+                            contenu+= '</tr><tr style="font-weight: bold;"><td colspan="2" class="case"></td>';
+                            contenu+='<td colspan="2" class="case">' + arrondi0decimal(panierMoyen) + '</td><td colspan="2" class="case"></td>';
+                            for(k=1;k<=weekLength;k++){
+                                contenu+= '<td colspan="2" class="case"></td><td colspan="2" class="case"></td>';
+                            }
+                            contenu+='</tr></tfoot>';
+                            contenu+= '</table>';
+                        }
+                        j$("#tableau5").html(contenu);
+                        flagPage5 = true;
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        j$('.swiper-slide').css( "height", "auto" );
+                    } else if (event.type === 'exception') {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 5 : ' + event.message);
+                    } else {
+                        htmlLoading.removeClass("show").addClass("hidden");
+                        displayMessage('Erreur lors du chargement de la page 5 : ' + event.message);
+                    }
+                },
+                {escape: true}
+            );
+        }
+
+        function arrondi2decimal(num) {
+            return numeral(Math.round(num * 100) / 100).format(decimalFormat);
+        }
+
+        function arrondi0decimal(num) {
+            return numeral(Math.round(num)).format(currencyFormat);
+        }
+
+        function formatDate(date) {
+            var stringDateFormated = '';
+            //Miser à jour de la date de dernier appel sortant vente
+            if(!isNaN(date)) {
+                date.setMonth(date.getMonth()+1);
+                // Formatage Date
+                if(date.getDate() < 10) stringDateFormated = '0' + date.getDate(); else stringDateFormated = date.getDate();
+                if(date.getMonth() < 10) stringDateFormated += '/0' + date.getMonth(); else stringDateFormated += '/' + date.getMonth();
+                //stringDateFormated += '/' + date.getFullYear();
+                // Formatage Time
+                //if(date.getHours() < 10) stringDateFormated += ' 0' + date.getHours(); else stringDateFormated += ' ' + date.getHours();
+                //if(date.getMinutes() < 10) stringDateFormated += ':0' + date.getMinutes(); else stringDateFormated += ':' + date.getMinutes();
+                //if(date.getSeconds() < 10) stringDateFormated += ':0' + date.getSeconds(); else stringDateFormated += ':' + date.getSeconds();
+            }
+            return stringDateFormated
+        }
+
+        /* Check if the browser agent in Mobile  */
+        /*----------------------------------------------------------*/
+        function isMobile() {
+            if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                || ((typeof sforce != 'undefined') && (sforce != null) )
+            ){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        /* Affiche message d'information ou d'erreur                                     */
+        /*------------------------------------------------------------------------------*/
+        function displayMessage(message) {
+            var htmlAlertErrorMsg = j$("[id$=alertErrorMsg]");
+            var htmlAlertError = j$("[id$=alertError]");
+            htmlAlertError.removeClass("hidden").addClass("show");
+            htmlAlertErrorMsg.html(message);
+        }         
+
+        /* Methodes pour affichage des pages                                            */
+        /*------------------------------------------------------------------------------*/
+        function displayTriptyqueAnalytique() {
+            var uRL = "/apex/VF_triptyque_Analytique";
+            if( (typeof sforce != 'undefined') && (sforce != null) ) {
+                sforce.one.navigateToURL(uRL);
+            } else {
+                window.open(uRL,'_blank');
+            }
+            return false;
+        }
+        
+        function displayObjectifVendeur() {
+            var annee = j$("[id$=annee]")[0].value;
+            var mois = j$("[id$=mois]")[0].value;
+            var semaine = j$("[id$=semaine]")[0].value;
+            var mag = j$("[id$=magasin]")[0].value;
+            var uRL = "/apex/VF_ObjectifsVendeurs?pAnnee="+annee+"&pMois="+mois+"&pSemaine="+semaine+"&pMag="+mag;
+            if( (typeof sforce != 'undefined') && (sforce != null) ) {
+                sforce.one.navigateToURL(uRL);
+            } else {
+                window.open(uRL,'_blank');
+            }
+            return false;
+        }
+    </script>
+
+    <apex:outputpanel id="repeatVendeurs">
+        <script type="text/javascript">
+            vendeursIDs = new Array();
+            allVendeursIDs = new Array();
+            vendeursActive = new Array();
+            vendeursName = new Array();
+            vendeursLastLoginDate = new Array();
+            vendeursNbLogin = new Object();
+        </script>
+        <apex:repeat value="{!vendeursList}" var="vendeur">
+            <script type="text/javascript">
+                vendeursIDs.push('{!vendeur}');
+                vendeursActive.push('{!vendeur.IsActive}');
+                vendeursName.push('{!vendeur.Name}');
+                vendeursLastLoginDate.push('{!vendeur.LastLoginDate}');
+                vendeursNbLogin['{!vendeur.Id}'] = '{!vendeursListNbConnexions[vendeur.Id]}'
+            </script>
+        </apex:repeat>
+        <apex:repeat value="{!allVendeursMagasin}" var="vendeur">
+            <script type="text/javascript">
+                allVendeursIDs.push('{!vendeur.Id}');
+            </script>
+        </apex:repeat>
+        <script type="text/javascript">
+            if(refresh)
+                refreshValues('magasin');
+        </script>
+    </apex:outputpanel>
+
+    <div id="loading" class="section" style="visibility: visible;">
+        <span class="loader loader-quart"></span>
+        Chargement en cours... Veuillez patienter
+    </div>
+
+    <c:importvisualstrap theme="default" />
+
+    <div id="infos" style="float:left; font-size:20px;">Hebdo (Contact et RDV)</div>
+    <div style="float:right; font-size:20px;">
+        <span>Page </span>
+        <span id="pageActuelle">1</span>
+        <span> sur 5</span>
+    </div>
+
+    <c:visualstrapblock >
+        <center>
+            <c:pageheader title="Triptyque - Suivi Hebdomadaire" icon="tasks" subtitle="{!$User.FirstName} {!$User.LastName}"/>
+        </center>
+
+        <div class="alert alert-danger alert-dismissible hidden" id="alertError" role="alert">
+            <button type="button" class="close alert-button-close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <div id="alertErrorMsg"></div>
+        </div>
+
+        <c:panel title="Critères" type="primary">
+            <c:formblock alignment="horizontal">
+                <apex:form >
+                    <apex:actionFunction name="rerendermois" rerender="semaine" oncomplete="rerenderVendeurs();">
+                        <apex:param name="firstParam" assignTo="{!moisActuel}" value="" />
+                    </apex:actionFunction>
+                    <apex:actionFunction name="rerenderannee" rerender="semaine" oncomplete="rerenderVendeurs();">
+                        <apex:param name="firstParam" assignTo="{!anneeActuelle}" value="" />
+                    </apex:actionFunction>
+                    <apex:actionFunction name="rerendermoisdelannee" rerender="mois" oncomplete="rerenderannee(this.value);">
+                        <apex:param name="firstParam" assignTo="{!anneeActuelle}" value="" />
+                    </apex:actionFunction>
+                    <apex:actionFunction name="rerendermagasin" action="{!refreshVendeurs}" rerender="repeatVendeurs">
+                        <apex:param name="firstParam" assignTo="{!codeMagasinActuel}" value="" />
+                    </apex:actionFunction>
+                    <apex:actionFunction name="rerenderVendeurs" action="{!refreshVendeurs}" rerender="repeatVendeurs,hiddenFields"  oncomplete="refreshValues('');"/>
+
+                    <c:formgroup >
+                        <c:column type="col-md-1" style="padding-top: 10px;">
+                            <apex:outputLabel >Date</apex:outputLabel>
+                        </c:column>
+                        <c:column type="col-md-2" style="padding-top: 10px;">
+                            <apex:selectlist styleClass="form-control input-sm" style="max-width:135px;" id="annee" size="1" value="{!anneeActuelle}" onChange="rerendermoisdelannee(this.value);">
+                                <apex:selectOptions value="{!annee}" />
+                            </apex:selectlist>
+                        </c:column>
+                        <c:column type="col-md-2" style="padding-top: 10px;">
+                            <apex:selectlist styleClass="form-control input-sm" style="max-width:250px;" id="mois" size="1" value="{!moisActuel}" onChange="rerendermois(this.value);">
+                                <apex:selectOptions value="{!mois}" />
+                            </apex:selectlist>
+                        </c:column>
+                        <c:column type="col-md-3" style="padding-top: 10px;">
+                            <apex:selectlist styleClass="form-control input-sm" style="max-width:250px;" id="semaine" size="1" value="{!semaineActuelle}" onChange="rerenderVendeurs();  ">
+                                <apex:selectOptions value="{!semaine}" />
+                            </apex:selectlist>
+                        </c:column>
+                        <c:column type="col-md-1" style="padding-top: 10px;">
+                            <apex:outputLabel >Magasin</apex:outputLabel>
+                        </c:column>
+                        <c:column type="col-md-3" style="padding-top: 10px;">
+                            <apex:selectlist styleClass="form-control input-sm" id="magasin" size="1" value="{!codeMagasinActuel}" onChange="refresh = true; refreshHidden(this.value); rerendermagasin(this.value);">
+                                <apex:selectOptions value="{!magasinOptionList}" />
+                            </apex:selectlist>
+                        </c:column>
+                    </c:formgroup>
+
+                    <div id="boutonBlock">
+                        <div id="boutonAnalytique">
+                            <button class="btn btn-primary btn-sm" type="button" onclick="displayTriptyqueAnalytique()">Analyse Ponctuelle</button>
+                        </div>
+
+                        <div id="boutonObjVendeurs">
+                            <apex:outputPanel rendered="{!CONTAINS($Profile.Name, 'Administrateur') || CONTAINS($Profile.Name, 'DV') || CONTAINS($Profile.Name, 'DR') || CONTAINS($Profile.Name, 'RVJ') || CONTAINS($Profile.Name, 'RV') }" >
+                                <button class="btn btn-primary btn-sm" type="button" onclick="displayObjectifVendeur()">Objectifs Vendeurs</button>
+                            </apex:outputPanel>
+                        </div>
+
+                        <div id="boutonExportPdf">
+                            <apex:commandlink action="{!exportPDF}" target="_blank">
+                                <apex:commandButton value="Exporter en PDF" styleClass="btn btn-primary btn-sm"/>
+                            </apex:commandlink>
+                        </div>
+                    </div>
+
+                    <apex:outputPanel id="hiddenFields">
+                        <apex:inputHidden id="periodId" value="{!periodId}"/>
+                        <apex:inputHidden id="fiscalSettingsId" value="{!fiscalSettingsId}"/>
+                        <apex:inputHidden id="magHidden" value="{!codeMagasinActuel}" />
+                    </apex:outputPanel>
+                </apex:form>
+            </c:formblock>
+        </c:panel>
+
+        <c:panel title="Résultats" type="primary">
+            <!-- <a class="arrow-left" href="#"><img src="{!URLFOR($Resource.Swiper, '/Swiper-master/src/left.png')}" alt="" /></a>  -->
+            <!-- <a class="arrow-right" href="#"><img src="{!URLFOR($Resource.Swiper, '/Swiper-master/src/right.png')}" alt="" /></a> -->
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div id="page1" class="swiper-slide">
+                        <div id="tableau1" class="table-responsive"></div><br/>
+                    </div>
+                    <div id="page2" class="swiper-slide">
+                        <div id="tableau2" class="table-responsive"></div><br/>
+                    </div>
+                    <div id="page3" class="swiper-slide">
+                        <div id="tableau3" class="table-responsive"></div><br/>
+                    </div>
+                    <div id="page4" class="swiper-slide">
+                        <div id="tableau4" class="table-responsive"></div><br/>
+                    </div>
+                    <div id="page5" class="swiper-slide">
+                        <div id="tableau5" class="table-responsive"></div><br/>
+                    </div>
+                </div>
+                <div class="pagination"></div>
+            </div>
+        </c:panel>
+
+        <c:panel title="Atteintes des objectifs personnels de la semaine" type="primary" id="obj">
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <input type="text" class="jaugeContactActif" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                    <div>
+                        <apex:outputPanel styleClass="glyphicon glyphicon-exclamation-sign" style="font-size:26px" id="objectifContactActifIc" />&nbsp;
+                        <span id="objectifContactActif" style="font-size:40px">0 / 0</span>
+                        <p class="text-muted">contacts actifs</p>
+                    </div>
+                </c:well>
+            </c:column>
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <input type="text" class="jaugeNbVente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                    <div>
+                        <apex:outputPanel styleClass="glyphicon glyphicon-shopping-cart" style="font-size:26px" id="objectifNbVenteIc" />&nbsp;
+                        <span id="objectifNbVente" style="font-size:40px">0 / 0</span>
+                        <p class="text-muted">ventes</p>
+                    </div>
+                </c:well>
+            </c:column>
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <input type="text" class="jaugeCAVente" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                    <div>
+                        <apex:outputPanel styleClass="glyphicon glyphicon-euro" style="font-size:26px" id="objectifCAVenteIc" />&nbsp;
+                        <span id="objectifCAVente" style="font-size:40px">0 / 0</span>
+                        <p class="text-muted">CA (KE)</p>
+                    </div>
+                </c:well>
+            </c:column>
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <div id="chartIndicRDV" style="" class="center-block"></div>
+                    <p class="text-muted">RDV commerciaux (J, J+1, J+2)</p>
+                </c:well>
+            </c:column>
+        </c:panel>
+
+        <c:panel title="Atteintes des objectifs équipe de la semaine" type="primary" id="obj2">
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <input type="text" class="jaugeContactActifMagasin" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                    <div>
+                        <apex:outputPanel styleClass="glyphicon glyphicon-exclamation-sign" style="font-size:26px" id="allObjectifContactActifIc" />&nbsp;
+                        <span id="allObjectifContactActif" style="font-size:40px">0 / 0</span>
+                        <p class="text-muted">contacts actifs</p>
+                    </div>
+                </c:well>
+            </c:column>
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <input type="text" class="jaugeNbVenteMagasin" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                    <div>
+                        <apex:outputPanel styleClass="glyphicon glyphicon-shopping-cart" style="font-size:26px" id="allObjectifNbVenteIc" />&nbsp;
+                        <span id="allObjectifNbVente" style="font-size:40px">0 / 0</span>
+                        <p class="text-muted">ventes</p>
+                    </div>
+                </c:well>
+            </c:column>
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <input type="text" class="jaugeCAVenteMagasin" value="0" data-min="0" data-max="100" data-width="120" data-height="100" data-readOnly="true" data-angleOffset="-125" data-angleArc="250" />
+                    <div>
+                        <apex:outputPanel styleClass="glyphicon glyphicon-euro" style="font-size:26px" id="allObjectifCAVenteIc" />&nbsp;
+                        <span id="allObjectifCAVente" style="font-size:40px">0 / 0</span>
+                        <p class="text-muted">CA (KE)</p>
+                    </div>
+                </c:well>
+            </c:column>
+            <c:column type="col-md-3">
+                <c:well style="text-align:center;">
+                    <div id="allChartIndicRDV" style="" class="center-block"></div>
+                    <p class="text-muted">RDV commerciaux (J, J+1, J+2)</p>
+                </c:well>
+            </c:column>
+        </c:panel>
+    </c:visualstrapblock>
+</apex:page>

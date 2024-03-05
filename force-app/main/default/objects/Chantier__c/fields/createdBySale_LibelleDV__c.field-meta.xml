@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>createdBySale_LibelleDV__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(OR(CONTAINS(&apos;K/K - DR,K/K - DV,K/K - DV - Mobile,K/K - En charge de magasin,K/K - En charge de magasin - Mobile,K/K - Foire,K/K - Formateur,K/K - RV,K/K - RV - Mobile,K/K - RVJ,K/K - RVJ - Mobile,K/K - TP,K/K - Vendeur,K/K - Vendeur - Mobile&apos;, CreatedBy.Profile.Name),
+      CreatedBy.UserRole.Name = &apos;Foire&apos;, 
+      CreatedBy.UserRole.Name = &apos;Formateur&apos;), 
+   CreatedBy.LibelleDV__c, &apos;&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>DV (Création)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>job__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Métier</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Referencial__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>Job</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Referencial__c</referenceTo>
+    <relationshipLabel>Contrats collaborateurs</relationshipLabel>
+    <relationshipName>CollaboratorContracts</relationshipName>
+    <required>true</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

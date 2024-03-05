@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>fsl_documentsAttendus__c</fullName>
+    <description>CGI - FSL : Avis d&apos;imposition attendu
+Chèque annulé
+Pièce d&apos;identité	
+Rib	
+Bulletin de salaire	
+Attestation TVA</description>
+    <externalId>false</externalId>
+    <isFilteringDisabled>false</isFilteringDisabled>
+    <isNameField>false</isNameField>
+    <isSortingDisabled>false</isSortingDisabled>
+    <label>DocumentsAtttendus</label>
+    <length>131000</length>
+    <type>LongTextArea</type>
+    <visibleLines>10</visibleLines>
+</CustomField>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>statusSummary__c</fullName>
+    <externalId>false</externalId>
+    <formula>TRIM(libelleStatutContrat__c 
++ IF(iSNULL(dateResiliation__c), &apos;&apos;, &apos;(&apos; + TEXT(dateResiliation__c) + &apos;)&apos;)
++ &apos; / &apos; + TEXT(montantTTC__c)
++ &apos;€ / &apos; + TEXT(dateSignature__c) + &apos; (&apos; + TEXT(FLOOR((TODAY() - dateSignature__c)/365)) + &apos;)&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Résumé (Statut)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

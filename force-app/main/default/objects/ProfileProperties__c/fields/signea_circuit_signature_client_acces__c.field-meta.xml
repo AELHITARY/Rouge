@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>signea_circuit_signature_client_acces__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Autoriser ou non la possibilité de signer à la place du client en accédant à l&apos;URL de signature</description>
+    <externalId>false</externalId>
+    <label>Signea : Accès signature clients</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>SATContact_Notification_au_client</fullName>
+        <description>SATContact - Notification au client</description>
+        <protected>false</protected>
+        <recipients>
+            <field>emailCompte__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>relationclients@kpark.fr</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>Batch_technique/SATContact_Notification_au_client</template>
+    </alerts>
+    <fieldUpdates>
+        <fullName>UR001_K2_Account_OrigineJPO</fullName>
+        <field>LeadSource</field>
+        <literalValue>VENTES PRIVEES</literalValue>
+        <name>UR001_K2_Account_OrigineJPO</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_DerniereAffectCall</fullName>
+        <field>dateDerniereAffectationCall__c</field>
+        <formula>TODAY()</formula>
+        <name>UR001_K2_Opport_DerniereAffectCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_DerniereAffectVendeur</fullName>
+        <field>dateDerniereAffectationVendeur__c</field>
+        <formula>TODAY()</formula>
+        <name>UR001_K2_Opport_DerniereAffectVendeur</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_NbAffectationsCall</fullName>
+        <field>nbAffectationsCall__c</field>
+        <formula>NULLVALUE(nbAffectationsCall__c, 0) + 1</formula>
+        <name>UR001_K2_Opport_NbAffectationsCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_NbAffectationsVendeur</fullName>
+        <field>nbAffectationsVendeur__c</field>
+        <formula>NULLVALUE(nbAffectationsVendeur__c, 0) + 1</formula>
+        <name>UR001_K2_Opport_NbAffectationsVendeur</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_PremiereAffectCall</fullName>
+        <field>datePremiereAffectationCall__c</field>
+        <formula>IF(ISNULL(datePremiereAffectationCall__c), TODAY(), datePremiereAffectationCall__c)</formula>
+        <name>UR001_K2_Opport_PremiereAffectCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_PremiereAffectVendeur</fullName>
+        <field>datePremiereAffectationVendeur__c</field>
+        <formula>IF(ISNULL(datePremiereAffectationVendeur__c), TODAY(), datePremiereAffectationVendeur__c)</formula>
+        <name>UR001_K2_Opport_PremiereAffectVendeur</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_SectoStats_CodeDV</fullName>
+        <field>codeDVStats__c</field>
+        <formula>owner__r.CodeDV__c</formula>
+        <name>UR001_K2_Opport_SectoStats_CodeDV</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_SectoStats_CodeMag</fullName>
+        <field>codeMagasinStats__c</field>
+        <formula>owner__r.CodeMagasin__c</formula>
+        <name>UR001_K2_Opport_SectoStats_CodeMag</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_SectoStats_CodeRegion</fullName>
+        <field>codeRegionStats__c</field>
+        <formula>owner__r.CodeDR__c</formula>
+        <name>UR001_K2_Opport_SectoStats_CodeRegion</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_SectoStats_LibDV</fullName>
+        <field>libelleDVStats__c</field>
+        <formula>owner__r.LibelleDV__c</formula>
+        <name>UR001_K2_Opport_SectoStats_LibDV</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_SectoStats_LibMag</fullName>
+        <field>libelleMagasinStats__c</field>
+        <formula>owner__r.libelleMagasin__c</formula>
+        <name>UR001_K2_Opport_SectoStats_LibMag</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opport_SectoStats_LibRegion</fullName>
+        <field>libelleRegionStats__c</field>
+        <formula>owner__r.LibelleDR__c</formula>
+        <name>UR001_K2_Opport_SectoStats_LibRegion</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_AutreMotifRefus</fullName>
+        <field>autreMotifRefusReport__c</field>
+        <formula>IF(ISPICKVAL(motifRefusReport__c, &apos;Autre&apos;), autreMotifRefusReport__c, &apos;&apos;)</formula>
+        <name>UR001_K2_Opportunity_AutreMotifRefus</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_AutreObjection</fullName>
+        <field>autreObjectionPrincipale__c</field>
+        <formula>IF(INCLUDES(objectionPrincipale__c, &apos;Autre&apos;), autreObjectionPrincipale__c, &apos;&apos;)</formula>
+        <name>UR001_K2_Opportunity_AutreObjection</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_DateModifStatut</fullName>
+        <field>dateModificationStatut__c</field>
+        <formula>IF(AND(!ISNEW(), TEXT(StageName) != TEXT(PRIORVALUE(StageName))),
+NOW() ,
+dateModificationStatut__c)</formula>
+        <name>UR001_K2_Opportunity_DateModifStatut</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_EmailCompte</fullName>
+        <field>emailCompte__c</field>
+        <formula>Account.email__c</formula>
+        <name>UR001_K2_Opportunity_EmailCompte</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_LastModifDateByCall</fullName>
+        <field>lastModifiedDateByCall__c</field>
+        <formula>IF(OR($Profile.Name = &apos;K/K - DC&apos;, $Profile.Name = &apos;K/K - TA&apos;, $Profile.Name = &apos;K/K - TA/Entrant&apos;, $Profile.Name = &apos;K/K - TA/Sortant&apos;, $Profile.Name = &apos;K/K - Superviseur&apos;, $Profile.Name = &apos;K/K - Assistante Call&apos;, $UserRole.Name = &apos;Directeur Call&apos;, $UserRole.Name = &apos;Superviseur&apos;, $UserRole.Name = &apos;TA&apos;), LastModifiedDate, lastModifiedDateByCall__c)</formula>
+        <name>UR001_K2_Opportunity_LastModifDateByCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_LastModifDateBySale</fullName>
+        <field>lastModifiedDateBySale__c</field>
+        <formula>IF(OR(CONTAINS(&apos;K/K - DR,K/K - DV,K/K - En charge de magasin,K/K - Foire,K/K - Formateur,K/K - RV,K/K - RVJ,K/K - Vendeur&apos;, $Profile.Name),
+      $Profile.Name = &apos;K/K - TP&apos;,       
+      $UserRole.Name = &apos;Foire&apos;,
+      $UserRole.Name = &apos;Formateur&apos;),  
+   LastModifiedDate,
+   lastModifiedDateBySale__c)</formula>
+        <name>UR001_K2_Opportunity_LastModifDateBySale</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_Montant</fullName>
+        <description>Alimentation du montant - Mise à jour du champ montant selon 1er prix laissé ou dernier si alimenté</description>
+        <field>Amount</field>
+        <formula>IF( 
+ISNULL(mntDernierPrixLaisse__c), 
+mntPremiereProposition__c, 
+mntDernierPrixLaisse__c 
+)</formula>
+        <name>UR001_K2_Opportunity_Montant</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_NbModifByCall</fullName>
+        <field>nbModificationsByCall__c</field>
+        <formula>IF(OR($Profile.Name = &apos;K/K - DC&apos;, $Profile.Name = &apos;K/K - TA&apos;, $Profile.Name = &apos;K/K - TA/Entrant&apos;, $Profile.Name = &apos;K/K - TA/Sortant&apos;, $Profile.Name = &apos;K/K - Superviseur&apos;, $Profile.Name = &apos;K/K - Assistante Call&apos;, $UserRole.Name = &apos;Directeur Call&apos;, $UserRole.Name = &apos;Superviseur&apos;, $UserRole.Name = &apos;TA&apos;), NULLVALUE(nbModificationsByCall__c, 0) + 1, nbModificationsByCall__c)</formula>
+        <name>UR001_K2_Opportunity_NbModifByCall</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_NbModifBySale</fullName>
+        <field>nbModificationsBySale__c</field>
+        <formula>IF(OR(CONTAINS(&apos;K/K - DR,K/K - DV,K/K - En charge de magasin,K/K - Foire,K/K - Formateur,K/K - RV,K/K - RVJ,K/K - Vendeur&apos;, $Profile.Name),
+      $Profile.Name = &apos;K/K - TP&apos;,       
+      $UserRole.Name = &apos;Foire&apos;,
+      $UserRole.Name = &apos;Formateur&apos;),    
+   NULLVALUE(nbModificationsBySale__c, 0) + 1, 
+   nbModificationsBySale__c)</formula>
+        <name>UR001_K2_Opportunity_NbModifBySale</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_NbModifications</fullName>
+        <field>nbModifications__c</field>
+        <formula>NULLVALUE(nbModifications__c, 0) + 1</formula>
+        <name>UR001_K2_Opportunity_NbModifications</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineCCM</fullName>
+        <field>LeadSource</field>
+        <literalValue>CCM</literalValue>
+        <name>UR001_K2_Opportunity_OrigineCCM</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineCampMkt</fullName>
+        <field>LeadSource</field>
+        <literalValue>CAMPAGNES MARKETING</literalValue>
+        <name>UR001_K2_Opportunity_OrigineCampMkt</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineFoire</fullName>
+        <field>LeadSource</field>
+        <literalValue>FOIRE</literalValue>
+        <name>UR001_K2_Opportunity_OrigineFoire</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineParrainge</fullName>
+        <field>LeadSource</field>
+        <literalValue>PARRAINAGE VENDEUR</literalValue>
+        <name>UR001_K2_Opportunity_OrigineParrainge</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OriginePassMag</fullName>
+        <field>LeadSource</field>
+        <literalValue>PASSAGE MAGASIN</literalValue>
+        <name>UR001_K2_Opportunity_OriginePassMag</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineTelMag</fullName>
+        <field>LeadSource</field>
+        <literalValue>TELEPRO MAGASIN</literalValue>
+        <name>UR001_K2_Opportunity_OrigineTelMag</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineVtePers</fullName>
+        <field>LeadSource</field>
+        <literalValue>COLLABORATEUR K PAR K</literalValue>
+        <name>UR001_K2_Opportunity_OrigineVtePers</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineVtePersSG</fullName>
+        <field>LeadSource</field>
+        <literalValue>COLLABORATEUR+RETRAIT S-GOBAIN</literalValue>
+        <name>UR001_K2_Opportunity_OrigineVtePersSG</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineWeb</fullName>
+        <field>LeadSource</field>
+        <literalValue>WEB</literalValue>
+        <name>UR001_K2_Opportunity_OrigineWeb</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_OrigineWebConfig</fullName>
+        <field>LeadSource</field>
+        <literalValue>WEB CONFIGURATEUR</literalValue>
+        <name>UR001_K2_Opportunity_OrigineWebConfig</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Literal</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <fieldUpdates>
+        <fullName>UR001_K2_Opportunity_Quantite</fullName>
+        <description>Utilisation des prévisions - Alimentation de la quantité</description>
+        <field>TotalOpportunityQuantity</field>
+        <formula>NULLVALUE(quantiteCoulissant__c, 0)
++ NULLVALUE(quantiteFenetre__c, 0)
++ NULLVALUE(quantiteMoustiquaire__c, 0)
++ NULLVALUE(quantitePersienne__c, 0)
++ NULLVALUE(quantitePortail__c, 0)
++ NULLVALUE(quantitePorteBlindee__c, 0)
++ NULLVALUE(quantitePorteEntree__c, 0)
++ NULLVALUE(quantitePorteInterieur__c, 0)
++ NULLVALUE(quantitePorteGarage__c, 0)
++ NULLVALUE(quantitePorteService__c, 0)
++ NULLVALUE(quantitePorteFenetre__c, 0)
++ NULLVALUE(quantiteStoreBanne__c, 0)
++ NULLVALUE(quantiteVoletBattant__c, 0)
++ NULLVALUE(quantiteVoletRoulant__c, 0)</formula>
+        <name>UR001_K2_Opportunity_Quantite</name>
+        <notifyAssignee>false</notifyAssignee>
+        <operation>Formula</operation>
+        <protected>false</protected>
+        <reevaluateOnChange>false</reevaluateOnChange>
+    </fieldUpdates>
+    <rules>
+        <fullName>WF001_K2_Opportunity_AffectationCall</fullName>
+        <actions>
+            <name>UR001_K2_Opport_DerniereAffectCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_NbAffectationsCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_PremiereAffectCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <formula>AND(NOT($User.ByPassWorkflowRule__c),
+    OR(owner__r.Profile.Name = &apos;K/K - DC&apos;,
+       owner__r.Profile.Name = &apos;K/K - TA&apos;,
+       owner__r.Profile.Name = &apos;K/K - TA/Entrant&apos;,
+       owner__r.Profile.Name = &apos;K/K - TA/Sortant&apos;,
+       owner__r.Profile.Name = &apos;K/K - Superviseur&apos;,
+       owner__r.Profile.Name = &apos;K/K - Assistante Call&apos;,
+       owner__r.UserRole.Name = &apos;Directeur Call&apos;,
+       owner__r.UserRole.Name = &apos;Superviseur&apos;,
+       owner__r.UserRole.Name = &apos;TA&apos;))</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_AffectationSectoStats</fullName>
+        <actions>
+            <name>UR001_K2_Opport_SectoStats_CodeDV</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_SectoStats_CodeMag</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_SectoStats_CodeRegion</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_SectoStats_LibDV</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_SectoStats_LibMag</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_SectoStats_LibRegion</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <formula>AND(
+  IsClosed = FALSE,
+  ISBLANK(codeMagasinStats__c),
+  ISNEW() || ISCHANGED(OwnerId)
+)</formula>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_AffectationVendeur</fullName>
+        <actions>
+            <name>UR001_K2_Opport_DerniereAffectVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_NbAffectationsVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opport_PremiereAffectVendeur</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <formula>AND(NOT($User.ByPassWorkflowRule__c),    
+    OR(CONTAINS(&apos;K/K - DR,K/K - DV,K/K - En charge de magasin,K/K - Foire,K/K - Formateur,K/K - RV,K/K - RVJ,K/K - Vendeur&apos;, owner__r.Profile.Name),
+       owner__r.Profile.Name = &apos;K/K - TP&apos;,       
+       owner__r.UserRole.Name = &apos;Foire&apos;,
+       owner__r.UserRole.Name = &apos;Formateur&apos;))</formula>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_InsertOrUpdate</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_AutreMotifRefus</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_AutreObjection</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_DateModifStatut</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_EmailCompte</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_LastModifDateByCall</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_LastModifDateBySale</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_Montant</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_NbModifBySale</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_NbModifications</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <actions>
+            <name>UR001_K2_Opportunity_Quantite</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <triggerType>onAllChanges</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineCCM</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineCCM</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>13 - enseigne magasin,13 - ancien client,13 - Bouche à oreille,13 - PJaune papier,13 - NSPP,13 - Panneaux de chantier</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineCampMkt</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineCampMkt</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>15 - Campagne marketing</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineFoire</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineFoire</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>43 - Foire</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineJPO</fullName>
+        <actions>
+            <name>UR001_K2_Account_OrigineJPO</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>17 - JPO</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineParrainge</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineParrainge</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>53 - Parrainage</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OriginePassMag</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OriginePassMag</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>20 - passage magasin</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineTelMag</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineTelMag</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>26 - Telepro magasin</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineVWeb</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineWeb</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <booleanFilter>1 AND 2 AND (3 OR 4)</booleanFilter>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>15 - Quotatis,15 - comprendre choisir,15 - Batiweb,15 - Calculéo B,15 - Calculéo A,15 - Calculéo D,15 - Calculéo C,15 - Keltravo</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>44 - moteur de recherche,44 - Formulaire site KparK,44 - Internet bannières,44 - Internet Emailing,44 - PJaune web,44 - Web call back</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineVtePers</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineVtePers</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>34 - vente personnel</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineVtePersSG</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineVtePersSG</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>35 - vente personnel StGobain</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+    <rules>
+        <fullName>WF001_K2_Opportunity_OrigineWebConfig</fullName>
+        <actions>
+            <name>UR001_K2_Opportunity_OrigineWebConfig</name>
+            <type>FieldUpdate</type>
+        </actions>
+        <active>true</active>
+        <criteriaItems>
+            <field>User.ByPassWorkflowRule__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.LeadSource</field>
+            <operation>equals</operation>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Opportunity.callSource__c</field>
+            <operation>equals</operation>
+            <value>44 - Web configurateur</value>
+        </criteriaItems>
+        <triggerType>onCreateOrTriggeringUpdate</triggerType>
+    </rules>
+</Workflow>

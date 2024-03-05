@@ -1,0 +1,561 @@
+<template>
+    <lightning-card variant="base">
+        <!-- HEADER -->
+		<div class="slds-page-header">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:orders" size="medium"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name">
+								<div class="slds-page-header__name-title">
+									<h1>
+										<span class="slds-page-header__title slds-truncate" title="Assistant reprise historique commande fournisseur">Assistant reprise historique commande fournisseur</span>
+									</h1>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+        <!-- BODY -->
+        <div class="c-container slds-scrollable" style="height:39vh">
+            <!-- Spinner -->
+            <template if:true={showLoadingSpinner}>
+                <lightning-spinner variant="brand" alternative-text="Chargement" size="large"></lightning-spinner>
+            </template>
+
+            <!-- NON DISPONIBLE -->
+            <template if:false={activeWizard}>
+                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                    <div class="slds-box slds-theme_error">
+                        <div class="slds-media slds-media_center">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar slds-avatar_small">
+                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>L'assistant de lettrage n'est pas disponible car la commande ne possède pas de ligne de commande avec un produit "REPRISE GC".</p>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+            </template>            
+
+            <!-- ASSISTANT -->
+            <template if:true={activeWizard}>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+
+                        <!-- Path assistant -->                    
+                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                            <template for:each={steps} for:item="step">
+                                <template if:true={step.display}>
+                                    <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                                </template>
+                            </template>
+                        </lightning-progress-indicator>
+
+                    </lightning-layout-item>
+                </lightning-layout>
+
+
+                <lightning-layout multiple-rows="true">
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <!-- STEP 1 (Order) --> 
+                        <template id="actionsListDiv" if:true={showStep1Form}>
+                            <div class="slds-form" role="list">
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <span class="slds-form-element__label">N° de contrat</span>
+                                            <div class="slds-form-element__control">
+                                                <lightning-formatted-text value={orderContractContractNumber}></lightning-formatted-text>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <span class="slds-form-element__label">Nom du client</span>
+                                            <div class="slds-form-element__control">
+                                                <lightning-formatted-text value={orderAccountName}></lightning-formatted-text>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="text" label="N° de la commande fournisseur" value={orderProviderReference} 
+                                                            onchange={handleProviderReferenceChange}></lightning-input>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="date" date-style="short" label="Date de commande" value={orderEffectiveDate} required 
+                                                                onchange={handleEffectiveDateChange}></lightning-input>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <span class="slds-form-element__label">Fournisseur</span>
+                                            <div class="slds-form-element__control">
+                                                <lightning-formatted-text value={orderProviderName}></lightning-formatted-text>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="date" date-style="short" label="Date de confirmation" value={orderConfirmationDate}
+                                                                onchange={handleConfirmationDateChange}></lightning-input>
+                                        </div> 
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="date" date-style="short" label="Date de livraison prévisionnelle" value={orderEstimatedDeliveryDate}  
+                                                                onchange={handleEstimatedDeliveryDateChange}></lightning-input>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            <lightning-input type="number" label="Coût prévisionnel" value={orderEstimatedTotalCost} formatter="currency" step=".01" 
+                                                            onchange={handleEstimatedTotalCostChange}>
+                                            </lightning-input>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input type="date" date-style="short" label="Date de livraison" value={orderDeliveryDate}  
+                                                            onchange={handleDeliveryDateChange}></lightning-input>
+                                    </div>  
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input label="N° de BL" value={orderDeliveryNumber} 
+                                                        onchange={handleDeliveryNumberChange}></lightning-input>
+                                    </div>  
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input type="date" date-style="short" label="Date de facture" value={orderBillingDate}  
+                                                            onchange={handleBillingDateChange}></lightning-input>
+                                    </div>  
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input label="N° de facture" value={orderBillingNumber} 
+                                                        onchange={handleBillingNumberChange}></lightning-input>
+                                    </div>  
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input type="number" label="Coût réel" value={orderTotalCost} formatter="currency" step=".01"
+                                                        onchange={handleTotalCostChange}>
+                                        </lightning-input>
+                                    </div>   
+                                </div>
+                            </div> 
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                        <lightning-input type="number" name="Nombre de produits inconnus" 
+                                                                    label="Nombre de produits inconnus" aria-label="Nombre de produits inconnus" 
+                                                                    value={unknownLineCount}
+                                                                    step="1" min="0"
+                                                                    onchange={handleChangeUnknownValue}>
+                                        </lightning-input>
+                                    </div> 
+                                </div> 
+                                <div class="slds-form__item" role="listitem">
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- STEP 2 (Actifs) --> 
+                        <template id="assetListDiv" if:true={showStep2Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Sélection des actifs
+                            </h3>         
+
+                            <template if:false={hasAssets}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Cette commande ne contient pas d'actif.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template if:true={hasAssets}><div class="slds-form">
+                                <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_stacked">
+                                                <p class="slds-m-bottom_medium">
+                                                    Veuillez sélectionner au moins un actif.
+                                                </p>
+                                            </div>
+                                        </div>        
+                                    </div>
+                                </div>
+                                <div>
+                                    <lightning-datatable data={assetsData}
+                                                        columns={assetColumns}
+                                                        key-field="Id"
+                                                        onrowselection={handleSelectedAssetsChange}
+                                                        selected-rows={selectedAssetRecords}>
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 3 (Ligne de commande) --> 
+                        <template id="selectedAssetListDiv" if:true={showStep3Form}> 
+                            <h3 class="slds-text-heading_small">
+                                Saisie des informations
+                            </h3>
+                                             
+                            <!--<template if:false={hasOrderItems}>
+                                <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                                    <div class="slds-box slds-theme_error">
+                                        <div class="slds-media slds-media_center">
+                                            <div class="slds-media__figure">
+                                                <span class="slds-avatar slds-avatar_small">
+                                                    <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>Problème au niveau des lignes de commande.</p>
+                                            </div>
+                                        </div>                            
+                                    </div>
+                                </div>
+                            </template>-->
+
+                            <div class="slds-form__row slds-m-bottom_medium">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_stacked">
+                                        <p>
+                                            Veuillez définir les valeurs pour le(s) {assetSelectedNumber} ligne(s) sélectionnée(s).
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="slds-form__item" role="listitem">     
+                                    <div class="slds-form-element slds-form-element_stacked">  </div>
+                                </div>
+                                <div class="slds-form__item" role="listitem">     
+                                    <div class="slds-form-element slds-form-element_stacked slds-text-align_right">
+                                        <div class ="slds-grid">      
+                                            <div class="slds-col slds-size_3-of-6">
+                                                <span>Coût prévisionnel total (commande) <br/></span>
+                                                <lightning-formatted-number format-style="currency" currency-code="EUR" value={orderEstimatedTotalCost}></lightning-formatted-number>
+                                            </div>
+                                            <div class="slds-col slds-size_3-of-6">
+                                                <span>Coût réel total (commande) <br/></span>
+                                                <lightning-formatted-number format-style="currency" currency-code="EUR" value={orderTotalCost}></lightning-formatted-number>
+                                            </div>
+                                        </div>
+                                        <div class ="slds-grid"> 
+                                            <div class="slds-col slds-size_3-of-6">
+                                                <span>Somme coûts prévisionnels (lignes) <br/></span>
+                                                <lightning-formatted-number format-style="currency" currency-code="EUR" value={orderLinesEstimatedTotalCost}></lightning-formatted-number>
+                                            </div>
+                                            <div class="slds-col slds-size_3-of-6">
+                                                <span>Somme coûts réels (lignes) <br/></span>
+                                                <lightning-formatted-number format-style="currency" currency-code="EUR" value={orderLinesTotalCost}></lightning-formatted-number>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+
+                            <template if:true={hasOrderItems}>
+                                <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                    <lightning-datatable data={orderItemsData}
+                                                        columns={orderItemColumns}
+                                                        onsave={handleOrderItemsSave}
+                                                        draft-values={draftValues}
+                                                        key-field="orderItemNumber__c"
+                                                        hide-checkbox-column="true">
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+
+                            <template if:true={showTableUnknown}>
+                                <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                    <lightning-datatable data={unknownProductData}
+                                                        columns={orderItemColumnsUnknown}
+                                                        onsave={handleOrderItemsSaveUnknown}
+                                                        draft-values={draftValuesUnknown}
+                                                        key-field="orderItemNumber__c"
+                                                        hide-checkbox-column="true">
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- STEP 4 (RESUME) -->
+                        <template id="resultsDiv" if:true={showStep4Form}>
+                            <lightning-accordion allow-multiple-sections-open
+                                                active-section-name={activeSummarySections}>
+
+                                <lightning-accordion-section name="providerOrderSummary" label="Commande fournisseur">
+                                    <div class="slds-form" role="list">
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">N° de contrat</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={orderContractContractNumber}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Nom du client</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={orderAccountName}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">N° de la commande fournisseur</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-text value={orderProviderReference}></lightning-formatted-text>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Date de commande</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={orderEffectiveDate}></lightning-formatted-date-time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Date de confirmation</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={orderConfirmationDate}></lightning-formatted-date-time>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-form__row">
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Date de livraison prévisionnelle</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={orderEstimatedDeliveryDate}></lightning-formatted-date-time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                </div>
+                                            </div>
+                                            <div class="slds-form__item" role="listitem">
+                                                <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                    <span class="slds-form-element__label">Coût prévisionnel</span>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-formatted-number format-style="currency" currency-code="EUR" value={orderEstimatedTotalCost}></lightning-formatted-number>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <span class="slds-form-element__label">Date de livraison</span>
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={orderDeliveryDate}></lightning-formatted-date-time>
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <span class="slds-form-element__label">N° de BL</span>
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value={orderDeliveryNumber}></lightning-formatted-text>
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__row">
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <span class="slds-form-element__label">Date de facture</span>
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-date-time year="numeric" month="numeric" day="numeric" value={orderBillingDate}></lightning-formatted-date-time>
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <span class="slds-form-element__label">N° de facture</span>
+                                                <div class="slds-form-element__control">
+                                                    <lightning-formatted-text value={orderBillingNumber}></lightning-formatted-text>
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="slds-form__item" role="listitem">
+                                            <div class="slds-form-element slds-form-element_readonly slds-form-element_stacked slds-hint-parent slds-m-bottom_x-small">
+                                                <span class="slds-form-element__label">Coût réel</span>
+                                                <div class="slds-form-element__control">
+                                                    <template if:true={isOrderTotalCostSupTo0}>
+                                                        <lightning-formatted-number format-style="currency" currency-code="EUR" value={orderTotalCost}></lightning-formatted-number>
+                                                    </template>
+                                                </div>
+                                            </div>   
+                                        </div>
+                                    </div> 
+                                </lightning-accordion-section>
+
+                                <template if:true={hasOrderItems}>
+                                    <lightning-accordion-section name="assetSummary" label="Actif(s) sélectionné(s)">
+                                        <lightning-badge slot="actions" label={selectedAssets.length}></lightning-badge>
+                                        <div class="slds-form" role="list">
+                                            <div class="slds-form__row">            
+                                                <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                                    <lightning-datatable data={orderItemsData}
+                                                        columns={orderItemReadOnlyColumns}
+                                                        key-field="Id"
+                                                        hide-checkbox-column="true">
+                                                    </lightning-datatable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+
+                                <template if:true={showTableUnknown}>
+                                    <lightning-accordion-section name="unknownSummary" label="Produit(s) inconnu(s)">
+                                        <lightning-badge slot="actions" label={unknownLineCount}></lightning-badge>
+                                        <div class="slds-form" role="list">
+                                            <div class="slds-form__row">            
+                                                <div style="width:100%; overflow-x: auto; white-space: nowrap;">
+                                                    <lightning-datatable data={unknownProductData}
+                                                        columns={orderItemReadOnlyColumnsUnknown}
+                                                        key-field="Id"
+                                                        hide-checkbox-column="true">
+                                                    </lightning-datatable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+
+                            </lightning-accordion>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+
+            
+            </template>
+        </div>
+
+        <div slot="footer">
+            <template if:true={activeWizard}>
+                <!-- ERROR -->   
+                <template if:true={error}>
+                    <div class="slds-m-top_xx-small slds-m-bottom_x-small ">
+                        <div class="slds-box slds-theme_error">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar slds-avatar_small">
+                                        <lightning-icon icon-name="utility:error" alternative-text="Attention !" variant="inverse" size="small"></lightning-icon>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{error}</p>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                <!-- BUTTONS -->   
+                <template if:true={showPreviousButton}> 
+                    <lightning-button label="Précédent" class="slds-m-around_medium" onclick={handlePrevious}></lightning-button>
+                </template>
+                <template if:true={showNextButton}> 
+                    <lightning-button variant="brand" label="Suivant" class="slds-m-around_medium" onclick={handleNext}></lightning-button>
+                </template>
+                <template if:true={showSubmitButton}> 
+                    <lightning-button variant="brand" label="Valider" class="slds-m-around_medium" onclick={handleCreateOrderItems}></lightning-button>
+                </template>
+            </template>
+        </div>
+
+    </lightning-card>
+    
+</template>

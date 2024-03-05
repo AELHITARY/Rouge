@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LAST_DEPLOY</fullName>
+    <columns>NAME</columns>
+    <columns>CodeOption__c</columns>
+    <columns>LibelleOption__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>equals</operation>
+        <value>10/1/2019 12:00 AM</value>
+    </filters>
+    <label>LAST_DEPLOY</label>
+    <language>fr</language>
+</ListView>

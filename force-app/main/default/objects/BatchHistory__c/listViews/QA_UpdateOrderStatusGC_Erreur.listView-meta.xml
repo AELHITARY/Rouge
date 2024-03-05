@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>QA_UpdateOrderStatusGC_Erreur</fullName>
+    <columns>NAME</columns>
+    <columns>dateLancementExecute__c</columns>
+    <columns>dateFinExecute__c</columns>
+    <columns>statut__c</columns>
+    <columns>nombreATraiter__c</columns>
+    <columns>nombreTraite__c</columns>
+    <columns>IdEnregistrementsErreur__c</columns>
+    <columns>erreurTraitee__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>nomDuBatch__c</field>
+        <operation>equals</operation>
+        <value>QA_UpdateOrderStatusGC</value>
+    </filters>
+    <filters>
+        <field>statut__c</field>
+        <operation>equals</operation>
+        <value>Erreur</value>
+    </filters>
+    <label>QA_UpdateOrderStatusGC - Erreur</label>
+</ListView>

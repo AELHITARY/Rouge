@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ModeValorisation__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Mode de valorisation de la promotion (% ou valeur)
+GC_ioptions.oiop_type</description>
+    <externalId>false</externalId>
+    <label>Mode Valorisation</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

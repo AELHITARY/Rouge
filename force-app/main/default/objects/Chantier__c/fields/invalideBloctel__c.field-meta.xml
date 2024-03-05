@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>invalideBloctel__c</fullName>
+    <externalId>false</externalId>
+    <formula>OR(
+  AND(!ISBLANK(autreTelephoneLocataires__c),
+      OR(BEGINS(autreTelephoneLocataires__c, &apos;+&apos;),
+         BEGINS(autreTelephoneLocataires__c, &apos;33&apos;),
+         BEGINS(autreTelephoneLocataires__c, &apos;11111&apos;))),
+  AND(!ISBLANK(autreTelephoneOccupants__c),
+      OR(BEGINS(autreTelephoneOccupants__c, &apos;+&apos;),
+         BEGINS(autreTelephoneOccupants__c, &apos;33&apos;),
+         BEGINS(autreTelephoneOccupants__c, &apos;11111&apos;))),
+  AND(!ISBLANK(autreTelephoneProprietaires__c),
+      OR(BEGINS(autreTelephoneProprietaires__c, &apos;+&apos;),
+         BEGINS(autreTelephoneProprietaires__c, &apos;33&apos;),
+         BEGINS(autreTelephoneProprietaires__c, &apos;11111&apos;))),
+
+  AND(!ISBLANK(telephoneLocataires__c),
+      OR(BEGINS(telephoneLocataires__c, &apos;+&apos;),
+         BEGINS(telephoneLocataires__c, &apos;33&apos;),
+         BEGINS(telephoneLocataires__c, &apos;11111&apos;))),
+  AND(!ISBLANK(telephoneOccupants__c),
+      OR(BEGINS(telephoneOccupants__c, &apos;+&apos;),
+         BEGINS(telephoneOccupants__c, &apos;33&apos;),
+         BEGINS(telephoneOccupants__c, &apos;11111&apos;))),
+  AND(!ISBLANK(telephoneProprietaires__c),
+      OR(BEGINS(telephoneProprietaires__c, &apos;+&apos;),
+         BEGINS(telephoneProprietaires__c, &apos;33&apos;),
+         BEGINS(telephoneProprietaires__c, &apos;11111&apos;))),
+
+  AND(!ISBLANK(telephoneDomicileLocataires__c),
+      OR(BEGINS(telephoneDomicileLocataires__c, &apos;+&apos;),
+         BEGINS(telephoneDomicileLocataires__c, &apos;33&apos;),
+         BEGINS(telephoneDomicileLocataires__c, &apos;11111&apos;))),
+  AND(!ISBLANK(telephoneDomicileOccupants__c),
+      OR(BEGINS(telephoneDomicileOccupants__c, &apos;+&apos;),
+         BEGINS(telephoneDomicileOccupants__c, &apos;33&apos;),
+         BEGINS(telephoneDomicileOccupants__c, &apos;11111&apos;))),
+  AND(!ISBLANK(telephoneDomicileProprietaires__c),
+      OR(BEGINS(telephoneDomicileProprietaires__c, &apos;+&apos;),
+         BEGINS(telephoneDomicileProprietaires__c, &apos;33&apos;),
+         BEGINS(telephoneDomicileProprietaires__c, &apos;11111&apos;))),
+
+  AND(!ISBLANK(telephoneMobileLocataires__c),
+      OR(BEGINS(telephoneMobileLocataires__c, &apos;+&apos;),
+         BEGINS(telephoneMobileLocataires__c, &apos;33&apos;),
+         BEGINS(telephoneMobileLocataires__c, &apos;11111&apos;))),
+  AND(!ISBLANK(telephoneMobileOccupants__c),
+      OR(BEGINS(telephoneMobileOccupants__c, &apos;+&apos;),
+         BEGINS(telephoneMobileOccupants__c, &apos;33&apos;),
+         BEGINS(telephoneMobileOccupants__c, &apos;11111&apos;))),
+  AND(!ISBLANK(telephoneMobileProprietaires__c),
+      OR(BEGINS(telephoneMobileProprietaires__c, &apos;+&apos;),
+         BEGINS(telephoneMobileProprietaires__c, &apos;33&apos;),
+         BEGINS(telephoneMobileProprietaires__c, &apos;11111&apos;)))
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>InvalideBloctel</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
