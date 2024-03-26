@@ -1,0 +1,11 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,force:hasSObjectName" access="global">
+    <!--Style-->
+    <aura:html tag="style">
+        .slds-modal__container{
+        height : auto;
+        width: 80%;
+        max-width: 80rem;
+        }
+    </aura:html> 
+    <c:customProviderOrderWizard recordId="{!v.recordId}" onclose="{!c.closeQA}" objectApiName="{!v.sObjectName}"/>
+</aura:component>

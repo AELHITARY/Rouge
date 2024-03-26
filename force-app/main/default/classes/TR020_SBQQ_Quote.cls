@@ -216,7 +216,15 @@ public without sharing class TR020_SBQQ_Quote {
                 if(Trigger.isInsert && opportunitiesMap.get(newQuote.SBQQ__Opportunity2__c) != null) {
                     Opportunity opp = opportunitiesMap.get(newQuote.SBQQ__Opportunity2__c);
                     System.debug('## Update Shipping Address');
-                    newQuote.SBQQ__ShippingName__c = opp.chantier__r.civiliteProprietaires__c+' '+opp.chantier__r.prenomProprietaires__c+' '+opp.chantier__r.nomProprietaires__c;
+                    system.debug('## Opportunity: '+opp);
+                    System.debug('## Opportunity civiliteProprietaires__c: '+opp.chantier__r.civiliteProprietaires__c);
+                    System.debug('## Opportunity prenomProprietaires__c: '+opp.chantier__r.prenomProprietaires__c);
+                    System.debug('## Opportunity nomProprietaires__c: '+opp.chantier__r.nomProprietaires__c);
+                            
+                    newQuote.SBQQ__ShippingName__c = (opp.chantier__r.civiliteProprietaires__c != null ? opp.chantier__r.civiliteProprietaires__c + ' ' : '') +
+                                                    (opp.chantier__r.prenomProprietaires__c != null ? opp.chantier__r.prenomProprietaires__c + ' ' : '') +
+                                                    (opp.chantier__r.nomProprietaires__c != null ? opp.chantier__r.nomProprietaires__c : '');
+                    //newQuote.SBQQ__ShippingName__c = opp.chantier__r.civiliteProprietaires__c?+' '+opp.chantier__r.prenomProprietaires__c+' '+opp.chantier__r.nomProprietaires__c;
                     newQuote.SBQQ__ShippingStreet__c = opp.chantier__r.rue__c; 
                     newQuote.SBQQ__ShippingCity__c = opp.chantier__r.ville__c;
                     newQuote.SBQQ__ShippingPostalCode__c = opp.chantier__r.codePostal__c; 
@@ -226,8 +234,16 @@ public without sharing class TR020_SBQQ_Quote {
                 }
                 if(Trigger.isInsert && Trigger.isBefore && accountsMap.get(newQuote.SBQQ__Account__c) != null) {
                     Account acc = accountsMap.get(newQuote.SBQQ__Account__c);
-                    System.debug('## Update Billing Address');
-                    newQuote.SBQQ__BillingName__c = acc.civilite__c+' '+acc.prenom__c+' '+acc.nom__c;
+                    System.debug('## Update Billing Address');  
+                    system.debug('## Account: '+acc);   
+                    system.debug('## Account civilite__c: '+acc.civilite__c);
+                    system.debug('## Account prenom__c: '+acc.prenom__c);
+                    system.debug('## Account nom__c: '+acc.nom__c); 
+                    newQuote.SBQQ__BillingName__c = (acc.civilite__c != null ? acc.civilite__c + ' ' : '') +
+                                                    (acc.prenom__c != null ? acc.prenom__c + ' ' : '') +
+                                                    (acc.nom__c != null ? acc.nom__c : '');
+
+                    //newQuote.SBQQ__BillingName__c = acc.civilite__c +' '+acc.prenom__c+' '+acc.nom__c;
                     newQuote.SBQQ__BillingStreet__c = acc.rue__c; 
                     newQuote.SBQQ__BillingCity__c = acc.ville__c;
                     newQuote.SBQQ__BillingPostalCode__c = acc.codePostal__c; 

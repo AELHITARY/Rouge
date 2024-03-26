@@ -1,0 +1,4 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" >
+    <c:createGlobalWizard name="createGlobalWizard" onsaveobjects="{!c.minimizeUtility}"/>
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+</aura:component>

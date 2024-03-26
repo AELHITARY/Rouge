@@ -1,0 +1,29 @@
+
+  <template> 
+        <div class="slds-box">
+                <div>i'm the component => {recordId}</div>
+                <div if:true={DisplayText}>{textValue}</div> 
+        </div>  
+        <lightning-card title="List des Actifs" icon-name="standard:account">      
+                <template if:true={assets.data}>
+                        <lightning-datatable
+                                key-field="Id"
+                                data={assets.data}
+                                columns={columns}
+                                onrowaction={handleRowAction}
+                                hide-checkbox-column="true">
+                        </lightning-datatable>
+                </template>
+                <template if:true={assets.error}>
+                        {assets.error}
+                </template>
+        </lightning-card>
+        <template if:true={assets.data}>
+                <template for:each={assets.data} for:item="asset">
+                    <p key={asset.Id}>{asset.Name}</p>
+                </template>
+            </template>
+            <template if:true={assets.error}>
+                {assets.error}
+        </template>
+</template>

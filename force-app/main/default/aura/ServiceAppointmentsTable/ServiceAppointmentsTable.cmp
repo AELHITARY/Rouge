@@ -1,0 +1,24 @@
+<aura:component controller="Ctrl_Calendrier" implements="flexipage:availableForRecordHome">
+    <aura:attribute name="codeMagasin" type="String" access="public"/>
+    <aura:attribute name="userRole" type="String" access="public"/>
+    <aura:attribute name="userName" type="String" access="public"/>
+    <aura:attribute name="startDatetime" type="Datetime" access="public"/>
+    <aura:attribute name="endDatetime" type="Datetime" access="public"/>
+    <aura:attribute name="serviceAppointments" type="String[]" access="public"/>
+    <aura:attribute name="tableColumns" type="List" access="public"/>
+    <aura:attribute name="tableConfig" type="Map" access="public"/>
+    <aura:attribute name="userInfo" type="user" /> 
+    <aura:attribute name="eventProspectionRTId" type="String"/> 
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="dtActionClick" event="ldt:clickedDtAction" action="{!c.handleTableActionClick}"/>
+    <aura:handler event="c:eventDatatableDevRerenderRows" action="{!c.handleRerenderEvent}"/>
+    
+    <section class="project-task-list slds-p-top--x-small">
+        <div class="task-list slds-p-top--medium">
+            <ldt:datatableDev aura:id="serviceAppointmentTable" title=""
+                              dataRows="{!v.serviceAppointments}" header="{!v.tableColumns}"
+                              config="{!v.tableConfig}"/>
+        </div>
+    </section>
+</aura:component>

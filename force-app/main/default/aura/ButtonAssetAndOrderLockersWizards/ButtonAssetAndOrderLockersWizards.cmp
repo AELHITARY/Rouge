@@ -1,0 +1,17 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,force:hasSObjectName" access="global">
+    <!--Style-->
+    <aura:html tag="style">
+        .slds-modal__container{
+            height : auto;
+            width: 95%;
+            max-width: 95%;
+        }
+
+        .slds-modal__content{
+            height : 640px !important;
+            max-height : 640px !important;
+        }
+    </aura:html> 
+    <!--<c:customAssetLockerWizard recordId="{!v.recordId}" objectApiName="{!v.sObjectName}"/>-->
+    <c:customOrderLockerWizard recordId="{!v.recordId}" onclose="{!c.closeQA}"/>
+</aura:component>

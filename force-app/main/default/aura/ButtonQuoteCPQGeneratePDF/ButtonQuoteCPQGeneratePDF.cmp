@@ -1,0 +1,3 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" >
+    <c:quoteCPQGeneratePDF recordId="{!v.recordId}" documentType="DIP" onclose="{!c.closeQA}"/>
+</aura:component>

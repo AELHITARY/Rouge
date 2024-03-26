@@ -34,11 +34,11 @@
     </types>
     <types>
         <members>*</members>
-        <name>ValidationRule</name>
+        <name>validationRules</name>
     </types>
     <types>
         <members>*</members>
-        <name>CustomLabel</name>
-    </types>
+        <name>AuraDefinitionBundle</name>
+    </types>    
     <version>54.0</version>
 </Package>

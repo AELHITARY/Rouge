@@ -1,0 +1,338 @@
+<aura:component implements="force:lightningQuickAction,force:appHostable,force:hasRecordId" controller="Ctrl_GDPR_AdminExportDeDonnees" access="global" >
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+    <aura:attribute name="metadatas" type="referentielExportDonnesGDPR__c[]" />
+    <aura:attribute name="metadataToModify" type="referentielExportDonnesGDPR__c" />
+    <aura:attribute name="picklistVal_NomObjet" type="String[]" />
+    <aura:attribute name="picklistVal_ObjetJointure" type="String[]" />
+    <aura:attribute name="picklistVal_ObjectNameList" type="String[]" />
+    <aura:attribute name="metadataRecord" type="referentielExportDonnesGDPR__c" default="" />
+    <aura:attribute name="picklistVal_ChampsExclus" type="List" />
+    <aura:attribute name="picklistVal_ChampJointure" type="List" />
+    <aura:attribute name="propObjetJointureModif" type="String" />
+    <aura:attribute name="errorMsg" type="String" />
+    <aura:attribute name="showError" type="Boolean" default="false" />
+    
+    <aura:attribute name="objetJointure" type="String" />
+    <aura:attribute name="objetPrincipal" type="String" />
+    
+    <aura:attribute name="metadataId" type="Id" />
+    <aura:attribute name="searchObjectName" type="String" default="Account"/>
+    <aura:attribute name="metadataStructure" type="Object" />
+    
+    <aura:attribute name="defaultOptions" type="List" />
+    <aura:attribute name="defaultOptions2" type="List" />
+    <aura:attribute name="defaultOptionsModif" type="List" />
+    <aura:attribute name="defaultOptions2Modif" type="List" />
+    <aura:attribute name="showAddTable" type="Boolean" default="false" />
+    <aura:attribute name="showModifyTable" type="Boolean" default="false" />    
+    <aura:attribute name="showButtonCreate" type="Boolean" default="true" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <force:recordData aura:id="forceRecord"
+                    recordId=""
+                    targetFields="{!v.metadataRecord}"
+                    fields="Id, nomObjet__c, actif__c, champDeJointure__c, champsExclus__c, objetDeJointure__c, priorite__c"
+                    mode="EDIT" />
+
+    <lightning:card>
+        <aura:set attribute="title">
+            <h1 class="slds-text-heading_large" stye="text:align">
+                <lightning:icon iconName="standard:entity" size="large"/>
+                Données à exporter au client
+            </h1>
+        </aura:set>
+        
+        <!-- Spinner (loading) -->
+        <aura:if isTrue="{!v.spinner}">
+    		<lightning:spinner variant="brand" size="medium" aura:id="objSpinner" alternativeText="Chargement..." />
+        </aura:if>
+        
+        <!-- Recherche -->
+        <div class="slds-grid">
+            <div class="slds-col">
+                <div class="slds-box slds-box--medium slds-text-align--bottom" style="border-radius: .25rem;border: 1px solid rgb(221, 219, 218);">
+                    <h2 class="slds-text-heading_medium">
+                        <lightning:icon iconName="utility:search" size="small"/>
+                        Recherche d'information sur des champs/objets
+                    </h2>
+                    <div style="width:250px;">
+                        <lightning:select value="{!v.searchObjectName}" label="Objet à visualiser"
+                                          onchange="{!c.objectStructureLoad}">
+                            <aura:iteration items="{!v.picklistVal_ObjectNameList}" var="item">
+                                <option value="{!item}" text="{!item}" selected="{!item==v.searchObjectName}"/>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    <div class="slds-p-top_xx-small slds-p-bottom_x-small slds-align_absolute-center">
+                        <aura:iteration var="metadata" items="{!v.metadataStructure}">
+                            <div class="slds-box slds-box--medium slds-text-align--bottom" style="width:18%;display:inline-block;">
+                                <div class="slds-truncate slds-has-flexi-truncate" title="{!metadata.sObjectName}" style="white-space:pre-wrap;">{!metadata.sObjectName[0]}</div><br/>
+                                <aura:iteration var="field" items="{!metadata.sObjectRelationFields}">
+                                    <p>{!field}</p>
+                                </aura:iteration>
+                            </div>
+                            <lightning:icon class="icn" iconName="utility:back" size="small" />
+                        </aura:iteration>
+                        <div class="slds-box slds-box--medium slds-text-align--bottom" style="width:18%;display:inline-block;">
+                            <div class="slds-truncate slds-has-flexi-truncate" title="Account" style="white-space:pre-wrap;">Account</div><br/>
+                            <p><strong>Objet de référence</strong></p>
+                        </div>
+                    </div>
+
+                    <!-- Tableau de création/modification -->
+                    <br /><br />
+                    <!-- Display errors, if any -->
+
+                    <aura:if isTrue="{!v.showError}">
+                        <div class="slds-m-bottom_x-small">
+                            <div class="slds-box slds-theme_shade">
+                                <div class="slds-media slds-media_center">
+                                    <div class="slds-media__figure">
+                                        <span class="slds-avatar slds-avatar_medium">
+                                            <lightning:icon iconName="utility:error" alternativeText="Erreur !" variant="error" size="medium" />
+                                        </span>
+                                    </div>
+                                    <div class="slds-media__body slds-text-color_error">
+                                        <p>{!v.errorMsg}</p>
+                                    </div>
+                                </div>                            
+                            </div>                         
+                        </div>
+                    </aura:if>
+
+                    <h2 class="slds-text-heading_medium">
+                        <lightning:icon iconName="utility:list" size="small"/>
+                        Liste des données à récupérer
+                    </h2>   
+                    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Nom de l'objet">Nom de l'objet</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Champs Exclus">Champs Exclus</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Objet de jointure">Objet de jointure</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Champ de jointure">Champ de jointure</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Actif">Actif</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Priorité">Priorité</div>
+                                </th>
+                                <th class="slds-cell-shrink" scope="col">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration var="metadata" items="{!v.metadatas}"> 
+                                <tr class="slds-hint-parent">
+                                    <td data-label="Nom de l'objet" style="max-width: 20px;vertical-align:middle">
+                                        <div class="slds-truncate slds-has-flexi-truncate" title="{!metadata.nomObjet__c}" style="white-space:nowrap; text-overflow:ellipsis; overflow:hidden; max-width:100px;">{!metadata.nomObjet__c}</div>
+                                    </td>
+                                    <td data-label="Champs Exclus" style="max-width: 20px;vertical-align:middle">
+                                        <div class="slds-truncate slds-has-flexi-truncate" title="{!metadata.champsExclus__c}" style="white-space:pre-wrap;">{!metadata.champsExclus__c}</div>
+                                    </td>
+                                    <td data-label="Objet de jointure" style="max-width: 20px;vertical-align:middle">
+                                        <div class="slds-truncate slds-has-flexi-truncate" title="{!metadata.objetDeJointure__c}" style="white-space:pre-wrap;">{!metadata.objetDeJointure__c}</div>
+                                    </td>
+                                    <td data-label="Champ de jointure" style="max-width: 20px;vertical-align:middle">
+                                        <div class="slds-truncate slds-has-flexi-truncate" title="{!metadata.champDeJointure__c}" style="white-space:pre-wrap;">{!metadata.champDeJointure__c}</div>
+                                    </td>
+                                    <td data-label="Actif" style="max-width: 20px;vertical-align:middle">
+                                        <lightning:input type="checkbox" name="input3" checked="{!metadata.actif__c}" disabled="true"/>
+                                    </td>
+                                    <td data-label="Priorité" style="max-width: 20px;vertical-align:middle">
+                                        <div class="slds-truncate slds-has-flexi-truncate" title="{!metadata.priorite__c}" style="white-space:pre-wrap;">{!metadata.priorite__c}</div>
+                                    </td>
+                                    <td class="slds-cell-shrink">
+                                        <div>
+                                            <lightning:buttonGroup >
+                                                <lightning:button variant="neutral" onclick="{!c.doOpenModifyTable}" label="Modifier" name="{!metadata.Id+';'+metadata.nomObjet__c+';'+metadata.objetDeJointure__c+';'+metadata.champsExclus__c+';'+metadata.champDeJointure__c+';'+metadata.actif__c+';'+metadata.priorite__c}"  />
+                                                <lightning:button variant="neutral" onclick="{!c.doDeleteMetadata}" label="Supprimer" name="{!metadata.Id}" />
+                                            </lightning:buttonGroup></div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                    <br></br>
+                    <aura:if isTrue="{!v.showButtonCreate}">
+                        <div style="float:right;width:50%;padding-bottom:10px">
+                            <lightning:button variant="brand" onclick="{!c.doOpenTable}" label="Ajouter un objet"/>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.showAddTable}">
+                        <div style="float:left;width:25%;"><h2 class="slds-text-heading_medium">
+                            <lightning:icon iconName="utility:new" size="small"/>
+                            Ajouter un nouvel Objet
+                            </h2>
+                        </div>
+                        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Nom de l'objet">Nom de l'objet</div>
+                                    </th>
+                                    <th scope="col" style="text-align:center">
+                                        <div class="slds-truncate" title="Champs Exclus">Champs Exclus</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Objet de jointure">Objet de jointure</div>
+                                    </th>
+                                    <th scope="col" style="text-align:center">
+                                        <div class="slds-truncate" title="Champ de jointure">Champ de jointure</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Actif">Actif</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Priorité">Priorité</div>
+                                    </th>
+                                    <th class="slds-cell-shrink" scope="col">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tr class="slds-hint-parent">
+                                <td data-label="Nom de l'objet" style="vertical-align:middle">
+                                    <lightning:select aura:id="propNomObjet" name="propNomObjet" value="{!v.objetPrincipal}" label="" onchange="{!c.objectNamedChange}">
+                                        <option value="" disabled="true"></option> 
+                                        <aura:iteration items="{!v.picklistVal_NomObjet}" var="item">
+                                            <option value="{!item}" text="{!item}" selected="{!item==v.objetPrincipal}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </td>
+                                <td data-label="Champs Exclus">
+                                    <lightning:dualListbox aura:id="propChampsExclus" name="propChampsExclus"  label="" 
+                                                           sourceLabel="Champs disponibles" 
+                                                           selectedLabel="Champs sélectionnés" 
+                                                           options="{!v.picklistVal_ChampsExclus}" 
+                                                           value="{!v.defaultOptions}"
+                                                           />
+                                </td>
+                                <td data-label="Objet de jointure" style="vertical-align:middle">
+                                    <lightning:select aura:id="propObjetJointure" name="propObjetJointure" value="{!v.objetJointure}" label="" onchange="{!c.objectJointChanged}">
+                                        <option value=""></option>
+                                        <aura:iteration items="{!v.picklistVal_ObjetJointure}" var="item">
+                                            <option value="{!item}" text="{!item}" selected="{!item==v.objetJointure}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </td>
+                                <td data-label="Champ de jointure">
+                                    <lightning:dualListbox aura:id="propChampJointure" name="propChampJointure"
+                                                           sourceLabel="Champs disponibles" 
+                                                           selectedLabel="Champs sélectionnés" 
+                                                           options="{!v.picklistVal_ChampJointure}" 
+                                                           value="{!v.defaultOptions2}"
+                                                           onchange="{!c.champJointureChange}"
+                                                           />
+                                </td>
+                                <td data-label="Actif" style="vertical-align:middle">
+                                    <lightning:input type="checkbox" aura:id="propActif" name="propActif" label="" checked="true"/>
+                                </td>
+                                <td data-label="Priorité" style="vertical-align:middle">
+                                    <lightning:input type="number" aura:id="propPriorite" name="propPriorite" label="" min="1" value="1"/>
+                                </td>
+                                <td class="slds-cell-shrink" style="vertical-align:middle">
+                                    <div style="margin-top: 2px;">
+                                        <lightning:buttonGroup >
+                                            <lightning:button variant="brand" onclick="{!c.doCreateMetadata}" label="Créer"  />
+                                        </lightning:buttonGroup></div>
+                                </td>
+                                <div aura:id="displayError"></div>
+                                <div aura:id="displaySuccess"></div>
+                            </tr>
+                        </table>
+                    </aura:if>
+                    
+                    <br></br>                <br></br>
+                    
+                    <aura:if isTrue="{!v.showModifyTable}">
+                        <h2 class="slds-text-heading_medium">
+                            <lightning:icon iconName="utility:edit" size="small"/>
+                            Modifier un Objet
+                        </h2>
+                        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Nom de l'objet">Nom de l'objet</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Champs Exclus" style="text-align:center">Champs Exclus</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Objet de jointure">Objet de jointure</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Champ de jointure" style="text-align:center">Champ de jointure</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Actif">Actif</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate" title="Priorité">Priorité</div>
+                                    </th>
+                                    <th class="slds-cell-shrink" scope="col">
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tr class="slds-hint-parent">
+                                <td data-label="Nom de l'objet" style="vertical-align:middle">
+                                    <div class="slds-form-element__control" >
+                                        <lightning:formattedText aura:id="propNomObjetModif" name="propNomObjetModif" class="slds-form-element__static" value="{!v.metadataToModify.nomObjet__c}" />
+                                    </div>
+                                </td>
+                                <td data-label="Champs Exclus">
+                                    <lightning:dualListbox aura:id="propChampsExclusModif" name="propChampsExclusModif"  label="" 
+                                                           sourceLabel="Champs disponibles" 
+                                                           selectedLabel="Champs sélectionnés" 
+                                                           options="{!v.picklistVal_ChampsExclus}" 
+                                                           value="{!v.defaultOptionsModif}"
+                                                           />
+                                </td>
+                                <td data-label="Objet de jointure" style="vertical-align:middle">
+                                    <lightning:select aura:id="propObjetJointureModif" name="propObjetJointureModif" onchange="{!c.objectJointChangedModify}" value="{!v.objetJointure}">
+                                        <option value=""></option> 
+                                        <aura:iteration items="{!v.picklistVal_ObjetJointure}" var="item">
+                                            <option value="{!item}" text="{!item}" selected="{!item==v.objetJointure}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </td>
+                                <td data-label="Champ de jointure">
+                                    <lightning:dualListbox aura:id="propChampJointureModif" name="propChampJointureModif"  label="" 
+                                                           sourceLabel="Champs disponibles" 
+                                                           selectedLabel="Champs sélectionnés" 
+                                                           options="{!v.picklistVal_ChampJointure}" 
+                                                           value="{!v.defaultOptions2Modif}"
+                                                           onchange="{!c.champJointureChangeModify}"
+                                                           />
+                                </td>
+                                <td data-label="Actif" style="vertical-align:middle">
+                                    <lightning:input type="checkbox" aura:id="propActifModif" name="propActifModif" label=""/>
+                                </td>
+                                <td data-label="Priorité" style="vertical-align:middle">
+                                    <lightning:input type="number" aura:id="propPrioriteModif" name="propPrioriteModif" label="" min="1"/>
+                                </td>
+                                <td class="slds-cell-shrink" style="vertical-align:middle">
+                                    <div style="margin-top: 2px;">
+                                        <lightning:buttonGroup >
+                                            <lightning:button variant="neutral" onclick="{!c.doModifyMetadata}" label="Modifier" />
+                                        </lightning:buttonGroup>
+                                    </div>
+                                </td>
+                                <div aura:id="displayError"></div>
+                                <div aura:id="displaySuccess"></div>
+                            </tr>
+                        </table>
+                    </aura:if>
+                </div>	
+            </div>
+        </div>
+    </lightning:card>
+</aura:component>

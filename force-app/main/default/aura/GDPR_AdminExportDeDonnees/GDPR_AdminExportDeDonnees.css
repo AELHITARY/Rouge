@@ -1,0 +1,69 @@
+.THIS {
+    background: white;
+    font-family: 'Helvetica';
+    color: #3c3d3e;
+    /* background: none transparent; */
+    margin: 0;
+    padding: 10px 20px 0 20px;
+    height: 100%;
+    overflow: auto;
+    border-radius: 0.25rem;
+}
+.THIS a.mylink{
+  text-decoration:none;
+  color:#015ba7 !important;
+  
+  }
+  
+ .THIS .lbl{
+  font-weight:bold;
+  font-size:11px;
+  margin-right:5px;
+  margin-left: 8px;  
+  
+  }
+  
+ .THIS a.btn {
+    height:30px;
+    padding: 4px 3px !important;
+	margin-right: 4px !important; 
+    text-decoration:none;
+  }
+  
+ .THIS  a.btn:hover {
+    text-decoration:none;
+  }
+
+.THIS .theTabPanel{margin-top:.75em !important;background-color:#8e9dbe;padding-top:2px}
+.THIS .theTabPanel img{margin:0}
+.THIS .activeTab{background-image:url(/img/tab/miniTab_on.gif);border:1px solid #747e96;border-bottom:2px solid #fff;font-weight:bold}
+.THIS .inactiveTab{background:url(/img/tab/miniTab_off.gif);border:1px solid #747e96;border-bottom:2px solid #8e9dbe;font-weight:bold}
+.THIS .tabContent{background:#fff}
+.THIS .dr-tbpnl-cntnt{font-size:.91em}
+.THIS .apexp .totalRow{background-color:#fff;border-bottom:medium none;border-top:1px solid #e3deb8;padding-bottom:10px;padding-top:10px}
+.THIS .classDefTypeHeader{font-size:91%;font-weight:bold;margin-bottom:2px;margin-top:8px;overflow:hidden;padding:2px 2px 2px 5px;background-color:#ebecf2;color:#333}
+.THIS .classDefBody{padding-top:12px;padding-right:12px;padding-left:12px;padding-bottom:0}
+.THIS .classDefBodyName{padding-bottom:8px}
+.THIS .acSizeLimitMessageWrapper .message{margin-bottom:15px}
+.THIS .apexClassDetailTabPanelWrapper{margin-top:20px}
+.THIS .classDef .codeGroupHeader .codeGroupHeaderSig{font-size:1.45em;font-weight:bold}
+.THIS .manageSettingDefaultOrgValuesWrapper{margin-top:10px;margin-bottom:30px}
+.THIS body .theTabPanel{background-color:transparent}
+.THIS body .rich-tab-bottom-line,.THIS body .rich-tabpanel-content,.THIS body .rich-tabpanel-content-position,.THIS body .rich-tabhdr-side-cell,.THIS body .rich-tab-header,.THIS body .rich-tab-active,.THIS body .dr-tbpnl-tb-dsbl,.THIS body .dr-tbpnl-tb-dsbld,.THIS body .rich-tab-inactive,.THIS body .dr-tbpnl-tb-sel,.THIS body .rich-tabhdr-side-border,.THIS body .dr-tbpnl-tbcell-dsbld,.THIS body .rich-tabhdr-cell-inactive{border:0 none;padding:0;background:transparent none;font-size:1em}
+.THIS body .rich-tabpanel-content{border:1px solid #d4dadc;border-top:3px solid #747e96;-moz-border-radius:4px;-webkit-border-radius:4px;background-color:#f8f8f8;padding:6px}
+.THIS body .activeTab,.THIS body .inactiveTab{font-weight:bold;color:#333;text-decoration:none}
+.THIS body .rich-tabhdr-cell-active>table[id$="shifted"] td.rich-tabhdr-side-cell{padding-right:9px}
+.THIS body .rich-tabhdr-cell-inactive>table[id$="shifted"] td.rich-tabhdr-side-cell{padding-right:4px}
+.THIS body .rich-tabhdr-cell-active>table[id$="shifted"] td.rich-tabhdr-side-cell,.THIS body .rich-tabhdr-cell-inactive>table[id$="shifted"] td.rich-tabhdr-side-cell,.THIS body .rich-tabhdr-cell-active>table[id$="shifted"] td.rich-tabhdr-side-cell td.rich-tab-active,.THIS body .rich-tabhdr-cell-inactive>table[id$="shifted"] td.rich-tabhdr-side-cell td.rich-tab-inactive{background:transparent url('/img/alohaSkin/subtab_sprite.png') no-repeat right -299px !important;cursor:pointer}
+.THIS body .rich-tabhdr-cell-active>table[id$="shifted"] td.rich-tabhdr-side-cell{background-position:right -100px !important}
+.THIS body .rich-tabhdr-cell-active>table[id$="shifted"] td.rich-tabhdr-side-cell td.rich-tab-active{padding:8px 2px 4px 11px;background-position:left top !important}
+.THIS body .rich-tabhdr-cell-inactive>table[id$="shifted"] td.rich-tabhdr-side-cell td.rich-tab-inactive{padding:8px 4px 4px 8px;background-position:left -199px !important}
+.THIS body table[id$="connectionTab_shifted"],.THIS body table[id$="apexClassTab_shifted"],.THIS body table[id$="classCodeTab_shifted"],.THIS body table[id$="apexTriggerTab_shifted"],.THIS body table[id$="emailContentTab_shifted"],.THIS body table[id$="visualforceMarkupTab_shifted"]{margin-left:1px}
+.THIS body table[id$="templateTab_shifted"],.THIS body table[id$="versionSettingsTab_shifted"],.THIS body table[id$="classDocTab_shifted"],.THIS body table[id$="traceSettingsTab_shifted"]{margin-left:-6px}
+.THIS body .rich-tabhdr-cell-active>table[id$="shifted"]{top:0 !important;margin-bottom:-3px;height:29px !important;z-index:1}
+.THIS body .rich-tabhdr-cell-inactive>table[id$="shifted"]{height:24px !important}
+.THIS body.setupTab a.acDownloadLink{text-decoration:none;padding:3px 5px 4px}
+.THIS body.setupTab a.acDownloadLink:hover{color:#333;text-decoration:none}
+.THIS .compRefLink{margin-left:5px}
+.THIS .newSpacer{padding:5px}
+.THIS .vfPageDetailWrapper{margin-top:15px;margin-bottom:15px}

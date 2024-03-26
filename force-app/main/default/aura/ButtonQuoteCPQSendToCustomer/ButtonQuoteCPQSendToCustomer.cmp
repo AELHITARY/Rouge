@@ -1,0 +1,3 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,lightning:availableForFlowActions" access="global">
+    <c:quoteCPQSendToCustomer recordId="{!v.recordId}" onclose="{!c.closeQA}"/>
+</aura:component>

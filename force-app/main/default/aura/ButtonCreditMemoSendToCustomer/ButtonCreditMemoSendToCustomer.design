@@ -1,0 +1,6 @@
+<design:component >
+    <design:attribute name="recordId" label="recordId" />
+    <sfdc:objects>
+        <sfdc:object>CreditMemo__c</sfdc:object>
+    </sfdc:objects>
+</design:component>

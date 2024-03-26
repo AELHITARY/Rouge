@@ -1,0 +1,9 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="Ctrl_ButtonCollaboratorCalcManager" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <div> 
+        <div class="slds-is-relative">
+            <lightning:spinner alternativeText="Chargement" size="medium" />
+        </div>
+    </div>
+</aura:component>

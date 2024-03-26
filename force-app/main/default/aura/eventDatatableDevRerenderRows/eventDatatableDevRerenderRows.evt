@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION">
+    <aura:attribute name="codeMagasin" type="String"/>
+    <aura:attribute name="userRole" type="String"/>
+    <aura:attribute name="userName" type="String"/>
+    <aura:attribute name="startDatetime" type="Datetime"/>
+    <aura:attribute name="endDatetime" type="Datetime"/>
+</aura:event>
