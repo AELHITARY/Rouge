@@ -1,7 +1,8 @@
 
   <template> 
         <div class="slds-box">
-                <div>i'm the component => {recordId}</div>
+                <div>i'm the component -----=> {recordId}</div>
+                <div>actionName -----=> {actionName}</div>
                 <div if:true={DisplayText}>{textValue}</div> 
         </div>  
         <lightning-card title="List des Actifs" icon-name="standard:account">      
@@ -18,6 +19,7 @@
                         {assets.error}
                 </template>
         </lightning-card>
+        
         <template if:true={assets.data}>
                 <template for:each={assets.data} for:item="asset">
                     <p key={asset.Id}>{asset.Name}</p>
@@ -25,5 +27,41 @@
             </template>
             <template if:true={assets.error}>
                 {assets.error}
-        </template>
+        </template>        
+
+        <div
+    class="slds-grid slds-grid_vertical"
+    style="background-color: white; height: 100%"
+  >
+    <c-image-selector
+      if:false={canSelectImage}
+      all-images-data={allImagesData}
+      onselectimages={handleImagesSelected}
+      ondelete={handleDeleteImage}
+      onannotateimage={handleAnnotateImage}
+      onuploadrequest={handleUploadRequested}
+      style="height: 100%"
+    ></c-image-selector>
+    <c-image-annotate
+      if:true={isImageSelected}
+      image-info={selectedImageInfo}
+      onsave={handleSaveAnnotatedImage}
+      ondiscard={handleImageDiscarded}
+      ondelete={handleDeleteImage}
+      style="height: 100%"
+    ></c-image-annotate>
+  </div>
+
+  <c-toast-message
+    if:true={shouldShowToast}
+    message={toastMessage}
+    type={toastType}
+    onclose={hideToast}
+  ></c-toast-message>
+
+  <c-loading-spinner
+    if:true={isUploading}
+    loading-message="Uploading..."
+  ></c-loading-spinner>
+  <c-loading-spinner if:true={isReading} loading-message=""></c-loading-spinner>
 </template>
